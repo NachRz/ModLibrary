@@ -5,47 +5,20 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class RawgApiService
+class RawgService
 {
-    protected $baseUrl = 'https://api.rawg.io/api';
     protected $apiKey;
+    protected $baseUrl = 'https://api.rawg.io/api';
 
     public function __construct()
     {
         $this->apiKey = config('services.rawg.api_key');
     }
 
-    public function getGames($page = 1, $pageSize = 20)
+    public function getGame($id)
     {
         try {
-            $response = Http::get("{$this->baseUrl}/games", [
-                'key' => $this->apiKey,
-                'page' => $page,
-                'page_size' => $pageSize,
-            ]);
-
-            if ($response->successful()) {
-                return $response->json();
-            }
-
-            Log::error('Error al obtener juegos de RAWG API', [
-                'status' => $response->status(),
-                'response' => $response->json()
-            ]);
-
-            return null;
-        } catch (\Exception $e) {
-            Log::error('Excepción al obtener juegos de RAWG API', [
-                'message' => $e->getMessage()
-            ]);
-            return null;
-        }
-    }
-
-    public function getGameDetails($gameId)
-    {
-        try {
-            $response = Http::get("{$this->baseUrl}/games/{$gameId}", [
+            $response = Http::get("{$this->baseUrl}/games/{$id}", [
                 'key' => $this->apiKey
             ]);
 
@@ -53,18 +26,46 @@ class RawgApiService
                 return $response->json();
             }
 
-            Log::error('Error al obtener detalles del juego de RAWG API', [
-                'game_id' => $gameId,
+            Log::error('Error al obtener juego de RAWG', [
                 'status' => $response->status(),
                 'response' => $response->json()
             ]);
 
             return null;
         } catch (\Exception $e) {
-            Log::error('Excepción al obtener detalles del juego de RAWG API', [
-                'game_id' => $gameId,
-                'message' => $e->getMessage()
+            Log::error('Excepción al obtener juego de RAWG', [
+                'error' => $e->getMessage()
             ]);
+
+            return null;
+        }
+    }
+
+    public function searchGames($query, $page = 1, $pageSize = 20)
+    {
+        try {
+            $response = Http::get("{$this->baseUrl}/games", [
+                'key' => $this->apiKey,
+                'search' => $query,
+                'page' => $page,
+                'page_size' => $pageSize
+            ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            Log::error('Error al buscar juegos en RAWG', [
+                'status' => $response->status(),
+                'response' => $response->json()
+            ]);
+
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Excepción al buscar juegos en RAWG', [
+                'error' => $e->getMessage()
+            ]);
+
             return null;
         }
     }

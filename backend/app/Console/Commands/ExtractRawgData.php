@@ -2,13 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Services\RawgApiService;
+use App\Services\RawgService;
 use Illuminate\Console\Command;
-use App\Models\Game;
-use App\Models\Genre;
-use App\Models\Platform;
-use App\Models\Developer;
-use App\Models\Publisher;
+use App\Models\Juego;
 use Illuminate\Support\Facades\Log;
 
 class ExtractRawgData extends Command
@@ -18,7 +14,7 @@ class ExtractRawgData extends Command
 
     protected $rawgService;
 
-    public function __construct(RawgApiService $rawgService)
+    public function __construct(RawgService $rawgService)
     {
         parent::__construct();
         $this->rawgService = $rawgService;
@@ -31,7 +27,7 @@ class ExtractRawgData extends Command
 
         for ($page = 1; $page <= $pages; $page++) {
             $this->info("Procesando página {$page} de {$pages}...");
-            $games = $this->rawgService->getGames($page);
+            $games = $this->rawgService->searchGames('', $page);
 
             if (!$games || !isset($games['results'])) {
                 $this->error("No se pudieron obtener juegos de la página {$page}");
@@ -50,71 +46,33 @@ class ExtractRawgData extends Command
     {
         try {
             // Obtener detalles completos del juego
-            $gameDetails = $this->rawgService->getGameDetails($gameData['id']);
+            $gameDetails = $this->rawgService->getGame($gameData['id']);
             if (!$gameDetails) {
                 $this->error("No se pudieron obtener detalles del juego {$gameData['id']}");
                 return;
             }
 
             // Crear o actualizar el juego
-            $game = Game::updateOrCreate(
+            $juego = Juego::updateOrCreate(
                 ['rawg_id' => $gameData['id']],
                 [
-                    'title' => $gameData['name'],
-                    'description' => $gameDetails['description_raw'] ?? $gameData['description'],
-                    'release_date' => $gameData['released'],
-                    'rating' => $gameData['rating'],
-                    'background_image' => $gameData['background_image'],
-                    'website' => $gameDetails['website'] ?? null,
+                    'slug' => $gameData['slug'] ?? null,
+                    'titulo' => $gameData['name'] ?? 'Sin título',
+                    'titulo_original' => $gameData['name_original'] ?? $gameData['name'] ?? 'Sin título original',
+                    'descripcion' => $gameDetails['description'] ?? 'Sin descripción',
                     'metacritic' => $gameData['metacritic'] ?? null,
+                    'fecha_lanzamiento' => $gameData['released'] ?? null,
+                    'tba' => $gameData['tba'] ?? false,
+                    'actualizado' => $gameData['updated'] ?? now(),
+                    'imagen_fondo' => $gameData['background_image'] ?? null,
+                    'imagen_fondo_adicional' => $gameData['background_image_additional'] ?? null,
+                    'sitio_web' => $gameData['website'] ?? null,
+                    'rating' => $gameData['rating'] ?? 0,
+                    'rating_top' => $gameData['rating_top'] ?? 0
                 ]
             );
 
-            // Procesar géneros
-            if (isset($gameData['genres'])) {
-                foreach ($gameData['genres'] as $genreData) {
-                    $genre = Genre::firstOrCreate(
-                        ['rawg_id' => $genreData['id']],
-                        ['name' => $genreData['name']]
-                    );
-                    $game->genres()->syncWithoutDetaching([$genre->id]);
-                }
-            }
-
-            // Procesar plataformas
-            if (isset($gameData['platforms'])) {
-                foreach ($gameData['platforms'] as $platformData) {
-                    $platform = Platform::firstOrCreate(
-                        ['rawg_id' => $platformData['platform']['id']],
-                        ['name' => $platformData['platform']['name']]
-                    );
-                    $game->platforms()->syncWithoutDetaching([$platform->id]);
-                }
-            }
-
-            // Procesar desarrolladores
-            if (isset($gameDetails['developers'])) {
-                foreach ($gameDetails['developers'] as $developerData) {
-                    $developer = Developer::firstOrCreate(
-                        ['rawg_id' => $developerData['id']],
-                        ['name' => $developerData['name']]
-                    );
-                    $game->developers()->syncWithoutDetaching([$developer->id]);
-                }
-            }
-
-            // Procesar editores
-            if (isset($gameDetails['publishers'])) {
-                foreach ($gameDetails['publishers'] as $publisherData) {
-                    $publisher = Publisher::firstOrCreate(
-                        ['rawg_id' => $publisherData['id']],
-                        ['name' => $publisherData['name']]
-                    );
-                    $game->publishers()->syncWithoutDetaching([$publisher->id]);
-                }
-            }
-
-            $this->info("Juego procesado: {$game->title}");
+            $this->info("Juego procesado: {$juego->titulo}");
         } catch (\Exception $e) {
             Log::error('Error al procesar juego', [
                 'game_id' => $gameData['id'],

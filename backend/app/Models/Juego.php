@@ -14,8 +14,26 @@ class Juego extends Model
 
     protected $fillable = [
         'rawg_id',
+        'slug',
         'titulo',
-        'imagen'
+        'titulo_original',
+        'descripcion',
+        'metacritic',
+        'fecha_lanzamiento',
+        'tba',
+        'actualizado',
+        'imagen_fondo',
+        'imagen_fondo_adicional',
+        'sitio_web',
+        'rating',
+        'rating_top'
+    ];
+
+    protected $casts = [
+        'fecha_lanzamiento' => 'date',
+        'tba' => 'boolean',
+        'actualizado' => 'datetime',
+        'rating' => 'decimal:2'
     ];
 
     public function mods(): HasMany
