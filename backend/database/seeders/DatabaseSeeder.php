@@ -14,9 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UsuarioSeeder::class,
             JuegoSeeder::class,
-            EtiquetaSeeder::class,
             ModSeeder::class,
-            ModEtiquetaSeeder::class,
             ComentarioSeeder::class,
             ValoracionSeeder::class,
             ModGuardadoSeeder::class,
