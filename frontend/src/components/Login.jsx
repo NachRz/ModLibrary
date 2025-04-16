@@ -1,13 +1,42 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí irá la lógica de autenticación
-    console.log('Login attempt:', { email, password });
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/login', {
+        correo: email,
+        contrasina: password
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        withCredentials: true
+      });
+
+      // Guardar el token en localStorage
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+
+      // Redirigir al dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,6 +53,11 @@ const Login = () => {
             </a>
           </p>
         </div>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <input type="hidden" name="remember" defaultValue="true" />
           <div className="rounded-md shadow-sm -space-y-px">
@@ -41,6 +75,7 @@ const Login = () => {
                 placeholder="Correo electrónico"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
             </div>
             <div>
@@ -57,6 +92,7 @@ const Login = () => {
                 placeholder="Contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
               />
             </div>
           </div>
@@ -68,6 +104,7 @@ const Login = () => {
                 name="remember-me"
                 type="checkbox"
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                disabled={loading}
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
                 Recordarme
@@ -84,7 +121,8 @@ const Login = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              disabled={loading}
             >
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                 <svg
@@ -101,7 +139,7 @@ const Login = () => {
                   />
                 </svg>
               </span>
-              Iniciar sesión
+              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
           </div>
         </form>
