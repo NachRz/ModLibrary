@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Footer from '../layout/Footer';
+import { Link, useLocation } from 'react-router-dom';
 import Tabs from '../common/Tabs';
 
-const Dashboard = () => {
+const Dashboard = ({ defaultTab = 0 }) => {
   const [activeTab, setActiveTab] = useState('recomendados');
   const [timeFilter, setTimeFilter] = useState('semana');
   const [userData, setUserData] = useState({
@@ -12,6 +11,33 @@ const Dashboard = () => {
     modsInstalled: 45,
     favorites: 8
   });
+  
+  // Obtener la ubicación actual para poder reaccionar a cambios de ruta
+  const location = useLocation();
+  const [currentTab, setCurrentTab] = useState(defaultTab);
+  
+  // Actualizar la pestaña activa basada en la ruta actual
+  useEffect(() => {
+    const pathToTabIndex = {
+      '/dashboard': 0,
+      '/dashboard/mis-mods': 1,
+      '/dashboard/mis-juegos': 2,
+      '/dashboard/juegos-favoritos': 3,
+      '/dashboard/guardados': 4
+    };
+    
+    // Determinar la pestaña activa basada en la ruta actual
+    const tabIndex = pathToTabIndex[location.pathname] !== undefined 
+      ? pathToTabIndex[location.pathname] 
+      : defaultTab;
+    
+    setCurrentTab(tabIndex);
+  }, [location.pathname, defaultTab]);
+
+  // Función para manejar cambios de pestaña
+  const handleTabChange = (index) => {
+    setCurrentTab(index);
+  };
 
   // Datos de ejemplo para mods
   const mods = [
@@ -324,7 +350,7 @@ const Dashboard = () => {
           <p className="text-3xl font-bold mt-2">{userData.modsCreated}</p>
         </div>
         <div className="bg-custom-secondary text-custom-text p-4 rounded-custom shadow-custom">
-          <h3 className="text-sm font-medium opacity-80">Mods Instalados</h3>
+          <h3 className="text-sm font-medium opacity-80">Mods Descargados</h3>
           <p className="text-3xl font-bold mt-2">{userData.modsInstalled}</p>
         </div>
         <div className="bg-custom-primary-hover text-custom-text p-4 rounded-custom shadow-custom">
@@ -445,10 +471,10 @@ const Dashboard = () => {
             </div>
             <div className="p-4">
               <h4 className="text-custom-text font-medium">Juego de Ejemplo {game}</h4>
-              <p className="text-custom-detail text-sm mt-1">{5 + game} mods instalados</p>
+              <p className="text-custom-detail text-sm mt-1">{5 + game} mods descargados</p>
               <div className="mt-3 pt-3 border-t border-custom-detail/10">
                 <button className="w-full bg-custom-primary/10 hover:bg-custom-primary/20 text-custom-primary font-medium py-2 rounded transition-colors">
-                  Ver mods instalados
+                  Ver mods descargados
                 </button>
               </div>
             </div>
@@ -458,77 +484,222 @@ const Dashboard = () => {
     </div>
   );
 
-  // Componente para configuración
-  const SettingsPanel = () => (
-    <div className="bg-custom-card rounded-custom p-6 shadow-custom">
-      <h3 className="text-lg font-semibold text-custom-text mb-6">Configuración de la cuenta</h3>
-      
-      <div className="space-y-6">
-        <div>
-          <label className="block text-custom-detail mb-2">Nombre de usuario</label>
-          <input
-            type="text"
-            defaultValue={userData.username}
-            className="w-full bg-custom-bg border border-custom-detail/20 rounded-md px-4 py-2 text-custom-text focus:outline-none focus:ring-2 focus:ring-custom-primary/50"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-custom-detail mb-2">Correo electrónico</label>
-          <input
-            type="email"
-            defaultValue="usuario@ejemplo.com"
-            className="w-full bg-custom-bg border border-custom-detail/20 rounded-md px-4 py-2 text-custom-text focus:outline-none focus:ring-2 focus:ring-custom-primary/50"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-custom-detail mb-2">Notificaciones</label>
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="notify-updates"
-                defaultChecked
-                className="h-4 w-4 text-custom-primary focus:ring-custom-primary border-custom-detail rounded"
-              />
-              <label htmlFor="notify-updates" className="ml-2 text-custom-text">
-                Actualizaciones de mods
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="notify-comments"
-                defaultChecked
-                className="h-4 w-4 text-custom-primary focus:ring-custom-primary border-custom-detail rounded"
-              />
-              <label htmlFor="notify-comments" className="ml-2 text-custom-text">
-                Comentarios en mis mods
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="notify-messages"
-                defaultChecked
-                className="h-4 w-4 text-custom-primary focus:ring-custom-primary border-custom-detail rounded"
-              />
-              <label htmlFor="notify-messages" className="ml-2 text-custom-text">
-                Mensajes privados
-              </label>
-            </div>
+  // Componente para mods guardados
+  const SavedModsPanel = () => {
+    const savedMods = [
+      {
+        id: 1,
+        name: "Enhanced Graphics Overhaul",
+        game: "Skyrim",
+        author: "GraphicsMaster",
+        rating: 4.8,
+        downloads: 25420,
+        dateAdded: "10/06/2023"
+      },
+      {
+        id: 2,
+        name: "Advanced Combat System",
+        game: "Fallout 4",
+        author: "CombatPro",
+        rating: 4.6,
+        downloads: 18750,
+        dateAdded: "22/07/2023"
+      },
+      {
+        id: 3,
+        name: "Realistic Weather Effects",
+        game: "GTA V",
+        author: "WeatherWizard",
+        rating: 4.9,
+        downloads: 32105,
+        dateAdded: "05/08/2023"
+      },
+      {
+        id: 4,
+        name: "UI Enhancement Suite",
+        game: "The Witcher 3",
+        author: "UIDesigner",
+        rating: 4.7,
+        downloads: 15680,
+        dateAdded: "17/09/2023"
+      }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-custom-text">Mods Guardados</h3>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Buscar mods..."
+              className="bg-custom-card border border-custom-detail/20 rounded-md px-4 py-2 text-custom-text placeholder-custom-detail/50 focus:outline-none focus:ring-2 focus:ring-custom-primary/50"
+            />
           </div>
         </div>
-        
-        <div className="pt-4 border-t border-custom-detail/10">
-          <button className="bg-custom-primary hover:bg-custom-primary-hover text-custom-text px-4 py-2 rounded-md transition-colors">
-            Guardar cambios
-          </button>
+
+        <div className="space-y-4">
+          {savedMods.map(mod => (
+            <div key={mod.id} className="bg-custom-card rounded-custom p-4 border border-custom-detail/10 shadow-custom hover:shadow-custom-lg transition-all duration-300">
+              <div className="flex items-start">
+                <div className="bg-custom-primary/10 rounded-md h-20 w-20 flex items-center justify-center">
+                  <span className="text-custom-primary text-xs">MOD</span>
+                </div>
+                <div className="ml-4 flex-1">
+                  <div className="flex justify-between">
+                    <div>
+                      <h4 className="text-custom-text font-medium">{mod.name}</h4>
+                      <p className="text-custom-detail text-sm">Para {mod.game} • Por {mod.author}</p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button className="text-custom-detail hover:text-custom-secondary transition-colors">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                      </button>
+                      <button className="text-custom-detail hover:text-custom-error transition-colors">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center text-custom-detail text-sm space-x-4">
+                    <span>⭐ {mod.rating}/5</span>
+                    <span>📥 {mod.downloads.toLocaleString()}</span>
+                    <span>📅 Guardado: {mod.dateAdded}</span>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-custom-detail/10 flex justify-between">
+                    <button className="text-sm text-custom-secondary font-medium hover:text-custom-secondary-hover transition-colors">
+                      Ver detalles
+                    </button>
+                    <button className="text-sm px-4 py-1 bg-custom-primary text-custom-text rounded-md hover:bg-custom-primary-hover transition-colors">
+                      Descargar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  // Componente para juegos favoritos
+  const FavoriteGamesPanel = () => {
+    const favoriteGames = [
+      {
+        id: 1,
+        name: "The Elder Scrolls V: Skyrim",
+        developer: "Bethesda Game Studios",
+        releaseYear: 2011,
+        genre: "RPG",
+        lastPlayed: "Hace 2 días",
+        modsCount: 24,
+        totalHours: 342
+      },
+      {
+        id: 2,
+        name: "Grand Theft Auto V",
+        developer: "Rockstar North",
+        releaseYear: 2013,
+        genre: "Acción/Aventura",
+        lastPlayed: "Ayer",
+        modsCount: 18,
+        totalHours: 215
+      },
+      {
+        id: 3,
+        name: "Fallout 4",
+        developer: "Bethesda Game Studios",
+        releaseYear: 2015,
+        genre: "RPG",
+        lastPlayed: "Hace 1 semana",
+        modsCount: 31,
+        totalHours: 278
+      },
+      {
+        id: 4,
+        name: "The Witcher 3: Wild Hunt",
+        developer: "CD Projekt Red",
+        releaseYear: 2015,
+        genre: "RPG",
+        lastPlayed: "Hace 3 días",
+        modsCount: 15,
+        totalHours: 189
+      }
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-custom-text">Juegos Favoritos</h3>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Buscar juegos..."
+              className="bg-custom-card border border-custom-detail/20 rounded-md px-4 py-2 text-custom-text placeholder-custom-detail/50 focus:outline-none focus:ring-2 focus:ring-custom-primary/50"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          {favoriteGames.map(game => (
+            <div key={game.id} className="bg-custom-card rounded-custom p-4 border border-custom-detail/10 shadow-custom hover:shadow-custom-lg transition-all duration-300">
+              <div className="flex items-start">
+                <div className="bg-gradient-to-br from-custom-primary/20 to-custom-secondary/20 rounded-md h-24 w-24 flex items-center justify-center">
+                  <span className="text-custom-detail text-xs">JUEGO</span>
+                </div>
+                <div className="ml-4 flex-1">
+                  <div className="flex justify-between">
+                    <div>
+                      <h4 className="text-custom-text font-medium">{game.name}</h4>
+                      <p className="text-custom-detail text-sm">{game.developer} • {game.releaseYear} • {game.genre}</p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <button className="text-custom-secondary hover:text-custom-secondary-hover transition-colors">
+                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                      <button className="text-custom-detail hover:text-custom-text transition-colors">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    <div className="bg-custom-bg/50 rounded p-2 text-center">
+                      <p className="text-xs text-custom-detail">Mods</p>
+                      <p className="text-custom-text font-medium">{game.modsCount}</p>
+                    </div>
+                    <div className="bg-custom-bg/50 rounded p-2 text-center">
+                      <p className="text-xs text-custom-detail">Horas</p>
+                      <p className="text-custom-text font-medium">{game.totalHours}</p>
+                    </div>
+                    <div className="bg-custom-bg/50 rounded p-2 text-center">
+                      <p className="text-xs text-custom-detail">Último juego</p>
+                      <p className="text-custom-text font-medium text-xs">{game.lastPlayed}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-custom-detail/10 flex justify-between">
+                    <button className="text-sm text-custom-secondary font-medium hover:text-custom-secondary-hover transition-colors">
+                      Ver perfil del juego
+                    </button>
+                    <button className="text-sm px-4 py-1 bg-custom-primary text-custom-text rounded-md hover:bg-custom-primary-hover transition-colors">
+                      Explorar mods
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const tabs = [
     {
@@ -544,40 +715,23 @@ const Dashboard = () => {
       content: <MyGamesPanel />,
     },
     {
-      label: 'Configuración',
-      content: <SettingsPanel />,
+      label: 'Juegos Favoritos',
+      content: <FavoriteGamesPanel />,
+    },
+    {
+      label: 'Guardados',
+      content: <SavedModsPanel />,
     },
   ];
 
   return (
-    <div className="min-h-screen bg-custom-bg">
-      {/* Cabecera del dashboard */}
-      <header className="bg-custom-card shadow-custom">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-custom-text">Dashboard</h1>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-custom-text">{userData.username}</p>
-                <p className="text-custom-detail text-sm">Miembro</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-custom-primary flex items-center justify-center text-custom-text">
-                {userData.username.charAt(0)}
-              </div>
-            </div>
-          </div>
+    <div className="bg-custom-bg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-3xl font-bold text-custom-text mb-6">Mi Panel</h1>
+        <div className="bg-custom-bg rounded-custom shadow-custom-lg overflow-hidden border border-white/20 ring-1 ring-white/10 shadow-white/10">
+          <Tabs tabs={tabs} defaultTab={currentTab} onTabChange={handleTabChange} />
         </div>
-      </header>
-
-      {/* Contenido principal */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-custom-bg rounded-custom shadow-custom-lg overflow-hidden">
-          <Tabs tabs={tabs} defaultTab={0} />
-        </div>
-      </main>
-
-      {/* Footer */}
-      <Footer />
+      </div>
     </div>
   );
 };

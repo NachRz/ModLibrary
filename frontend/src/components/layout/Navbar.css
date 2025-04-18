@@ -1,0 +1,93 @@
+/* Estilos para la barra de búsqueda desplegable */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 10;
+}
+
+.search-wrapper {
+  position: relative;
+  overflow: hidden;
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+  background-color: rgba(30, 41, 59, 0.8); /* Tono similar a bg-custom-card pero con transparencia */
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  display: flex;
+  align-items: center;
+}
+
+.search-wrapper-open {
+  width: 260px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2); /* custom-secondary con opacidad */
+  background-color: rgba(30, 41, 59, 0.95);
+}
+
+.search-input {
+  border: none;
+  height: 100%;
+  width: 100%;
+  padding: 0 15px;
+  font-size: 14px;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.search-wrapper-open .search-input {
+  opacity: 1;
+}
+
+.search-button {
+  position: absolute;
+  right: 0;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 20;
+  transition: all 0.3s ease;
+}
+
+.search-wrapper-open .search-button {
+  background-color: rgba(27, 79, 114, 0.3); /* custom-primary con opacidad */
+}
+
+.search-wrapper-open .search-button:hover {
+  background-color: rgba(27, 79, 114, 0.5); /* custom-primary con más opacidad */
+}
+
+/* Efecto de foco para el input de búsqueda */
+.search-input:focus {
+  outline: none;
+}
+
+/* Animación para el placeholder */
+.search-wrapper-open .search-input::placeholder {
+  opacity: 0.7;
+  transition: opacity 0.3s ease 0.2s;
+}
+
+/* Efecto de brillo en el borde cuando está abierto */
+@keyframes glow {
+  0% {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
+  }
+  50% {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(241, 143, 117, 0.3);
+  }
+  100% {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
+  }
+}
+
+.search-wrapper-open {
+  animation: glow 2s infinite;
+} 

@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Tabs = ({ tabs, defaultTab = 0, onTabChange }) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
+
+  // Actualizar activeTab cuando cambia defaultTab desde fuera
+  useEffect(() => {
+    setActiveTab(defaultTab);
+  }, [defaultTab]);
 
   const handleTabChange = (index) => {
     setActiveTab(index);
@@ -23,7 +28,7 @@ const Tabs = ({ tabs, defaultTab = 0, onTabChange }) => {
                 className={`
                   relative py-4 px-6 text-sm font-medium transition-all duration-300 overflow-hidden
                   ${activeTab === index
-                    ? 'text-custom-primary'
+                    ? 'text-custom-text font-semibold'
                     : 'text-custom-detail hover:text-custom-text'
                   }
                 `}
@@ -31,13 +36,15 @@ const Tabs = ({ tabs, defaultTab = 0, onTabChange }) => {
                 <span className="relative z-10">{tab.label}</span>
                 {/* Indicador activo */}
                 {activeTab === index && (
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-custom-primary"></span>
+                  <>
+                    <span className="absolute bottom-0 left-0 w-full h-1 bg-custom-secondary"></span>
+                    <span className="absolute inset-0 bg-custom-primary/15"></span>
+                  </>
                 )}
                 {/* Efecto hover */}
                 <span className={`
                   absolute bottom-0 left-0 w-full h-full transform transition-transform duration-300 
-                  ${activeTab === index ? 'bg-custom-primary/10' : 'bg-transparent'} 
-                  ${activeTab === index ? 'opacity-100' : 'opacity-0 hover:opacity-10'}
+                  ${activeTab === index ? 'opacity-100' : 'opacity-0 hover:opacity-10 bg-custom-primary/10'} 
                 `}></span>
               </button>
             ))}
