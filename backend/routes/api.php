@@ -13,6 +13,7 @@ Route::get('/test', function() {
 // Rutas de autenticación sin prefijo
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('auth:sanctum');
 
 // Rutas de juegos
 Route::prefix('juegos')->group(function () {

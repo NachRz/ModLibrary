@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -48,9 +48,9 @@ const Login = () => {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             O{' '}
-            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-              regístrate si aún no tienes cuenta
-            </a>
+            <Link to="/reset-password" className="font-medium text-indigo-600 hover:text-indigo-500">
+              cambiar tu contraseña
+            </Link>
           </p>
         </div>
         {error && (
@@ -112,9 +112,9 @@ const Login = () => {
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link to="/reset-password" className="font-medium text-indigo-600 hover:text-indigo-500">
                 ¿Olvidaste tu contraseña?
-              </a>
+              </Link>
             </div>
           </div>
 

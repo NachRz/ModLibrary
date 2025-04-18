@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Login from './components/Login';
+import ResetPassword from './components/ResetPassword';
 
 // Componente Dashboard básico
 const Dashboard = () => {
@@ -24,6 +25,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
     </Routes>
   );
