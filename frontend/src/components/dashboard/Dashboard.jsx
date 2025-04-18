@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../layout/Footer';
+import Tabs from '../common/Tabs';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('recomendados');
   const [timeFilter, setTimeFilter] = useState('semana');
+  const [userData, setUserData] = useState({
+    username: 'Usuario1',
+    modsCreated: 12,
+    modsInstalled: 45,
+    favorites: 8
+  });
 
   // Datos de ejemplo para mods
   const mods = [
@@ -307,104 +314,265 @@ const Dashboard = () => {
     </div>
   );
 
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header/Navbar */}
-      <header className="bg-indigo-600 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-white">ModLibrary</Link>
-            </div>
-            <div className="flex items-center">
-              <div className="relative mx-4">
-                <input
-                  type="text"
-                  placeholder="Buscar mods..."
-                  className="w-64 pl-10 pr-4 py-2 rounded-md border-none focus:ring-2 focus:ring-white"
-                />
-                <div className="absolute left-3 top-2.5 text-gray-400">
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+  // Componente para el panel de control
+  const OverviewPanel = () => (
+    <div className="space-y-6">
+      {/* Tarjetas de estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-custom-primary text-custom-text p-4 rounded-custom shadow-custom">
+          <h3 className="text-sm font-medium opacity-80">Mods Creados</h3>
+          <p className="text-3xl font-bold mt-2">{userData.modsCreated}</p>
+        </div>
+        <div className="bg-custom-secondary text-custom-text p-4 rounded-custom shadow-custom">
+          <h3 className="text-sm font-medium opacity-80">Mods Instalados</h3>
+          <p className="text-3xl font-bold mt-2">{userData.modsInstalled}</p>
+        </div>
+        <div className="bg-custom-primary-hover text-custom-text p-4 rounded-custom shadow-custom">
+          <h3 className="text-sm font-medium opacity-80">Favoritos</h3>
+          <p className="text-3xl font-bold mt-2">{userData.favorites}</p>
+        </div>
+        <div className="bg-custom-card text-custom-text p-4 rounded-custom shadow-custom border border-custom-detail/10">
+          <h3 className="text-sm font-medium text-custom-detail">Valoraciones</h3>
+          <p className="text-3xl font-bold mt-2 text-custom-secondary">4.8</p>
+        </div>
+      </div>
+
+      {/* Actividad reciente */}
+      <div className="bg-custom-card rounded-custom p-4 shadow-custom border border-custom-detail/10">
+        <h3 className="text-lg font-semibold text-custom-text mb-4">Actividad Reciente</h3>
+        <div className="space-y-3">
+          {[1, 2, 3].map(item => (
+            <div key={item} className="p-3 border-b border-custom-detail/10 last:border-0">
+              <div className="flex items-start">
+                <div className="bg-custom-primary/20 h-10 w-10 rounded-full flex items-center justify-center text-custom-primary">
+                  {item === 1 ? '⬇️' : item === 2 ? '⭐' : '📝'}
+                </div>
+                <div className="ml-4">
+                  <p className="text-custom-text">{
+                    item === 1 ? 'Has descargado un nuevo mod' : 
+                    item === 2 ? 'Has marcado un mod como favorito' : 
+                    'Has comentado en un mod'
+                  }</p>
+                  <p className="text-custom-detail text-sm">Hace {item} hora{item > 1 ? 's' : ''}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <button className="text-white hover:text-indigo-200">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                </button>
-                <button className="text-white hover:text-indigo-200">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </button>
-                <div className="ml-3 relative">
-                  <div>
-                    <button className="bg-indigo-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-600 focus:ring-white">
-                      <img className="h-8 w-8 rounded-full" src="https://via.placeholder.com/150" alt="Avatar del usuario" />
-                    </button>
-                  </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Componente para mis mods
+  const MyModsPanel = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-custom-text">Mis Mods</h3>
+        <button className="bg-custom-primary hover:bg-custom-primary-hover text-custom-text px-4 py-2 rounded-md transition-colors">
+          Crear Nuevo Mod
+        </button>
+      </div>
+
+      {userData.modsCreated > 0 ? (
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-custom-card rounded-custom p-4 border border-custom-detail/10 shadow-custom">
+              <div className="flex justify-between">
+                <div>
+                  <h4 className="text-custom-text font-medium">Mod de Ejemplo {i+1}</h4>
+                  <p className="text-custom-detail text-sm mt-1">Versión 1.{i+1}</p>
                 </div>
+                <div className="flex space-x-2">
+                  <button className="text-custom-detail hover:text-custom-text transition-colors">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                  <button className="text-custom-detail hover:text-custom-error transition-colors">
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="mt-3">
+                <div className="flex items-center text-custom-detail text-sm space-x-4">
+                  <span>Descargas: {(i+1)*124}</span>
+                  <span>Valoraciones: {4 + i*0.1}/5</span>
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-custom-detail/10 flex justify-between">
+                <button className="text-sm text-custom-secondary hover:text-custom-secondary/80 transition-colors">
+                  Ver estadísticas
+                </button>
+                <button className="text-sm text-custom-secondary hover:text-custom-text transition-colors">
+                  Subir actualización
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-custom-card rounded-custom p-6 text-center border border-dashed border-custom-detail/30">
+          <p className="text-custom-detail mb-4">Aún no has creado ningún mod</p>
+          <button className="bg-custom-primary hover:bg-custom-primary-hover text-custom-text px-4 py-2 rounded-md transition-colors">
+            Crear tu primer mod
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  // Componente para mis juegos
+  const MyGamesPanel = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-custom-text">Mis Juegos</h3>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Buscar juegos..."
+            className="bg-custom-card border border-custom-detail/20 rounded-md px-4 py-2 text-custom-text placeholder-custom-detail/50 focus:outline-none focus:ring-2 focus:ring-custom-primary/50"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[1, 2, 3, 4, 5].map(game => (
+          <div key={game} className="bg-custom-card rounded-custom shadow-custom overflow-hidden group">
+            <div className="h-32 bg-gradient-to-r from-custom-primary/20 to-custom-secondary/20 flex items-center justify-center">
+              <span className="text-custom-detail">Imagen del juego {game}</span>
+            </div>
+            <div className="p-4">
+              <h4 className="text-custom-text font-medium">Juego de Ejemplo {game}</h4>
+              <p className="text-custom-detail text-sm mt-1">{5 + game} mods instalados</p>
+              <div className="mt-3 pt-3 border-t border-custom-detail/10">
+                <button className="w-full bg-custom-primary/10 hover:bg-custom-primary/20 text-custom-primary font-medium py-2 rounded transition-colors">
+                  Ver mods instalados
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Componente para configuración
+  const SettingsPanel = () => (
+    <div className="bg-custom-card rounded-custom p-6 shadow-custom">
+      <h3 className="text-lg font-semibold text-custom-text mb-6">Configuración de la cuenta</h3>
+      
+      <div className="space-y-6">
+        <div>
+          <label className="block text-custom-detail mb-2">Nombre de usuario</label>
+          <input
+            type="text"
+            defaultValue={userData.username}
+            className="w-full bg-custom-bg border border-custom-detail/20 rounded-md px-4 py-2 text-custom-text focus:outline-none focus:ring-2 focus:ring-custom-primary/50"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-custom-detail mb-2">Correo electrónico</label>
+          <input
+            type="email"
+            defaultValue="usuario@ejemplo.com"
+            className="w-full bg-custom-bg border border-custom-detail/20 rounded-md px-4 py-2 text-custom-text focus:outline-none focus:ring-2 focus:ring-custom-primary/50"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-custom-detail mb-2">Notificaciones</label>
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="notify-updates"
+                defaultChecked
+                className="h-4 w-4 text-custom-primary focus:ring-custom-primary border-custom-detail rounded"
+              />
+              <label htmlFor="notify-updates" className="ml-2 text-custom-text">
+                Actualizaciones de mods
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="notify-comments"
+                defaultChecked
+                className="h-4 w-4 text-custom-primary focus:ring-custom-primary border-custom-detail rounded"
+              />
+              <label htmlFor="notify-comments" className="ml-2 text-custom-text">
+                Comentarios en mis mods
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="notify-messages"
+                defaultChecked
+                className="h-4 w-4 text-custom-primary focus:ring-custom-primary border-custom-detail rounded"
+              />
+              <label htmlFor="notify-messages" className="ml-2 text-custom-text">
+                Mensajes privados
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div className="pt-4 border-t border-custom-detail/10">
+          <button className="bg-custom-primary hover:bg-custom-primary-hover text-custom-text px-4 py-2 rounded-md transition-colors">
+            Guardar cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const tabs = [
+    {
+      label: 'Panel',
+      content: <OverviewPanel />,
+    },
+    {
+      label: 'Mis Mods',
+      content: <MyModsPanel />,
+    },
+    {
+      label: 'Mis Juegos',
+      content: <MyGamesPanel />,
+    },
+    {
+      label: 'Configuración',
+      content: <SettingsPanel />,
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-custom-bg">
+      {/* Cabecera del dashboard */}
+      <header className="bg-custom-card shadow-custom">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-custom-text">Dashboard</h1>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-custom-text">{userData.username}</p>
+                <p className="text-custom-detail text-sm">Miembro</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-custom-primary flex items-center justify-center text-custom-text">
+                {userData.username.charAt(0)}
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Tabs */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8 overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('recomendados')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'recomendados'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Recomendados
-            </button>
-            <button
-              onClick={() => setActiveTab('tendencias')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'tendencias'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Tendencias
-            </button>
-            <button
-              onClick={() => setActiveTab('categorias')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'categorias'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Categorías
-            </button>
-            <button
-              onClick={() => setActiveTab('busqueda')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'busqueda'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Búsqueda Avanzada
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {renderTabContent()}
+      {/* Contenido principal */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-custom-bg rounded-custom shadow-custom-lg overflow-hidden">
+          <Tabs tabs={tabs} defaultTab={0} />
         </div>
       </main>
 
