@@ -1,0 +1,891 @@
+{
+    "mods": [
+        {
+            "id": 1,
+            "Titulo": "expansion Galáctica",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "Exploration",
+                "new-world",
+                "dlc"
+            ],
+            "Juego": "Resident Evil 4",
+            "NumDescargas": 5000,
+            "VersionJuegoNecesaria": "1.4.2",
+            "VersionesAnteriores": [
+                "1.3.0",
+                "1.2.1"
+            ],
+            "VersionActual": "2.0.0",
+            "Url": "https://www.expansiongalactica.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 2,
+            "Titulo": "Nuevas Fronteras",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "expansion",
+                "finding",
+                "Aliens"
+            ],
+            "Juego": "Resident Evil 4",
+            "NumDescargas": 4000,
+            "VersionJuegoNecesaria": "1.4.2",
+            "VersionesAnteriores": [],
+            "VersionActual": "1.0.0",
+            "Url": "https://www.nuevasfronterasmod.com",
+            "Valoracion": 4.7,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 3,
+            "Titulo": "Conquista Estelar",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "space-combat",
+                "strategical",
+                "Tactical"
+            ],
+            "Juego": "Resident Evil 4",
+            "NumDescargas": 3000,
+            "VersionJuegoNecesaria": "1.4.2",
+            "VersionesAnteriores": [
+                "1.2.5",
+                "1.3.7"
+            ],
+            "VersionActual": "2.2.0",
+            "Url": "https://www.conquistaestelarmod.com",
+            "Valoracion": 4.6,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 4,
+            "Titulo": "Galaxias Lejanas",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "Exploration",
+                "adventures",
+                "Mystery"
+            ],
+            "Juego": "Resident Evil 4",
+            "NumDescargas": 3500,
+            "VersionJuegoNecesaria": "1.4.2",
+            "VersionesAnteriores": [
+                "1.1.0",
+                "1.3.3"
+            ],
+            "VersionActual": "2.3.0",
+            "Url": "https://www.galaxiaslejanasmod.com",
+            "Valoracion": 4.8,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 5,
+            "Titulo": "Rebeliósan Intergaláctica",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "rebellion",
+                "strategical"
+            ],
+            "Juego": "Resident Evil 4",
+            "NumDescargas": 4500,
+            "VersionJuegoNecesaria": "1.4.2",
+            "VersionesAnteriores": [
+                "1.3.9",
+                "1.4.0"
+            ],
+            "VersionActual": "2.4.0",
+            "Url": "https://www.rebelionintergalacticamod.com",
+            "Valoracion": 4.9,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 6,
+            "Titulo": "Historia de Reinos",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 16,
+            "Etiquetas": [
+                "rol",
+                "adventures",
+                "expansion"
+            ],
+            "Juego": "Dark Souls: Remastered",
+            "NumDescargas": 5200,
+            "VersionJuegoNecesaria": "2.0.1",
+            "VersionesAnteriores": [
+                "1.9.0",
+                "2.0.0"
+            ],
+            "VersionActual": "2.1.0",
+            "Url": "https://www.historysdereinosmod.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 7,
+            "Titulo": "Misterios Antiguos",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 16,
+            "Etiquetas": [
+                "Mystery",
+                "Exploration",
+                "Puzzles"
+            ],
+            "Juego": "Dark Souls: Remastered",
+            "NumDescargas": 4800,
+            "VersionJuegoNecesaria": "2.0.1",
+            "VersionesAnteriores": [],
+            "VersionActual": "2.2.0",
+            "Url": "https://www.Mysterysantiguosmod.com",
+            "Valoracion": 4.7,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 8,
+            "Titulo": "Guerreros del Oeste",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 18,
+            "Etiquetas": [
+                "adventures",
+                "history"
+            ],
+            "Juego": "Persona 5 Royal",
+            "NumDescargas": 5300,
+            "VersionJuegoNecesaria": "1.7.3",
+            "VersionesAnteriores": [
+                "1.6.0",
+                "1.6.5"
+            ],
+            "VersionActual": "1.8.0",
+            "Url": "https://www.guerrerosdeloestemod.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 9,
+            "Titulo": "Secretos de la Mansión",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 10,
+            "Etiquetas": [
+                "Puzzles",
+                "Mystery",
+                "adventures"
+            ],
+            "Juego": "Sekiro: Shadows Die Twice",
+            "NumDescargas": 4200,
+            "VersionJuegoNecesaria": "2.5.0",
+            "VersionesAnteriores": [
+                "2.4.0",
+                "2.4.5"
+            ],
+            "VersionActual": "2.6.0",
+            "Url": "https://www.secretosdelamansionmod.com",
+            "Valoracion": 4.8,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 10,
+            "Titulo": "Desafíos Futuristas",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 14,
+            "Etiquetas": [
+                "races",
+                "speed",
+                "tecnology"
+            ],
+            "Juego": "Cyberpunk 2077",
+            "NumDescargas": 5600,
+            "VersionJuegoNecesaria": "3.1.4",
+            "VersionesAnteriores": [
+                "3.0.0",
+                "3.1.0"
+            ],
+            "VersionActual": "3.2.0",
+            "Url": "https://www.desafiosfuturistasmod.com",
+            "Valoracion": 4.6,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 11,
+            "Titulo": "Circuitos de Neo-Tokio",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 14,
+            "Etiquetas": [
+                "races",
+                "futuristic",
+                "night"
+            ],
+            "Juego": "Cyberpunk 2077",
+            "NumDescargas": 3200,
+            "VersionJuegoNecesaria": "3.1.4",
+            "VersionesAnteriores": [
+                "3.0.5"
+            ],
+            "VersionActual": "3.2.5",
+            "Url": "https://www.circuitosneotokiomod.com",
+            "Valoracion": 4.8,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 12,
+            "Titulo": "Desafío solar",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 14,
+            "Etiquetas": [
+                "races",
+                "solar",
+                "speed-of-light"
+            ],
+            "Juego": "Cyberpunk 2077",
+            "NumDescargas": 3000,
+            "VersionJuegoNecesaria": "3.1.4",
+            "VersionesAnteriores": [
+                "3.0.1",
+                "3.1.0"
+            ],
+            "VersionActual": "3.3.0",
+            "Url": "https://www.desafiosolarmod.com",
+            "Valoracion": 4.9,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 13,
+            "Titulo": "Rally Intergaláctico",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 14,
+            "Etiquetas": [
+                "races",
+                "galaxy",
+                "Exploration"
+            ],
+            "Juego": "Cyberpunk 2077",
+            "NumDescargas": 3500,
+            "VersionJuegoNecesaria": "3.1.4",
+            "VersionesAnteriores": [
+                "3.1.3"
+            ],
+            "VersionActual": "3.4.0",
+            "Url": "https://www.rallyintergalacticomod.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 14,
+            "Titulo": "speed en el Vacío",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 14,
+            "Etiquetas": [
+                "races",
+                "Space"
+                
+            ],
+            "Juego": "Cyberpunk 2077",
+            "NumDescargas": 3700,
+            "VersionJuegoNecesaria": "3.1.4",
+            "VersionesAnteriores": [],
+            "VersionActual": "3.5.0",
+            "Url": "https://www.speedenelvaciomod.com",
+            "Valoracion": 4.7,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 15,
+            "Titulo": "Pilotos del Futuro",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 14,
+            "Etiquetas": [
+                "races",
+                "Futuristic",
+                "pilots"
+            ],
+            "Juego": "Cyberpunk 2077",
+            "NumDescargas": 4100,
+            "VersionJuegoNecesaria": "3.1.4",
+            "VersionesAnteriores": [
+                "3.0.0",
+                "3.1.2"
+            ],
+            "VersionActual": "3.6.0",
+            "Url": "https://www.pilotosdelfuturomod.com",
+            "Valoracion": 4.6,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 16,
+            "Titulo": "Arsenal Estelar",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 13,
+            "Etiquetas": [
+                "strategical",
+                "armory",
+                "expansion"
+            ],
+            "Juego": "Minecraft",
+            "NumDescargas": 2000,
+            "VersionJuegoNecesaria": "1.2.5",
+            "VersionesAnteriores": [
+                "1.2.0"
+            ],
+            "VersionActual": "1.3.0",
+            "Url": "https://www.arsenalestelarmod.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 17,
+            "Titulo": "Construye tu Estación",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 13,
+            "Etiquetas": [
+                "strategical",
+                "construction",
+                "simulations"
+            ],
+            "Juego": "Minecraft",
+            "NumDescargas": 2500,
+            "VersionJuegoNecesaria": "1.2.5",
+            "VersionesAnteriores": [],
+            "VersionActual": "1.4.0",
+            "Url": "https://www.construyetuestacionmod.com",
+            "Valoracion": 4.7,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 18,
+            "Titulo": "Alianzas Galácticas",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 13,
+            "Etiquetas": [
+                "Diplomacy",
+                "alliance",
+                "strategical"
+            ],
+            "Juego": "Minecraft",
+            "NumDescargas": 1500,
+            "VersionJuegoNecesaria": "1.2.5",
+            "VersionesAnteriores": [
+                "1.1.0",
+                "1.2.0"
+            ],
+            "VersionActual": "1.5.0",
+            "Url": "https://www.alianzasgalacticasmod.com",
+            "Valoracion": 4.8,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 19,
+            "Titulo": "Invasión Oscura",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 13,
+            "Etiquetas": [
+                "defense",
+                "invasion",
+                "strategical"
+            ],
+            "Juego": "Minecraft",
+            "NumDescargas": 1800,
+            "VersionJuegoNecesaria": "1.2.5",
+            "VersionesAnteriores": [
+                "1.2.3"
+            ],
+            "VersionActual": "1.6.0",
+            "Url": "https://www.invasionoscuramod.com",
+            "Valoracion": 4.9,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 20,
+            "Titulo": "Nuevas tecnologys",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 13,
+            "Etiquetas": [
+                "tecnology",
+                "update",
+                "strategical"
+            ],
+            "Juego": "Minecraft",
+            "NumDescargas": 2200,
+            "VersionJuegoNecesaria": "1.2.5",
+            "VersionesAnteriores": [
+                "1.0.0",
+                "1.2.0"
+            ],
+            "VersionActual": "1.7.0",
+            "Url": "https://www.nuevastecnologiasmod.com",
+            "Valoracion": 4.6,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 21,
+            "Titulo": "Tesoro Hundido",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 15,
+            "Etiquetas": [
+                "Exploration",
+                "treasure",
+                "adventures"
+            ],
+            "Juego": "Sea of Thieves",
+            "NumDescargas": 3000,
+            "VersionJuegoNecesaria": "3.4.1",
+            "VersionesAnteriores": [
+                "3.3.0",
+                "3.3.5"
+            ],
+            "VersionActual": "3.5.0",
+            "Url": "https://www.tesorohundidomod.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 22,
+            "Titulo": "Nuevas Islas",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 15,
+            "Etiquetas": [
+                "Exploration",
+                "colonization",
+                "adventures"
+            ],
+            "Juego": "Sea of Thieves",
+            "NumDescargas": 2500,
+            "VersionJuegoNecesaria": "3.4.1",
+            "VersionesAnteriores": [],
+            "VersionActual": "3.6.0",
+            "Url": "https://www.nuevasislasmod.com",
+            "Valoracion": 4.7,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 23,
+            "Titulo": "Batallas Navales",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 15,
+            "Etiquetas": [
+                "combat",
+                "strategical",
+                "Multiplayer"
+            ],
+            "Juego": "Sea of Thieves",
+            "NumDescargas": 3200,
+            "VersionJuegoNecesaria": "3.4.1",
+            "VersionesAnteriores": [
+                "3.3.8",
+                "3.4.0"
+            ],
+            "VersionActual": "3.7.0",
+            "Url": "https://www.batallasnavalesmod.com",
+            "Valoracion": 4.8,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 24,
+            "Titulo": "Monstruos Marinos",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 15,
+            "Etiquetas": [
+                "adventures",
+                "Mystery",
+                "Exploration"
+            ],
+            "Juego": "Sea of Thieves",
+            "NumDescargas": 2800,
+            "VersionJuegoNecesaria": "3.4.1",
+            "VersionesAnteriores": [
+                "3.2.0",
+                "3.3.0"
+            ],
+            "VersionActual": "3.8.0",
+            "Url": "https://www.monstruosmarinosmod.com",
+            "Valoracion": 4.6,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 25,
+            "Titulo": "Comercio y Riqueza",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 15,
+            "Etiquetas": [
+                "Economy",
+                "trade",
+                "strategical"
+            ],
+            "Juego": "Sea of Thieves",
+            "NumDescargas": 2900,
+            "VersionJuegoNecesaria": "3.4.1",
+            "VersionesAnteriores": [
+                "3.4.0"
+            ],
+            "VersionActual": "3.9.0",
+            "Url": "https://www.comercioyriquezamod.com",
+            "Valoracion": 4.9,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 26,
+            "Titulo": "Refugios Mejorados",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 18,
+            "Etiquetas": [
+                "Survival",
+                "construction",
+                "shelter"
+            ],
+            "Juego": "Outer Wilds",
+            "NumDescargas": 4100,
+            "VersionJuegoNecesaria": "2.2.0",
+            "VersionesAnteriores": [
+                "2.1.5",
+                "2.1.8"
+            ],
+            "VersionActual": "2.3.0",
+            "Url": "https://www.refugiosmejoradosmod.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 27,
+            "Titulo": "Armas Avanzadas",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 18,
+            "Etiquetas": [
+                "combat",
+                "Armas",
+                "tecnology"
+            ],
+            "Juego": "Outer Wilds",
+            "NumDescargas": 4300,
+            "VersionJuegoNecesaria": "2.2.0",
+            "VersionesAnteriores": [],
+            "VersionActual": "2.4.0",
+            "Url": "https://www.armasavanzadasmod.com",
+            "Valoracion": 4.7,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 28,
+            "Titulo": "Nuevas Zonas Explorables",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 18,
+            "Etiquetas": [
+                "Exploration",
+                "Open World",
+                "adventures"
+            ],
+            "Juego": "Outer Wilds",
+            "NumDescargas": 3900,
+            "VersionJuegoNecesaria": "2.2.0",
+            "VersionesAnteriores": [
+                "2.1.0",
+                "2.1.9"
+            ],
+            "VersionActual": "2.5.0",
+            "Url": "https://www.nuevaszonasexplorablesmod.com",
+            "Valoracion": 4.8,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 29,
+            "Titulo": "Sistemas de Cultivo",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 18,
+            "Etiquetas": [
+                "Survival",
+                "Agriculture",
+                "sustainability"
+            ],
+            "Juego": "Outer Wilds",
+            "NumDescargas": 4200,
+            "VersionJuegoNecesaria": "2.2.0",
+            "VersionesAnteriores": [
+                "2.2.0"
+            ],
+            "VersionActual": "2.6.0",
+            "Url": "https://www.sistemasdecultivomod.com",
+            "Valoracion": 4.6,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 30,
+            "Titulo": "Comunidades Seguras",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 18,
+            "Etiquetas": [
+                "comunity",
+                "defense",
+                "strategical"
+            ],
+            "Juego": "Outer Wilds",
+            "NumDescargas": 4000,
+            "VersionJuegoNecesaria": "2.2.0",
+            "VersionesAnteriores": [
+                "2.0.0",
+                "2.1.0"
+            ],
+            "VersionActual": "2.7.0",
+            "Url": "https://www.comunidadessegurasmod.com",
+            "Valoracion": 4.9,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 31,
+            "Titulo": "Artefactos Ocultos",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 16,
+            "Etiquetas": [
+                "adventures",
+                "Mystery",
+                "Exploration"
+            ],
+            "Juego": "Dark Souls III: The Ringed City",
+            "NumDescargas": 3200,
+            "VersionJuegoNecesaria": "1.5.7",
+            "VersionesAnteriores": [
+                "1.5.0",
+                "1.5.5"
+            ],
+            "VersionActual": "1.6.0",
+            "Url": "https://www.artefactosocultosmod.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 32,
+            "Titulo": "Hechizos de Sombra",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 16,
+            "Etiquetas": [
+                "Magic",
+                "spells",
+                "Dark Fantasy"
+            ],
+            "Juego": "Dark Souls III: The Ringed City",
+            "NumDescargas": 2900,
+            "VersionJuegoNecesaria": "1.5.7",
+            "VersionesAnteriores": [],
+            "VersionActual": "1.7.0",
+            "Url": "https://www.hechizosdesombramod.com",
+            "Valoracion": 4.7,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 33,
+            "Titulo": "Criaturas de la Noche",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 16,
+            "Etiquetas": [
+                "Monsters",
+                "adventures",
+                "RPG"
+            ],
+            "Juego": "Dark Souls III: The Ringed City",
+            "NumDescargas": 3500,
+            "VersionJuegoNecesaria": "1.5.7",
+            "VersionesAnteriores": [
+                "1.4.8",
+                "1.5.0"
+            ],
+            "VersionActual": "1.8.0",
+            "Url": "https://www.criaturasdelanochemod.com",
+            "Valoracion": 4.8,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 34,
+            "Titulo": "Guardianes Arcanos",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 16,
+            "Etiquetas": [
+                "defense",
+                "Magic",
+                "strategical"
+            ],
+            "Juego": "Dark Souls III: The Ringed City",
+            "NumDescargas": 3000,
+            "VersionJuegoNecesaria": "1.5.7",
+            "VersionesAnteriores": [
+                "1.5.2"
+            ],
+            "VersionActual": "1.9.0",
+            "Url": "https://www.guardianesarcanosmod.com",
+            "Valoracion": 4.6,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 35,
+            "Titulo": "El Ascenso del Nigromante",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 16,
+            "Etiquetas": [
+                "necromancy",
+                "Mystery",
+                "RPG"
+            ],
+            "Juego": "Dark Souls III: The Ringed City",
+            "NumDescargas": 2800,
+            "VersionJuegoNecesaria": "1.5.7",
+            "VersionesAnteriores": [
+                "1.4.5",
+                "1.5.3"
+            ],
+            "VersionActual": "2.0.0",
+            "Url": "https://www.ascensodelnigromantemod.com",
+            "Valoracion": 4.9,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 36,
+            "Titulo": "Circuitos Legendarios",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "races",
+                "history",
+                "racing-circuit"
+            ],
+            "Juego": "Assetto Corsa",
+            "NumDescargas": 2100,
+            "VersionJuegoNecesaria": "4.0.3",
+            "VersionesAnteriores": [
+                "3.9.5",
+                "4.0.0"
+            ],
+            "VersionActual": "4.1.0",
+            "Url": "https://www.circuitoslegendariosmod.com",
+            "Valoracion": 4.5,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 37,
+            "Titulo": "Desafíos de Época",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "races",
+                "Retro",
+                "challenges"
+            ],
+            "Juego": "Assetto Corsa",
+            "NumDescargas": 2300,
+            "VersionJuegoNecesaria": "4.0.3",
+            "VersionesAnteriores": [],
+            "VersionActual": "4.2.0",
+            "Url": "https://www.desafiosdeepocamod.com",
+            "Valoracion": 4.7,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 38,
+            "Titulo": "Supercoches del Pasado",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "races",
+                "clasics",
+                "supercars"
+            ],
+            "Juego": "Assetto Corsa",
+            "NumDescargas": 2500,
+            "VersionJuegoNecesaria": "4.0.3",
+            "VersionesAnteriores": [
+                "4.0.1",
+                "4.0.2"
+            ],
+            "VersionActual": "4.3.0",
+            "Url": "https://www.supercochesdelpasadomod.com",
+            "Valoracion": 4.8,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 39,
+            "Titulo": "Rivales en la Pista",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "races",
+                "rivalry"
+                
+            ],
+            "Juego": "Assetto Corsa",
+            "NumDescargas": 1900,
+            "VersionJuegoNecesaria": "4.0.3",
+            "VersionesAnteriores": [
+                "3.8.0",
+                "4.0.0"
+            ],
+            "VersionActual": "4.4.0",
+            "Url": "https://www.rivalesenlapistamod.com",
+            "Valoracion": 4.6,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        },
+        {
+            "id": 40,
+            "Titulo": "Torneos Mundiales",
+            "Imagen": "modImgPre.jpeg",
+            "EdadRecomendada": 12,
+            "Etiquetas": [
+                "races",
+                "world-championship",
+                "competition"
+            ],
+            "Juego": "Assetto Corsa",
+            "NumDescargas": 2200,
+            "VersionJuegoNecesaria": "4.0.3",
+            "VersionesAnteriores": [
+                "4.0.0",
+                "4.0.2"
+            ],
+            "VersionActual": "4.5.0",
+            "Url": "https://www.torneosmundialesmod.com",
+            "Valoracion": 4.9,
+            "Creador": "usuario1",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+        }
+    ]
+}
