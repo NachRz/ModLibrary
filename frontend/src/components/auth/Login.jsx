@@ -45,12 +45,14 @@ const Login = () => {
           <h2 className="mt-2 text-2xl font-extrabold text-custom-text bg-clip-text bg-gradient-to-r from-custom-primary to-custom-secondary">
             Bienvenido de nuevo
           </h2>
-          <p className="mt-2 text-sm text-custom-detail">
-            ¿No tienes una cuenta?{' '}
-            <Link to="/register" className="font-medium text-custom-primary hover:text-custom-secondary transition-colors duration-300 border-b border-transparent hover:border-custom-secondary">
-              Regístrate ahora
-            </Link>
-          </p>
+          <div className="pb-6 text-center">
+            <p className="text-sm text-custom-detail">
+              ¿No tienes una cuenta?{" "}
+              <Link to="/register" className="font-semibold text-lg text-custom-secondary hover:text-custom-primary border-b-2 border-custom-secondary hover:border-custom-primary transition-all duration-300 hover:scale-105 inline-block">
+                Regístrate ahora
+              </Link>
+            </p>
+          </div>
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -127,7 +129,7 @@ const Login = () => {
             </div>
 
             <div className="text-sm">
-              <Link to="/reset-password" className="font-medium text-custom-detail hover:text-custom-primary border-b border-transparent hover:border-custom-primary transition-all duration-300">
+              <Link to="/reset-password" className="font-semibold text-custom-secondary hover:text-custom-primary border-b border-custom-secondary hover:border-custom-primary transition-all duration-300">
                 ¿Olvidaste tu contraseña?
               </Link>
             </div>

@@ -65,12 +65,14 @@ const Register = () => {
           <h2 className="mt-2 text-2xl font-extrabold text-custom-text bg-clip-text bg-gradient-to-r from-custom-primary to-custom-secondary">
             Crea tu cuenta
           </h2>
-          <p className="mt-2 text-sm text-custom-detail">
-            ¿Ya tienes una cuenta?{' '}
-            <Link to="/login" className="font-medium text-custom-primary hover:text-custom-secondary transition-colors duration-300 border-b border-transparent hover:border-custom-secondary">
-              Inicia sesión
-            </Link>
-          </p>
+          <div className="pb-6 text-center">
+            <p className="text-sm text-custom-detail">
+              ¿Ya tienes una cuenta?{" "}
+              <Link to="/login" className="font-semibold text-lg text-custom-secondary hover:text-custom-primary border-b-2 border-custom-secondary hover:border-custom-primary transition-all duration-300 hover:scale-105 inline-block">
+                Inicia sesión
+              </Link>
+            </p>
+          </div>
         </div>
         
         {error && (
