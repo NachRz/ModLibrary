@@ -29,27 +29,43 @@ class ModSeeder extends Seeder
             return;
         }
 
-        // Procesar cada mod
+        // Primero, recopilar información sobre juegos de los mods
+        $juegosInfo = [];
         foreach ($mods as $modData) {
-            // Verificar si el juego existe, si no, crearlo
+            $juegoNombre = $modData['Juego'];
+            if (!isset($juegosInfo[$juegoNombre])) {
+                $juegosInfo[$juegoNombre] = [
+                    'nombre' => $juegoNombre,
+                    'edad_recomendada' => $modData['EdadRecomendada'] ?? 16
+                ];
+            }
+        }
+
+        // Crear juegos si no existen
+        $juegosMap = [];
+        foreach ($juegosInfo as $juegoNombre => $juegoInfo) {
             $juego = Juego::firstOrCreate(
-                ['titulo' => $modData['Juego']],
+                ['titulo' => $juegoNombre],
                 [
-                    'slug' => strtolower(str_replace(' ', '-', $modData['Juego'])),
+                    'slug' => strtolower(str_replace(' ', '-', $juegoNombre)),
                     'rawg_id' => 10000 + rand(1, 9999), // ID provisional
-                    'titulo_original' => $modData['Juego'],
-                    'descripcion' => 'Descripción generada automáticamente para ' . $modData['Juego'],
+                    'titulo_original' => $juegoNombre,
+                    'descripcion' => 'Descripción generada automáticamente para ' . $juegoNombre,
                     'metacritic' => rand(60, 95),
                     'fecha_lanzamiento' => now()->subYears(rand(1, 5)),
                     'tba' => false,
                     'actualizado' => now(),
                     'imagen_fondo' => 'default_background.jpg',
-                    'sitio_web' => 'https://www.ejemplo.com/' . strtolower(str_replace(' ', '-', $modData['Juego'])),
+                    'sitio_web' => 'https://www.ejemplo.com/' . strtolower(str_replace(' ', '-', $juegoNombre)),
                     'rating' => rand(30, 50) / 10,
                     'rating_top' => 5
                 ]
             );
+            $juegosMap[$juegoNombre] = $juego;
+        }
 
+        // Ahora, procesar los mods usando los juegos ya creados
+        foreach ($mods as $modData) {
             // Determinar el creador basado en el campo 'Creador'
             $creador = null;
             switch($modData['Creador']) {
@@ -65,6 +81,9 @@ class ModSeeder extends Seeder
                 default:
                     $creador = $usuario1; // Default a usuario1 si no coincide
             }
+
+            // Obtener el juego ya creado
+            $juego = $juegosMap[$modData['Juego']];
 
             // Crear o actualizar el mod
             $mod = Mod::firstOrCreate(
