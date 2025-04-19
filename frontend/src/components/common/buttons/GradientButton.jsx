@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../../assets/styles/components/buttons.css'; // Ruta actualizada del CSS
+import '../../../assets/styles/components/common/buttons/buttons.css'; // Ruta actualizada a la nueva ubicación
 
 /**
  * Botón con efecto de gradiente suave en hover

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import './Navbar.css'; // Importamos el CSS para las animaciones
+import '../../assets/styles/components/layout/navbar.css'; // Ruta actualizada al CSS
 
 // Componente NavLink reutilizable
 const NavLink = ({ to, children, isActive }) => (
