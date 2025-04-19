@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import GradientButton from '../common/buttons/GradientButton';
+import { authService } from '../../services/api';
 
 const Register = () => {
   const [userData, setUserData] = useState({
@@ -11,6 +12,7 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,35 +23,50 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setLoading(true);
     
     // Validaciones básicas
     if (!userData.username || !userData.email || !userData.password || !userData.confirmPassword) {
       setError('Por favor, completa todos los campos');
+      setLoading(false);
       return;
     }
     
     if (userData.password !== userData.confirmPassword) {
       setError('Las contraseñas no coinciden');
+      setLoading(false);
       return;
     }
     
     if (userData.password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres');
+      setLoading(false);
       return;
     }
     
-    // Simulación de registro exitoso
-    // En un caso real, aquí iría la llamada a la API
-    setSuccess('Cuenta creada correctamente. Redirigiendo al inicio de sesión...');
-    
-    // Redirección a login después de 2 segundos
-    setTimeout(() => {
-      navigate('/login');
-    }, 2000);
+    try {
+      // Llamada real a la API para registrar al usuario
+      await authService.register(userData);
+      
+      setSuccess('Cuenta creada correctamente. Redirigiendo al dashboard...');
+      
+      // Redirección a dashboard después de 2 segundos
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
+    } catch (error) {
+      console.error('Error al registrar:', error);
+      setError(error.message || 'Ha ocurrido un error durante el registro. Por favor, inténtalo de nuevo.');
+      if (error.errors && error.errors.correo) {
+        setError(`El correo electrónico ya está en uso.`);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

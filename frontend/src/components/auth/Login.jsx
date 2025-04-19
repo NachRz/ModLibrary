@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import GradientButton from '../common/buttons/GradientButton';
+import { authService } from '../../services/api';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -8,6 +9,7 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,17 +20,28 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     
-    // Simulación de inicio de sesión exitoso
-    if (credentials.email && credentials.password) {
-      // En un caso real, aquí iría la llamada a la API
-      localStorage.setItem('token', 'fake-token-for-demo');
-      navigate('/dashboard');
-    } else {
+    if (!credentials.email || !credentials.password) {
       setError('Por favor, completa todos los campos');
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      // Llamada real a la API para autenticar al usuario
+      await authService.login(credentials);
+      
+      // Redirección al dashboard si el inicio de sesión es exitoso
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      setError(error.message || 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.');
+    } finally {
+      setLoading(false);
     }
   };
 

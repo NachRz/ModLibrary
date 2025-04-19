@@ -12,6 +12,7 @@ Route::get('/test', function() {
 
 // Rutas de autenticación sin prefijo
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('auth:sanctum');
 
@@ -22,4 +23,3 @@ Route::prefix('juegos')->group(function () {
     Route::post('/{id}/sincronizar', [JuegoController::class, 'syncGame']);
 });
 
-// ... existing code ... 
