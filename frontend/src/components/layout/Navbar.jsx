@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../../assets/styles/components/layout/navbar.css'; // Ruta actualizada al CSS
+import { authService } from '../../services/api'; // Importar el servicio de autenticación
 
 // Componente NavLink reutilizable
 const NavLink = ({ to, children, isActive }) => (
@@ -44,7 +45,7 @@ const NavLinkWithDropdown = ({ title, isActive, children }) => {
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
+  const [userData, setUserData] = useState({ nome: '', correo: '', rol: '' });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPanelMenuOpen, setIsPanelMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -55,13 +56,19 @@ const Navbar = () => {
   // Verificar autenticación
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      if (token) {
+      if (authService.isAuthenticated()) {
         setIsLoggedIn(true);
-        setUsername('Usuario'); // En un caso real, obtendríamos el nombre del usuario de la API
+        const user = authService.getCurrentUser();
+        if (user) {
+          setUserData({
+            nome: user.nome || 'Usuario',
+            correo: user.correo || '',
+            rol: user.rol || 'usuario'
+          });
+        }
       } else {
         setIsLoggedIn(false);
-        setUsername('');
+        setUserData({ nome: '', correo: '', rol: '' });
       }
     };
     
@@ -92,8 +99,12 @@ const Navbar = () => {
 
   // Función para cerrar sesión
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/';
+    authService.logout().then(() => {
+      window.location.href = '/';
+    }).catch(error => {
+      console.error('Error al cerrar sesión:', error);
+      window.location.href = '/';
+    });
   };
 
   // Toggles para menú móvil
@@ -246,11 +257,11 @@ const Navbar = () => {
             {isLoggedIn ? (
               <div className="flex items-center space-x-2 relative group">
                 <div className="text-right hidden md:block">
-                  <p className="text-custom-text font-medium">{username}</p>
-                  <p className="text-custom-detail text-xs">Miembro</p>
+                  <p className="text-custom-text font-medium">{userData.nome}</p>
+                  <p className="text-custom-detail text-xs capitalize">{userData.rol}</p>
                 </div>
                 <div className="h-10 w-10 rounded-full bg-custom-primary flex items-center justify-center text-custom-text shadow-sm cursor-pointer group-hover:ring-2 group-hover:ring-custom-secondary/50 transition-all">
-                  {username.charAt(0)}
+                  {userData.nome.charAt(0)}
                 </div>
                 <svg className="h-5 w-5 text-custom-detail group-hover:text-custom-text transition-colors cursor-pointer hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -259,6 +270,10 @@ const Navbar = () => {
                 {/* Menú desplegable */}
                 <div className="absolute top-full right-0 mt-2 w-48 bg-custom-card rounded-custom shadow-custom-lg border border-custom-detail/10 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 transform origin-top-right scale-95 group-hover:scale-100">
                   <div className="py-1">
+                    <div className="px-4 py-2 border-b border-custom-detail/10">
+                      <p className="text-sm font-medium text-custom-text">{userData.nome}</p>
+                      <p className="text-xs text-custom-detail truncate">{userData.correo}</p>
+                    </div>
                     <Link to="/dashboard" className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors">
                       Mi Panel
                     </Link>
