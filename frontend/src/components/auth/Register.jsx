@@ -85,7 +85,7 @@ const Register = () => {
           <div className="pb-6 text-center">
             <p className="text-sm text-custom-detail">
               ¿Ya tienes una cuenta?{" "}
-              <Link to="/login" className="font-semibold text-lg text-custom-secondary hover:text-custom-primary border-b-2 border-custom-secondary hover:border-custom-primary transition-all duration-300 hover:scale-105 inline-block">
+              <Link to="/login" className="font-semibold text-base text-custom-secondary hover:text-custom-primary border-b border-custom-secondary hover:border-custom-primary transition-all duration-300 hover:scale-102 inline-block">
                 Inicia sesión
               </Link>
             </p>
@@ -226,7 +226,7 @@ const Register = () => {
               className="h-4 w-4 text-custom-primary focus:ring-custom-primary border-custom-detail/20 rounded"
             />
             <label htmlFor="terms" className="ml-2 block text-sm text-custom-detail">
-              Acepto los <Link to="#" className="text-custom-primary hover:text-custom-secondary">Términos y Condiciones</Link> y la <Link to="#" className="text-custom-primary hover:text-custom-secondary">Política de Privacidad</Link>
+              Acepto los <Link to="#" className="text-custom-secondary font-semibold hover:text-custom-primary border-b border-custom-secondary hover:border-custom-primary transition-colors duration-300">Términos y Condiciones</Link> y la <Link to="#" className="text-custom-secondary font-semibold hover:text-custom-primary border-b border-custom-secondary hover:border-custom-primary transition-colors duration-300">Política de Privacidad</Link>
             </label>
           </div>
 

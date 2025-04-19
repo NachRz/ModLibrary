@@ -61,7 +61,7 @@ const Login = () => {
           <div className="pb-6 text-center">
             <p className="text-sm text-custom-detail">
               ¿No tienes una cuenta?{" "}
-              <Link to="/register" className="font-semibold text-lg text-custom-secondary hover:text-custom-primary border-b-2 border-custom-secondary hover:border-custom-primary transition-all duration-300 hover:scale-105 inline-block">
+              <Link to="/register" className="font-semibold text-base text-custom-secondary hover:text-custom-primary border-b border-custom-secondary hover:border-custom-primary transition-all duration-300 hover:scale-102 inline-block">
                 Regístrate ahora
               </Link>
             </p>
