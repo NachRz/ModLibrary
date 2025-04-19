@@ -23,9 +23,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard defaultTab={0} />} />
           <Route path="/dashboard/mis-mods" element={<Dashboard defaultTab={1} />} />
-          <Route path="/dashboard/mis-juegos" element={<Dashboard defaultTab={2} />} />
-          <Route path="/dashboard/juegos-favoritos" element={<Dashboard defaultTab={3} />} />
-          <Route path="/dashboard/guardados" element={<Dashboard defaultTab={4} />} />
+          <Route path="/dashboard/juegos-favoritos" element={<Dashboard defaultTab={2} />} />
+          <Route path="/dashboard/guardados" element={<Dashboard defaultTab={3} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/explorar" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Explorar Mods</h1></div>} />
           <Route path="/tendencias" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Tendencias</h1></div>} />

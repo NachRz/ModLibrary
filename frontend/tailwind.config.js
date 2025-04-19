@@ -11,6 +11,7 @@ module.exports = {
           'primary': '#1B4F72',
           'primary-hover': '#4682B4',
           'secondary': '#F18F75',
+          'tertiary': '#10B981',
           'error': '#D36D5A',
           'text': '#FFFFFF',
           'detail': '#DADADA',
@@ -24,6 +25,21 @@ module.exports = {
       },
       borderRadius: {
         'custom': '1rem',
+      },
+      animation: {
+        'fadeIn': 'fadeIn 0.3s ease-in-out',
+        'slideIn': 'slideIn 0.4s ease-out',
+        'pulse-slow': 'pulse 3s infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideIn: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
       },
     },
   },

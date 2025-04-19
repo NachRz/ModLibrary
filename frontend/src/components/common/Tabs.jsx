@@ -16,35 +16,35 @@ const Tabs = ({ tabs, defaultTab = 0, onTabChange }) => {
   };
 
   return (
-    <div className="w-full bg-custom-bg rounded-t-custom overflow-hidden">
+    <div className="w-full overflow-hidden">
       {/* Navegación de pestañas */}
-      <div className="bg-custom-card border-b border-custom-detail/20 shadow-custom">
-        <div className="max-w-7xl mx-auto">
-          <nav className="flex" aria-label="Tabs">
+      <div className="border-b border-custom-detail/10 bg-custom-card/80">
+        <div className="px-4">
+          <nav className="flex overflow-x-auto hide-scrollbar" aria-label="Tabs">
             {tabs.map((tab, index) => (
               <button
                 key={index}
                 onClick={() => handleTabChange(index)}
                 className={`
-                  relative py-4 px-6 text-sm font-medium transition-all duration-300 overflow-hidden
+                  relative flex items-center py-4 px-5 text-sm font-medium transition-all duration-200
                   ${activeTab === index
-                    ? 'text-custom-text font-semibold'
+                    ? 'text-blue-400'
                     : 'text-custom-detail hover:text-custom-text'
                   }
+                  focus:outline-none whitespace-nowrap
                 `}
               >
                 <span className="relative z-10">{tab.label}</span>
-                {/* Indicador activo */}
+                
+                {/* Indicador activo - línea debajo */}
                 {activeTab === index && (
-                  <>
-                    <span className="absolute bottom-0 left-0 w-full h-1 bg-custom-secondary"></span>
-                    <span className="absolute inset-0 bg-custom-primary/15"></span>
-                  </>
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 rounded-t-full transform transition-transform duration-300"></span>
                 )}
-                {/* Efecto hover */}
+                
+                {/* Efecto sutil al pasar el ratón */}
                 <span className={`
-                  absolute bottom-0 left-0 w-full h-full transform transition-transform duration-300 
-                  ${activeTab === index ? 'opacity-100' : 'opacity-0 hover:opacity-10 bg-custom-primary/10'} 
+                  absolute inset-0 bg-blue-400/5 opacity-0 transition-opacity duration-200
+                  ${activeTab === index ? 'opacity-100' : 'group-hover:opacity-75'}
                 `}></span>
               </button>
             ))}
@@ -52,8 +52,8 @@ const Tabs = ({ tabs, defaultTab = 0, onTabChange }) => {
         </div>
       </div>
 
-      {/* Contenido de las pestañas */}
-      <div className="mt-6 p-4">
+      {/* Contenido de las pestañas con animación */}
+      <div className="p-6 transition-all duration-300 animate-fadeIn">
         {tabs[activeTab].content}
       </div>
     </div>

@@ -90,11 +90,10 @@ const Navbar = () => {
 
   // Opciones del panel
   const panelOptions = [
-    { name: 'Panel', path: '/dashboard' },
+    { name: 'General', path: '/dashboard' },
     { name: 'Mis Mods', path: '/dashboard/mis-mods' },
-    { name: 'Mis Juegos', path: '/dashboard/mis-juegos' },
     { name: 'Juegos Favoritos', path: '/dashboard/juegos-favoritos' },
-    { name: 'Guardados', path: '/dashboard/guardados' },
+    { name: 'Mods Guardados', path: '/dashboard/guardados' },
   ];
 
   // Función para cerrar sesión
@@ -263,9 +262,6 @@ const Navbar = () => {
                 <div className="h-10 w-10 rounded-full bg-custom-primary flex items-center justify-center text-custom-text shadow-sm cursor-pointer group-hover:ring-2 group-hover:ring-custom-secondary/50 transition-all">
                   {userData.nome.charAt(0)}
                 </div>
-                <svg className="h-5 w-5 text-custom-detail group-hover:text-custom-text transition-colors cursor-pointer hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
                 
                 {/* Menú desplegable */}
                 <div className="absolute top-full right-0 mt-2 w-48 bg-custom-card rounded-custom shadow-custom-lg border border-custom-detail/10 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 transform origin-top-right scale-95 group-hover:scale-100">
@@ -274,17 +270,34 @@ const Navbar = () => {
                       <p className="text-sm font-medium text-custom-text">{userData.nome}</p>
                       <p className="text-xs text-custom-detail truncate">{userData.correo}</p>
                     </div>
-                    <Link to="/dashboard" className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors">
-                      Mi Panel
+                    <Link to="/dashboard" className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors flex items-center">
+                      <svg className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                      </svg>
+                      Panel
                     </Link>
-                    <Link to="/perfil" className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors">
-                      Mi Perfil
+                    <Link to="/perfil" className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors flex items-center">
+                      <svg className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      Perfil
+                    </Link>
+                    <Link to="/ajustes" className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors flex items-center">
+                      <svg className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Ajustes
                     </Link>
                     <div className="border-t border-custom-detail/10 my-1"></div>
                     <button 
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-custom-error hover:bg-custom-error/10 transition-colors"
+                      className="block w-full text-left px-4 py-2 text-sm text-custom-error hover:bg-custom-error/10 transition-colors flex items-center"
                     >
+                      <svg className="h-4 w-4 mr-2 text-custom-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
                       Desconectar
                     </button>
                   </div>

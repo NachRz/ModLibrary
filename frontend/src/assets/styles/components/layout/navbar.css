@@ -90,4 +90,14 @@
 
 .search-wrapper-open {
   animation: glow 2s infinite;
+}
+
+/* Ocultar barras de desplazamiento */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* Internet Explorer y Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari y Opera */
 } 
