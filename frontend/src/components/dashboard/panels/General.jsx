@@ -326,12 +326,12 @@ const General = () => {
             </h4>
             
             <div className="space-y-3">
-              <button className="w-full bg-custom-primary hover:bg-custom-primary-hover text-white flex items-center justify-center rounded-lg px-4 py-2.5 transition-all duration-300 shadow-md hover:shadow-lg">
+              <Link to="/mods/crear" className="w-full bg-custom-primary hover:bg-custom-primary-hover text-white flex items-center justify-center rounded-lg px-4 py-2.5 transition-all duration-300 shadow-md hover:shadow-lg">
                 <svg className="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 <span>Crear Nuevo Mod</span>
-              </button>
+              </Link>
               
               <button className="w-full bg-custom-bg/40 hover:bg-custom-bg/60 text-white flex items-center justify-center rounded-lg px-4 py-2.5 transition-all duration-300 shadow-md hover:shadow-lg border border-custom-detail/20">
                 <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
