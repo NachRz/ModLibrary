@@ -15,7 +15,15 @@ class VersionMod extends Model
     protected $fillable = [
         'mod_id',
         'version',
-        'fecha_lanzamiento'
+        'notas',
+        'archivo',
+        'fecha_lanzamiento',
+        'descargas'
+    ];
+
+    protected $casts = [
+        'fecha_lanzamiento' => 'datetime',
+        'descargas' => 'integer'
     ];
 
     public function mod(): BelongsTo

@@ -7,6 +7,7 @@ import Footer from './components/layout/Footer';
 import Login from './components/auth/Login';
 import ResetPassword from './components/auth/ResetPassword';
 import Register from './components/auth/Register';
+import CrearMod from './components/mods/CrearMod';
 
 // Rutas que no deben mostrar el navbar ni el footer
 const noLayoutRoutes = ['/login', '/register', '/reset-password'];
@@ -26,6 +27,7 @@ function App() {
           <Route path="/dashboard/juegos-favoritos" element={<Dashboard defaultTab={2} />} />
           <Route path="/dashboard/guardados" element={<Dashboard defaultTab={3} />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/mods/crear" element={<CrearMod />} />
           <Route path="/explorar" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Explorar Mods</h1></div>} />
           <Route path="/tendencias" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Tendencias</h1></div>} />
           <Route path="/categorias" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Categorías</h1></div>} />

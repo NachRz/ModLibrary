@@ -58,6 +58,88 @@ const modService = {
     } catch (error) {
       throw error.response?.data || { message: 'Error al obtener tus mods' };
     }
+  },
+  
+  // Obtener un mod específico por ID
+  getModById: async (modId) => {
+    try {
+      const response = await apiClient.get(`/mods/${modId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener el mod' };
+    }
+  },
+  
+  // Crear un nuevo mod
+  createMod: async (formData) => {
+    try {
+      const response = await apiClient.post('/mods', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data' // Necesario para enviar archivos
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al crear el mod' };
+    }
+  },
+  
+  // Actualizar un mod existente
+  updateMod: async (modId, formData) => {
+    try {
+      const response = await apiClient.put(`/mods/${modId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data' // Necesario para enviar archivos
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al actualizar el mod' };
+    }
+  },
+  
+  // Eliminar un mod
+  deleteMod: async (modId) => {
+    try {
+      const response = await apiClient.delete(`/mods/${modId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al eliminar el mod' };
+    }
+  },
+  
+  // Cambiar el estado de un mod (borrador/publicado)
+  changeModStatus: async (modId, estado) => {
+    try {
+      const response = await apiClient.patch(`/mods/${modId}/estado`, { estado });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al cambiar el estado del mod' };
+    }
+  },
+  
+  // Obtener todas las versiones de un mod
+  getModVersions: async (modId) => {
+    try {
+      const response = await apiClient.get(`/mods/${modId}/versiones`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener las versiones del mod' };
+    }
+  },
+  
+  // Añadir una nueva versión a un mod
+  addModVersion: async (modId, versionData) => {
+    try {
+      const response = await apiClient.post(`/mods/${modId}/versiones`, versionData, {
+        headers: {
+          'Content-Type': 'multipart/form-data' // Necesario para enviar archivos
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al añadir la versión al mod' };
+    }
   }
 };
 

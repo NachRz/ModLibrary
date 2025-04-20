@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ModCard from '../../common/Cards/ModCard';
 import modService from '../../../services/api/modService';
 
 const MisMods = () => {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [myMods, setMyMods] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -122,7 +124,10 @@ const MisMods = () => {
     <div className="space-y-6 animate-fadeIn">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-bold text-custom-text">Mis Mods</h3>
-        <button className="bg-custom-primary hover:bg-custom-primary-hover text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center shadow-md hover:shadow-lg">
+        <button 
+          onClick={() => navigate('/mods/crear')} 
+          className="bg-custom-primary hover:bg-custom-primary-hover text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center shadow-md hover:shadow-lg"
+        >
           <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>

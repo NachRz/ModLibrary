@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JuegoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModController;
+use App\Http\Controllers\VersionModController;
 
 // Ruta de prueba
 Route::get('/test', function() {
@@ -37,5 +38,47 @@ Route::prefix('mods')->group(function () {
     
     // Obtener mods por nombre de usuario
     Route::get('/creador/nombre/{username}', [ModController::class, 'getModsByCreatorName']);
+    
+    // Obtener un mod específico por ID
+    Route::get('/{id}', [ModController::class, 'show']);
+    
+    // Rutas para las versiones de mods
+    Route::prefix('/{modId}/versiones')->group(function () {
+        // Obtener todas las versiones de un mod
+        Route::get('/', [VersionModController::class, 'index']);
+        
+        // Obtener una versión específica
+        Route::get('/{versionId}', [VersionModController::class, 'show']);
+        
+        // Incrementar contador de descargas (no requiere autenticación)
+        Route::post('/{versionId}/descargar', [VersionModController::class, 'incrementarDescargas']);
+        
+        // Rutas que requieren autenticación
+        Route::middleware('auth:sanctum')->group(function () {
+            // Crear una nueva versión
+            Route::post('/', [VersionModController::class, 'store']);
+            
+            // Actualizar una versión
+            Route::put('/{versionId}', [VersionModController::class, 'update']);
+            
+            // Eliminar una versión
+            Route::delete('/{versionId}', [VersionModController::class, 'destroy']);
+        });
+    });
+    
+    // Rutas que requieren autenticación
+    Route::middleware('auth:sanctum')->group(function () {
+        // Crear un nuevo mod
+        Route::post('/', [ModController::class, 'store']);
+        
+        // Actualizar un mod existente
+        Route::put('/{id}', [ModController::class, 'update']);
+        
+        // Eliminar un mod
+        Route::delete('/{id}', [ModController::class, 'destroy']);
+        
+        // Cambiar el estado de un mod (borrador/publicado)
+        Route::patch('/{id}/estado', [ModController::class, 'cambiarEstado']);
+    });
 });
 
