@@ -1,33 +1,6 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
-// Configuración base de axios
-const API_URL = 'http://localhost:8000/api';
-
-const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  withCredentials: true // Necesario para las cookies de autenticación si se usa Sanctum
-});
-
-// Interceptor para agregar el token a todas las solicitudes
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Servicios de autenticación
-export const authService = {
+const authService = {
   // Iniciar sesión
   login: async (credentials) => {
     try {
@@ -98,4 +71,4 @@ export const authService = {
   }
 };
 
-export default apiClient; 
+export default authService; 

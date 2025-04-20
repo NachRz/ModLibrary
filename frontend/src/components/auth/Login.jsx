@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import GradientButton from '../common/buttons/GradientButton';
-import { authService } from '../../services/api';
+import authService from '../../services/api/authService';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import authService from '../../services/api/authService'; // Importar el servicio de autenticación
 import '../../assets/styles/components/layout/navbar.css'; // Ruta actualizada al CSS
-import { authService } from '../../services/api'; // Importar el servicio de autenticación
 
 // Componente NavLink reutilizable
 const NavLink = ({ to, children, isActive }) => (

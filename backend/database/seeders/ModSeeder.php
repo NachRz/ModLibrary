@@ -9,9 +9,17 @@ use App\Models\Etiqueta;
 use App\Models\VersionMod;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use App\Services\RawgService;
 
 class ModSeeder extends Seeder
 {
+    protected $rawgService;
+
+    public function __construct(RawgService $rawgService)
+    {
+        $this->rawgService = $rawgService;
+    }
+
     public function run()
     {
         // Cargar datos del JSON
@@ -20,11 +28,9 @@ class ModSeeder extends Seeder
         $mods = $jsonData['mods'];
 
         // Obtener usuarios
-        $usuario1 = Usuario::where('nome', 'usuario1')->first();
-        $usuario2 = Usuario::where('nome', 'usuario2')->first();
-        $usuario3 = Usuario::where('nome', 'usuario3')->first();
+        $usuarios = Usuario::whereIn('nome', ['usuario1', 'usuario2', 'usuario3'])->get()->keyBy('nome');
 
-        if (!$usuario1 || !$usuario2 || !$usuario3) {
+        if ($usuarios->count() < 3) {
             $this->command->error('Los usuarios necesarios no existen. Ejecute el seeder de usuarios primero.');
             return;
         }
@@ -43,44 +49,54 @@ class ModSeeder extends Seeder
 
         // Crear juegos si no existen
         $juegosMap = [];
+        $this->command->info('Obteniendo información de juegos desde RAWG API...');
+        
+        $progressBar = $this->command->getOutput()->createProgressBar(count($juegosInfo));
+        $progressBar->start();
+
         foreach ($juegosInfo as $juegoNombre => $juegoInfo) {
+            // Buscar el juego en RAWG API para obtener su ID real
+            $rawgId = null;
+            $rawgData = null;
+            
+            $searchResults = $this->rawgService->searchGames($juegoNombre);
+            if ($searchResults && isset($searchResults['results']) && count($searchResults['results']) > 0) {
+                // Tomar el primer resultado que coincide mejor con el nombre
+                $rawgData = $searchResults['results'][0];
+                $rawgId = $rawgData['id'];
+            }
+            
             $juego = Juego::firstOrCreate(
                 ['titulo' => $juegoNombre],
                 [
-                    'slug' => strtolower(str_replace(' ', '-', $juegoNombre)),
-                    'rawg_id' => 10000 + rand(1, 9999), // ID provisional
-                    'titulo_original' => $juegoNombre,
-                    'descripcion' => 'Descripción generada automáticamente para ' . $juegoNombre,
-                    'metacritic' => rand(60, 95),
-                    'fecha_lanzamiento' => now()->subYears(rand(1, 5)),
-                    'tba' => false,
+                    'slug' => $rawgData['slug'] ?? strtolower(str_replace(' ', '-', $juegoNombre)),
+                    'rawg_id' => $rawgId ?? 10000 + rand(1, 9999), // Usar ID real o uno provisional si no se encuentra
+                    'titulo_original' => $rawgData['name'] ?? $juegoNombre,
+                    'descripcion' => $rawgData['description'] ?? 'Descripción generada automáticamente para ' . $juegoNombre,
+                    'metacritic' => $rawgData['metacritic'] ?? rand(60, 95),
+                    'fecha_lanzamiento' => isset($rawgData['released']) ? \Carbon\Carbon::parse($rawgData['released']) : now()->subYears(rand(1, 5)),
+                    'tba' => $rawgData['tba'] ?? false,
                     'actualizado' => now(),
-                    'imagen_fondo' => 'default_background.jpg',
-                    'sitio_web' => 'https://www.ejemplo.com/' . strtolower(str_replace(' ', '-', $juegoNombre)),
-                    'rating' => rand(30, 50) / 10,
-                    'rating_top' => 5
+                    'imagen_fondo' => $rawgData['background_image'] ?? 'default_background.jpg',
+                    'sitio_web' => $rawgData['website'] ?? 'https://www.ejemplo.com/' . strtolower(str_replace(' ', '-', $juegoNombre)),
+                    'rating' => $rawgData['rating'] ?? (rand(30, 50) / 10),
+                    'rating_top' => $rawgData['rating_top'] ?? 5
                 ]
             );
+            
             $juegosMap[$juegoNombre] = $juego;
+            $progressBar->advance();
         }
+        
+        $progressBar->finish();
+        $this->command->newLine(2);
+        $this->command->info('Creando mods...');
 
         // Ahora, procesar los mods usando los juegos ya creados
         foreach ($mods as $modData) {
             // Determinar el creador basado en el campo 'Creador'
-            $creador = null;
-            switch($modData['Creador']) {
-                case 'usuario1':
-                    $creador = $usuario1;
-                    break;
-                case 'usuario2':
-                    $creador = $usuario2;
-                    break;
-                case 'usuario3':
-                    $creador = $usuario3;
-                    break;
-                default:
-                    $creador = $usuario1; // Default a usuario1 si no coincide
-            }
+            $creadorNombre = $modData['Creador'] ?? 'usuario1';
+            $creador = $usuarios->has($creadorNombre) ? $usuarios[$creadorNombre] : $usuarios['usuario1'];
 
             // Obtener el juego ya creado
             $juego = $juegosMap[$modData['Juego']];
@@ -96,7 +112,8 @@ class ModSeeder extends Seeder
                     'version_actual' => $modData['VersionActual'],
                     'url' => $modData['Url'],
                     'creador_id' => $creador->id,
-                    'descripcion' => $modData['Descripcion']
+                    'descripcion' => $modData['Descripcion'],
+                    'estado' => $modData['Estado'] ?? 'publicado'
                 ]
             );
 
@@ -138,5 +155,7 @@ class ModSeeder extends Seeder
                 }
             }
         }
+        
+        $this->command->info('Seeder de mods completado con éxito.');
     }
 } 

@@ -21,7 +21,8 @@
             "Url": "https://www.expansiongalactica.com",
             "Valoracion": 4.5,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 2,
@@ -40,8 +41,9 @@
             "VersionActual": "1.0.0",
             "Url": "https://www.nuevasfronterasmod.com",
             "Valoracion": 4.7,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario2",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "borrador"
         },
         {
             "id": 3,
@@ -64,7 +66,8 @@
             "Url": "https://www.conquistaestelarmod.com",
             "Valoracion": 4.6,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 4,
@@ -86,8 +89,9 @@
             "VersionActual": "2.3.0",
             "Url": "https://www.galaxiaslejanasmod.com",
             "Valoracion": 4.8,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario3",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 5,
@@ -108,8 +112,9 @@
             "VersionActual": "2.4.0",
             "Url": "https://www.rebelionintergalacticamod.com",
             "Valoracion": 4.9,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario2",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 6,
@@ -131,8 +136,9 @@
             "VersionActual": "2.1.0",
             "Url": "https://www.historysdereinosmod.com",
             "Valoracion": 4.5,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario3",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 7,
@@ -151,8 +157,9 @@
             "VersionActual": "2.2.0",
             "Url": "https://www.Mysterysantiguosmod.com",
             "Valoracion": 4.7,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario2",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "borrador"
         },
         {
             "id": 8,
@@ -174,7 +181,8 @@
             "Url": "https://www.guerrerosdeloestemod.com",
             "Valoracion": 4.5,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 9,
@@ -196,8 +204,9 @@
             "VersionActual": "2.6.0",
             "Url": "https://www.secretosdelamansionmod.com",
             "Valoracion": 4.8,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario3",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 10,
@@ -219,8 +228,9 @@
             "VersionActual": "3.2.0",
             "Url": "https://www.desafiosfuturistasmod.com",
             "Valoracion": 4.6,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario2",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 11,
@@ -242,7 +252,8 @@
             "Url": "https://www.circuitosneotokiomod.com",
             "Valoracion": 4.8,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 12,
@@ -264,8 +275,9 @@
             "VersionActual": "3.3.0",
             "Url": "https://www.desafiosolarmod.com",
             "Valoracion": 4.9,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario3",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 13,
@@ -286,8 +298,9 @@
             "VersionActual": "3.4.0",
             "Url": "https://www.rallyintergalacticomod.com",
             "Valoracion": 4.5,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario2",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 14,
@@ -307,7 +320,8 @@
             "Url": "https://www.speedenelvaciomod.com",
             "Valoracion": 4.7,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 15,
@@ -329,8 +343,9 @@
             "VersionActual": "3.6.0",
             "Url": "https://www.pilotosdelfuturomod.com",
             "Valoracion": 4.6,
-            "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Creador": "usuario3",
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 16,
@@ -352,7 +367,8 @@
             "Url": "https://www.arsenalestelarmod.com",
             "Valoracion": 4.5,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 17,
@@ -372,7 +388,8 @@
             "Url": "https://www.construyetuestacionmod.com",
             "Valoracion": 4.7,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 18,
@@ -395,7 +412,8 @@
             "Url": "https://www.alianzasgalacticasmod.com",
             "Valoracion": 4.8,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "borrador"
         },
         {
             "id": 19,
@@ -417,7 +435,8 @@
             "Url": "https://www.invasionoscuramod.com",
             "Valoracion": 4.9,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 20,
@@ -440,7 +459,8 @@
             "Url": "https://www.nuevastecnologiasmod.com",
             "Valoracion": 4.6,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 21,
@@ -463,7 +483,8 @@
             "Url": "https://www.tesorohundidomod.com",
             "Valoracion": 4.5,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 22,
@@ -483,7 +504,8 @@
             "Url": "https://www.nuevasislasmod.com",
             "Valoracion": 4.7,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 23,
@@ -506,7 +528,8 @@
             "Url": "https://www.batallasnavalesmod.com",
             "Valoracion": 4.8,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 24,
@@ -529,7 +552,8 @@
             "Url": "https://www.monstruosmarinosmod.com",
             "Valoracion": 4.6,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 25,
@@ -551,7 +575,8 @@
             "Url": "https://www.comercioyriquezamod.com",
             "Valoracion": 4.9,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 26,
@@ -574,7 +599,8 @@
             "Url": "https://www.refugiosmejoradosmod.com",
             "Valoracion": 4.5,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 27,
@@ -594,7 +620,8 @@
             "Url": "https://www.armasavanzadasmod.com",
             "Valoracion": 4.7,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 28,
@@ -617,7 +644,8 @@
             "Url": "https://www.nuevaszonasexplorablesmod.com",
             "Valoracion": 4.8,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 29,
@@ -639,7 +667,8 @@
             "Url": "https://www.sistemasdecultivomod.com",
             "Valoracion": 4.6,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 30,
@@ -662,7 +691,8 @@
             "Url": "https://www.comunidadessegurasmod.com",
             "Valoracion": 4.9,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 31,
@@ -685,7 +715,8 @@
             "Url": "https://www.artefactosocultosmod.com",
             "Valoracion": 4.5,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 32,
@@ -705,7 +736,8 @@
             "Url": "https://www.hechizosdesombramod.com",
             "Valoracion": 4.7,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 33,
@@ -728,7 +760,8 @@
             "Url": "https://www.criaturasdelanochemod.com",
             "Valoracion": 4.8,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 34,
@@ -750,7 +783,8 @@
             "Url": "https://www.guardianesarcanosmod.com",
             "Valoracion": 4.6,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 35,
@@ -773,7 +807,8 @@
             "Url": "https://www.ascensodelnigromantemod.com",
             "Valoracion": 4.9,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 36,
@@ -796,7 +831,8 @@
             "Url": "https://www.circuitoslegendariosmod.com",
             "Valoracion": 4.5,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 37,
@@ -816,7 +852,8 @@
             "Url": "https://www.desafiosdeepocamod.com",
             "Valoracion": 4.7,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 38,
@@ -839,7 +876,8 @@
             "Url": "https://www.supercochesdelpasadomod.com",
             "Valoracion": 4.8,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 39,
@@ -862,7 +900,8 @@
             "Url": "https://www.rivalesenlapistamod.com",
             "Valoracion": 4.6,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         },
         {
             "id": 40,
@@ -885,7 +924,8 @@
             "Url": "https://www.torneosmundialesmod.com",
             "Valoracion": 4.9,
             "Creador": "usuario1",
-            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt"
+            "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
+            "Estado": "publicado"
         }
     ]
 }

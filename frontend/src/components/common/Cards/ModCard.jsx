@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 const ModCard = ({ mod, isOwner = false, actions }) => {
   // Función para mostrar estrellas según la valoración
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
+  const renderStars = (valoracion) => {
+    const fullStars = Math.floor(valoracion);
+    const hasHalfStar = valoracion % 1 >= 0.5;
     const stars = [];
 
     // Añadir estrellas completas
@@ -53,8 +53,8 @@ const ModCard = ({ mod, isOwner = false, actions }) => {
       {/* Imagen del mod */}
       <div className="relative">
         <img 
-          src={mod.image} 
-          alt={mod.title} 
+          src={mod.imagen} 
+          alt={mod.titulo} 
           className="w-full h-48 object-cover brightness-90" 
           loading="lazy"
         />
@@ -64,27 +64,27 @@ const ModCard = ({ mod, isOwner = false, actions }) => {
         
         {/* Categoría */}
         <div className="absolute top-3 left-3 bg-custom-primary/90 text-white text-xs font-medium py-1.5 px-3 rounded-full shadow-lg backdrop-blur-sm">
-          {mod.category}
+          {mod.categoria}
         </div>
         
         {/* Estado (si es propietario) */}
-        {isOwner && mod.status && (
+        {isOwner && mod.estado && (
           <div className={`absolute top-3 right-3 text-xs font-medium py-1.5 px-3 rounded-full shadow-lg backdrop-blur-sm ${
-            mod.status === 'publicado' 
+            mod.estado === 'publicado' 
               ? 'bg-green-500/90 text-white' 
               : 'bg-yellow-500/90 text-white'
           }`}>
-            {mod.status === 'publicado' ? 'Publicado' : 'Borrador'}
+            {mod.estado === 'publicado' ? 'Publicado' : 'Borrador'}
           </div>
         )}
         
         {/* Título sobre la imagen con mayor contraste */}
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-          <h3 className="font-bold text-lg leading-tight line-clamp-1 drop-shadow-lg">{mod.title}</h3>
+          <h3 className="font-bold text-lg leading-tight line-clamp-1 drop-shadow-lg">{mod.titulo}</h3>
           <p className="text-sm text-white/95 mt-1 flex items-center drop-shadow-lg">
-            <span className="bg-custom-card/50 px-2 py-0.5 rounded backdrop-blur-md">{mod.game}</span>
+            <span className="bg-custom-card/50 px-2 py-0.5 rounded backdrop-blur-md">{mod.juego}</span>
             <span className="mx-1.5">•</span>
-            <span>por <span className="text-custom-secondary font-medium">{mod.author}</span></span>
+            <span>por <span className="text-custom-secondary font-medium">{mod.autor}</span></span>
           </p>
         </div>
       </div>
@@ -92,15 +92,15 @@ const ModCard = ({ mod, isOwner = false, actions }) => {
       {/* Contenido */}
       <div className="p-5">
         {/* Descripción */}
-        <p className="text-white/90 text-sm mb-4 line-clamp-2 mt-1">{mod.description}</p>
+        <p className="text-white/90 text-sm mb-4 line-clamp-2 mt-1">{mod.descripcion}</p>
         
         {/* Estadísticas */}
         <div className="flex items-center justify-between">
           <div className="flex items-center bg-custom-bg/50 rounded-full px-3 py-1.5 text-white shadow-sm">
             <div className="flex items-center mr-1">
-              {renderStars(mod.rating)}
+              {renderStars(mod.valoracion)}
             </div>
-            <span className="ml-1 text-xs font-medium">{mod.rating.toFixed(1)}</span>
+            <span className="ml-1 text-xs font-medium">{mod.valoracion.toFixed(1)}</span>
           </div>
           
           <div className="flex items-center space-x-3">
@@ -108,7 +108,7 @@ const ModCard = ({ mod, isOwner = false, actions }) => {
               <svg className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              <span className="text-xs font-medium">{mod.downloads >= 1000 ? `${(mod.downloads / 1000).toFixed(1)}k` : mod.downloads}</span>
+              <span className="text-xs font-medium">{mod.descargas >= 1000 ? `${(mod.descargas / 1000).toFixed(1)}k` : mod.descargas}</span>
             </div>
             
             {/* Acciones personalizadas o botón de guardar por defecto */}

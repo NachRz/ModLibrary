@@ -6,78 +6,7 @@ const ModsGuardados = () => {
   
   // Datos de ejemplo para mods guardados
   const savedMods = [
-    {
-      id: 1,
-      title: 'Better Graphics Overhaul',
-      game: 'Skyrim',
-      author: 'ModMaster',
-      downloads: 15243,
-      rating: 4.8,
-      category: 'Gráficos',
-      image: 'https://via.placeholder.com/150',
-      description: 'Mejora todos los gráficos del juego sin impactar el rendimiento.',
-      dateAdded: '2023-04-15'
-    },
-    {
-      id: 2,
-      title: 'Enhanced Combat System',
-      game: 'Fallout 4',
-      author: 'CombatPro',
-      downloads: 8976,
-      rating: 4.5,
-      category: 'Jugabilidad',
-      image: 'https://via.placeholder.com/150',
-      description: 'Un sistema de combate completamente renovado para una experiencia más inmersiva.',
-      dateAdded: '2023-04-10'
-    },
-    {
-      id: 3,
-      title: 'New Weapons Pack',
-      game: 'GTA V',
-      author: 'WeaponMaster',
-      downloads: 12567,
-      rating: 4.7,
-      category: 'Armas',
-      image: 'https://via.placeholder.com/150',
-      description: 'Añade más de 50 armas nuevas al juego, todas personalizables.',
-      dateAdded: '2023-03-28'
-    },
-    {
-      id: 4,
-      title: 'Ultimate UI Improvement',
-      game: 'Witcher 3',
-      author: 'UIDesigner',
-      downloads: 7865,
-      rating: 4.6,
-      category: 'Interfaz',
-      image: 'https://via.placeholder.com/150',
-      description: 'Mejora la interfaz de usuario para una experiencia más limpia y funcional.',
-      dateAdded: '2023-03-20'
-    },
-    {
-      id: 5,
-      title: 'Realistic Weather System',
-      game: 'Red Dead Redemption 2',
-      author: 'WeatherPro',
-      downloads: 9543,
-      rating: 4.9,
-      category: 'Inmersión',
-      image: 'https://via.placeholder.com/150',
-      description: 'Sistema climático realista con ciclos dinámicos y efectos visuales mejorados.',
-      dateAdded: '2023-03-15'
-    },
-    {
-      id: 6,
-      title: 'Character Enhancement Pack',
-      game: 'Mass Effect',
-      author: 'CharacterArtist',
-      downloads: 6789,
-      rating: 4.4,
-      category: 'Personajes',
-      image: 'https://via.placeholder.com/150',
-      description: 'Mejora todos los modelos de personajes para un aspecto más detallado.',
-      dateAdded: '2023-03-05'
-    }
+   
   ];
 
   // Ordenar los mods según la opción seleccionada

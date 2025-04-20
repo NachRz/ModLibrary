@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('url');
             $table->foreignId('creador_id')->constrained('usuarios')->onDelete('cascade');
             $table->text('descripcion');
+            $table->string('estado')->default('publicado');
             $table->timestamps();
         });
     }
