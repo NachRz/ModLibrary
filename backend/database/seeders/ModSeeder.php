@@ -101,21 +101,20 @@ class ModSeeder extends Seeder
             // Obtener el juego ya creado
             $juego = $juegosMap[$modData['Juego']];
 
-            // Crear o actualizar el mod
-            $mod = Mod::firstOrCreate(
-                ['titulo' => $modData['Titulo']],
-                [
-                    'imagen' => $modData['Imagen'],
-                    'edad_recomendada' => $modData['EdadRecomendada'],
-                    'juego_id' => $juego->id,
-                    'version_juego_necesaria' => $modData['VersionJuegoNecesaria'],
-                    'version_actual' => $modData['VersionActual'],
-                    'url' => $modData['Url'],
-                    'creador_id' => $creador->id,
-                    'descripcion' => $modData['Descripcion'],
-                    'estado' => $modData['Estado'] ?? 'publicado'
-                ]
-            );
+            // Crear el mod
+            $mod = Mod::create([
+                'titulo' => $modData['Titulo'],
+                'imagen' => $modData['Imagen'],
+                'edad_recomendada' => $modData['EdadRecomendada'],
+                'juego_id' => $juego->id,
+                'version_juego_necesaria' => $modData['VersionJuegoNecesaria'],
+                'version_actual' => $modData['VersionActual'],
+                'url' => $modData['Url'],
+                'creador_id' => $creador->id,
+                'descripcion' => $modData['Descripcion'],
+                'estado' => $modData['Estado'],
+                'total_descargas' => $modData['NumDescargas']
+            ]);
 
             // Crear versiones
             // Versión actual

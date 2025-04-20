@@ -44,7 +44,7 @@ const MisMods = () => {
               titulo: mod.titulo,
               juego: juegoNombre,
               autor: mod.creador?.nome || 'Anónimo',
-              descargas: totalDescargas,
+              descargas: mod.total_descargas,
               valoracion: valoracionMedia || 0,
               categoria: categoria,
               imagen: mod.imagen || '/images/mod-placeholder.jpg',

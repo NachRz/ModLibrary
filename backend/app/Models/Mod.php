@@ -24,7 +24,8 @@ class Mod extends Model
         'url',
         'creador_id',
         'descripcion',
-        'estado'
+        'estado',
+        'total_descargas'
     ];
 
     public function juego(): BelongsTo

@@ -61,7 +61,7 @@ class ModController extends Controller
             $mod->estadisticas = [
                 'valoracion_media' => round($valoracionMedia, 1),
                 'total_valoraciones' => $totalValoraciones,
-                'total_descargas' => $mod->versiones->sum('descargas') ?? 0
+                'total_descargas' => $mod->total_descargas
             ];
             
             return $mod;
