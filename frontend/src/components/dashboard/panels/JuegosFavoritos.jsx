@@ -4,68 +4,7 @@ import GameCard from '../../common/Cards/GameCard';
 const JuegosFavoritos = () => {
   // Datos de ejemplo para juegos favoritos
   const favoriteGames = [
-    {
-      id: 1,
-      title: 'Skyrim',
-      image: 'https://via.placeholder.com/400x225',
-      developer: 'Bethesda Game Studios',
-      genres: ['RPG'],
-      description: 'Un juego de rol de mundo abierto donde puedes explorar la vasta región de Skyrim y embarcarte en un viaje épico.',
-      rating: 4.8,
-      releaseYear: '2011',
-      platforms: ['PC', 'Xbox', 'PS4'],
-      totalMods: 58421,
-      trending: true
-    },
-    {
-      id: 2,
-      title: 'Fallout 4',
-      image: 'https://via.placeholder.com/400x225',
-      developer: 'Bethesda Game Studios',
-      genres: ['RPG', 'Acción'],
-      description: 'Explora un mundo post-apocalíptico y sobrevive en un entorno devastado por la guerra nuclear.',
-      rating: 4.5,
-      releaseYear: '2015',
-      platforms: ['PC', 'Xbox', 'PS4'],
-      totalMods: 32145
-    },
-    {
-      id: 3,
-      title: 'Witcher 3',
-      image: 'https://via.placeholder.com/400x225',
-      developer: 'CD Projekt Red',
-      genres: ['RPG', 'Aventura'],
-      description: 'Un RPG de mundo abierto con una rica narrativa y múltiples decisiones que afectan el desarrollo de la historia.',
-      rating: 4.9,
-      releaseYear: '2015',
-      platforms: ['PC', 'Xbox', 'PS4', 'Switch'],
-      totalMods: 12789,
-      trending: true
-    },
-    {
-      id: 4,
-      title: 'Cyberpunk 2077',
-      image: 'https://via.placeholder.com/400x225',
-      developer: 'CD Projekt Red',
-      genres: ['RPG', 'Acción'],
-      description: 'Un RPG de acción ambientado en un futuro distópico donde la tecnología y las modificaciones corporales son parte de la vida cotidiana.',
-      rating: 3.8,
-      releaseYear: '2020',
-      platforms: ['PC', 'Xbox', 'PS5'],
-      totalMods: 8542
-    },
-    {
-      id: 5,
-      title: 'Red Dead Redemption 2',
-      image: 'https://via.placeholder.com/400x225',
-      developer: 'Rockstar Games',
-      genres: ['Acción', 'Aventura'],
-      description: 'Un juego de acción y aventura ambientado en el Viejo Oeste americano con un extenso mundo abierto y una narrativa inmersiva.',
-      rating: 4.7,
-      releaseYear: '2019',
-      platforms: ['PC', 'Xbox', 'PS4'],
-      totalMods: 5632
-    }
+    
   ];
 
   return (
