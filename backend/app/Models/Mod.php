@@ -25,8 +25,36 @@ class Mod extends Model
         'creador_id',
         'descripcion',
         'estado',
-        'total_descargas'
+        'total_descargas',
+        'num_valoraciones',
+        'val_media'
     ];
+
+    /**
+     * Calcula y actualiza el número de valoraciones para este mod
+     */
+    public function actualizarNumValoraciones()
+    {
+        $this->num_valoraciones = $this->valoraciones()->count();
+        $this->save();
+    }
+
+    /**
+     * Calcula y actualiza la valoración media para este mod
+     */
+    public function actualizarValMedia()
+    {
+        $numValoraciones = $this->valoraciones()->count();
+        
+        if ($numValoraciones > 0) {
+            $this->val_media = $this->valoraciones()->avg('puntuacion'); //Calcula el promedio de valoraciones usando la función avg
+        } else {
+            $this->val_media = 0;
+        }
+
+        $this->num_valoraciones = $numValoraciones;
+        $this->save();
+    }
 
     public function juego(): BelongsTo
     {

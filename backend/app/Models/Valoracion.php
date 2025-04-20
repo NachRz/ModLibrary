@@ -19,6 +19,24 @@ class Valoracion extends Model
         'fecha'
     ];
 
+    /**
+     * El "booted" method del modelo.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        // Cuando se crea o actualiza una valoración, actualizamos los contadores en el mod
+        static::saved(function ($valoracion) {
+            $valoracion->mod->actualizarValMedia();
+        });
+
+        // Cuando se elimina una valoración, actualizamos los contadores en el mod
+        static::deleted(function ($valoracion) {
+            $valoracion->mod->actualizarValMedia();
+        });
+    }
+
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');

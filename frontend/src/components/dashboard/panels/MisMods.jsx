@@ -8,7 +8,6 @@ const MisMods = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Función para cargar los mods del usuario autenticado
   useEffect(() => {
     const fetchMyMods = async () => {
       try {
@@ -18,48 +17,7 @@ const MisMods = () => {
         const response = await modService.getMyMods();
         
         if (response.status === 'success') {
-          // Procesamos y calculamos los datos necesarios
-          const formattedMods = response.data.map(mod => {
-            // Calculamos el número total de descargas sumando las descargas de todas las versiones
-            const totalDescargas = mod.versiones 
-              ? mod.versiones.reduce((total, version) => total + (version.descargas || 0), 0)
-              : 0;
-            
-            // Calculamos la valoración media
-            let valoracionMedia = 0;
-            if (mod.valoraciones && mod.valoraciones.length > 0) {
-              valoracionMedia = mod.valoraciones.reduce((sum, val) => sum + val.puntuacion, 0) / mod.valoraciones.length;
-            }
-            
-            // Obtenemos el nombre del juego
-            const juegoNombre = mod.juego ? mod.juego.titulo : 'Juego desconocido';
-            
-            // Formateamos la primera etiqueta para la categoría
-            const categoria = mod.etiquetas && mod.etiquetas.length > 0 
-              ? mod.etiquetas[0].nombre 
-              : 'General';
-            
-            return {
-              id: mod.id,
-              titulo: mod.titulo,
-              juego: juegoNombre,
-              autor: mod.creador?.nome || 'Anónimo',
-              descargas: mod.total_descargas,
-              valoracion: valoracionMedia || 0,
-              categoria: categoria,
-              imagen: mod.imagen || '/images/mod-placeholder.jpg',
-              descripcion: mod.descripcion,
-              estado: mod.estado || 'publicado',
-              // Información adicional
-              versiones: mod.versiones || [],
-              etiquetas: mod.etiquetas || [],
-              url: mod.url,
-              fechaCreacion: mod.created_at,
-              fechaActualizacion: mod.updated_at
-            };
-          });
-          
-          setMyMods(formattedMods);
+          setMyMods(response.data.map(formatModData));
         } else {
           setError('No se pudieron cargar los mods');
         }
@@ -73,10 +31,92 @@ const MisMods = () => {
     
     fetchMyMods();
   }, []);
+
+  // Función para formatear los datos del mod
+  const formatModData = (mod) => ({
+    id: mod.id,
+    titulo: mod.titulo,
+    juego: mod.juego?.titulo || 'Juego desconocido',
+    autor: mod.creador?.nome || 'Anónimo',
+    descargas: mod.total_descargas || 0,
+    valoracion: mod.val_media || 0,
+    numValoraciones: mod.num_valoraciones || 0,
+    categoria: mod.etiquetas?.[0]?.nombre || 'General',
+    imagen: mod.imagen || '/images/mod-placeholder.jpg',
+    descripcion: mod.descripcion || '',
+    estado: mod.estado || 'publicado',
+    url: mod.url
+  });
   
   const filteredMods = activeFilter === 'todos' 
     ? myMods 
     : myMods.filter(mod => mod.estado === activeFilter);
+
+  // Componentes para los diferentes estados
+  const renderLoading = () => (
+    <div className="text-center py-8">
+      <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-custom-primary"></div>
+      <p className="mt-2 text-custom-detail">Cargando tus mods...</p>
+    </div>
+  );
+
+  const renderError = () => (
+    <div className="text-center py-8">
+      <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+        <p>{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-2 text-sm underline hover:text-red-800"
+        >
+          Intentar de nuevo
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderEmptyState = () => (
+    <div className="text-center py-8">
+      <p className="text-custom-detail">No tienes mods en esta categoría.</p>
+      {activeFilter !== 'todos' && (
+        <button 
+          onClick={() => setActiveFilter('todos')} 
+          className="mt-2 text-sm text-custom-primary hover:underline"
+        >
+          Ver todos los mods
+        </button>
+      )}
+    </div>
+  );
+
+  const renderModGrid = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filteredMods.map(mod => (
+        <ModCard key={mod.id} mod={mod} isOwner={true} />
+      ))}
+    </div>
+  );
+
+  const renderFilterButtons = () => {
+    const buttonClass = (filter) => `px-4 py-2 rounded-md transition-colors duration-300 ${
+      activeFilter === filter 
+        ? 'bg-custom-primary text-white' 
+        : 'bg-custom-bg text-custom-detail hover:text-custom-text'
+    }`;
+
+    return (
+      <div className="flex space-x-2 mb-4 overflow-x-auto hide-scrollbar">
+        <button onClick={() => setActiveFilter('todos')} className={buttonClass('todos')}>
+          Todos
+        </button>
+        <button onClick={() => setActiveFilter('publicado')} className={buttonClass('publicado')}>
+          Publicados
+        </button>
+        <button onClick={() => setActiveFilter('borrador')} className={buttonClass('borrador')}>
+          Borradores
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -91,75 +131,12 @@ const MisMods = () => {
       </div>
       
       <div className="bg-custom-card rounded-lg shadow-custom p-4">
-        <div className="flex space-x-2 mb-4 overflow-x-auto hide-scrollbar">
-          <button
-            onClick={() => setActiveFilter('todos')}
-            className={`px-4 py-2 rounded-md transition-colors duration-300 ${
-              activeFilter === 'todos' 
-                ? 'bg-custom-primary text-white' 
-                : 'bg-custom-bg text-custom-detail hover:text-custom-text'
-            }`}
-          >
-            Todos
-          </button>
-          <button
-            onClick={() => setActiveFilter('publicado')}
-            className={`px-4 py-2 rounded-md transition-colors duration-300 ${
-              activeFilter === 'publicado' 
-                ? 'bg-custom-primary text-white' 
-                : 'bg-custom-bg text-custom-detail hover:text-custom-text'
-            }`}
-          >
-            Publicados
-          </button>
-          <button
-            onClick={() => setActiveFilter('borrador')}
-            className={`px-4 py-2 rounded-md transition-colors duration-300 ${
-              activeFilter === 'borrador' 
-                ? 'bg-custom-primary text-white' 
-                : 'bg-custom-bg text-custom-detail hover:text-custom-text'
-            }`}
-          >
-            Borradores
-          </button>
-        </div>
+        {renderFilterButtons()}
         
-        {loading ? (
-          <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-custom-primary"></div>
-            <p className="mt-2 text-custom-detail">Cargando tus mods...</p>
-          </div>
-        ) : error ? (
-          <div className="text-center py-8">
-            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-              <p>{error}</p>
-              <button 
-                onClick={() => window.location.reload()} 
-                className="mt-2 text-sm underline hover:text-red-800"
-              >
-                Intentar de nuevo
-              </button>
-            </div>
-          </div>
-        ) : filteredMods.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-custom-detail">No tienes mods en esta categoría.</p>
-            {activeFilter !== 'todos' && (
-              <button 
-                onClick={() => setActiveFilter('todos')} 
-                className="mt-2 text-sm text-custom-primary hover:underline"
-              >
-                Ver todos los mods
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMods.map(mod => (
-              <ModCard key={mod.id} mod={mod} isOwner={true} />
-            ))}
-          </div>
-        )}
+        {loading ? renderLoading() :
+         error ? renderError() :
+         filteredMods.length === 0 ? renderEmptyState() :
+         renderModGrid()}
       </div>
     </div>
   );

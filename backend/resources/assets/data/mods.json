@@ -19,7 +19,6 @@
             ],
             "VersionActual": "2.0.0",
             "Url": "https://www.expansiongalactica.com",
-            "Valoracion": 4.5,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -40,7 +39,6 @@
             "VersionesAnteriores": [],
             "VersionActual": "1.0.0",
             "Url": "https://www.nuevasfronterasmod.com",
-            "Valoracion": 4.7,
             "Creador": "usuario2",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "borrador"
@@ -64,7 +62,6 @@
             ],
             "VersionActual": "2.2.0",
             "Url": "https://www.conquistaestelarmod.com",
-            "Valoracion": 4.6,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -88,7 +85,6 @@
             ],
             "VersionActual": "2.3.0",
             "Url": "https://www.galaxiaslejanasmod.com",
-            "Valoracion": 4.8,
             "Creador": "usuario3",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -111,7 +107,6 @@
             ],
             "VersionActual": "2.4.0",
             "Url": "https://www.rebelionintergalacticamod.com",
-            "Valoracion": 4.9,
             "Creador": "usuario2",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -135,7 +130,6 @@
             ],
             "VersionActual": "2.1.0",
             "Url": "https://www.historysdereinosmod.com",
-            "Valoracion": 4.5,
             "Creador": "usuario3",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -156,7 +150,6 @@
             "VersionesAnteriores": [],
             "VersionActual": "2.2.0",
             "Url": "https://www.Mysterysantiguosmod.com",
-            "Valoracion": 4.7,
             "Creador": "usuario2",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "borrador"
@@ -179,7 +172,6 @@
             ],
             "VersionActual": "1.8.0",
             "Url": "https://www.guerrerosdeloestemod.com",
-            "Valoracion": 4.5,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -203,7 +195,6 @@
             ],
             "VersionActual": "2.6.0",
             "Url": "https://www.secretosdelamansionmod.com",
-            "Valoracion": 4.8,
             "Creador": "usuario3",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -227,7 +218,6 @@
             ],
             "VersionActual": "3.2.0",
             "Url": "https://www.desafiosfuturistasmod.com",
-            "Valoracion": 4.6,
             "Creador": "usuario2",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -250,7 +240,6 @@
             ],
             "VersionActual": "3.2.5",
             "Url": "https://www.circuitosneotokiomod.com",
-            "Valoracion": 4.8,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -274,7 +263,6 @@
             ],
             "VersionActual": "3.3.0",
             "Url": "https://www.desafiosolarmod.com",
-            "Valoracion": 4.9,
             "Creador": "usuario3",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -297,7 +285,6 @@
             ],
             "VersionActual": "3.4.0",
             "Url": "https://www.rallyintergalacticomod.com",
-            "Valoracion": 4.5,
             "Creador": "usuario2",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -318,7 +305,6 @@
             "VersionesAnteriores": [],
             "VersionActual": "3.5.0",
             "Url": "https://www.speedenelvaciomod.com",
-            "Valoracion": 4.7,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -342,7 +328,6 @@
             ],
             "VersionActual": "3.6.0",
             "Url": "https://www.pilotosdelfuturomod.com",
-            "Valoracion": 4.6,
             "Creador": "usuario3",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -365,7 +350,6 @@
             ],
             "VersionActual": "1.3.0",
             "Url": "https://www.arsenalestelarmod.com",
-            "Valoracion": 4.5,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -386,7 +370,6 @@
             "VersionesAnteriores": [],
             "VersionActual": "1.4.0",
             "Url": "https://www.construyetuestacionmod.com",
-            "Valoracion": 4.7,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -410,7 +393,6 @@
             ],
             "VersionActual": "1.5.0",
             "Url": "https://www.alianzasgalacticasmod.com",
-            "Valoracion": 4.8,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "borrador"
@@ -433,7 +415,6 @@
             ],
             "VersionActual": "1.6.0",
             "Url": "https://www.invasionoscuramod.com",
-            "Valoracion": 4.9,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -457,7 +438,6 @@
             ],
             "VersionActual": "1.7.0",
             "Url": "https://www.nuevastecnologiasmod.com",
-            "Valoracion": 4.6,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -481,7 +461,6 @@
             ],
             "VersionActual": "3.5.0",
             "Url": "https://www.tesorohundidomod.com",
-            "Valoracion": 4.5,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -502,7 +481,6 @@
             "VersionesAnteriores": [],
             "VersionActual": "3.6.0",
             "Url": "https://www.nuevasislasmod.com",
-            "Valoracion": 4.7,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -526,7 +504,6 @@
             ],
             "VersionActual": "3.7.0",
             "Url": "https://www.batallasnavalesmod.com",
-            "Valoracion": 4.8,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -550,7 +527,6 @@
             ],
             "VersionActual": "3.8.0",
             "Url": "https://www.monstruosmarinosmod.com",
-            "Valoracion": 4.6,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -573,7 +549,6 @@
             ],
             "VersionActual": "3.9.0",
             "Url": "https://www.comercioyriquezamod.com",
-            "Valoracion": 4.9,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -597,7 +572,6 @@
             ],
             "VersionActual": "2.3.0",
             "Url": "https://www.refugiosmejoradosmod.com",
-            "Valoracion": 4.5,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -618,7 +592,6 @@
             "VersionesAnteriores": [],
             "VersionActual": "2.4.0",
             "Url": "https://www.armasavanzadasmod.com",
-            "Valoracion": 4.7,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -642,7 +615,6 @@
             ],
             "VersionActual": "2.5.0",
             "Url": "https://www.nuevaszonasexplorablesmod.com",
-            "Valoracion": 4.8,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -665,7 +637,6 @@
             ],
             "VersionActual": "2.6.0",
             "Url": "https://www.sistemasdecultivomod.com",
-            "Valoracion": 4.6,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -689,7 +660,6 @@
             ],
             "VersionActual": "2.7.0",
             "Url": "https://www.comunidadessegurasmod.com",
-            "Valoracion": 4.9,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -713,7 +683,6 @@
             ],
             "VersionActual": "1.6.0",
             "Url": "https://www.artefactosocultosmod.com",
-            "Valoracion": 4.5,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -734,7 +703,6 @@
             "VersionesAnteriores": [],
             "VersionActual": "1.7.0",
             "Url": "https://www.hechizosdesombramod.com",
-            "Valoracion": 4.7,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -758,7 +726,6 @@
             ],
             "VersionActual": "1.8.0",
             "Url": "https://www.criaturasdelanochemod.com",
-            "Valoracion": 4.8,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -781,7 +748,6 @@
             ],
             "VersionActual": "1.9.0",
             "Url": "https://www.guardianesarcanosmod.com",
-            "Valoracion": 4.6,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -805,7 +771,6 @@
             ],
             "VersionActual": "2.0.0",
             "Url": "https://www.ascensodelnigromantemod.com",
-            "Valoracion": 4.9,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -829,7 +794,6 @@
             ],
             "VersionActual": "4.1.0",
             "Url": "https://www.circuitoslegendariosmod.com",
-            "Valoracion": 4.5,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -850,7 +814,6 @@
             "VersionesAnteriores": [],
             "VersionActual": "4.2.0",
             "Url": "https://www.desafiosdeepocamod.com",
-            "Valoracion": 4.7,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -874,7 +837,6 @@
             ],
             "VersionActual": "4.3.0",
             "Url": "https://www.supercochesdelpasadomod.com",
-            "Valoracion": 4.8,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -898,7 +860,6 @@
             ],
             "VersionActual": "4.4.0",
             "Url": "https://www.rivalesenlapistamod.com",
-            "Valoracion": 4.6,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"
@@ -922,7 +883,6 @@
             ],
             "VersionActual": "4.5.0",
             "Url": "https://www.torneosmundialesmod.com",
-            "Valoracion": 4.9,
             "Creador": "usuario1",
             "Descripcion": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus ut nunc tincidunt tincidunt",
             "Estado": "publicado"

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->foreignId('creador_id')->constrained('usuarios')->onDelete('cascade');
             $table->text('descripcion');
             $table->integer('total_descargas')->default(0);
+            $table->integer('num_valoraciones')->default(0);
+            $table->decimal('val_media', 3, 1)->default(0.0);
             $table->string('estado')->default('publicado');
             $table->timestamps();
         });

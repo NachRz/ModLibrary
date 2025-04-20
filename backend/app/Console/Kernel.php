@@ -9,6 +9,7 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         Commands\ExtractRawgData::class,
+        Commands\ActualizarNumValoraciones::class,
     ];
 
     protected function schedule(Schedule $schedule)
