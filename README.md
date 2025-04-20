@@ -1,110 +1,297 @@
 # ModLibrary - Sistema de Gestión de Biblioteca
 
-## Requisitos Previos
+## 🚀 Guía Paso a Paso para Windows
 
-### Windows
-1. **Docker Desktop**
-   - Descargar e instalar Docker Desktop desde: https://www.docker.com/products/docker-desktop
-   - Durante la instalación, asegúrate de que la opción "WSL 2" esté habilitada
-   - Reiniciar el equipo después de la instalación
+### 1️⃣ Instalar Docker Desktop
+1. **Descargar Docker Desktop**
+   - Ve a https://www.docker.com/products/docker-desktop
+   - Haz clic en "Download for Windows"
+   - Ejecuta el instalador que descargaste
 
-2. **WSL 2 (Windows Subsystem for Linux)**
-   - Abrir PowerShell como administrador y ejecutar:
+2. **Instalar Docker Desktop**
+   - Sigue las instrucciones en pantalla
+   - **IMPORTANTE**: Marca la casilla que dice "WSL 2" cuando te pregunte --> Si durante la instalacion no te sale, despues de instalarlo vete a ajustes de docker destock y activalo
+   - Cuando termine, reinicia tu computadora
+
+3. **Verificar que Docker funciona**
+   - Abre el menú Inicio
+   - Busca "Docker Desktop" y ábrelo (Si te da problemas abrelo como admin)
+   - Espera a que aparezca el ícono de Docker en la barra de tareas (puede tardar unos minutos la primera vez)
+   
+
+### 2️⃣ Descargar el Proyecto
+**Opción 1: Usando Git (recomendado)**
+1. **Abre PowerShell o CMD**
+   
+3. **Ve a la carpeta donde quieres guardar el proyecto**, por ejemplo:
    ```bash
-   wsl --install
+   cd Documentos
    ```
-   - Reiniciar el equipo
-   - Crear un usuario y contraseña cuando se solicite
-
-3. **Git**
-   - Descargar e instalar Git desde: https://git-scm.com/download/win
-   - Durante la instalación, seleccionar "Git from the command line and also from 3rd-party software"
-
-### Linux
-1. **Docker**
+4. **Descarga el proyecto**:
    ```bash
-   # Actualizar repositorios
-   sudo apt update
-
-   # Instalar dependencias
-   sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
-
-   # Agregar la clave GPG oficial de Docker
-   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
-   # Agregar el repositorio de Docker
-   echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-   # Instalar Docker
-   sudo apt update
-   sudo apt install -y docker-ce docker-ce-cli containerd.io
-
-   # Agregar usuario actual al grupo docker
-   sudo usermod -aG docker $USER
+   git clone https://github.com/NachRz/ModLibrary.git
    ```
-
-2. **Docker Compose**
+5. **Entra a la carpeta del proyecto**:
    ```bash
-   # Descargar la última versión de Docker Compose
-   sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-   # Dar permisos de ejecución
-   sudo chmod +x /usr/local/bin/docker-compose
-   ```
-
-3. **Git**
-   ```bash
-   sudo apt install -y git
-   ```
-
-## Instalación y Configuración
-
-1. **Clonar el repositorio**
-   ```bash
-   git clone [URL_DEL_REPOSITORIO]
    cd ModLibrary
    ```
 
-2. **Configurar variables de entorno**
-   - En Windows, crear un archivo `.env` en la raíz del proyecto
-   - En Linux, ejecutar:
+**Opción 2: Descarga Manual**
+1. **Abre tu navegador** y ve a https://github.com/NachRz/ModLibrary
+2. **Haz clic en el botón verde "Code"**
+3. **Selecciona "Download ZIP"**
+4. **Extrae el archivo ZIP** en la carpeta donde quieras guardar el proyecto
+5. **Abre la carpeta extraída** (debería llamarse ModLibrary-main o similar)
+6. **Renombra la carpeta** a simplemente "ModLibrary"
+
+### 3️⃣ Configurar el archivo .env
+1. **Ve a la carpeta backend**:
    ```bash
-   cp .env.example .env
+   cd backend
+   ```
+2. **Crea el archivo .env**:
+   - **IMPORTANTE**: Copia el archivo .env.example y renómbralo a .env
+   - O crea un nuevo archivo .env con este contenido:
+   ```
+   APP_NAME=ModLibrary
+   APP_ENV=local
+   APP_KEY=
+   APP_DEBUG=true
+   APP_URL=http://localhost:8000
+
+   DB_CONNECTION=mysql
+   DB_HOST=db
+   DB_PORT=3306
+   DB_DATABASE=modlibrary
+   DB_USERNAME=root
+   DB_PASSWORD=root
    ```
 
-3. **Construir y ejecutar los contenedores**
-   ```bash
-   # Construir las imágenes
-   docker compose build
+### 4️⃣ Ejecutar la Aplicación
+1. **Abre Docker Desktop**
+   - Abre el docker desktop
+   - Espera a que el ícono deje de moverse (estado "Running")
 
-   # Iniciar los contenedores
+2. **Abre la terminal integrada de Docker Desktop**
+   - Abre docker(Si te da problemas abrelo como admin)
+   - Abajo a la derecha deberiaponer terminal dale click, y se deberia abrir el terminal integrado
+     
+
+3. **Navega a la carpeta del proyecto**
+   ```bash
+   cd C:\Users\TuUsuario\Documentos\ModLibrary
+   ```
+
+4. **Construye las imágenes** (esto puede tardar varios minutos):
+   ```bash
+   docker compose build
+   ```
+
+5. **Inicia la aplicación**:
+   ```bash
    docker compose up -d
    ```
 
-4. **Configurar la base de datos**
-   ```bash
-   # Acceder al contenedor del backend
-   docker compose exec backend bash
+6. **Verifica que todo esté funcionando**:
+   - En Docker Desktop, haz clic en "Containers"
+   - Deberías ver 4 contenedores en estado "Running":
+     - modlibrary-backend
+     - modlibrary-frontend
+     - modlibrary-db
+     - modlibrary-phpmyadmin
 
-   # Dentro del contenedor, ejecutar las migraciones
+### 5️⃣ Configurar la Base de Datos
+1. **Abre phpMyAdmin en tu navegador**
+   - Ve a http://localhost:8080
+   - Inicia sesión con:
+     - Usuario: root
+     - Contraseña: root
+
+2. **Crear la base de datos (si no existe)**
+   - En el panel izquierdo, haz clic en "Nueva"
+   - En "Nombre de la base de datos", escribe: `modlibrary`
+   - Haz clic en "Crear"
+
+3. **Abre una nueva terminal en Docker Desktop**
+   - Dentro de docker en la zona del terminal a la derecha vas a ver un "+" dale ahi y abre otra terminal
+     
+4. **Navega a la carpeta del proyecto**
+   ```bash
+   cd C:\Users\TuUsuario\Documentos\ModLibrary
+   ```
+5. **Accede al contenedor del backend**:
+   ```bash
+   docker compose exec backend bash
+   ```
+6. **Ejecuta las migraciones**:
+   ```bash
    php artisan migrate
    ```
+5. **Ejecuta los seeders**:
+   ```bash
+   php artisan db:seed
+   ```
+7. **Sal del contenedor**:
+   ```bash
+   exit
+   ```
 
-## Acceso a la Aplicación
-
-- **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:8000
-- **phpMyAdmin**: http://localhost:8080
+### 6️⃣ Acceder a la Aplicación
+- **Frontend** (Interfaz de usuario): http://localhost:3000
+- **Backend** (API): http://localhost:8000
+- **phpMyAdmin** (Base de datos): http://localhost:8080
   - Usuario: root
   - Contraseña: root
 
-## Comandos Útiles
+## 🐧 Guía Paso a Paso para Linux
+
+### 1️⃣ Instalar Docker
+1. **Abre la terminal** (Ctrl + Alt + T)
+2. **Copia y pega estos comandos uno por uno**:
+   ```bash
+   sudo apt update
+   sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   sudo apt update
+   sudo apt install -y docker-ce docker-ce-cli containerd.io
+   sudo usermod -aG docker $USER
+   ```
+3. **Cierra la terminal y vuelve a abrirla**
+
+### 2️⃣ Descargar el Proyecto
+**Opción 1: Usando Git (recomendado)**
+1. **Abre la terminal**
+2. **Ve a la carpeta donde quieres guardar el proyecto**, por ejemplo:
+   ```bash
+   cd ~/Documentos
+   ```
+3. **Descarga el proyecto**:
+   ```bash
+   git clone https://github.com/NachRz/ModLibrary.git
+   ```
+4. **Entra a la carpeta del proyecto**:
+   ```bash
+   cd ModLibrary
+   ```
+
+**Opción 2: Descarga Manual**
+1. **Abre tu navegador** y ve a https://github.com/NachRz/ModLibrary
+2. **Haz clic en el botón verde "Code"**
+3. **Selecciona "Download ZIP"**
+4. **Extrae el archivo ZIP**:
+   ```bash
+   unzip ModLibrary-main.zip -d ~/Documentos
+   cd ~/Documentos/ModLibrary-main
+   mv ModLibrary-main ModLibrary
+   cd ModLibrary
+   ```
+
+### 3️⃣ Configurar el archivo .env
+1. **Ve a la carpeta backend**:
+   ```bash
+   cd backend
+   ```
+2. **Crea el archivo .env**:
+   ```bash
+   cp .env.example .env
+   ```
+3. **Edita el archivo .env**:
+   ```bash
+   nano .env
+   ```
+   - Asegúrate de que tenga este contenido:
+   ```
+   APP_NAME=ModLibrary
+   APP_ENV=local
+   APP_KEY=
+   APP_DEBUG=true
+   APP_URL=http://localhost:8000
+
+   DB_CONNECTION=mysql
+   DB_HOST=db
+   DB_PORT=3306
+   DB_DATABASE=modlibrary
+   DB_USERNAME=root
+   DB_PASSWORD=root
+   ```
+   - Presiona Ctrl + X, luego Y y Enter para guardar
+
+### 4️⃣ Ejecutar la Aplicación
+1. **Navega a la carpeta del proyecto**:
+   ```bash
+   cd ~/Documentos/ModLibrary
+   ```
+
+2. **Construye las imágenes** (esto puede tardar varios minutos):
+   ```bash
+   docker compose build
+   ```
+
+3. **Inicia la aplicación**:
+   ```bash
+   docker compose up -d
+   ```
+
+4. **Verifica que todo esté funcionando**:
+   ```bash
+   docker compose ps
+   ```
+   Deberías ver 4 contenedores en estado "Up":
+   - modlibrary-backend
+   - modlibrary-frontend
+   - modlibrary-db
+   - modlibrary-phpmyadmin
+
+### 5️⃣ Configurar la Base de Datos
+1. **Abre phpMyAdmin en tu navegador**
+   - Ve a http://localhost:8080
+   - Inicia sesión con:
+     - Usuario: root
+     - Contraseña: root
+
+2. **Crear la base de datos (si no existe)**
+   - En el panel izquierdo, haz clic en "Nueva"
+   - En "Nombre de la base de datos", escribe: `modlibrary`
+   - Haz clic en "Crear"
+
+3. **Abre una nueva terminal"
+    ```bash
+   cd ~/Documentos/ModLibrary
+   ```
+
+4. **Accede al contenedor del backend**:
+   ```bash
+   docker compose exec backend bash
+   ```
+5. **Ejecuta las migraciones**:
+   ```bash
+   php artisan migrate
+   ```
+6. **Ejecuta los seeders**:
+   ```bash
+   php artisan db:seed
+   ```
+   
+7. **Sal del contenedor**:
+   ```bash
+   exit
+   ```
+
+### 6️⃣ Acceder a la Aplicación
+- **Frontend** (Interfaz de usuario): http://localhost:3000
+- **Backend** (API): http://localhost:8000
+- **phpMyAdmin** (Base de datos): http://localhost:8080
+  - Usuario: root
+  - Contraseña: root
+
+### 🔧 Comandos Básicos que Necesitarás
 
 ```bash
-# Ver estado de los contenedores
+# Ver si la aplicación está funcionando
 docker compose ps
 
-# Ver logs de los contenedores
+# Ver los logs (mensajes de la aplicación)
 docker compose logs -f
 
 # Detener la aplicación
@@ -113,40 +300,41 @@ docker compose down
 # Reiniciar la aplicación
 docker compose restart
 
-# Reconstruir después de cambios
+# Actualizar después de hacer cambios
 docker compose down
 docker compose build
 docker compose up -d
 ```
 
-## Solución de Problemas Comunes
+### ❓ Solución de Problemas Comunes
 
-1. **Error de puertos en uso**
-   - Verificar que los puertos 3000, 8000, 8080 y 3306 no estén en uso
-   - En Windows: `netstat -ano | findstr :PUERTO`
-   - En Linux: `sudo lsof -i :PUERTO`
+1. **"Los puertos están en uso"**
+   - En Windows, abre PowerShell y escribe:
+     ```bash
+     netstat -ano | findstr :3000
+     netstat -ano | findstr :8000
+     netstat -ano | findstr :8080
+     ```
+   - En Linux, escribe:
+     ```bash
+     sudo lsof -i :3000
+     sudo lsof -i :8000
+     sudo lsof -i :8080
+     ```
 
-2. **Problemas con Docker Desktop en Windows**
-   - Asegurarse de que WSL 2 esté correctamente instalado
-   - Verificar que la virtualización esté habilitada en la BIOS
-   - Reiniciar Docker Desktop
+2. **"Docker no funciona"**
+   - En Windows:
+     - Abre Docker Desktop
+     - Espera a que el ícono deje de moverse
+     - Si no funciona, reinicia tu computadora
+   - En Linux:
+     - Escribe en la terminal:
+       ```bash
+       sudo systemctl restart docker
+       ```
 
-3. **Problemas de permisos en Linux**
-   - Asegurarse de que el usuario esté en el grupo docker
-   - Ejecutar: `sudo usermod -aG docker $USER`
-   - Cerrar sesión y volver a iniciar
-
-## Estructura del Proyecto
-
-```
-ModLibrary/
-├── backend/           # Aplicación Laravel
-├── frontend/          # Aplicación React
-├── docker-compose.yml # Configuración de Docker
-└── README.md          # Este archivo
-```
-
-## Contacto y Soporte
-
-Para problemas técnicos o consultas, contactar al equipo de desarrollo.
-
+3. **"No puedo acceder a la aplicación"**
+   - Verifica que todos los contenedores estén en estado "Up":
+     ```bash
+     docker compose ps
+     ```
