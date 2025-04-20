@@ -1,5 +1,87 @@
 # ModLibrary - Sistema de Gestión de Biblioteca
 
+## 🎮 Funcionalidades Principales
+
+### ✅ Funcionalidades Implementadas
+
+#### 1️⃣ Conexión con la API de RAWG
+- Integración con la API de RAWG para obtener información de videojuegos
+- Búsqueda y visualización de juegos
+- Obtención de detalles específicos de cada juego
+
+#### 2️⃣ Gestión de Base de Datos
+- Conexión segura entre backend y base de datos MySQL
+- Migraciones para la estructura de la base de datos
+- Modelos y relaciones para:
+  - Juegos
+  - Mods
+  - Usuarios
+  - Categorías
+
+#### 3️⃣ Backend (Laravel)
+- API RESTful para operaciones básicas
+- Endpoints para:
+  - Gestión de mods
+  - Gestión de juegos
+  - Búsqueda y filtrado
+- Integración con RAWG API
+- Validación de datos básica
+
+#### 4️⃣ Frontend (React)
+- Interfaz de usuario básica
+- Funcionalidades implementadas:
+  - Creación de mods (disponible en el panel de administración)
+  - Búsqueda y filtrado de mods
+- Conexión con el backend mediante API
+
+### 📝 Cómo Probar la Creación de Mods
+1. **Accede al panel de administración**:
+   - Inicia sesión con las credenciales por defecto:
+     - Email: admin@gmail.com
+     - Contraseña: 1234
+   - Vete a Mi Panel
+   - Ahí le das crear mod y ya te lleva al formulario de creación de Mods
+
+2. **Crea un nuevo mod**:
+   - Haz clic en "Crear Mod"
+   - Completa los campos requeridos:
+     - Nombre del mod
+     - Descripción
+     - Juego asociado (seleccionable desde la API de RAWG)
+     - Categoría
+     - Enlace de descarga
+   - Haz clic en "Guardar"
+
+3. **Verifica el mod creado**:
+   - El mod aparecerá en la lista de mods
+   - Podrás ver sus detalles en la vista correspondiente
+
+### 🚧 Funcionalidades en Desarrollo
+
+#### 1️⃣ Backend
+- Autenticación y autorización de usuarios
+- Endpoints para gestión de usuarios
+- Manejo avanzado de errores
+- Optimización de consultas
+
+#### 2️⃣ Frontend
+- Sistema de categorías
+- Gestión de usuario
+- Estado global con Redux
+- Diseño responsive mejorado
+- Edición de mods
+- Eliminación de mods
+
+#### 3️⃣ Base de Datos
+- Seeders para datos iniciales
+- Optimización de índices
+- Relaciones avanzadas
+
+#### 4️⃣ RAWG API
+- Actualización automática de datos de juegos
+- Caché de datos
+- Sincronización periódica
+
 ## 🚀 Guía Paso a Paso para Windows
 
 ### 1️⃣ Instalar Docker Desktop
