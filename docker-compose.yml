@@ -52,7 +52,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: modlibrary
+      MYSQL_DATABASE: Modlibrary
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - db_data:/var/lib/mysql
