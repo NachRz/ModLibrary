@@ -1,19 +1,33 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: laravel-backend
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/var/www/html
-      - ./backend/storage:/var/www/html/storage
+      - ./backend:/var/www/html            # Código fuente
+      - laravel_vendor:/var/www/html/vendor  # Carpeta vendor persistente
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: modlibrary
+      DB_USERNAME: root
+      DB_PASSWORD: root
     depends_on:
       - db
-    environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+    networks:
+      - app-network
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: react-frontend
     ports:
       - "3000:3000"
     volumes:
@@ -22,27 +36,46 @@ services:
     stdin_open: true
     tty: true
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      DANGEROUSLY_DISABLE_HOST_CHECK: "true"
+      REACT_APP_API_URL: http://backend:8000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - app-network
 
   db:
     image: mysql:5.7
+    container_name: mysql-db
     restart: always
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_DATABASE: modlibrary
       MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - app-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:5.2.1
+    container_name: phpmyadmin
     restart: always
     ports:
       - "8080:80"
     environment:
       PMA_HOST: db
-      MYSQL_ROOT_PASSWORD: root
+      PMA_USER: root
+      PMA_PASSWORD: root
+    networks:
+      - app-network
 
 volumes:
   db_data:
+  laravel_vendor:
+
+networks:
+  app-network:
+    driver: bridge
