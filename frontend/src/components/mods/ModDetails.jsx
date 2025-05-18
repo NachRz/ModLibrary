@@ -16,6 +16,8 @@ const ModDetails = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [hasRated, setHasRated] = useState(false);
   const [showRatingMsg, setShowRatingMsg] = useState(false);
+  const [showSaveMsg, setShowSaveMsg] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
     const fetchModDetails = async () => {
@@ -28,16 +30,20 @@ const ModDetails = () => {
           
           // Obtener la última versión del mod si tiene versiones
           if (response.data.versiones && response.data.versiones.length > 0) {
-            // Ordenar las versiones por fecha (de más reciente a más antigua)
             const versionesOrdenadas = [...response.data.versiones].sort((a, b) => 
               new Date(b.fecha) - new Date(a.fecha)
             );
             setUltimaVersion(versionesOrdenadas[0]);
           }
 
-          // Comprobar si el mod está guardado (esto debe implementarse según la lógica de tu app)
-          // Por ahora, simulamos que no está guardado inicialmente
-          setIsGuardado(false);
+          // Verificar si el mod está guardado
+          try {
+            const savedResponse = await modService.isModSaved(id);
+            setIsGuardado(savedResponse.guardado);
+          } catch (err) {
+            console.error('Error al verificar si el mod está guardado:', err);
+            setIsGuardado(false);
+          }
           
           // Comprobar si el usuario ya ha valorado este mod (simulado)
           setHasRated(false);
@@ -55,14 +61,30 @@ const ModDetails = () => {
     fetchModDetails();
   }, [id]);
 
-  const handleGuardarClick = () => {
-    // Aquí iría la lógica para guardar/desguardar el mod en tu backend
-    // Por ahora, simplemente cambiamos el estado local
-    setIsGuardado(!isGuardado);
-    
-    // Ejemplo de mensaje para visualizar el cambio (opcional)
-    const mensaje = !isGuardado ? 'Mod guardado' : 'Mod eliminado de guardados';
-    console.log(mensaje);
+  const handleGuardarClick = async () => {
+    try {
+      setSaveError(null);
+      if (isGuardado) {
+        await modService.unsaveMod(id);
+        setShowSaveMsg(true);
+        setIsGuardado(false);
+      } else {
+        await modService.saveMod(id);
+        setShowSaveMsg(true);
+        setIsGuardado(true);
+      }
+      
+      // Mostrar mensaje de éxito
+      setTimeout(() => {
+        setShowSaveMsg(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error al guardar/eliminar el mod:', error);
+      setSaveError(error.message);
+      setTimeout(() => {
+        setSaveError(null);
+      }, 3000);
+    }
   };
 
   const handleRatingClick = (rating) => {
@@ -138,11 +160,25 @@ const ModDetails = () => {
 
   return (
     <div className="mod-details-container">
-      {/* Banner de mensaje de valoración */}
+      {/* Mensajes de estado */}
       {showRatingMsg && (
         <div className="rating-message-banner">
           <i className="fas fa-check-circle"></i>
           <span>¡Gracias por tu valoración!</span>
+        </div>
+      )}
+      
+      {showSaveMsg && (
+        <div className="save-message-banner">
+          <i className="fas fa-check-circle"></i>
+          <span>{isGuardado ? '¡Mod guardado!' : 'Mod eliminado de guardados'}</span>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="error-message-banner">
+          <i className="fas fa-exclamation-circle"></i>
+          <span>{saveError}</span>
         </div>
       )}
       

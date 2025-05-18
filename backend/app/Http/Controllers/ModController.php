@@ -483,4 +483,116 @@ class ModController extends Controller
             'data' => $mod
         ]);
     }
+
+    /**
+     * Obtener los mods guardados del usuario autenticado
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getModsGuardados(Request $request): JsonResponse
+    {
+        $usuario = $request->user();
+        
+        $modsGuardados = $usuario->modsGuardados()
+            ->with(['creador:id,nome,correo,foto_perfil', 'juego:id,titulo,imagen_fondo'])
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $modsGuardados
+        ]);
+    }
+
+    /**
+     * Guardar un mod para el usuario autenticado
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function guardarMod(Request $request, int $id): JsonResponse
+    {
+        $usuario = $request->user();
+        $mod = Mod::find($id);
+
+        if (!$mod) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Mod no encontrado'
+            ], 404);
+        }
+
+        // Verificar si el mod ya está guardado
+        if ($usuario->modsGuardados()->where('mod_id', $id)->exists()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'El mod ya está guardado'
+            ], 400);
+        }
+
+        // Guardar el mod
+        $usuario->modsGuardados()->attach($id);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mod guardado exitosamente',
+            'guardado' => true
+        ]);
+    }
+
+    /**
+     * Eliminar un mod de guardados del usuario autenticado
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function eliminarModGuardado(Request $request, int $id): JsonResponse
+    {
+        $usuario = $request->user();
+        $mod = Mod::find($id);
+
+        if (!$mod) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Mod no encontrado'
+            ], 404);
+        }
+
+        // Verificar si el mod está guardado
+        if (!$usuario->modsGuardados()->where('mod_id', $id)->exists()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'El mod no está guardado'
+            ], 400);
+        }
+
+        // Eliminar el mod de guardados
+        $usuario->modsGuardados()->detach($id);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mod eliminado de guardados exitosamente',
+            'guardado' => false
+        ]);
+    }
+
+    /**
+     * Verificar si un mod está guardado por el usuario autenticado
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function verificarModGuardado(Request $request, int $id): JsonResponse
+    {
+        $usuario = $request->user();
+        $guardado = $usuario->modsGuardados()->where('mod_id', $id)->exists();
+
+        return response()->json([
+            'status' => 'success',
+            'guardado' => $guardado
+        ]);
+    }
 } 

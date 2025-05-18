@@ -140,6 +140,46 @@ const modService = {
     } catch (error) {
       throw error.response?.data || { message: 'Error al añadir la versión al mod' };
     }
+  },
+
+  // Obtener los mods guardados del usuario
+  getSavedMods: async () => {
+    try {
+      const response = await apiClient.get('/mods/guardados');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener los mods guardados' };
+    }
+  },
+
+  // Guardar un mod
+  saveMod: async (modId) => {
+    try {
+      const response = await apiClient.post(`/mods/${modId}/guardar`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al guardar el mod' };
+    }
+  },
+
+  // Eliminar un mod de guardados
+  unsaveMod: async (modId) => {
+    try {
+      const response = await apiClient.delete(`/mods/${modId}/guardar`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al eliminar el mod de guardados' };
+    }
+  },
+
+  // Verificar si un mod está guardado
+  isModSaved: async (modId) => {
+    try {
+      const response = await apiClient.get(`/mods/${modId}/guardado`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al verificar el estado del mod' };
+    }
   }
 };
 

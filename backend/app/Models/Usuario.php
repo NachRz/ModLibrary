@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 
 class Usuario extends Authenticatable
@@ -52,8 +53,10 @@ class Usuario extends Authenticatable
         return $this->hasMany(Valoracion::class, 'usuario_id');
     }
 
-    public function modsGuardados(): HasMany
+    public function modsGuardados(): BelongsToMany
     {
-        return $this->hasMany(ModGuardado::class, 'usuario_id');
+        return $this->belongsToMany(Mod::class, 'mods_guardados', 'usuario_id', 'mod_id')
+            ->withTimestamps()
+            ->withPivot('fecha_guardado');
     }
 } 

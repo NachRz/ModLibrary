@@ -68,6 +68,12 @@ Route::prefix('mods')->group(function () {
     
     // Rutas que requieren autenticación
     Route::middleware('auth:sanctum')->group(function () {
+        // Rutas de mods guardados
+        Route::get('/guardados', [ModController::class, 'getModsGuardados']);
+        Route::get('/{id}/guardado', [ModController::class, 'verificarModGuardado']);
+        Route::post('/{id}/guardar', [ModController::class, 'guardarMod']);
+        Route::delete('/{id}/guardar', [ModController::class, 'eliminarModGuardado']);
+
         // Crear un nuevo mod
         Route::post('/', [ModController::class, 'store']);
         
