@@ -614,4 +614,153 @@ class ModController extends Controller
             'guardado' => $guardado
         ]);
     }
+
+    /**
+     * Obtener la valoración del usuario para un mod específico
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function getUserValoracion(Request $request, int $id): JsonResponse
+    {
+        $usuario = $request->user();
+        
+        $mod = Mod::find($id);
+        if (!$mod) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Mod no encontrado'
+            ], 404);
+        }
+        
+        $valoracion = \App\Models\Valoracion::where('usuario_id', $usuario->id)
+            ->where('mod_id', $id)
+            ->first();
+            
+        if (!$valoracion) {
+            return response()->json([
+                'status' => 'success',
+                'hasRated' => false,
+                'data' => null
+            ]);
+        }
+        
+        return response()->json([
+            'status' => 'success',
+            'hasRated' => true,
+            'data' => [
+                'puntuacion' => $valoracion->puntuacion,
+                'fecha' => $valoracion->fecha
+            ]
+        ]);
+    }
+    
+    /**
+     * Valorar un mod
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function valorarMod(Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'puntuacion' => 'required|numeric|min:1|max:5'
+        ]);
+        
+        $usuario = $request->user();
+        
+        $mod = Mod::find($id);
+        if (!$mod) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Mod no encontrado'
+            ], 404);
+        }
+        
+        // Verificar si el usuario ya ha valorado este mod
+        $valoracionExistente = \App\Models\Valoracion::where('usuario_id', $usuario->id)
+            ->where('mod_id', $id)
+            ->first();
+            
+        if ($valoracionExistente) {
+            // Actualizar la valoración existente
+            $valoracionExistente->puntuacion = $request->puntuacion;
+            $valoracionExistente->fecha = now();
+            $valoracionExistente->save();
+            
+            // La media y total se actualizan automáticamente mediante events en el modelo
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Valoración actualizada correctamente',
+                'data' => [
+                    'puntuacion' => $valoracionExistente->puntuacion,
+                    'fecha' => $valoracionExistente->fecha
+                ]
+            ]);
+        }
+        
+        // Crear nueva valoración
+        $valoracion = new \App\Models\Valoracion([
+            'usuario_id' => $usuario->id,
+            'mod_id' => $id,
+            'puntuacion' => $request->puntuacion,
+            'fecha' => now()
+        ]);
+        
+        $valoracion->save();
+        
+        // La media y total se actualizan automáticamente mediante events en el modelo
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Valoración registrada correctamente',
+            'data' => [
+                'puntuacion' => $valoracion->puntuacion,
+                'fecha' => $valoracion->fecha
+            ]
+        ], 201);
+    }
+    
+    /**
+     * Eliminar la valoración de un mod
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function eliminarValoracion(Request $request, int $id): JsonResponse
+    {
+        $usuario = $request->user();
+        
+        $mod = Mod::find($id);
+        if (!$mod) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Mod no encontrado'
+            ], 404);
+        }
+        
+        $valoracion = \App\Models\Valoracion::where('usuario_id', $usuario->id)
+            ->where('mod_id', $id)
+            ->first();
+            
+        if (!$valoracion) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No tienes una valoración para este mod'
+            ], 404);
+        }
+        
+        $valoracion->delete();
+        
+        // La media y total se actualizan automáticamente mediante events en el modelo
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Valoración eliminada correctamente'
+        ]);
+    }
 } 

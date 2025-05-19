@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import modService from '../../services/api/modService';
 import useSavedStatus from '../../hooks/useSavedStatus';
+import useRating from '../../hooks/useRating';
 import '../../assets/styles/components/mods/ModDetails.css';
+import authService from '../../services/api/authService';
 
 const ModDetails = () => {
   const { id } = useParams();
@@ -12,18 +14,33 @@ const ModDetails = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('descripcion');
   const [ultimaVersion, setUltimaVersion] = useState(null);
-  const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [hasRated, setHasRated] = useState(false);
-  const [showRatingMsg, setShowRatingMsg] = useState(false);
   const [showSaveMsg, setShowSaveMsg] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   // Usar el hook personalizado para manejar el estado de guardado
   const [isGuardado, toggleSavedStatus, isSaving, savedError] = useSavedStatus(id);
 
+  // Usar el hook personalizado para manejar las valoraciones
+  const [
+    userRating, 
+    hasRated, 
+    rateMod, 
+    deleteRating, 
+    ratingLoading, 
+    ratingError, 
+    ratingMessage
+  ] = useRating(id);
+
   // Nuevo estado para saber la última acción
   const [lastSaveAction, setLastSaveAction] = useState(null); // 'guardado' | 'eliminado' | null
+
+  useEffect(() => {
+    // Verificar si el usuario está autenticado
+    const user = authService.getCurrentUser();
+    setIsAuthenticated(!!user);
+  }, []);
 
   useEffect(() => {
     const fetchModDetails = async () => {
@@ -41,10 +58,6 @@ const ModDetails = () => {
             );
             setUltimaVersion(versionesOrdenadas[0]);
           }
-          
-          // Comprobar si el usuario ya ha valorado este mod (simulado)
-          setHasRated(false);
-          setUserRating(0);
         } else {
           throw new Error(response.message || 'Error al cargar los detalles del mod');
         }
@@ -84,22 +97,36 @@ const ModDetails = () => {
     }
   };
 
-  const handleRatingClick = (rating) => {
-    // Actualizamos el estado local
-    setUserRating(rating);
-    setHasRated(true);
-    
-    // Mostrar mensaje de confirmación
-    setShowRatingMsg(true);
-    setTimeout(() => {
-      setShowRatingMsg(false);
-    }, 3000);
-    
-    // Aquí iría la lógica para enviar la valoración al backend
-    console.log(`Valoración enviada: ${rating} estrellas`);
-    
-    // Idealmente habría que actualizar el promedio de valoraciones
-    // Esto requeriría una llamada a la API y actualizar el estado del mod
+  // Manejador para valorar un mod
+  const handleRatingClick = async (rating) => {
+    const success = await rateMod(rating);
+    if (success) {
+      refreshModStats();
+    }
+  };
+  
+  // Manejador para eliminar una valoración
+  const handleDeleteRating = async () => {
+    const success = await deleteRating();
+    if (success) {
+      refreshModStats();
+    }
+  };
+  
+  // Actualizar las estadísticas del mod después de valorar
+  const refreshModStats = async () => {
+    try {
+      const response = await modService.getModById(id);
+      if (response.status === 'success') {
+        // Actualizar solo las estadísticas sin recargar todo el mod
+        setMod(prevMod => ({
+          ...prevMod,
+          estadisticas: response.data.estadisticas
+        }));
+      }
+    } catch (err) {
+      console.error('Error al actualizar las estadísticas del mod:', err);
+    }
   };
 
   const renderStars = () => {
@@ -158,10 +185,17 @@ const ModDetails = () => {
   return (
     <div className="mod-details-container">
       {/* Mensajes de estado */}
-      {showRatingMsg && (
+      {ratingMessage && (
         <div className="rating-message-banner">
           <i className="fas fa-check-circle"></i>
-          <span>¡Gracias por tu valoración!</span>
+          <span>{ratingMessage}</span>
+        </div>
+      )}
+      
+      {ratingError && (
+        <div className="error-message-banner">
+          <i className="fas fa-exclamation-circle"></i>
+          <span>{ratingError}</span>
         </div>
       )}
       
@@ -196,18 +230,18 @@ const ModDetails = () => {
             <div className="game-info">
               <h2>Mod para {mod.juego.titulo}</h2>
               <div className="mod-title-container">
-                <h1>{mod.titulo}</h1>
+          <h1>{mod.titulo}</h1>
                 <button 
                   className={`icon-button favorite ${isGuardado ? 'active' : ''}`}
                   onClick={handleGuardarClick}
                   title={isGuardado ? 'Guardado' : 'Guardar mod'}
-                  disabled={isSaving}
+                  disabled={isSaving || !isAuthenticated}
                 >
                   <i className={isGuardado ? 'fas fa-bookmark' : 'far fa-bookmark'}></i>
                 </button>
               </div>
               <div className="mod-creator-info">
-                <img src={mod.creador?.foto_perfil || '/images/user-placeholder.jpg'} alt={mod.creador?.nome} />
+              <img src={mod.creador?.foto_perfil || '/images/user-placeholder.jpg'} alt={mod.creador?.nome} />
                 <div className="creator-details">
                   <span className="creator-label">Creado por</span>
                   <span className="creator-name">{mod.creador?.nome || 'Anónimo'}</span>
@@ -227,17 +261,17 @@ const ModDetails = () => {
                   <span className="banner-stat">
                     <i className="fas fa-code-branch"></i>
                     v{ultimaVersion ? ultimaVersion.version : mod.version}
-                  </span>
-                </div>
+            </span>
+          </div>
                 <div className="action-buttons">
                   <button 
                     className="icon-button download"
                     title={`Descargar v${ultimaVersion ? ultimaVersion.version : mod.version}`}
                   >
-                    <i className="fas fa-download"></i>
+              <i className="fas fa-download"></i>
                   </button>
                 </div>
-              </div>
+            </div>
             </div>
           </div>
         </div>
@@ -262,13 +296,29 @@ const ModDetails = () => {
             <div className="rating-stars">
               {renderStars()}
             </div>
-            {hasRated && (
-              <span className="rating-success">
-                <i className="fas fa-check-circle"></i>
+            {ratingLoading && (
+              <span className="rating-loading">
+                <i className="fas fa-spinner fa-spin"></i>
               </span>
             )}
-          </div>
+            {hasRated && isAuthenticated && !ratingLoading && (
+              <button 
+                className="btn-delete-rating" 
+                onClick={handleDeleteRating}
+                title="Eliminar tu valoración"
+                disabled={ratingLoading}
+              >
+                <i className="fas fa-trash-alt"></i>
+              </button>
+            )}
+            {!isAuthenticated && (
+              <div className="login-needed">
+                <i className="fas fa-info-circle"></i>
+                <span>Inicia sesión para valorar</span>
+              </div>
+            )}
         </div>
+      </div>
 
         <div className="mod-tabs">
           <button 
@@ -290,9 +340,9 @@ const ModDetails = () => {
             <div className="mod-versions">
               {mod.versiones?.length > 0 ? (
                 mod.versiones.map(version => (
-                  <div key={version.id} className="version-item">
-                    <div className="version-info">
-                      <h3>v{version.version}</h3>
+                <div key={version.id} className="version-item">
+                  <div className="version-info">
+                    <h3>v{version.version}</h3>
                       <span className="version-date">
                         <i className="fas fa-calendar-alt"></i> {new Date(version.fecha).toLocaleDateString()}
                       </span>
@@ -304,14 +354,14 @@ const ModDetails = () => {
                     </div>
                     <div className="version-notes">
                       {version.notas && <p>{version.notas}</p>}
-                    </div>
-                    <div className="version-actions">
-                      <button className="btn-download-version">
-                        <i className="fas fa-download"></i>
-                        Descargar
-                      </button>
-                    </div>
                   </div>
+                  <div className="version-actions">
+                    <button className="btn-download-version">
+                      <i className="fas fa-download"></i>
+                      Descargar
+                    </button>
+                  </div>
+                </div>
                 ))
               ) : (
                 <div className="no-versions">

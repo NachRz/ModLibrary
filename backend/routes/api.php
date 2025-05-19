@@ -39,6 +39,11 @@ Route::prefix('mods')->group(function () {
         Route::get('/{id}/guardado', [ModController::class, 'verificarModGuardado']);
         Route::post('/{id}/guardar', [ModController::class, 'guardarMod']);
         Route::delete('/{id}/guardar', [ModController::class, 'eliminarModGuardado']);
+        
+        // Rutas para valoraciones (requieren autenticación)
+        Route::get('/{id}/valoracion', [ModController::class, 'getUserValoracion']);
+        Route::post('/{id}/valoracion', [ModController::class, 'valorarMod']);
+        Route::delete('/{id}/valoracion', [ModController::class, 'eliminarValoracion']);
     });
 
     // Estas rutas deben ir después de las anteriores

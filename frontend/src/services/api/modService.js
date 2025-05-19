@@ -180,6 +180,38 @@ const modService = {
     } catch (error) {
       throw error.response?.data || { message: 'Error al verificar el estado del mod' };
     }
+  },
+  
+  // Obtener la valoración del usuario para un mod específico
+  getUserRating: async (modId) => {
+    try {
+      const response = await apiClient.get(`/mods/${modId}/valoracion`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener tu valoración' };
+    }
+  },
+  
+  // Valorar un mod
+  rateMod: async (modId, rating) => {
+    try {
+      const response = await apiClient.post(`/mods/${modId}/valoracion`, { 
+        puntuacion: rating 
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al valorar el mod' };
+    }
+  },
+  
+  // Eliminar valoración de un mod
+  deleteRating: async (modId) => {
+    try {
+      const response = await apiClient.delete(`/mods/${modId}/valoracion`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al eliminar tu valoración' };
+    }
   }
 };
 
