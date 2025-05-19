@@ -95,7 +95,9 @@ const ModCard = ({ mod, isOwner = false, actions }) => {
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
           <h3 className="font-bold text-lg leading-tight line-clamp-1 drop-shadow-lg">{mod.titulo}</h3>
           <p className="text-sm text-white/95 mt-1 flex items-center drop-shadow-lg">
-            <span className="bg-custom-card/50 px-2 py-0.5 rounded backdrop-blur-md">{mod.juego}</span>
+            <span className="bg-custom-card/50 px-2 py-0.5 rounded backdrop-blur-md">
+              {mod.juego?.titulo || 'Juego no especificado'}
+            </span>
             <span className="mx-1.5">•</span>
             <span>por <span className="text-custom-secondary font-medium">{mod.autor}</span></span>
           </p>

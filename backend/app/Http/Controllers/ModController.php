@@ -495,8 +495,27 @@ class ModController extends Controller
         $usuario = $request->user();
         
         $modsGuardados = $usuario->modsGuardados()
-            ->with(['creador:id,nome,correo,foto_perfil', 'juego:id,titulo,imagen_fondo'])
-            ->get();
+            ->with([
+                'creador:id,nome,correo,foto_perfil',
+                'juego:id,titulo,imagen_fondo',
+                'valoraciones',
+                'etiquetas:id,nombre'
+            ])
+            ->get()
+            ->map(function ($mod) {
+                // Calcular la valoración media
+                $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
+                $numValoraciones = $mod->valoraciones->count();
+                
+                // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
+                unset($mod->valoraciones);
+                
+                // Agregar los campos calculados
+                $mod->valoracion = round($valoracionMedia, 1);
+                $mod->numValoraciones = $numValoraciones;
+                
+                return $mod;
+            });
 
         return response()->json([
             'status' => 'success',

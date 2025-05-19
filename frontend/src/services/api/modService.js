@@ -163,7 +163,7 @@ const modService = {
   },
 
   // Eliminar un mod de guardados
-  unsaveMod: async (modId) => {
+  removeFromSaved: async (modId) => {
     try {
       const response = await apiClient.delete(`/mods/${modId}/guardar`);
       return response.data;

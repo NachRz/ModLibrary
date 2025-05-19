@@ -33,13 +33,17 @@ Route::prefix('mods')->group(function () {
     // Obtener mods con detalles completos del creador y estadísticas
     Route::get('/con-detalles', [ModController::class, 'getModsWithCreatorDetails']);
     
-    // Obtener mods por creador (usando ID)
+    // Rutas de mods guardados
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/guardados', [ModController::class, 'getModsGuardados']);
+        Route::get('/{id}/guardado', [ModController::class, 'verificarModGuardado']);
+        Route::post('/{id}/guardar', [ModController::class, 'guardarMod']);
+        Route::delete('/{id}/guardar', [ModController::class, 'eliminarModGuardado']);
+    });
+
+    // Estas rutas deben ir después de las anteriores
     Route::get('/creador/{creadorId}', [ModController::class, 'getModsByCreador']);
-    
-    // Obtener mods por nombre de usuario
     Route::get('/creador/nombre/{username}', [ModController::class, 'getModsByCreatorName']);
-    
-    // Obtener un mod específico por ID
     Route::get('/{id}', [ModController::class, 'show']);
     
     // Rutas para las versiones de mods
@@ -68,12 +72,6 @@ Route::prefix('mods')->group(function () {
     
     // Rutas que requieren autenticación
     Route::middleware('auth:sanctum')->group(function () {
-        // Rutas de mods guardados
-        Route::get('/guardados', [ModController::class, 'getModsGuardados']);
-        Route::get('/{id}/guardado', [ModController::class, 'verificarModGuardado']);
-        Route::post('/{id}/guardar', [ModController::class, 'guardarMod']);
-        Route::delete('/{id}/guardar', [ModController::class, 'eliminarModGuardado']);
-
         // Crear un nuevo mod
         Route::post('/', [ModController::class, 'store']);
         
