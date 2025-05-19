@@ -8,23 +8,24 @@ const ModsGuardados = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchSavedMods = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await modService.getSavedMods();
-        if (response.status === 'success') {
-          setSavedMods(response.data);
-        } else {
-          setError(response.message || 'Error al obtener los mods guardados');
-        }
-      } catch (err) {
-        setError(err.message || 'Error al obtener los mods guardados');
-      } finally {
-        setLoading(false);
+  const fetchSavedMods = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await modService.getSavedMods();
+      if (response.status === 'success') {
+        setSavedMods(response.data);
+      } else {
+        setError(response.message || 'Error al obtener los mods guardados');
       }
-    };
+    } catch (err) {
+      setError(err.message || 'Error al obtener los mods guardados');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchSavedMods();
   }, []);
 
@@ -44,16 +45,10 @@ const ModsGuardados = () => {
     }
   });
 
-  const handleRemoveFromSaved = async (id) => {
-    try {
-      const response = await modService.removeFromSaved(id);
-      if (response.status === 'success') {
-        setSavedMods(savedMods.filter(mod => mod.id !== id));
-      } else {
-        setError(response.message || 'Error al eliminar el mod de guardados');
-      }
-    } catch (err) {
-      setError(err.message || 'Error al eliminar el mod de guardados');
+  // Cuando un mod es desmarcado como guardado, lo eliminamos de la lista
+  const handleModSavedChanged = (modId, isCurrentlySaved) => {
+    if (!isCurrentlySaved) {
+      setSavedMods(prevMods => prevMods.filter(mod => mod.id !== modId));
     }
   };
 
@@ -109,17 +104,8 @@ const ModsGuardados = () => {
                 valoracion: mod.valoracion || 0,
                 numValoraciones: mod.numValoraciones || 0
               }}
-              actions={
-                <button 
-                  onClick={() => handleRemoveFromSaved(mod.id)}
-                  className="text-custom-detail hover:text-custom-error transition-colors duration-300"
-                  title="Eliminar de guardados"
-                >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              }
+              showSaveButton={true}
+              onSavedChange={(isCurrentlySaved) => handleModSavedChanged(mod.id, isCurrentlySaved)}
             />
           ))}
         </div>

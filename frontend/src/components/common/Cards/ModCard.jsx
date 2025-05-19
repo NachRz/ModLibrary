@@ -1,7 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import authService from '../../../services/api/authService';
+import useSavedStatus from '../../../hooks/useSavedStatus';
+import { useNotification } from '../../../context/NotificationContext';
+import '../../../assets/styles/components/Cards/ModCard.css';
 
-const ModCard = ({ mod, isOwner = false, actions }) => {
+const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSavedChange }) => {
+  const isAuthenticated = authService.isAuthenticated();
+  const [isGuardado, toggleSavedStatus, isSaving] = useSavedStatus(mod?.id);
+  const { showNotification } = useNotification();
+
   // Función para mostrar estrellas según la valoración
   const renderStars = (valoracion) => {
     // Si no hay valoraciones, mostramos estrellas vacías
@@ -58,11 +66,37 @@ const ModCard = ({ mod, isOwner = false, actions }) => {
     return stars;
   };
 
+  // Manejar el clic en el botón de guardar/eliminar
+  const handleSaveToggle = async (e) => {
+    e.preventDefault(); // Evitar que se navegue al detalle del mod
+    e.stopPropagation(); // Evitar propagación del evento
+    
+    if (!isAuthenticated) {
+      return; // Si no está autenticado, no hacemos nada (podríamos redirigir al login)
+    }
+    
+    const prevStatus = isGuardado;
+    try {
+      await toggleSavedStatus();
+      // Notificar el cambio al componente padre si es necesario
+      if (onSavedChange && typeof onSavedChange === 'function') {
+        onSavedChange(!prevStatus);
+      }
+      // Mostrar notificación global
+      showNotification(
+        !prevStatus ? '¡Mod guardado!' : 'Mod eliminado de guardados',
+        'success'
+      );
+    } catch (err) {
+      showNotification('Error al guardar/eliminar el mod', 'error');
+    }
+  };
+
   // Determinar la URL del mod
   const modUrl = `/mods/${mod.id}`;
 
   return (
-    <div className="bg-custom-card rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-custom-detail/10">
+    <div className="bg-custom-card rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-custom-detail/10">
       {/* Imagen del mod */}
       <div className="relative">
         <img 
@@ -130,6 +164,18 @@ const ModCard = ({ mod, isOwner = false, actions }) => {
               </svg>
               <span className="text-xs font-medium">{mod.descargas >= 1000 ? `${(mod.descargas / 1000).toFixed(1)}k` : mod.descargas}</span>
             </div>
+            
+            {/* Botón de guardar (si está autenticado) */}
+            {isAuthenticated && showSaveButton && (
+              <button 
+                onClick={handleSaveToggle}
+                disabled={isSaving}
+                className={`mod-card-save-button ${isGuardado ? 'active' : ''}`}
+                title={isGuardado ? 'Guardado' : 'Guardar mod'}
+              >
+                <i className={`${isGuardado ? 'fas' : 'far'} fa-bookmark`}></i>
+              </button>
+            )}
             
             {/* Solo mostrar acciones personalizadas si existen */}
             {actions && actions}

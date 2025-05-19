@@ -1419,9 +1419,9 @@
 
 .creator-details {
   display: flex;
-  flex-direction: column;
+    flex-direction: column;
   gap: 0.25rem;
-}
+  }
 
 .creator-label {
   font-size: 0.75rem;
@@ -1482,7 +1482,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+    width: 100%;
   height: 100%;
   background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
   transition: all 0.3s ease;
@@ -1512,7 +1512,7 @@
 .icon-button.favorite i {
   color: #F18F75;
   font-size: 1.3rem;
-}
+  }
 
 .icon-button.favorite:hover {
   background: rgba(241, 143, 117, 0.2);

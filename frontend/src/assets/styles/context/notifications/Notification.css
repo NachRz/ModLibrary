@@ -1,0 +1,31 @@
+.global-notification {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 2000;
+  font-size: 1.1rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out, fadeOut 0.3s ease-out 2.7s;
+}
+
+.global-notification.success {
+  background: rgba(67, 181, 129, 0.95);
+  color: white;
+}
+
+.global-notification.error {
+  background: rgba(241, 71, 71, 0.95);
+  color: white;
+}
+
+.global-notification i {
+  color: white;
+  font-size: 1.3rem;
+} 

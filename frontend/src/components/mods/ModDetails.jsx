@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import modService from '../../services/api/modService';
+import useSavedStatus from '../../hooks/useSavedStatus';
 import '../../assets/styles/components/mods/ModDetails.css';
 
 const ModDetails = () => {
@@ -11,13 +12,18 @@ const ModDetails = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('descripcion');
   const [ultimaVersion, setUltimaVersion] = useState(null);
-  const [isGuardado, setIsGuardado] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [hasRated, setHasRated] = useState(false);
   const [showRatingMsg, setShowRatingMsg] = useState(false);
   const [showSaveMsg, setShowSaveMsg] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  
+  // Usar el hook personalizado para manejar el estado de guardado
+  const [isGuardado, toggleSavedStatus, isSaving, savedError] = useSavedStatus(id);
+
+  // Nuevo estado para saber la última acción
+  const [lastSaveAction, setLastSaveAction] = useState(null); // 'guardado' | 'eliminado' | null
 
   useEffect(() => {
     const fetchModDetails = async () => {
@@ -34,15 +40,6 @@ const ModDetails = () => {
               new Date(b.fecha) - new Date(a.fecha)
             );
             setUltimaVersion(versionesOrdenadas[0]);
-          }
-
-          // Verificar si el mod está guardado
-          try {
-            const savedResponse = await modService.isModSaved(id);
-            setIsGuardado(savedResponse.guardado);
-          } catch (err) {
-            console.error('Error al verificar si el mod está guardado:', err);
-            setIsGuardado(false);
           }
           
           // Comprobar si el usuario ya ha valorado este mod (simulado)
@@ -61,29 +58,29 @@ const ModDetails = () => {
     fetchModDetails();
   }, [id]);
 
+  // Función para manejar el clic en el botón de guardar
   const handleGuardarClick = async () => {
+    setSaveError(null);
+    let action;
     try {
-      setSaveError(null);
       if (isGuardado) {
-        await modService.unsaveMod(id);
-        setShowSaveMsg(true);
-        setIsGuardado(false);
+        action = 'eliminado';
+        await toggleSavedStatus();
       } else {
-        await modService.saveMod(id);
-        setShowSaveMsg(true);
-        setIsGuardado(true);
+        action = 'guardado';
+        await toggleSavedStatus();
       }
-      
-      // Mostrar mensaje de éxito
+      setLastSaveAction(action);
+      setShowSaveMsg(true);
       setTimeout(() => {
         setShowSaveMsg(false);
+        setLastSaveAction(null);
       }, 3000);
     } catch (error) {
-      console.error('Error al guardar/eliminar el mod:', error);
-      setSaveError(error.message);
-      setTimeout(() => {
-        setSaveError(null);
-      }, 3000);
+      setSaveError(error?.message || 'Error al guardar/eliminar el mod');
+      setShowSaveMsg(false);
+      setLastSaveAction(null);
+      setTimeout(() => setSaveError(null), 3000);
     }
   };
 
@@ -168,10 +165,10 @@ const ModDetails = () => {
         </div>
       )}
       
-      {showSaveMsg && (
+      {showSaveMsg && !saveError && lastSaveAction && (
         <div className="save-message-banner">
           <i className="fas fa-check-circle"></i>
-          <span>{isGuardado ? '¡Mod guardado!' : 'Mod eliminado de guardados'}</span>
+          <span>{lastSaveAction === 'guardado' ? '¡Mod guardado!' : 'Mod eliminado de guardados'}</span>
         </div>
       )}
 
@@ -204,6 +201,7 @@ const ModDetails = () => {
                   className={`icon-button favorite ${isGuardado ? 'active' : ''}`}
                   onClick={handleGuardarClick}
                   title={isGuardado ? 'Guardado' : 'Guardar mod'}
+                  disabled={isSaving}
                 >
                   <i className={isGuardado ? 'fas fa-bookmark' : 'far fa-bookmark'}></i>
                 </button>
