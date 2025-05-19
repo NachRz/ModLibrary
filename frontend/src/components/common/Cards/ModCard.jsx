@@ -129,14 +129,8 @@ const ModCard = ({ mod, isOwner = false, actions }) => {
               <span className="text-xs font-medium">{mod.descargas >= 1000 ? `${(mod.descargas / 1000).toFixed(1)}k` : mod.descargas}</span>
             </div>
             
-            {/* Acciones personalizadas o botón de guardar por defecto */}
-            {actions || (
-              <button className="text-white/90 hover:text-custom-secondary transition-colors duration-300 bg-custom-bg/50 p-2 rounded-full shadow-sm hover:shadow-md">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
-              </button>
-            )}
+            {/* Solo mostrar acciones personalizadas si existen */}
+            {actions && actions}
           </div>
         </div>
         
