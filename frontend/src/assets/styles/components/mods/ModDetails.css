@@ -188,12 +188,12 @@
 .mod-action-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
-}
+  }
 
 .mod-action-btn.track {
   background: rgba(96, 165, 250, 0.1);
   color: #60A5FA;
-}
+  }
 
 .mod-action-btn.track:hover {
   background: rgba(96, 165, 250, 0.2);
@@ -202,7 +202,7 @@
 .mod-action-btn.endorse {
   background: rgba(241, 143, 117, 0.1);
   color: #F18F75;
-}
+  }
 
 .mod-action-btn.endorse:hover, 
 .mod-action-btn.endorse.active {
@@ -565,17 +565,17 @@
   .mod-info-section {
     flex-direction: column;
     gap: 1.5rem;
-  }
-  
+}
+
   .mod-info-left {
     flex-direction: column;
     gap: 1.5rem;
   }
   
   .mod-actions-group {
-    margin-top: 1rem;
+  margin-top: 1rem;
     justify-content: center;
-  }
+}
 }
 
 @media (max-width: 768px) {
@@ -589,14 +589,14 @@
   
   .mod-stats-group {
     flex-direction: column;
-    gap: 1rem;
-  }
-  
+  gap: 1rem;
+}
+
   .mod-action-btn {
     flex: 1;
     justify-content: center;
-  }
-  
+}
+
   .tab-btn {
     padding: 0.5rem 0.75rem;
   }

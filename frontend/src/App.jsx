@@ -9,6 +9,7 @@ import ResetPassword from './components/auth/ResetPassword';
 import Register from './components/auth/Register';
 import CrearMod from './components/mods/CrearMod';
 import ModDetails from './components/mods/ModDetails';
+import Explorar from './components/explorar/Explorar';
 import { NotificationProvider } from './context/NotificationContext';
 import './assets/styles/context/notifications/Notification.css';
 
@@ -50,7 +51,9 @@ function App() {
             </Route>
 
             {/* Rutas de exploración */}
-            <Route path="/explorar" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Explorar Mods</h1></div>} />
+            <Route path="/explorar" element={<Explorar />} />
+            <Route path="/explorar/recientes" element={<Explorar />} />
+            <Route path="/explorar/populares" element={<Explorar />} />
             <Route path="/tendencias" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Tendencias</h1></div>} />
             <Route path="/categorias" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Categorías</h1></div>} />
 

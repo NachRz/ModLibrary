@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import modService from '../../services/api/modService';
 import useSavedStatus from '../../hooks/useSavedStatus';
 import useRating from '../../hooks/useRating';
+import Breadcrumb from '../common/Breadcrumb/Breadcrumb';
 import '../../assets/styles/components/mods/ModDetails.css';
 import authService from '../../services/api/authService';
 
@@ -165,42 +166,60 @@ const ModDetails = () => {
     return stars;
   };
 
+  // Configuración del breadcrumb
+  const breadcrumbItems = [
+    { label: 'Explorar', path: '/explorar' },
+    { label: 'Mods', path: '/explorar/mods' },
+    { label: mod?.titulo || 'Detalles del Mod', path: `/mods/${id}` }
+  ];
+
   if (loading) {
     return (
-      <div className="mod-details-loading">
-        <div className="loading-spinner"></div>
-        <p>Cargando detalles del mod...</p>
+      <div className="mod-details-container">
+        <div className="mod-details-loading">
+          <div className="loading-spinner"></div>
+          <p>Cargando detalles del mod...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mod-details-error">
-        <h2>Error</h2>
-        <p>{error}</p>
-        <button onClick={() => navigate(-1)} className="action-button">
-          <i className="fas fa-arrow-left"></i>
-          Volver atrás
-        </button>
+      <div className="mod-details-container">
+        <div className="mod-details-error">
+          <h2>Error</h2>
+          <p>{error}</p>
+          <button onClick={() => navigate(-1)} className="action-button">
+            <i className="fas fa-arrow-left"></i>
+            Volver atrás
+          </button>
+        </div>
       </div>
     );
   }
 
   if (!mod) {
     return (
-      <div className="mod-details-not-found">
-        <h2>Mod no encontrado</h2>
-        <button onClick={() => navigate(-1)} className="action-button">
-          <i className="fas fa-arrow-left"></i>
-          Volver atrás
-        </button>
+      <div className="mod-details-container">
+        <div className="mod-details-not-found">
+          <h2>Mod no encontrado</h2>
+          <button onClick={() => navigate(-1)} className="action-button">
+            <i className="fas fa-arrow-left"></i>
+            Volver atrás
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="mod-details-container">
+      {/* Breadcrumb */}
+      <div className="mod-navigation">
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
+
       {/* Mensajes de estado */}
       {ratingMessage && (
         <div className="rating-message-banner">
@@ -229,19 +248,6 @@ const ModDetails = () => {
           <span>{saveError}</span>
         </div>
       )}
-      
-      {/* Sección de navegación del juego */}
-      <div className="mod-navigation">
-        <div className="mod-breadcrumbs">
-          <span className="breadcrumb-item">Juegos</span>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item">{mod.juego?.titulo || 'Juego'}</span>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item">Mods</span>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item active">{mod.titulo}</span>
-        </div>
-      </div>
       
       {/* Header con título principal */}
       <div className="mod-header-main">
@@ -283,7 +289,7 @@ const ModDetails = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="mod-actions-group">
           <button className="mod-action-btn track">
             <i className="fas fa-bell"></i> Seguir
@@ -307,7 +313,7 @@ const ModDetails = () => {
           </button>
         </div>
       </div>
-      
+
       {/* Galería y detalles del mod */}
       <div className="mod-gallery-section">
         <div className="mod-gallery">
@@ -346,7 +352,6 @@ const ModDetails = () => {
           </div>
         </div>
         
-
       </div>
       
       {/* Etiquetas del mod */}
