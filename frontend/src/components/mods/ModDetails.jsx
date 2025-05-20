@@ -148,6 +148,23 @@ const ModDetails = () => {
     return stars;
   };
 
+  // Función para renderizar estrellas estáticas basadas en una valoración
+  const renderStaticStars = (rating) => {
+    const stars = [];
+    const maxStars = 5;
+    
+    for (let i = 1; i <= maxStars; i++) {
+      stars.push(
+        <i 
+          key={i}
+          className={`${i <= rating ? 'fas' : 'far'} fa-star`} 
+        />
+      );
+    }
+    
+    return stars;
+  };
+
   if (loading) {
     return (
       <div className="mod-details-loading">
@@ -215,9 +232,9 @@ const ModDetails = () => {
       
       {/* Banner del juego */}
       {mod.juego && (
-        <div className="game-banner">
-          <div className="game-banner-content">
-            <div className="game-logo">
+        <div className="game-card">
+          <div className="game-card-content">
+            <div className="game-card-logo">
               <img 
                 src={mod.imagen || '/images/mod-placeholder.jpg'} 
                 alt={mod.titulo} 
@@ -227,10 +244,10 @@ const ModDetails = () => {
                 }} 
               />
             </div>
-            <div className="game-info">
+            <div className="game-card-info">
               <h2>Mod para {mod.juego.titulo}</h2>
               <div className="mod-title-container">
-          <h1>{mod.titulo}</h1>
+                <h1>{mod.titulo}</h1>
                 <button 
                   className={`icon-button favorite ${isGuardado ? 'active' : ''}`}
                   onClick={handleGuardarClick}
@@ -241,7 +258,7 @@ const ModDetails = () => {
                 </button>
               </div>
               <div className="mod-creator-info">
-              <img src={mod.creador?.foto_perfil || '/images/user-placeholder.jpg'} alt={mod.creador?.nome} />
+                <img src={mod.creador?.foto_perfil || '/images/user-placeholder.jpg'} alt={mod.creador?.nome} />
                 <div className="creator-details">
                   <span className="creator-label">Creado por</span>
                   <span className="creator-name">{mod.creador?.nome || 'Anónimo'}</span>
@@ -253,25 +270,54 @@ const ModDetails = () => {
                     <i className="fas fa-download"></i>
                     {mod.estadisticas?.total_descargas || 0} descargas
                   </span>
-                  <span className="banner-stat">
-                    <i className="fas fa-star"></i>
-                    {mod.estadisticas?.valoracion_media || 0}
-                    <small>({mod.estadisticas?.total_valoraciones || 0})</small>
+                  <span className="banner-stat rating">
+                    <div className="rating-stars static">
+                      {renderStaticStars(mod.estadisticas?.valoracion_media || 0)}
+                    </div>
+                    <span>{mod.estadisticas?.valoracion_media || 0}
+                    <small>({mod.estadisticas?.total_valoraciones || 0})</small></span>
                   </span>
                   <span className="banner-stat">
                     <i className="fas fa-code-branch"></i>
                     v{ultimaVersion ? ultimaVersion.version : mod.version}
-            </span>
-          </div>
+                  </span>
+                  
+                  {/* Sección de valoración del usuario añadida aquí */}
+                  {isAuthenticated && (
+                    <span className="banner-stat user-rating">
+                      <i className="fas fa-user-edit"></i>
+                      <div className="rating-stars-container compact">
+                        <div className="rating-stars">
+                          {renderStars()}
+                        </div>
+                        {ratingLoading && (
+                          <span className="rating-loading">
+                            <i className="fas fa-spinner fa-spin"></i>
+                          </span>
+                        )}
+                        {hasRated && !ratingLoading && (
+                          <button 
+                            className="btn-delete-rating" 
+                            onClick={handleDeleteRating}
+                            title="Eliminar tu valoración"
+                            disabled={ratingLoading}
+                          >
+                            <i className="fas fa-trash-alt"></i>
+                          </button>
+                        )}
+                      </div>
+                    </span>
+                  )}
+                </div>
                 <div className="action-buttons">
                   <button 
                     className="icon-button download"
                     title={`Descargar v${ultimaVersion ? ultimaVersion.version : mod.version}`}
                   >
-              <i className="fas fa-download"></i>
+                    <i className="fas fa-download"></i>
                   </button>
                 </div>
-            </div>
+              </div>
             </div>
           </div>
         </div>
@@ -290,35 +336,13 @@ const ModDetails = () => {
           </div>
         </div>
 
-        <div className="mod-user-rating">
-          <h3>Tu valoración</h3>
-          <div className="rating-stars-container">
-            <div className="rating-stars">
-              {renderStars()}
-            </div>
-            {ratingLoading && (
-              <span className="rating-loading">
-                <i className="fas fa-spinner fa-spin"></i>
-              </span>
-            )}
-            {hasRated && isAuthenticated && !ratingLoading && (
-              <button 
-                className="btn-delete-rating" 
-                onClick={handleDeleteRating}
-                title="Eliminar tu valoración"
-                disabled={ratingLoading}
-              >
-                <i className="fas fa-trash-alt"></i>
-              </button>
-            )}
-            {!isAuthenticated && (
-              <div className="login-needed">
-                <i className="fas fa-info-circle"></i>
-                <span>Inicia sesión para valorar</span>
-              </div>
-            )}
-        </div>
-      </div>
+        {/* Quitamos la sección de valoración de usuario de aquí */}
+        {!isAuthenticated && (
+          <div className="login-needed-card">
+            <i className="fas fa-info-circle"></i>
+            <span>Inicia sesión para valorar este mod</span>
+          </div>
+        )}
 
         <div className="mod-tabs">
           <button 
