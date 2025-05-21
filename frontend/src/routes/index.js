@@ -5,8 +5,8 @@ import Home from '../components/home/Home';
 import authRoutes from './auth/authRoutes';
 import dashboardRoutes from './dashboard/dashboardRoutes';
 import modRoutes from './mods/modRoutes';
-import exploreRoutes from './explore/exploreRoutes';
 import userRoutes from './user/userRoutes';
+import juegoRoutes from './juegos/juegoRoutes';
 
 
 const AppRoutes = () => {
@@ -22,8 +22,8 @@ const AppRoutes = () => {
             {/* Rutas de mods */}
             {modRoutes}
 
-            {/* Rutas de exploración */}
-            {exploreRoutes}
+            {/* Rutas de juegos */}
+            {juegoRoutes}
 
             {/* Rutas de usuario */}
             {userRoutes}

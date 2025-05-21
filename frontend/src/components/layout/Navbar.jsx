@@ -83,9 +83,9 @@ const Navbar = () => {
 
   // Definir enlaces de navegación
   const navLinks = [
-    { name: 'Mods', path: '/explorar' },
-    { name: 'Tendencias', path: '/tendencias' },
-    { name: 'Categorías', path: '/categorias' },
+    { name: 'Mods', path: '/mods' },
+    { name: 'Juegos', path: '/juegos' },
+
   ];
 
   // Opciones del panel
