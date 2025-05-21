@@ -176,9 +176,9 @@ const ModDetails = () => {
   if (loading) {
     return (
       <div className="mod-details-container">
-        <div className="mod-details-loading">
-          <div className="loading-spinner"></div>
-          <p>Cargando detalles del mod...</p>
+      <div className="mod-details-loading">
+        <div className="loading-spinner"></div>
+        <p>Cargando detalles del mod...</p>
         </div>
       </div>
     );
@@ -187,13 +187,13 @@ const ModDetails = () => {
   if (error) {
     return (
       <div className="mod-details-container">
-        <div className="mod-details-error">
-          <h2>Error</h2>
-          <p>{error}</p>
-          <button onClick={() => navigate(-1)} className="action-button">
-            <i className="fas fa-arrow-left"></i>
-            Volver atrás
-          </button>
+      <div className="mod-details-error">
+        <h2>Error</h2>
+        <p>{error}</p>
+        <button onClick={() => navigate(-1)} className="action-button">
+          <i className="fas fa-arrow-left"></i>
+          Volver atrás
+        </button>
         </div>
       </div>
     );
@@ -202,12 +202,12 @@ const ModDetails = () => {
   if (!mod) {
     return (
       <div className="mod-details-container">
-        <div className="mod-details-not-found">
-          <h2>Mod no encontrado</h2>
-          <button onClick={() => navigate(-1)} className="action-button">
-            <i className="fas fa-arrow-left"></i>
-            Volver atrás
-          </button>
+      <div className="mod-details-not-found">
+        <h2>Mod no encontrado</h2>
+        <button onClick={() => navigate(-1)} className="action-button">
+          <i className="fas fa-arrow-left"></i>
+          Volver atrás
+        </button>
         </div>
       </div>
     );
@@ -263,15 +263,15 @@ const ModDetails = () => {
               <div className="stat-label">Valoraciones</div>
               <div className="stat-value">{mod.estadisticas?.total_valoraciones || 0}</div>
             </div>
-          </div>
+              </div>
           
           <div className="mod-stat-box">
             <div className="stat-icon"><i className="fas fa-download"></i></div>
             <div className="stat-content">
               <div className="stat-label">Descargas</div>
               <div className="stat-value">{mod.estadisticas?.total_descargas || 0}</div>
-            </div>
-          </div>
+                </div>
+              </div>
           
           <div className="mod-stat-box">
             <div className="stat-icon"><i className="fas fa-eye"></i></div>
@@ -286,7 +286,7 @@ const ModDetails = () => {
             <div className="stat-content">
               <div className="stat-label">Versión</div>
               <div className="stat-value">v{ultimaVersion ? ultimaVersion.version : mod.version}</div>
-            </div>
+        </div>
           </div>
         </div>
 
@@ -312,7 +312,7 @@ const ModDetails = () => {
             <i className="fas fa-download"></i> Descargar
           </button>
         </div>
-      </div>
+                    </div>
 
       {/* Galería y detalles del mod */}
       <div className="mod-gallery-section">
@@ -320,9 +320,9 @@ const ModDetails = () => {
           <div className="gallery-placeholder">
             <i className="fas fa-images"></i>
             <p>Imágenes próximamente</p>
-          </div>
-        </div>
-      </div>
+                  </div>
+                  </div>
+                </div>
       
       {/* Información del mod */}
       <div className="mod-info-section">
@@ -332,7 +332,7 @@ const ModDetails = () => {
               <div className="date-label">Última actualización</div>
               <div className="date-value">
                 {mod.fecha_actualizacion ? new Date(mod.fecha_actualizacion).toLocaleDateString() : 'No disponible'}
-              </div>
+                </div>
             </div>
             
             <div className="mod-date-box">
@@ -367,8 +367,8 @@ const ModDetails = () => {
             <span className="no-tags">Sin etiquetas</span>
           }
           <button className="add-tag-btn">+ Añadir etiqueta</button>
-        </div>
-      </div>
+                </div>
+              </div>
       
       {/* Pestañas de navegación */}
       <div className="mod-content-tabs">

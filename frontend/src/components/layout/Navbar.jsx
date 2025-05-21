@@ -83,7 +83,7 @@ const Navbar = () => {
 
   // Definir enlaces de navegación
   const navLinks = [
-    { name: 'Explorar', path: '/explorar' },
+    { name: 'Mods', path: '/explorar' },
     { name: 'Tendencias', path: '/tendencias' },
     { name: 'Categorías', path: '/categorias' },
   ];
