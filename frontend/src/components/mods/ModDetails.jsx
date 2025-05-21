@@ -168,8 +168,7 @@ const ModDetails = () => {
 
   // Configuración del breadcrumb
   const breadcrumbItems = [
-    { label: 'Explorar', path: '/explorar' },
-    { label: 'Mods', path: '/explorar/mods' },
+    { label: 'Mods', path: '/mods' },
     { label: mod?.titulo || 'Detalles del Mod', path: `/mods/${id}` }
   ];
 
