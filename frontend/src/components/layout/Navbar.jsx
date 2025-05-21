@@ -79,13 +79,14 @@ const Navbar = () => {
   }, []);
 
   // Función para verificar ruta activa 
-  const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
+  const isActive = useCallback((path) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  }, [location.pathname]);
 
   // Definir enlaces de navegación
   const navLinks = [
     { name: 'Mods', path: '/mods' },
     { name: 'Juegos', path: '/juegos' },
-
   ];
 
   // Opciones del panel
