@@ -346,12 +346,12 @@ const ExplorarMods = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Panel de filtros */}
             <div className={`lg:w-80 flex-shrink-0 transition-all duration-300 ${showFilters ? 'block' : 'hidden'}`}>
-              <div className="filters-panel rounded-lg p-2">
+              <div className="filters-panel rounded-lg">
                 {/* Botón de mostrar/ocultar filtros */}
-                <div className="flex justify-start items-center p-2">
+                <div className="flex justify-start items-center h-[52px] px-4 border-b border-custom-detail/10">
                   <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className="filter-button text-custom-text hover:text-custom-primary transition-colors bg-custom-bg/30 px-3 py-1.5 rounded-md flex items-center"
+                    className="filter-button text-sm text-custom-text hover:text-custom-primary transition-colors bg-custom-bg/30 px-4 py-2 rounded-md flex items-center h-9 w-auto"
                   >
                     <svg className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -360,26 +360,28 @@ const ExplorarMods = () => {
                   </button>
                 </div>
 
-                {/* Sección JUEGO */}
-                <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                  <button
-                    className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                    onClick={() => toggleSeccion('juego')}
-                  >
-                    <span className="text-xs font-bold uppercase">Juego</span>
-                    <svg className={`h-4 w-4 transition-transform ${secciones.juego ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+                {/* Contenido del panel de filtros */}
+                <div className="p-2">
+                  {/* Sección JUEGO */}
+                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
+                    <button
+                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
+                      onClick={() => toggleSeccion('juego')}
+                    >
+                      <span className="text-xs font-bold uppercase">Juego</span>
+                      <svg className={`h-4 w-4 transition-transform ${secciones.juego ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
 
-                  {secciones.juego && (
-                    <div className="filter-section-content p-2">
+                    {secciones.juego && (
+                      <div className="filter-section-content p-2">
                   <div className="custom-select">
                     <select
                       name="juego"
                       value={filtros.juego}
                       onChange={handleFiltroChange}
-                          className="w-full"
+                            className="w-full"
                     >
                       <option value="">Todos los juegos</option>
                       {juegosUnicos.map(juego => (
@@ -388,31 +390,31 @@ const ExplorarMods = () => {
                     </select>
                   </div>
                 </div>
-                  )}
-                </div>
+                    )}
+                  </div>
 
-                {/* Sección ETIQUETAS */}
-                <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                  <button
-                    className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                    onClick={() => toggleSeccion('etiquetas')}
-                  >
-                    <span className="text-xs font-bold uppercase">Etiquetas</span>
-                    <svg className={`h-4 w-4 transition-transform ${secciones.etiquetas ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+                  {/* Sección ETIQUETAS */}
+                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
+                    <button
+                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
+                      onClick={() => toggleSeccion('etiquetas')}
+                    >
+                      <span className="text-xs font-bold uppercase">Etiquetas</span>
+                      <svg className={`h-4 w-4 transition-transform ${secciones.etiquetas ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
 
-                  {secciones.etiquetas && (
-                    <div className="filter-section-content p-2 space-y-2">
-                      <div>
-                        <label className="text-xs text-custom-detail">Incluye</label>
+                    {secciones.etiquetas && (
+                      <div className="filter-section-content p-2 space-y-2">
+                        <div>
+                          <label className="text-xs text-custom-detail">Incluye</label>
                   <div className="custom-select">
                     <select
                       name="categoria"
                       value={filtros.categoria}
                       onChange={handleFiltroChange}
-                            className="w-full"
+                              className="w-full"
                     >
                       <option value="">Todas las categorías</option>
                       {categoriasUnicas.map(categoria => (
@@ -422,372 +424,373 @@ const ExplorarMods = () => {
                   </div>
                 </div>
 
-                      <div className="proximamente-feature">
-                        <label className="text-xs text-custom-detail">Excluye</label>
-                        <div className="custom-select">
-                          <select className="w-full" disabled>
-                            <option value="">Seleccionar etiqueta para excluir...</option>
+                        <div className="proximamente-feature">
+                          <label className="text-xs text-custom-detail">Excluye</label>
+                          <div className="custom-select">
+                            <select className="w-full" disabled>
+                              <option value="">Seleccionar etiqueta para excluir...</option>
                     {etiquetasUnicas.map(etiqueta => (
-                              <option key={etiqueta} value={etiqueta}>{etiqueta}</option>
-                            ))}
-                          </select>
+                                <option key={etiqueta} value={etiqueta}>{etiqueta}</option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Sección PARAMETROS DE BÚSQUEDA */}
-                <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                  <button
-                    className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                    onClick={() => toggleSeccion('parametrosBusqueda')}
-                  >
-                    <span className="text-xs font-bold uppercase">Parámetros de búsqueda</span>
-                    <div className="flex items-center">
-                      <span className="proximamente-badge mr-2">Parcial</span>
-                      <svg className={`h-4 w-4 transition-transform ${secciones.parametrosBusqueda ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </button>
-
-                  {secciones.parametrosBusqueda && (
-                    <div className="filter-section-content p-2 space-y-2">
-                      <div>
-                        <input
-                          type="text"
-                          name="busqueda"
-                          value={filtros.busqueda}
-                          onChange={handleFiltroChange}
-                          placeholder="Título contiene..."
-                          className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text"
-                        />
-                      </div>
-
-                      <div className="proximamente-feature">
-                        <input
-                          type="text"
-                          placeholder="Descripción contiene..."
-                          className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text"
-                          disabled
-                        />
-                      </div>
-
-                      <div className="proximamente-feature">
-                        <input
-                          type="text"
-                          placeholder="Autor contiene..."
-                          className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text"
-                          disabled
-                        />
-                      </div>
-
-                      <button
-                        className="w-full bg-custom-primary hover:bg-custom-primary-hover text-white py-2 rounded-md transition-colors"
-                      >
-                        Aplicar
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Sección SOPORTE DE IDIOMAS */}
-                <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                  <button
-                    className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                    onClick={() => toggleSeccion('idiomas')}
-                  >
-                    <span className="text-xs font-bold uppercase">Soporte de idiomas</span>
-                    <div className="flex items-center">
-                      <span className="proximamente-badge mr-2">Próximamente</span>
-                      <svg className={`h-4 w-4 transition-transform ${secciones.idiomas ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </button>
-
-                  {secciones.idiomas && (
-                    <div className="filter-section-content p-2">
-                      <label className="custom-checkbox block mb-2">
-                        <input type="checkbox" disabled />
-                        <span className="checkmark"></span>
-                        <span className="text-sm text-custom-text">Ocultar traducciones</span>
-                      </label>
-
-                      <div className="space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
-                        <label className="custom-checkbox block">
-                          <input type="checkbox" disabled />
-                          <span className="checkmark"></span>
-                          <span className="text-sm text-custom-text">Español <span className="text-custom-detail text-xs">(978)</span></span>
-                        </label>
-                        <label className="custom-checkbox block">
-                          <input type="checkbox" disabled />
-                          <span className="checkmark"></span>
-                          <span className="text-sm text-custom-text">Inglés <span className="text-custom-detail text-xs">(22.889)</span></span>
-                        </label>
-                        <label className="custom-checkbox block">
-                          <input type="checkbox" disabled />
-                          <span className="checkmark"></span>
-                          <span className="text-sm text-custom-text">Francés <span className="text-custom-detail text-xs">(793)</span></span>
-                        </label>
-                        <label className="custom-checkbox block">
-                          <input type="checkbox" disabled />
-                          <span className="checkmark"></span>
-                          <span className="text-sm text-custom-text">Alemán <span className="text-custom-detail text-xs">(918)</span></span>
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Sección EDAD RECOMENDADA */}
-                <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                  <button
-                    className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                    onClick={() => toggleSeccion('opcionesContenido')}
-                  >
-                    <span className="text-xs font-bold uppercase">Edad Recomendada</span>
-                    <svg className={`h-4 w-4 transition-transform ${secciones.opcionesContenido ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {secciones.opcionesContenido && (
-                    <div className="filter-section-content p-2 space-y-2">
-                      <div className="text-xs text-custom-detail mb-2">
-                        Selecciona para ver mods adecuados para esa edad y rangos inferiores
-                      </div>
-
-                      {/* Opción por defecto - Sin filtro */}
-                      <div className="classification-option bg-custom-bg/30 p-2 rounded-md">
-                        <label className="custom-checkbox block">
-                          <input
-                            type="checkbox"
-                            checked={filtros.edades_seleccionadas.length === 0}
-                            onChange={() => setFiltros(prev => ({
-                              ...prev,
-                              edades_seleccionadas: []
-                            }))}
-                          />
-                          <span className="checkmark"></span>
-                          <span className="text-sm font-medium text-custom-text">Todos los mods</span>
-                          <span className="text-xs text-custom-detail block ml-6">Mostrar contenido de todas las edades</span>
-                        </label>
-                      </div>
-
-                      {/* Opciones de edad */}
-                      <div className="mt-3 space-y-1.5">
-                        <div className="classification-option">
-                          <label className="custom-checkbox block">
-                            <input
-                              type="checkbox"
-                              checked={filtros.edades_seleccionadas.includes('3')}
-                              onChange={() => handleEdadChange('3')}
-                            />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">Para todos los públicos (3+)</span>
-                          </label>
-                        </div>
-
-                        <div className="classification-option">
-                          <label className="custom-checkbox block">
-                            <input
-                              type="checkbox"
-                              checked={filtros.edades_seleccionadas.includes('7')}
-                              onChange={() => handleEdadChange('7')}
-                            />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">7+ años</span>
-                          </label>
-                        </div>
-
-                        <div className="classification-option">
-                          <label className="custom-checkbox block">
-                            <input
-                              type="checkbox"
-                              checked={filtros.edades_seleccionadas.includes('12')}
-                              onChange={() => handleEdadChange('12')}
-                            />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">12+ años</span>
-                          </label>
-                        </div>
-
-                        <div className="classification-option">
-                          <label className="custom-checkbox block">
-                            <input
-                              type="checkbox"
-                              checked={filtros.edades_seleccionadas.includes('16')}
-                              onChange={() => handleEdadChange('16')}
-                            />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">16+ años</span>
-                          </label>
-                        </div>
-
-                        <div className="classification-option">
-                          <label className="custom-checkbox block">
-                            <input
-                              type="checkbox"
-                              checked={filtros.edades_seleccionadas.includes('18')}
-                              onChange={() => handleEdadChange('18')}
-                            />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">18+ años</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      {/* Contenido sin etiqueta */}
-                      <div className="classification-option mt-3 pt-3 border-t border-custom-detail/10">
-                        <label className="custom-checkbox block">
-                          <input
-                            type="checkbox"
-                            checked={filtros.edades_seleccionadas.includes('0')}
-                            onChange={() => handleEdadChange('0')}
-                          />
-                          <span className="checkmark"></span>
-                          <span className="text-sm text-custom-text">Solo sin clasificar</span>
-                          <span className="text-xs text-custom-detail block ml-6">Mods sin etiqueta de edad</span>
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Sección TAMAÑO DE ARCHIVO */}
-                <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                  <button
-                    className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                    onClick={() => toggleSeccion('tamanoArchivo')}
-                  >
-                    <span className="text-xs font-bold uppercase">Tamaño de archivo</span>
-                    <div className="flex items-center">
-                      <span className="proximamente-badge mr-2">Próximamente</span>
-                      <svg className={`h-4 w-4 transition-transform ${secciones.tamanoArchivo ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
-                  </button>
-
-                  {secciones.tamanoArchivo && (
-                    <div className="filter-section-content p-2">
-                      <div className="flex items-center justify-between space-x-2">
-                        <div className="custom-select w-1/2">
-                          <select className="w-full" disabled>
-                            <option value="">Sin mín.</option>
-                            <option value="1mb">1 MB</option>
-                            <option value="10mb">10 MB</option>
-                            <option value="50mb">50 MB</option>
-                            <option value="100mb">100 MB</option>
-                          </select>
-                        </div>
-                        <div className="custom-select w-1/2">
-                          <select className="w-full" disabled>
-                            <option value="">Sin máx.</option>
-                            <option value="100mb">100 MB</option>
-                            <option value="500mb">500 MB</option>
-                            <option value="1gb">1 GB</option>
-                            <option value="5gb">5 GB</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Sección DESCARGAS */}
-                <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                  <button
-                    className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                    onClick={() => toggleSeccion('descargas')}
-                  >
-                    <span className="text-xs font-bold uppercase">Descargas</span>
-                    <svg className={`h-4 w-4 transition-transform ${secciones.descargas ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {secciones.descargas && (
-                    <div className="filter-section-content p-2">
-                      <div className="flex items-center justify-between space-x-2">
-                        <div className="custom-select w-1/2">
-                          <select
-                            name="descargasMin"
-                            value={filtros.descargasMin}
-                            onChange={handleFiltroChange}
-                            className="w-full"
-                          >
-                            <option value="">Sin mín.</option>
-                            <option value="100">100+</option>
-                            <option value="1000">1K+</option>
-                            <option value="10000">10K+</option>
-                            <option value="100000">100K+</option>
-                          </select>
-                        </div>
-                        <div className="custom-select w-1/2">
-                          <select
-                            name="descargasMax"
-                            value={filtros.descargasMax}
-                            onChange={handleFiltroChange}
-                            className="w-full"
-                          >
-                            <option value="">Sin máx.</option>
-                            <option value="10000">10K</option>
-                            <option value="100000">100K</option>
-                            <option value="1000000">1M</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Sección VALORACIONES */}
-                <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                  <button
-                    className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                    onClick={() => toggleSeccion('valoraciones')}
-                  >
-                    <span className="text-xs font-bold uppercase">Valoraciones</span>
-                    <svg className={`h-4 w-4 transition-transform ${secciones.valoraciones ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {secciones.valoraciones && (
-                    <div className="filter-section-content p-2">
-                      <div className="flex items-center justify-between space-x-2">
-                        <div className="custom-select w-1/2">
-                          <select
-                            name="valoracionesMin"
-                            value={filtros.valoracionesMin}
-                            onChange={handleFiltroChange}
-                            className="w-full"
-                          >
-                            <option value="">Sin mín.</option>
-                            <option value="10">10+</option>
-                            <option value="100">100+</option>
-                            <option value="1000">1K+</option>
-                          </select>
-                        </div>
-                        <div className="custom-select w-1/2">
-                          <select
-                            name="valoracionesMax"
-                            value={filtros.valoracionesMax}
-                            onChange={handleFiltroChange}
-                            className="w-full"
-                          >
-                            <option value="">Sin máx.</option>
-                            <option value="500">500</option>
-                            <option value="1000">1K</option>
-                            <option value="10000">10K</option>
-                          </select>
-                        </div>
-                      </div>
+                    )}
                   </div>
-                  )}
+
+                  {/* Sección PARAMETROS DE BÚSQUEDA */}
+                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
+                    <button
+                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
+                      onClick={() => toggleSeccion('parametrosBusqueda')}
+                    >
+                      <span className="text-xs font-bold uppercase">Parámetros de búsqueda</span>
+                      <div className="flex items-center">
+                        <span className="proximamente-badge mr-2">Parcial</span>
+                        <svg className={`h-4 w-4 transition-transform ${secciones.parametrosBusqueda ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </button>
+
+                    {secciones.parametrosBusqueda && (
+                      <div className="filter-section-content p-2 space-y-2">
+                        <div>
+                          <input
+                            type="text"
+                            name="busqueda"
+                            value={filtros.busqueda}
+                            onChange={handleFiltroChange}
+                            placeholder="Título contiene..."
+                            className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text"
+                          />
+                        </div>
+
+                        <div className="proximamente-feature">
+                          <input
+                            type="text"
+                            placeholder="Descripción contiene..."
+                            className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text"
+                            disabled
+                          />
+                        </div>
+
+                        <div className="proximamente-feature">
+                          <input
+                            type="text"
+                            placeholder="Autor contiene..."
+                            className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text"
+                            disabled
+                          />
+                        </div>
+
+                        <button
+                          className="w-full bg-custom-primary hover:bg-custom-primary-hover text-white py-2 rounded-md transition-colors"
+                        >
+                          Aplicar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección SOPORTE DE IDIOMAS */}
+                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
+                    <button
+                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
+                      onClick={() => toggleSeccion('idiomas')}
+                    >
+                      <span className="text-xs font-bold uppercase">Soporte de idiomas</span>
+                      <div className="flex items-center">
+                        <span className="proximamente-badge mr-2">Próximamente</span>
+                        <svg className={`h-4 w-4 transition-transform ${secciones.idiomas ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </button>
+
+                    {secciones.idiomas && (
+                      <div className="filter-section-content p-2">
+                        <label className="custom-checkbox block mb-2">
+                          <input type="checkbox" disabled />
+                          <span className="checkmark"></span>
+                          <span className="text-sm text-custom-text">Ocultar traducciones</span>
+                        </label>
+
+                        <div className="space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
+                          <label className="custom-checkbox block">
+                            <input type="checkbox" disabled />
+                            <span className="checkmark"></span>
+                            <span className="text-sm text-custom-text">Español <span className="text-custom-detail text-xs">(978)</span></span>
+                          </label>
+                          <label className="custom-checkbox block">
+                            <input type="checkbox" disabled />
+                            <span className="checkmark"></span>
+                            <span className="text-sm text-custom-text">Inglés <span className="text-custom-detail text-xs">(22.889)</span></span>
+                          </label>
+                          <label className="custom-checkbox block">
+                            <input type="checkbox" disabled />
+                            <span className="checkmark"></span>
+                            <span className="text-sm text-custom-text">Francés <span className="text-custom-detail text-xs">(793)</span></span>
+                          </label>
+                          <label className="custom-checkbox block">
+                            <input type="checkbox" disabled />
+                            <span className="checkmark"></span>
+                            <span className="text-sm text-custom-text">Alemán <span className="text-custom-detail text-xs">(918)</span></span>
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección EDAD RECOMENDADA */}
+                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
+                    <button
+                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
+                      onClick={() => toggleSeccion('opcionesContenido')}
+                    >
+                      <span className="text-xs font-bold uppercase">Edad Recomendada</span>
+                      <svg className={`h-4 w-4 transition-transform ${secciones.opcionesContenido ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {secciones.opcionesContenido && (
+                      <div className="filter-section-content p-2 space-y-2">
+                        <div className="text-xs text-custom-detail mb-2">
+                          Selecciona para ver mods adecuados para esa edad y rangos inferiores
+                        </div>
+
+                        {/* Opción por defecto - Sin filtro */}
+                        <div className="classification-option bg-custom-bg/30 p-2 rounded-md">
+                          <label className="custom-checkbox block">
+                            <input
+                              type="checkbox"
+                              checked={filtros.edades_seleccionadas.length === 0}
+                              onChange={() => setFiltros(prev => ({
+                                ...prev,
+                                edades_seleccionadas: []
+                              }))}
+                            />
+                            <span className="checkmark"></span>
+                            <span className="text-sm font-medium text-custom-text">Todos los mods</span>
+                            <span className="text-xs text-custom-detail block ml-6">Mostrar contenido de todas las edades</span>
+                          </label>
+                        </div>
+
+                        {/* Opciones de edad */}
+                        <div className="mt-3 space-y-1.5">
+                          <div className="classification-option">
+                            <label className="custom-checkbox block">
+                              <input
+                                type="checkbox"
+                                checked={filtros.edades_seleccionadas.includes('3')}
+                                onChange={() => handleEdadChange('3')}
+                              />
+                              <span className="checkmark"></span>
+                              <span className="text-sm text-custom-text">Para todos los públicos (3+)</span>
+                            </label>
+                          </div>
+
+                          <div className="classification-option">
+                            <label className="custom-checkbox block">
+                              <input
+                                type="checkbox"
+                                checked={filtros.edades_seleccionadas.includes('7')}
+                                onChange={() => handleEdadChange('7')}
+                              />
+                              <span className="checkmark"></span>
+                              <span className="text-sm text-custom-text">7+ años</span>
+                            </label>
+                          </div>
+
+                          <div className="classification-option">
+                            <label className="custom-checkbox block">
+                              <input
+                                type="checkbox"
+                                checked={filtros.edades_seleccionadas.includes('12')}
+                                onChange={() => handleEdadChange('12')}
+                              />
+                              <span className="checkmark"></span>
+                              <span className="text-sm text-custom-text">12+ años</span>
+                            </label>
+                          </div>
+
+                          <div className="classification-option">
+                            <label className="custom-checkbox block">
+                              <input
+                                type="checkbox"
+                                checked={filtros.edades_seleccionadas.includes('16')}
+                                onChange={() => handleEdadChange('16')}
+                              />
+                              <span className="checkmark"></span>
+                              <span className="text-sm text-custom-text">16+ años</span>
+                            </label>
+                          </div>
+
+                          <div className="classification-option">
+                            <label className="custom-checkbox block">
+                              <input
+                                type="checkbox"
+                                checked={filtros.edades_seleccionadas.includes('18')}
+                                onChange={() => handleEdadChange('18')}
+                              />
+                              <span className="checkmark"></span>
+                              <span className="text-sm text-custom-text">18+ años</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Contenido sin etiqueta */}
+                        <div className="classification-option mt-3 pt-3 border-t border-custom-detail/10">
+                          <label className="custom-checkbox block">
+                        <input
+                          type="checkbox"
+                              checked={filtros.edades_seleccionadas.includes('0')}
+                              onChange={() => handleEdadChange('0')}
+                        />
+                        <span className="checkmark"></span>
+                            <span className="text-sm text-custom-text">Solo sin clasificar</span>
+                            <span className="text-xs text-custom-detail block ml-6">Mods sin etiqueta de edad</span>
+                      </label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección TAMAÑO DE ARCHIVO */}
+                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
+                    <button
+                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
+                      onClick={() => toggleSeccion('tamanoArchivo')}
+                    >
+                      <span className="text-xs font-bold uppercase">Tamaño de archivo</span>
+                      <div className="flex items-center">
+                        <span className="proximamente-badge mr-2">Próximamente</span>
+                        <svg className={`h-4 w-4 transition-transform ${secciones.tamanoArchivo ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </button>
+
+                    {secciones.tamanoArchivo && (
+                      <div className="filter-section-content p-2">
+                        <div className="flex items-center justify-between space-x-2">
+                          <div className="custom-select w-1/2">
+                            <select className="w-full" disabled>
+                              <option value="">Sin mín.</option>
+                              <option value="1mb">1 MB</option>
+                              <option value="10mb">10 MB</option>
+                              <option value="50mb">50 MB</option>
+                              <option value="100mb">100 MB</option>
+                            </select>
+                          </div>
+                          <div className="custom-select w-1/2">
+                            <select className="w-full" disabled>
+                              <option value="">Sin máx.</option>
+                              <option value="100mb">100 MB</option>
+                              <option value="500mb">500 MB</option>
+                              <option value="1gb">1 GB</option>
+                              <option value="5gb">5 GB</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección DESCARGAS */}
+                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
+                    <button
+                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
+                      onClick={() => toggleSeccion('descargas')}
+                    >
+                      <span className="text-xs font-bold uppercase">Descargas</span>
+                      <svg className={`h-4 w-4 transition-transform ${secciones.descargas ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {secciones.descargas && (
+                      <div className="filter-section-content p-2">
+                        <div className="flex items-center justify-between space-x-2">
+                          <div className="custom-select w-1/2">
+                            <select
+                              name="descargasMin"
+                              value={filtros.descargasMin}
+                              onChange={handleFiltroChange}
+                              className="w-full"
+                            >
+                              <option value="">Sin mín.</option>
+                              <option value="100">100+</option>
+                              <option value="1000">1K+</option>
+                              <option value="10000">10K+</option>
+                              <option value="100000">100K+</option>
+                            </select>
+                          </div>
+                          <div className="custom-select w-1/2">
+                            <select
+                              name="descargasMax"
+                              value={filtros.descargasMax}
+                              onChange={handleFiltroChange}
+                              className="w-full"
+                            >
+                              <option value="">Sin máx.</option>
+                              <option value="10000">10K</option>
+                              <option value="100000">100K</option>
+                              <option value="1000000">1M</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sección VALORACIONES */}
+                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
+                    <button
+                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
+                      onClick={() => toggleSeccion('valoraciones')}
+                    >
+                      <span className="text-xs font-bold uppercase">Valoraciones</span>
+                      <svg className={`h-4 w-4 transition-transform ${secciones.valoraciones ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {secciones.valoraciones && (
+                      <div className="filter-section-content p-2">
+                        <div className="flex items-center justify-between space-x-2">
+                          <div className="custom-select w-1/2">
+                            <select
+                              name="valoracionesMin"
+                              value={filtros.valoracionesMin}
+                              onChange={handleFiltroChange}
+                              className="w-full"
+                            >
+                              <option value="">Sin mín.</option>
+                              <option value="10">10+</option>
+                              <option value="100">100+</option>
+                              <option value="1000">1K+</option>
+                            </select>
+                          </div>
+                          <div className="custom-select w-1/2">
+                            <select
+                              name="valoracionesMax"
+                              value={filtros.valoracionesMax}
+                              onChange={handleFiltroChange}
+                              className="w-full"
+                            >
+                              <option value="">Sin máx.</option>
+                              <option value="500">500</option>
+                              <option value="1000">1K</option>
+                              <option value="10000">10K</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -940,12 +943,12 @@ const ExplorarMods = () => {
               )}
 
               {/* Barra de ordenamiento */}
-              <div className="sort-bar rounded-lg p-4 mb-6">
-                <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="sort-bar rounded-lg mb-6">
+                <div className="flex flex-wrap items-center justify-between gap-4 h-[52px] px-4">
                   {!showFilters && (
                   <button
                       onClick={() => setShowFilters(true)}
-                      className="filter-button text-custom-text hover:text-custom-primary transition-colors bg-custom-bg/30 px-3 py-1.5 rounded-md flex items-center"
+                      className="filter-button text-sm text-custom-text hover:text-custom-primary transition-colors bg-custom-bg/30 px-4 py-2 rounded-md flex items-center h-9 w-auto"
                   >
                       <svg className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
@@ -955,13 +958,14 @@ const ExplorarMods = () => {
                   )}
 
                   {/* Controles de ordenamiento y vista alineados a la derecha */}
-                  <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-2">
                     {/* Filtro de período */}
-                    <div className="custom-select">
+                    <div className="custom-select text-sm">
                       <select
                         name="periodoTiempo"
                         value={filtros.periodoTiempo}
                         onChange={handlePeriodoChange}
+                        className="h-9 px-2 py-1"
                       >
                         <option value="todo">Todo el tiempo</option>
                         <option value="24h">Últimas 24 horas</option>
@@ -973,11 +977,12 @@ const ExplorarMods = () => {
                     </div>
 
                     {/* Tipo de orden */}
-                    <div className="custom-select">
+                    <div className="custom-select text-sm">
                       <select
                         name="ordenarPor"
                         value={filtros.ordenarPor}
                         onChange={handleFiltroChange}
+                        className="h-9 px-2 py-1"
                       >
                         <option value="recientes">Fecha</option>
                         <option value="descargas">Descargas</option>
@@ -988,11 +993,12 @@ const ExplorarMods = () => {
                     </div>
 
                     {/* Dirección de orden */}
-                    <div className="custom-select">
+                    <div className="custom-select text-sm">
                       <select
                         name="orden"
                         value={filtros.orden}
                         onChange={handleFiltroChange}
+                        className="h-9 px-2 py-1"
                       >
                         <option value="desc">Descendente</option>
                         <option value="asc">Ascendente</option>
@@ -1000,7 +1006,7 @@ const ExplorarMods = () => {
                     </div>
 
                     {/* Tipo de vista */}
-                    <div className="view-selector">
+                    <div className="view-selector text-sm">
                       <button
                         onClick={() => cambiarVista('compacta')}
                         className={vistaActual === 'compacta' ? 'active' : ''}
