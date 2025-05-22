@@ -69,7 +69,7 @@ const Dashboard = ({ defaultTab = 0 }) => {
       <div className="bg-custom-card rounded-lg shadow-lg p-6">
         <Tabs 
           tabs={tabConfig} 
-          currentTab={currentTab} 
+          defaultTab={currentTab} 
           onTabChange={handleTabChange}
         />
       </div>
