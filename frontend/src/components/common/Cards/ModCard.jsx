@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import authService from '../../../services/api/authService';
 import useSavedStatus from '../../../hooks/useSavedStatus';
 import { useNotification } from '../../../context/NotificationContext';
-import '../../../assets/styles/components/Cards/ModCard.css';
+import '../../../assets/styles/components/common/Cards/ModCard.css';
 
 const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSavedChange }) => {
   const isAuthenticated = authService.isAuthenticated();

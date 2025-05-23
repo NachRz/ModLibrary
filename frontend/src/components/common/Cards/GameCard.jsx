@@ -49,112 +49,58 @@ const GameCard = ({ game, showStats = true }) => {
   const gameUrl = `/juegos/${game.id}`;
 
   return (
-    <div className="bg-custom-card rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-custom-detail/10">
-      {/* Imagen del juego */}
-      <div className="relative">
-        <img 
-          src={game.image} 
-          alt={game.title} 
-          className="w-full h-56 object-cover brightness-90" 
-          loading="lazy"
-        />
-        
-        {/* Overlay sutil mejorado */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none"></div>
-        
-        {/* Año de lanzamiento */}
-        <div className="absolute top-3 left-3 bg-custom-primary/90 text-white text-xs font-medium py-1.5 px-3 rounded-full shadow-lg backdrop-blur-sm">
-          {game.releaseYear}
-        </div>
-        
-        {/* Plataformas */}
-        {game.platforms && (
-          <div className="absolute top-3 right-3 flex space-x-1">
-            {game.platforms.map((platform, index) => (
-              <div key={index} className="bg-custom-bg/60 text-white text-xs font-medium py-1 px-2 rounded-md shadow-lg backdrop-blur-sm">
-                {platform}
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Título sobre la imagen con mayor contraste */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-          <h3 className="font-bold text-xl leading-tight line-clamp-1 drop-shadow-lg">{game.title}</h3>
-          <p className="text-sm text-white/95 mt-1 flex items-center drop-shadow-lg">
-            <span className="bg-custom-card/50 px-2 py-0.5 rounded backdrop-blur-md">{game.developer}</span>
-            {game.genres && (
-              <>
-                <span className="mx-1.5">•</span>
-                <span className="bg-custom-card/50 px-2 py-0.5 rounded backdrop-blur-md">
-                  {game.genres.join(', ')}
-                </span>
-              </>
-            )}
-          </p>
-        </div>
-      </div>
-      
-      {/* Contenido */}
-      <div className="p-5">
-        {/* Descripción */}
-        <p className="text-white/90 text-sm mb-4 line-clamp-2 mt-1">{game.description}</p>
-        
-        {showStats && (
-          <>
-            {/* Estadísticas */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center bg-custom-bg/50 rounded-full px-3 py-1.5 text-white shadow-sm">
-                <div className="flex items-center mr-1">
-                  {renderStars(game.rating)}
-                </div>
-                <span className="ml-1 text-xs font-medium">{game.rating.toFixed(1)}</span>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center text-white/90 bg-custom-bg/50 rounded-full px-3 py-1.5 shadow-sm">
-                  <svg className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  <span className="text-xs font-medium">{game.totalMods} mods</span>
-                </div>
-                
-                {game.trending && (
-                  <div className="flex items-center text-white/90 bg-custom-tertiary/50 rounded-full px-3 py-1.5 shadow-sm">
-                    <svg className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                    <span className="text-xs font-medium">Trending</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-        
-        {/* Botones de acción */}
-        <div className="flex space-x-3">
-          <Link 
-            to={`${gameUrl}/mods`} 
-            className="flex-1 text-center py-2.5 font-medium rounded-lg text-white bg-custom-primary hover:bg-custom-primary-hover transition-colors duration-300 text-sm shadow-sm hover:shadow-md"
-          >
-            Ver mods
-          </Link>
+    <div className="relative group">
+      {/* Card Container */}
+      <div className="bg-custom-card rounded-lg shadow-xl overflow-hidden transition-all duration-300 group-hover:shadow-2xl">
+        {/* Imagen del juego con overlay */}
+        <div className="relative aspect-[3/4]">
+          <img 
+            src={game.image} 
+            alt={game.title} 
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
           
-          <Link 
-            to={gameUrl} 
-            className="flex-1 text-center py-2.5 font-medium rounded-lg text-white bg-custom-primary/10 hover:bg-custom-primary/20 transition-colors duration-300 text-sm shadow-sm hover:shadow-md"
-          >
-            Detalles
-          </Link>
-          
-          <button className="bg-custom-bg/50 hover:bg-custom-bg/70 p-2.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-            <svg className="h-5 w-5 text-white hover:text-custom-tertiary transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          {/* Botón de guardar */}
+          <button className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 p-2 rounded-full transition-colors duration-300">
+            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
             </svg>
           </button>
+
+          {/* Información del juego */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+            <h3 className="text-2xl font-bold mb-2">{game.title}</h3>
+            
+            {/* Estadísticas */}
+            <div className="flex items-center space-x-4 text-sm">
+              {/* Total de mods */}
+              <div className="flex items-center">
+                <svg className="h-5 w-5 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span>{game.totalMods || 0}</span>
+              </div>
+
+              {/* Descargas únicas por usuario */}
+              <div className="flex items-center">
+                <svg className="h-5 w-5 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                <span>Próximamente</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Enlace que cubre toda la tarjeta */}
+      <Link 
+        to={`/juegos/${game.id}`} 
+        className="absolute inset-0 z-10"
+        aria-label={`Ver detalles de ${game.title}`}
+      />
     </div>
   );
 };
