@@ -20,6 +20,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middle
 
 // Rutas de juegos
 Route::prefix('juegos')->group(function () {
+    Route::get('/', [JuegoController::class, 'index']);
     Route::get('/buscar', [JuegoController::class, 'search']);
     Route::get('/{id}', [JuegoController::class, 'show']);
     Route::post('/{id}/sincronizar', [JuegoController::class, 'syncGame']);

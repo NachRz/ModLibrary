@@ -32,11 +32,11 @@ const ExplorarJuegos = () => {
       const response = await gameService.getAllGames();
       setJuegos(response.map(game => ({
         id: game.id,
-        titulo: game.title,
-        image: game.background_image,
-        totalMods: game.total_mods || 0,
+        titulo: game.titulo,
+        image: game.imagen_fondo,
+        totalMods: game.mods?.length || 0,
         rating: game.rating,
-        release_date: game.release_date
+        release_date: game.fecha_lanzamiento
       })));
     } catch (err) {
       setError('Error al cargar los juegos');

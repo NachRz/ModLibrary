@@ -16,6 +16,16 @@ class JuegoController extends Controller
         $this->rawgService = $rawgService;
     }
 
+    public function index()
+    {
+        $juegos = Juego::all();
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $juegos
+        ]);
+    }
+
     public function search(Request $request)
     {
         $query = $request->input('query');
