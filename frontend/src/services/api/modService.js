@@ -73,9 +73,30 @@ const modService = {
   // Crear un nuevo mod
   createMod: async (formData) => {
     try {
-      const response = await apiClient.post('/mods', formData, {
+      // Crear un FormData object para enviar los datos
+      const data = new FormData();
+      
+      // Añadir cada campo al FormData, asegurando que juego_id sea un número
+      Object.keys(formData).forEach(key => {
+        if (key === 'imagen') {
+          if (formData[key]) {
+            data.append(key, formData[key]);
+          }
+        } else if (key === 'juego_id') {
+          data.append(key, Number(formData[key]));
+        } else if (key === 'etiquetas') {
+          // Las etiquetas se envían como array
+          formData[key].forEach(etiqueta => {
+            data.append('etiquetas[]', etiqueta);
+          });
+        } else {
+          data.append(key, formData[key]);
+        }
+      });
+
+      const response = await apiClient.post('/mods', data, {
         headers: {
-          'Content-Type': 'multipart/form-data' // Necesario para enviar archivos
+          'Content-Type': 'multipart/form-data'
         }
       });
       return response.data;
@@ -212,7 +233,17 @@ const modService = {
     } catch (error) {
       throw error.response?.data || { message: 'Error al eliminar tu valoración' };
     }
-  }
+  },
+
+  // Obtener lista de juegos
+  getJuegos: async () => {
+    try {
+      const response = await apiClient.get('/juegos');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener los juegos' };
+    }
+  },
 };
 
 export default modService; 

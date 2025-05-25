@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/styles/components/mods/CrearMod.css';
 import modService from '../../services/api/modService';
@@ -10,6 +10,11 @@ const CrearMod = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  
+  // Estado para la lista de juegos
+  const [juegos, setJuegos] = useState([]);
+  const [loadingJuegos, setLoadingJuegos] = useState(true);
+  const [errorJuegos, setErrorJuegos] = useState(null);
   
   // Estados para los campos del formulario
   const [formData, setFormData] = useState({
@@ -29,18 +34,6 @@ const CrearMod = () => {
   // Estado para los errores de validación
   const [errors, setErrors] = useState({});
   
-  // Lista hardcoded de juegos
-  const juegos = [
-    { id: 1, titulo: 'Minecraft' },
-    { id: 2, titulo: 'Skyrim' },
-    { id: 3, titulo: 'The Sims 4' },
-    { id: 4, titulo: 'Stardew Valley' },
-    { id: 5, titulo: 'Fallout 4' },
-    { id: 6, titulo: 'Cyberpunk 2077' },
-    { id: 7, titulo: 'GTA V' },
-    { id: 8, titulo: 'Cities: Skylines' }
-  ];
-  
   // Lista hardcoded de etiquetas disponibles
   const etiquetasDisponibles = [
     { id: 1, nombre: 'Gameplay' },
@@ -53,12 +46,36 @@ const CrearMod = () => {
     { id: 8, nombre: 'Personajes' }
   ];
   
+  // Cargar la lista de juegos al montar el componente
+  useEffect(() => {
+    const cargarJuegos = async () => {
+      try {
+        setLoadingJuegos(true);
+        const response = await modService.getJuegos();
+        if (response.status === 'success' && response.data) {
+          setJuegos(response.data);
+        } else {
+          throw new Error('No se pudieron cargar los juegos');
+        }
+      } catch (error) {
+        setErrorJuegos(error.message);
+      } finally {
+        setLoadingJuegos(false);
+      }
+    };
+
+    cargarJuegos();
+  }, []);
+  
   // Manejador para cambios en los inputs
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
     if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked });
+    } else if (name === 'juego_id') {
+      // Asegurarnos de que juego_id sea un número
+      setFormData({ ...formData, [name]: Number(value) });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -162,13 +179,9 @@ const CrearMod = () => {
         // Preparamos los datos para enviar al backend
         const modDataToSubmit = {
           ...formData,
-          // Aseguramos que juego_id sea un número
-          juego_id: parseInt(formData.juego_id, 10),
-          // Aseguramos que edad_recomendada sea un número
+          // El juego_id ya es un número gracias al handleChange
           edad_recomendada: parseInt(formData.edad_recomendada, 10),
-          // Añadimos explícitamente el ID del creador
           creador_id: user.id,
-          // Asignamos la versión actual como la versión del mod
           version: formData.version_actual
         };
         
@@ -285,19 +298,25 @@ const CrearMod = () => {
                 
                 <div className="form-group">
                   <label htmlFor="juego_id">Juego *</label>
-                  <select
-                    id="juego_id"
-                    name="juego_id"
-                    value={formData.juego_id}
-                    onChange={handleChange}
-                    className={errors.juego_id ? 'error' : ''}
-                    disabled={submitting}
-                  >
-                    <option value="">Seleccionar juego</option>
-                    {juegos.map(juego => (
-                      <option key={juego.id} value={juego.id}>{juego.titulo}</option>
-                    ))}
-                  </select>
+                  {loadingJuegos ? (
+                    <div className="loading-message">Cargando juegos...</div>
+                  ) : errorJuegos ? (
+                    <div className="error-message">{errorJuegos}</div>
+                  ) : (
+                    <select
+                      id="juego_id"
+                      name="juego_id"
+                      value={formData.juego_id}
+                      onChange={handleChange}
+                      className={errors.juego_id ? 'error' : ''}
+                      disabled={submitting}
+                    >
+                      <option value="">Seleccionar juego</option>
+                      {juegos.map(juego => (
+                        <option key={juego.id} value={juego.id}>{juego.titulo}</option>
+                      ))}
+                    </select>
+                  )}
                   {errors.juego_id && <span className="error-message">{errors.juego_id}</span>}
                 </div>
                 
