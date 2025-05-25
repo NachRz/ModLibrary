@@ -34,7 +34,7 @@ const ExplorarJuegos = () => {
         id: game.id,
         titulo: game.titulo,
         image: game.imagen_fondo,
-        totalMods: game.mods?.length || 0,
+        totalMods: game.total_mods,
         rating: game.rating,
         release_date: game.fecha_lanzamiento
       })));

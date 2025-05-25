@@ -30,6 +30,39 @@ class Mod extends Model
         'val_media'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Al crear un nuevo mod
+        static::created(function ($mod) {
+            if ($mod->juego) {
+                $mod->juego->incrementarModsTotales();
+            }
+        });
+
+        // Al eliminar un mod
+        static::deleted(function ($mod) {
+            if ($mod->juego) {
+                $mod->juego->decrementarModsTotales();
+            }
+        });
+
+        // Al actualizar un mod (por si cambia el juego)
+        static::updated(function ($mod) {
+            if ($mod->isDirty('juego_id')) {
+                // Decrementar el contador del juego anterior
+                if ($mod->getOriginal('juego_id')) {
+                    Juego::find($mod->getOriginal('juego_id'))?->decrementarModsTotales();
+                }
+                // Incrementar el contador del nuevo juego
+                if ($mod->juego_id) {
+                    Juego::find($mod->juego_id)?->incrementarModsTotales();
+                }
+            }
+        });
+    }
+
     /**
      * Calcula y actualiza el número de valoraciones para este mod
      */

@@ -18,11 +18,23 @@ class JuegoController extends Controller
 
     public function index()
     {
-        $juegos = Juego::all();
+        $juegos = Juego::select([
+            'id', 'titulo', 'imagen_fondo', 'mods_totales',
+            'rating', 'fecha_lanzamiento'
+        ])->get();
         
         return response()->json([
             'status' => 'success',
-            'data' => $juegos
+            'data' => $juegos->map(function ($juego) {
+                return [
+                    'id' => $juego->id,
+                    'titulo' => $juego->titulo,
+                    'imagen_fondo' => $juego->imagen_fondo,
+                    'total_mods' => $juego->mods_totales,
+                    'rating' => $juego->rating,
+                    'fecha_lanzamiento' => $juego->fecha_lanzamiento
+                ];
+            })
         ]);
     }
 
@@ -64,21 +76,39 @@ class JuegoController extends Controller
                 'imagen_fondo_adicional' => $gameData['background_image_additional'],
                 'sitio_web' => $gameData['website'],
                 'rating' => $gameData['rating'],
-                'rating_top' => $gameData['rating_top']
+                'rating_top' => $gameData['rating_top'],
+                'mods_totales' => 0
             ]
         );
+
+        // Recalcular mods totales después de sincronizar
+        $juego->recalcularModsTotales();
 
         return response()->json($juego);
     }
 
     public function show($id)
     {
-        $juego = Juego::where('rawg_id', $id)->first();
+        $juego = Juego::select([
+            'id', 'titulo', 'descripcion', 'imagen_fondo',
+            'mods_totales', 'rating', 'fecha_lanzamiento'
+        ])->where('rawg_id', $id)->first();
 
         if (!$juego) {
             return response()->json(['error' => 'Juego no encontrado'], 404);
         }
 
-        return response()->json($juego);
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $juego->id,
+                'titulo' => $juego->titulo,
+                'descripcion' => $juego->descripcion,
+                'imagen_fondo' => $juego->imagen_fondo,
+                'total_mods' => $juego->mods_totales,
+                'rating' => $juego->rating,
+                'fecha_lanzamiento' => $juego->fecha_lanzamiento
+            ]
+        ]);
     }
 } 

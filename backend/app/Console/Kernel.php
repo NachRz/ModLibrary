@@ -10,11 +10,13 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\ExtractRawgData::class,
         Commands\ActualizarNumValoraciones::class,
+        Commands\RecalcularModsTotales::class,
     ];
 
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Recalcular mods totales cada día a las 3 AM
+        $schedule->command('mods:recalcular-totales')->dailyAt('03:00');
     }
 
     protected function commands()

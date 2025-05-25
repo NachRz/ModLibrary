@@ -26,18 +26,56 @@ class Juego extends Model
         'imagen_fondo_adicional',
         'sitio_web',
         'rating',
-        'rating_top'
+        'rating_top',
+        'mods_totales'
     ];
 
     protected $casts = [
         'fecha_lanzamiento' => 'date',
         'tba' => 'boolean',
         'actualizado' => 'datetime',
-        'rating' => 'decimal:2'
+        'rating' => 'decimal:2',
+        'mods_totales' => 'integer'
     ];
 
     public function mods(): HasMany
     {
         return $this->hasMany(Mod::class, 'juego_id');
+    }
+
+    /**
+     * Incrementa el contador de mods
+     */
+    public function incrementarModsTotales(): void
+    {
+        $this->increment('mods_totales');
+    }
+
+    /**
+     * Decrementa el contador de mods
+     */
+    public function decrementarModsTotales(): void
+    {
+        $this->decrement('mods_totales');
+    }
+
+    /**
+     * Recalcula y actualiza el total de mods
+     */
+    public function recalcularModsTotales(): void
+    {
+        $this->mods_totales = $this->mods()->count();
+        $this->save();
+    }
+
+    /**
+     * Recalcula los mods totales para todos los juegos
+     */
+    public static function recalcularTodosModsTotales(): void
+    {
+        $juegos = self::all();
+        foreach ($juegos as $juego) {
+            $juego->recalcularModsTotales();
+        }
     }
 } 

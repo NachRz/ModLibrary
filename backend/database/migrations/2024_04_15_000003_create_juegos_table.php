@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('sitio_web')->nullable();
             $table->decimal('rating', 3, 2);
             $table->integer('rating_top');
+            $table->integer('mods_totales')->default(0);
             $table->timestamps();
         });
     }
