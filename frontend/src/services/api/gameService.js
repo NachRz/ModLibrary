@@ -260,6 +260,72 @@ const gameService = {
       lastFetched: null,
       isFetching: false
     };
+  },
+
+  // Buscar juegos en RAWG directamente
+  searchRawgGames: async (query) => {
+    try {
+      const response = await apiClient.get('/juegos/buscar', {
+        params: { query }
+      });
+      
+      if (response.data && response.data.results) {
+        return response.data.results.map(game => ({
+          id: game.id,
+          title: game.name,
+          background_image: game.background_image,
+          release_date: game.released,
+          rating: game.rating
+        }));
+      }
+      
+      throw new Error('Error al buscar juegos en RAWG');
+    } catch (error) {
+      console.error('Error en searchRawgGames:', error);
+      throw error.response?.data || { message: 'Error al buscar juegos en RAWG' };
+    }
+  },
+
+  // Obtener juegos iniciales ordenados alfabéticamente
+  getInitialGames: async () => {
+    try {
+      const response = await apiClient.get('/juegos/buscar', {
+        params: { 
+          search: '',
+          ordering: 'name',
+          page: 1,
+          page_size: 40,
+          key: process.env.REACT_APP_RAWG_API_KEY
+        }
+      });
+      
+      if (response.data && response.data.results) {
+        const sortedGames = response.data.results
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(game => ({
+            id: game.id,
+            title: game.name,
+            background_image: game.background_image,
+            release_date: game.released,
+            rating: game.rating
+          }));
+        
+        return sortedGames;
+      }
+      
+      throw new Error('Error al obtener los juegos iniciales');
+    } catch (error) {
+      console.error('Error en getInitialGames:', error);
+      
+      // Si hay un error de red, devolver datos de ejemplo ordenados
+      if (error.code === 'ERR_NETWORK') {
+        return MOCK_GAMES
+          .sort((a, b) => a.title.localeCompare(b.title))
+          .slice(0, 40);
+      }
+      
+      throw error.response?.data || { message: 'Error al obtener los juegos iniciales' };
+    }
   }
 };
 

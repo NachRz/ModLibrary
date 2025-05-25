@@ -337,4 +337,196 @@
   .btn-secondary {
     width: 100%;
   }
+}
+
+/* Estilos para el select de juegos */
+.select-container {
+  width: 100%;
+}
+
+.select-container .select__control {
+  background-color: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+
+.select-container .select__control:hover {
+  border-color: #475569;
+}
+
+.select-container .select__control--is-focused {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 1px #3B82F6;
+}
+
+.select-container .select__menu {
+  background-color: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+}
+
+.select-container .select__menu-list {
+  max-height: 300px;
+  padding: 0;
+}
+
+.select-container .select__option {
+  padding: 0;
+  margin: 0;
+  background-color: transparent !important;
+}
+
+.select-container .select__option--is-focused {
+  background-color: transparent !important;
+}
+
+.select-container .select__option:hover {
+  background-color: #334155;
+}
+
+.select-container .select__option--is-selected {
+  background-color: #3B82F6;
+}
+
+.select-container .select__value-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.select-container .select__input-container {
+  margin: 0;
+  padding: 0;
+  color: #FFFFFF !important;
+}
+
+.select-container .select__indicators {
+  margin-left: auto;
+}
+
+.select-container.error .select__control {
+  border-color: #EF4444;
+}
+
+/* Estilos para las opciones del juego */
+.game-option {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.game-option:hover {
+  background-color: #334155;
+}
+
+.game-option-image,
+.game-single-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 1rem;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.game-option-image img,
+.game-single-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image {
+  width: 100%;
+  height: 100%;
+  background-color: #1E293B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #94A3B8;
+}
+
+.game-option-info,
+.game-single-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-option-title,
+.game-single-title {
+  font-size: 1rem;
+  color: #FFFFFF;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.game-option-rating,
+.game-single-rating {
+  font-size: 0.875rem;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rating-star {
+  color: #F59E0B;
+}
+
+.game-single-value {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  max-width: calc(100% - 20px);
+  min-width: 0;
+}
+
+.game-single-image {
+  width: 32px;
+  height: 32px;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.game-single-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.game-single-title {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.game-single-rating {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.select-container .select__option--is-selected .game-option {
+  background-color: #3B82F6;
+}
+
+.select-container .select__option--is-focused .game-option {
+  background-color: #334155;
 } 

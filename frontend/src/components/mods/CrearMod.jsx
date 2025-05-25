@@ -2,6 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/styles/components/mods/CrearMod.css';
 import modService from '../../services/api/modService';
+import gameService from '../../services/api/gameService';
+import AsyncSelect from 'react-select/async';
+
+// Componente personalizado para la opción del select
+const CustomOption = ({ innerProps, label, data }) => (
+  <div {...innerProps} className="game-option">
+    <div className="game-option-image">
+      {data.game.background_image ? (
+        <img src={data.game.background_image} alt={label} />
+      ) : (
+        <div className="no-image">Sin imagen</div>
+      )}
+    </div>
+    <div className="game-option-info">
+      <div className="game-option-title">{label}</div>
+      <div className="game-option-rating">
+        <span className="rating-star">★</span>
+        {data.game.rating ? data.game.rating.toFixed(1) : 'N/A'}
+      </div>
+    </div>
+  </div>
+);
+
+// Componente personalizado para el valor seleccionado
+const CustomSingleValue = ({ children, data }) => (
+  <div className="game-single-value">
+    <div className="game-single-image">
+      {data.game.background_image ? (
+        <img src={data.game.background_image} alt={children} />
+      ) : (
+        <div className="no-image">Sin imagen</div>
+      )}
+    </div>
+    <div className="game-single-info">
+      <div className="game-single-title">{children}</div>
+      <div className="game-single-rating">
+        <span className="rating-star">★</span>
+        {data.game.rating ? data.game.rating.toFixed(1) : 'N/A'}
+      </div>
+    </div>
+  </div>
+);
 
 const CrearMod = () => {
   const navigate = useNavigate();
@@ -12,9 +54,9 @@ const CrearMod = () => {
   const [submitError, setSubmitError] = useState(null);
   
   // Estado para la lista de juegos
-  const [juegos, setJuegos] = useState([]);
-  const [loadingJuegos, setLoadingJuegos] = useState(true);
+  const [loadingJuegos, setLoadingJuegos] = useState(false);
   const [errorJuegos, setErrorJuegos] = useState(null);
+  const [initialOptions, setInitialOptions] = useState([]);
   
   // Estados para los campos del formulario
   const [formData, setFormData] = useState({
@@ -22,7 +64,7 @@ const CrearMod = () => {
     descripcion: '',
     imagen: null,
     imagenPreview: '',
-    juego_id: '',
+    juego_id: null,
     edad_recomendada: 12,
     version_juego_necesaria: '',
     version_actual: '1.0.0',
@@ -46,26 +88,62 @@ const CrearMod = () => {
     { id: 8, nombre: 'Personajes' }
   ];
   
-  // Cargar la lista de juegos al montar el componente
+  // Cargar opciones iniciales cuando se monta el componente
   useEffect(() => {
-    const cargarJuegos = async () => {
+    const loadInitialGames = async () => {
       try {
-        setLoadingJuegos(true);
-        const response = await modService.getJuegos();
-        if (response.status === 'success' && response.data) {
-          setJuegos(response.data);
-        } else {
-          throw new Error('No se pudieron cargar los juegos');
-        }
+        const games = await gameService.getInitialGames();
+        const options = games.map(game => ({
+          value: game.id,
+          label: game.title,
+          game: game
+        }));
+        setInitialOptions(options);
       } catch (error) {
         setErrorJuegos(error.message);
-      } finally {
-        setLoadingJuegos(false);
       }
     };
 
-    cargarJuegos();
+    loadInitialGames();
   }, []);
+  
+  // Función para cargar opciones de juegos
+  const loadGameOptions = async (inputValue) => {
+    try {
+      setLoadingJuegos(true);
+      
+      if (!inputValue) {
+        return initialOptions;
+      }
+      
+      const games = await gameService.searchRawgGames(inputValue);
+      return games.map(game => ({
+        value: game.id,
+        label: game.title,
+        game: game
+      }));
+    } catch (error) {
+      setErrorJuegos(error.message);
+      return [];
+    } finally {
+      setLoadingJuegos(false);
+    }
+  };
+  
+  // Manejador para cambios en el select de juegos
+  const handleGameChange = (selectedOption) => {
+    if (selectedOption) {
+      setFormData(prev => ({
+        ...prev,
+        juego_id: selectedOption.value
+      }));
+      
+      // Limpiar el error para este campo
+      if (errors.juego_id) {
+        setErrors(prev => ({ ...prev, juego_id: '' }));
+      }
+    }
+  };
   
   // Manejador para cambios en los inputs
   const handleChange = (e) => {
@@ -298,25 +376,24 @@ const CrearMod = () => {
                 
                 <div className="form-group">
                   <label htmlFor="juego_id">Juego *</label>
-                  {loadingJuegos ? (
-                    <div className="loading-message">Cargando juegos...</div>
-                  ) : errorJuegos ? (
-                    <div className="error-message">{errorJuegos}</div>
-                  ) : (
-                    <select
-                      id="juego_id"
-                      name="juego_id"
-                      value={formData.juego_id}
-                      onChange={handleChange}
-                      className={errors.juego_id ? 'error' : ''}
-                      disabled={submitting}
-                    >
-                      <option value="">Seleccionar juego</option>
-                      {juegos.map(juego => (
-                        <option key={juego.id} value={juego.id}>{juego.titulo}</option>
-                      ))}
-                    </select>
-                  )}
+                  <AsyncSelect
+                    id="juego_id"
+                    name="juego_id"
+                    className={`select-container ${errors.juego_id ? 'error' : ''}`}
+                    classNamePrefix="select"
+                    loadOptions={loadGameOptions}
+                    defaultOptions={initialOptions}
+                    onChange={handleGameChange}
+                    isDisabled={submitting}
+                    placeholder="Buscar juego..."
+                    noOptionsMessage={() => "No se encontraron juegos"}
+                    loadingMessage={() => "Cargando juegos..."}
+                    cacheOptions
+                    components={{
+                      Option: CustomOption,
+                      SingleValue: CustomSingleValue
+                    }}
+                  />
                   {errors.juego_id && <span className="error-message">{errors.juego_id}</span>}
                 </div>
                 
