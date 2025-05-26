@@ -111,4 +111,62 @@ class JuegoController extends Controller
             ]
         ]);
     }
+
+    public function verifyAndSync($rawgId)
+    {
+        try {
+            // Primero buscamos si el juego ya existe
+            $juego = Juego::where('rawg_id', $rawgId)->first();
+
+            // Si el juego ya existe, lo devolvemos
+            if ($juego) {
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $juego,
+                    'message' => 'Juego encontrado'
+                ]);
+            }
+
+            // Si no existe, obtenemos los datos de RAWG y lo creamos
+            $gameData = $this->rawgService->getGame($rawgId);
+
+            if (!$gameData) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No se pudo obtener información del juego desde RAWG'
+                ], 404);
+            }
+
+            // Crear el nuevo juego
+            $juego = Juego::create([
+                'rawg_id' => $rawgId,
+                'slug' => $gameData['slug'],
+                'titulo' => $gameData['name'],
+                'titulo_original' => $gameData['name_original'],
+                'descripcion' => $gameData['description'],
+                'metacritic' => $gameData['metacritic'],
+                'fecha_lanzamiento' => $gameData['released'],
+                'tba' => $gameData['tba'],
+                'actualizado' => $gameData['updated'],
+                'imagen_fondo' => $gameData['background_image'],
+                'imagen_fondo_adicional' => $gameData['background_image_additional'],
+                'sitio_web' => $gameData['website'],
+                'rating' => $gameData['rating'],
+                'rating_top' => $gameData['rating_top'],
+                'mods_totales' => 0
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $juego,
+                'message' => 'Juego creado exitosamente'
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al procesar el juego: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 } 

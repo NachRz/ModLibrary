@@ -326,6 +326,22 @@ const gameService = {
       
       throw error.response?.data || { message: 'Error al obtener los juegos iniciales' };
     }
+  },
+
+  // Verificar y sincronizar un juego por su RAWG ID
+  verifyAndSyncGame: async (rawgId) => {
+    try {
+      const response = await apiClient.post(`/juegos/${rawgId}/verify-sync`);
+      
+      if (response.data.status === 'success') {
+        return response.data.data;
+      }
+      
+      throw new Error(response.data.message || 'Error al verificar/sincronizar el juego');
+    } catch (error) {
+      console.error('Error en verifyAndSyncGame:', error);
+      throw error.response?.data || { message: 'Error al verificar/sincronizar el juego' };
+    }
   }
 };
 

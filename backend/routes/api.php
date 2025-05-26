@@ -24,7 +24,14 @@ Route::prefix('juegos')->group(function () {
     Route::get('/buscar', [JuegoController::class, 'search']);
     Route::get('/{id}', [JuegoController::class, 'show']);
     Route::post('/{id}/sincronizar', [JuegoController::class, 'syncGame']);
+    Route::post('/{id}/verify-sync', [JuegoController::class, 'verifyAndSync']);
 });
+
+// Rutas para juegos
+Route::get('/juegos', [JuegoController::class, 'index']);
+Route::get('/juegos/buscar', [JuegoController::class, 'search']);
+Route::post('/juegos/{id}/verify-sync', [JuegoController::class, 'verifyAndSync']);
+Route::get('/juegos/{id}', [JuegoController::class, 'show']);
 
 // Rutas de mods
 Route::prefix('mods')->group(function () {

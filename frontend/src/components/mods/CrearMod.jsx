@@ -131,16 +131,37 @@ const CrearMod = () => {
   };
   
   // Manejador para cambios en el select de juegos
-  const handleGameChange = (selectedOption) => {
+  const handleGameChange = async (selectedOption) => {
     if (selectedOption) {
-      setFormData(prev => ({
-        ...prev,
-        juego_id: selectedOption.value
-      }));
-      
-      // Limpiar el error para este campo
-      if (errors.juego_id) {
-        setErrors(prev => ({ ...prev, juego_id: '' }));
+      try {
+        // Mostrar estado de carga
+        setLoadingJuegos(true);
+        setErrorJuegos(null);
+
+        // Verificar y sincronizar el juego
+        const syncedGame = await gameService.verifyAndSyncGame(selectedOption.value);
+
+        // Actualizar el formData con el ID del juego sincronizado
+        setFormData(prev => ({
+          ...prev,
+          juego_id: syncedGame.id // Usamos el ID de nuestra base de datos, no el RAWG ID
+        }));
+        
+        // Limpiar el error para este campo
+        if (errors.juego_id) {
+          setErrors(prev => ({ ...prev, juego_id: '' }));
+        }
+      } catch (error) {
+        console.error('Error al sincronizar el juego:', error);
+        setErrorJuegos(error.message || 'Error al sincronizar el juego con la base de datos');
+        
+        // Limpiar la selección en caso de error
+        setFormData(prev => ({
+          ...prev,
+          juego_id: null
+        }));
+      } finally {
+        setLoadingJuegos(false);
       }
     }
   };
@@ -379,12 +400,12 @@ const CrearMod = () => {
                   <AsyncSelect
                     id="juego_id"
                     name="juego_id"
-                    className={`select-container ${errors.juego_id ? 'error' : ''}`}
+                    className={`select-container ${errors.juego_id || errorJuegos ? 'error' : ''}`}
                     classNamePrefix="select"
                     loadOptions={loadGameOptions}
                     defaultOptions={initialOptions}
                     onChange={handleGameChange}
-                    isDisabled={submitting}
+                    isDisabled={submitting || loadingJuegos}
                     placeholder="Buscar juego..."
                     noOptionsMessage={() => "No se encontraron juegos"}
                     loadingMessage={() => "Cargando juegos..."}
@@ -395,6 +416,8 @@ const CrearMod = () => {
                     }}
                   />
                   {errors.juego_id && <span className="error-message">{errors.juego_id}</span>}
+                  {errorJuegos && <span className="error-message">{errorJuegos}</span>}
+                  {loadingJuegos && <span className="loading-message">Sincronizando juego...</span>}
                 </div>
                 
                 <div className="form-group">
