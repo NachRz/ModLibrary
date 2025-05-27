@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../../assets/styles/components/mods/CrearMod.css';
 import modService from '../../services/api/modService';
 import gameService from '../../services/api/gameService';
+import etiquetasService from '../../services/api/etiquetasService';
 import AsyncSelect from 'react-select/async';
 
 // Componente personalizado para la opción del select
@@ -45,6 +46,28 @@ const CustomSingleValue = ({ children, data }) => (
   </div>
 );
 
+// Componente personalizado para la opción de etiqueta
+const CustomTagOption = ({ innerProps, label, data }) => (
+  <div {...innerProps} className="tag-option">
+    <div className="tag-option-info">
+      <div className="tag-option-name">{data.label}</div>
+      <div className="tag-option-count">
+        {data.juegos_count.toLocaleString()} juegos
+      </div>
+    </div>
+  </div>
+);
+
+// Componente personalizado para el valor seleccionado de etiqueta
+const CustomTagValue = ({ children, data }) => (
+  <div className="tag-single-value">
+    <div className="tag-single-name">{data.label}</div>
+    <div className="tag-single-count">
+      {data.juegos_count.toLocaleString()} juegos
+    </div>
+  </div>
+);
+
 const CrearMod = () => {
   const navigate = useNavigate();
   
@@ -75,6 +98,11 @@ const CrearMod = () => {
   
   // Estado para los errores de validación
   const [errors, setErrors] = useState({});
+  
+  // Estado para las etiquetas
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [loadingTags, setLoadingTags] = useState(false);
+  const [errorTags, setErrorTags] = useState(null);
   
   // Lista hardcoded de etiquetas disponibles
   const etiquetasDisponibles = [
@@ -185,24 +213,38 @@ const CrearMod = () => {
     }
   };
   
-  // Manejador para agregar/quitar etiquetas
-  const handleTagToggle = (tagId) => {
-    const currentTags = [...formData.etiquetas];
-    const index = currentTags.indexOf(tagId);
-    
-    if (index === -1) {
-      // Agregar etiqueta
-      currentTags.push(tagId);
-    } else {
-      // Quitar etiqueta
-      currentTags.splice(index, 1);
+  // Función para cargar opciones de etiquetas
+  const loadTagOptions = async (inputValue) => {
+    try {
+      setLoadingTags(true);
+      setErrorTags(null);
+
+      const response = await etiquetasService.searchTags(inputValue);
+      
+      return response.etiquetas.map(tag => ({
+        value: tag.id,
+        label: tag.name,
+        juegos_count: tag.juegos_count
+      }));
+    } catch (error) {
+      setErrorTags(error.message);
+      return [];
+    } finally {
+      setLoadingTags(false);
     }
-    
-    setFormData({ ...formData, etiquetas: currentTags });
-    
+  };
+  
+  // Manejador para cambios en la selección de etiquetas
+  const handleTagChange = (selectedOptions) => {
+    setSelectedTags(selectedOptions || []);
+    setFormData(prev => ({
+      ...prev,
+      etiquetas: selectedOptions ? selectedOptions.map(option => option.value) : []
+    }));
+
     // Limpiar error de etiquetas si se selecciona al menos una
-    if (currentTags.length > 0 && errors.etiquetas) {
-      setErrors({ ...errors, etiquetas: '' });
+    if (selectedOptions?.length > 0 && errors.etiquetas) {
+      setErrors(prev => ({ ...prev, etiquetas: '' }));
     }
   };
   
@@ -268,31 +310,28 @@ const CrearMod = () => {
         setSubmitting(true);
         setSubmitError(null);
         
-        // Obtenemos el usuario actual del localStorage
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         
         if (!user.id) {
           throw new Error('Debes iniciar sesión para crear un mod');
         }
         
-        // Preparamos los datos para enviar al backend
+        // Sincronizar etiquetas seleccionadas
+        const syncedTags = await etiquetasService.syncMultipleTags(formData.etiquetas);
+        
+        // Preparar datos para enviar al backend
         const modDataToSubmit = {
           ...formData,
-          // El juego_id ya es un número gracias al handleChange
           edad_recomendada: parseInt(formData.edad_recomendada, 10),
           creador_id: user.id,
-          version: formData.version_actual
+          version: formData.version_actual,
+          etiquetas: syncedTags.map(tag => tag.id) // Usar IDs locales de las etiquetas sincronizadas
         };
         
-        // Llamamos al método real del servicio
         const response = await modService.createMod(modDataToSubmit);
         
-        // Verificamos si la respuesta fue exitosa
         if (response.status === 'success') {
-          // Marcamos como exitoso
           setSubmitSuccess(true);
-          
-          // Redirigimos después de un pequeño delay para mostrar el mensaje de éxito
           setTimeout(() => {
             navigate('/dashboard/mis-mods');
           }, 1500);
@@ -499,18 +538,73 @@ const CrearMod = () => {
                 
                 <div className="form-group">
                   <label>Etiquetas *</label>
-                  <div className={`tags-container ${errors.etiquetas ? 'error' : ''}`}>
-                    {etiquetasDisponibles.map(tag => (
-                      <div 
-                        key={tag.id} 
-                        className={`tag-item ${formData.etiquetas.includes(tag.id) ? 'active' : ''}`}
-                        onClick={() => !submitting && handleTagToggle(tag.id)}
-                      >
-                        {tag.nombre}
-                      </div>
-                    ))}
-                  </div>
+                  <AsyncSelect
+                    isMulti
+                    cacheOptions
+                    defaultOptions
+                    value={selectedTags}
+                    onChange={handleTagChange}
+                    loadOptions={loadTagOptions}
+                    className={`tag-select-container ${errors.etiquetas ? 'error' : ''}`}
+                    classNamePrefix="tag-select"
+                    placeholder="Buscar etiquetas..."
+                    loadingMessage={() => "Cargando etiquetas..."}
+                    noOptionsMessage={() => "No se encontraron etiquetas"}
+                    isDisabled={submitting}
+                    components={{
+                      Option: CustomTagOption,
+                      MultiValue: CustomTagValue
+                    }}
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        backgroundColor: '#1E293B',
+                        borderColor: errors.etiquetas ? '#EF4444' : '#334155',
+                        '&:hover': {
+                          borderColor: '#475569'
+                        }
+                      }),
+                      menu: (base) => ({
+                        ...base,
+                        backgroundColor: '#1E293B',
+                        border: '1px solid #334155'
+                      }),
+                      option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isFocused ? '#334155' : '#1E293B',
+                        color: '#FFFFFF',
+                        '&:active': {
+                          backgroundColor: '#3B82F6'
+                        }
+                      }),
+                      multiValue: (base) => ({
+                        ...base,
+                        backgroundColor: '#334155'
+                      }),
+                      multiValueLabel: (base) => ({
+                        ...base,
+                        color: '#FFFFFF'
+                      }),
+                      multiValueRemove: (base) => ({
+                        ...base,
+                        color: '#FFFFFF',
+                        '&:hover': {
+                          backgroundColor: '#EF4444',
+                          color: '#FFFFFF'
+                        }
+                      }),
+                      input: (base) => ({
+                        ...base,
+                        color: '#FFFFFF'
+                      }),
+                      singleValue: (base) => ({
+                        ...base,
+                        color: '#FFFFFF'
+                      })
+                    }}
+                  />
                   {errors.etiquetas && <span className="error-message">{errors.etiquetas}</span>}
+                  {errorTags && <span className="error-message">{errorTags}</span>}
                   <small className="form-help-text">Selecciona las etiquetas que mejor describan tu mod</small>
                 </div>
               </div>

@@ -62,25 +62,45 @@ class EtiquetaController extends Controller
     public function sincronizarConRawg($rawgId)
     {
         try {
+            // Primero buscar si ya existe la etiqueta
+            $etiqueta = Etiqueta::where('rawg_id', $rawgId)->first();
+
+            if ($etiqueta) {
+                return Response::json([
+                    'status' => 'success',
+                    'data' => $etiqueta
+                ]);
+            }
+
+            // Si no existe, obtener datos de RAWG
             $rawgData = $this->rawgService->getTag($rawgId);
 
             if (!$rawgData) {
-                return Response::json(['error' => 'No se pudo obtener la información de la etiqueta desde RAWG'], 404);
+                return Response::json([
+                    'error' => 'No se pudo obtener la información de la etiqueta desde RAWG'
+                ], 404);
             }
 
-            $etiqueta = Etiqueta::firstOrCreate(
-                ['rawg_id' => $rawgData['id']],
-                ['nombre' => $rawgData['name']]
-            );
+            // Crear nueva etiqueta
+            $etiqueta = Etiqueta::create([
+                'nombre' => $rawgData['name'],
+                'rawg_id' => $rawgData['id']
+            ]);
 
-            return Response::json($etiqueta);
+            return Response::json([
+                'status' => 'success',
+                'data' => $etiqueta
+            ]);
+
         } catch (\Exception $e) {
             Log::error('Error al sincronizar etiqueta con RAWG', [
                 'rawg_id' => $rawgId,
                 'error' => $e->getMessage()
             ]);
 
-            return Response::json(['error' => 'Error al sincronizar la etiqueta'], 500);
+            return Response::json([
+                'error' => 'Error al sincronizar la etiqueta'
+            ], 500);
         }
     }
 
@@ -100,12 +120,11 @@ class EtiquetaController extends Controller
             // Transformar los resultados para incluir solo la información necesaria
             $etiquetas = collect($results['results'])->map(function ($tag) {
                 return [
-                    'rawg_id' => $tag['id'],
-                    'nombre' => $tag['name'],
-                    'slug' => $tag['slug'],
+                    'id' => $tag['id'],
+                    'name' => $tag['name'],
                     'juegos_count' => $tag['games_count']
                 ];
-            });
+            })->sortBy('name')->values();
 
             return Response::json([
                 'etiquetas' => $etiquetas,

@@ -529,4 +529,117 @@
 
 .select-container .select__option--is-focused .game-option {
   background-color: #334155;
+}
+
+/* Estilos para el selector de etiquetas */
+.tag-select-container {
+  margin-bottom: 0.5rem;
+}
+
+.tag-select-container.error .tag-select__control {
+  border-color: var(--error-color);
+}
+
+.tag-select__control {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  min-height: 45px;
+  transition: all 0.2s ease;
+}
+
+.tag-select__control:hover {
+  border-color: var(--primary-color);
+}
+
+.tag-select__control--is-focused {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.tag-select__menu {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  margin-top: 4px;
+}
+
+.tag-select__option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.tag-select__option--is-focused {
+  background-color: var(--primary-color-light);
+}
+
+.tag-select__option--is-selected {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.tag-option {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.tag-option-info {
+  flex: 1;
+}
+
+.tag-option-name {
+  font-weight: 500;
+}
+
+.tag-option-count {
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.tag-single-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-single-name {
+  font-weight: 500;
+}
+
+.tag-single-count {
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.tag-select__multi-value {
+  background-color: var(--primary-color-light);
+  border-radius: 4px;
+}
+
+.tag-select__multi-value__label {
+  color: var(--text-color);
+}
+
+.tag-select__multi-value__remove {
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.tag-select__multi-value__remove:hover {
+  background-color: var(--error-color);
+  color: white;
+}
+
+/* Estilos para los mensajes de estado */
+.loading-message {
+  color: var(--text-muted);
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.9em;
+  margin-top: 4px;
 } 
