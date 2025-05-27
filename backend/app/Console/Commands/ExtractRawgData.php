@@ -5,12 +5,14 @@ namespace App\Console\Commands;
 use App\Services\RawgService;
 use Illuminate\Console\Command;
 use App\Models\Juego;
+use App\Models\Etiqueta;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
 
 class ExtractRawgData extends Command
 {
     protected $signature = 'rawg:extract {--pages=1}';
-    protected $description = 'Extrae datos de juegos de la API de RAWG';
+    protected $description = 'Extrae datos de juegos y etiquetas de la API de RAWG';
 
     protected $rawgService;
 
@@ -22,8 +24,80 @@ class ExtractRawgData extends Command
 
     public function handle()
     {
+        $this->extractTags();
+        $this->extractGames();
+    }
+
+    protected function extractTags()
+    {
+        $this->info("\nIniciando extracción de etiquetas desde RAWG API...");
+
+        // Cargar el JSON de mods para obtener las etiquetas únicas
+        $jsonPath = base_path('resources/assets/data/mods.json');
+        $jsonData = json_decode(File::get($jsonPath), true);
+
+        // Recopilar todas las etiquetas únicas
+        $etiquetasUnicas = collect();
+        foreach ($jsonData['mods'] as $mod) {
+            if (isset($mod['Etiquetas']) && is_array($mod['Etiquetas'])) {
+                foreach ($mod['Etiquetas'] as $etiqueta) {
+                    // Si la etiqueta es un string, lo usamos directamente
+                    $nombreEtiqueta = is_array($etiqueta) ? $etiqueta['nombre'] : $etiqueta;
+                    $etiquetasUnicas->push($nombreEtiqueta);
+                }
+            }
+        }
+        $etiquetasUnicas = $etiquetasUnicas->unique()->values();
+
+        $this->info("Se encontraron " . $etiquetasUnicas->count() . " etiquetas únicas.");
+        $bar = $this->output->createProgressBar($etiquetasUnicas->count());
+        $bar->start();
+
+        foreach ($etiquetasUnicas as $nombreEtiqueta) {
+            try {
+                // Buscar la etiqueta en RAWG
+                $results = $this->rawgService->searchTags($nombreEtiqueta);
+
+                if ($results && isset($results['results']) && count($results['results']) > 0) {
+                    // Intentar encontrar una coincidencia exacta primero
+                    $tagMatch = collect($results['results'])->first(function ($tag) use ($nombreEtiqueta) {
+                        return strtolower($tag['name']) === strtolower($nombreEtiqueta);
+                    });
+
+                    // Si no hay coincidencia exacta, usar el primer resultado
+                    if (!$tagMatch) {
+                        $tagMatch = $results['results'][0];
+                    }
+
+                    // Crear o actualizar la etiqueta en la base de datos
+                    Etiqueta::updateOrCreate(
+                        ['rawg_id' => $tagMatch['id']],
+                        ['nombre' => $tagMatch['name']]
+                    );
+
+                    $this->info("\nEtiqueta sincronizada: {$nombreEtiqueta} -> {$tagMatch['name']} (ID: {$tagMatch['id']})");
+                } else {
+                    $this->warn("\nNo se encontró la etiqueta en RAWG: {$nombreEtiqueta}");
+                }
+            } catch (\Exception $e) {
+                $this->error("\nError al procesar la etiqueta {$nombreEtiqueta}: " . $e->getMessage());
+                Log::error("Error al procesar etiqueta", [
+                    'etiqueta' => $nombreEtiqueta,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            $bar->advance();
+        }
+
+        $bar->finish();
+        $this->info("\nProceso de extracción de etiquetas completado.");
+    }
+
+    protected function extractGames()
+    {
         $pages = $this->option('pages');
-        $this->info("Iniciando extracción de datos de RAWG API...");
+        $this->info("\nIniciando extracción de datos de juegos de RAWG API...");
 
         for ($page = 1; $page <= $pages; $page++) {
             $this->info("Procesando página {$page} de {$pages}...");
@@ -39,7 +113,7 @@ class ExtractRawgData extends Command
             }
         }
 
-        $this->info('Extracción de datos completada.');
+        $this->info('Extracción de datos de juegos completada.');
     }
 
     protected function processGame($gameData)

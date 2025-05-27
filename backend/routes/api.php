@@ -6,6 +6,7 @@ use App\Http\Controllers\JuegoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModController;
 use App\Http\Controllers\VersionModController;
+use App\Http\Controllers\EtiquetaController;
 
 // Ruta de prueba
 Route::get('/test', function() {
@@ -97,5 +98,11 @@ Route::prefix('mods')->group(function () {
         // Cambiar el estado de un mod (borrador/publicado)
         Route::patch('/{id}/estado', [ModController::class, 'cambiarEstado']);
     });
+});
+
+// Rutas de etiquetas
+Route::prefix('etiquetas')->group(function () {
+    Route::get('/buscar-rawg', [EtiquetaController::class, 'buscarEnRawg']);
+    Route::post('/{id}/sincronizar', [EtiquetaController::class, 'sincronizarConRawg'])->middleware('auth:sanctum');
 });
 

@@ -13,7 +13,8 @@ class Etiqueta extends Model
     protected $table = 'etiquetas';
 
     protected $fillable = [
-        'nombre'
+        'nombre',
+        'rawg_id'
     ];
 
     public function mods(): BelongsToMany

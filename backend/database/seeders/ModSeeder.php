@@ -10,6 +10,7 @@ use App\Models\VersionMod;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 use App\Services\RawgService;
+use Illuminate\Support\Facades\Log;
 
 class ModSeeder extends Seeder
 {
@@ -92,7 +93,60 @@ class ModSeeder extends Seeder
         $this->command->newLine(2);
         $this->command->info('Creando mods...');
 
-        // Ahora, procesar los mods usando los juegos ya creados
+        // Recopilar todas las etiquetas únicas primero
+        $etiquetasUnicas = collect();
+        foreach ($mods as $modData) {
+            if (isset($modData['Etiquetas']) && is_array($modData['Etiquetas'])) {
+                $etiquetasUnicas = $etiquetasUnicas->concat($modData['Etiquetas']);
+            }
+        }
+        $etiquetasUnicas = $etiquetasUnicas->unique()->values();
+
+        // Procesar todas las etiquetas primero
+        $this->command->info('Procesando ' . $etiquetasUnicas->count() . ' etiquetas únicas...');
+        $progressBarEtiquetas = $this->command->getOutput()->createProgressBar($etiquetasUnicas->count());
+        $progressBarEtiquetas->start();
+
+        $etiquetasCache = [];
+        foreach ($etiquetasUnicas as $etiquetaNombre) {
+            try {
+                // Buscar la etiqueta en RAWG
+                $results = $this->rawgService->searchTags($etiquetaNombre);
+
+                if ($results && isset($results['results']) && count($results['results']) > 0) {
+                    // Intentar encontrar una coincidencia exacta primero
+                    $tagMatch = collect($results['results'])->first(function ($tag) use ($etiquetaNombre) {
+                        return strtolower($tag['name']) === strtolower($etiquetaNombre);
+                    });
+
+                    // Si no hay coincidencia exacta, usar el primer resultado
+                    if (!$tagMatch) {
+                        $tagMatch = $results['results'][0];
+                    }
+
+                    // Crear o actualizar la etiqueta
+                    $etiqueta = Etiqueta::firstOrCreate(
+                        ['rawg_id' => $tagMatch['id']],
+                        ['nombre' => $tagMatch['name']]
+                    );
+
+                    $etiquetasCache[strtolower($etiquetaNombre)] = $etiqueta;
+                }
+            } catch (\Exception $e) {
+                Log::error("Error al procesar etiqueta", [
+                    'etiqueta' => $etiquetaNombre,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
+            $progressBarEtiquetas->advance();
+        }
+
+        $progressBarEtiquetas->finish();
+        $this->command->newLine(2);
+        $this->command->info('Procesamiento de etiquetas completado.');
+
+        // Ahora, procesar los mods usando los juegos y etiquetas ya creados
         foreach ($mods as $modData) {
             // Determinar el creador basado en el campo 'Creador'
             $creadorNombre = $modData['Creador'] ?? 'usuario1';
@@ -115,6 +169,19 @@ class ModSeeder extends Seeder
                 'estado' => $modData['Estado'],
                 'total_descargas' => $modData['NumDescargas']
             ]);
+
+            // Asociar etiquetas usando el caché
+            if (isset($modData['Etiquetas']) && is_array($modData['Etiquetas'])) {
+                $etiquetasIds = [];
+                foreach ($modData['Etiquetas'] as $etiquetaNombre) {
+                    if (isset($etiquetasCache[strtolower($etiquetaNombre)])) {
+                        $etiquetasIds[] = $etiquetasCache[strtolower($etiquetaNombre)]->id;
+                    }
+                }
+                if (!empty($etiquetasIds)) {
+                    $mod->etiquetas()->syncWithoutDetaching($etiquetasIds);
+                }
+            }
 
             // Crear versiones
             // Versión actual
@@ -140,17 +207,6 @@ class ModSeeder extends Seeder
                             'fecha_lanzamiento' => now()->subDays(rand(31, 365))
                         ]
                     );
-                }
-            }
-
-            // Procesar etiquetas
-            if (isset($modData['Etiquetas']) && is_array($modData['Etiquetas'])) {
-                foreach ($modData['Etiquetas'] as $etiquetaNombre) {
-                    // Crear o encontrar la etiqueta
-                    $etiqueta = Etiqueta::firstOrCreate(['nombre' => $etiquetaNombre]);
-                    
-                    // Asociar al mod (usando sync para no duplicar)
-                    $mod->etiquetas()->syncWithoutDetaching([$etiqueta->id]);
                 }
             }
         }
