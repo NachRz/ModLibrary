@@ -32,7 +32,7 @@ const ExplorarJuegos = () => {
       const response = await gameService.getAllGames();
       setJuegos(response.map(game => ({
         id: game.id,
-        titulo: game.titulo,
+        title: game.titulo,
         image: game.imagen_fondo,
         totalMods: game.total_mods,
         rating: game.rating,
@@ -83,7 +83,7 @@ const ExplorarJuegos = () => {
     .filter(juego => {
       if (filtros.busqueda) {
         const searchTerm = filtros.busqueda.toLowerCase();
-        return juego.titulo.toLowerCase().includes(searchTerm);
+        return juego.title.toLowerCase().includes(searchTerm);
       }
       return true;
     })
@@ -91,7 +91,7 @@ const ExplorarJuegos = () => {
       const order = filtros.orden === 'desc' ? -1 : 1;
       switch (filtros.ordenarPor) {
         case 'nombre':
-          return order * a.titulo.localeCompare(b.titulo);
+          return order * a.title.localeCompare(b.title);
         case 'descargas':
           return order * ((b.totalMods || 0) - (a.totalMods || 0));
         case 'fecha':

@@ -393,6 +393,49 @@ class ModController extends Controller
     }
 
     /**
+     * Obtener mods de un juego específico
+     *
+     * @param int $juegoId
+     * @return JsonResponse
+     */
+    public function getModsByGame(int $juegoId): JsonResponse
+    {
+        $mods = Mod::where('juego_id', $juegoId)
+            ->where('estado', 'publicado') // Solo mods publicados
+            ->with([
+                'creador:id,nome,correo,foto_perfil',
+                'valoraciones',
+                'juego:id,titulo,imagen_fondo',
+                'etiquetas:id,nombre',
+                'versiones'
+            ])
+            ->get();
+        
+        // Calcular la valoración media para cada mod
+        $mods = $mods->map(function ($mod) {
+            $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
+            $totalValoraciones = $mod->valoraciones->count();
+            
+            // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
+            unset($mod->valoraciones);
+            
+            // Agregar las estadísticas calculadas
+            $mod->estadisticas = [
+                'valoracion_media' => round($valoracionMedia, 1),
+                'total_valoraciones' => $totalValoraciones,
+                'total_descargas' => $mod->total_descargas
+            ];
+            
+            return $mod;
+        });
+        
+        return response()->json([
+            'status' => 'success',
+            'data' => $mods
+        ]);
+    }
+
+    /**
      * Obtener mods por nombre de usuario creador
      *
      * @param string $username

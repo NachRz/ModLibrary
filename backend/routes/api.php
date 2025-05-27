@@ -58,6 +58,7 @@ Route::prefix('mods')->group(function () {
     // Estas rutas deben ir después de las anteriores
     Route::get('/creador/{creadorId}', [ModController::class, 'getModsByCreador']);
     Route::get('/creador/nombre/{username}', [ModController::class, 'getModsByCreatorName']);
+    Route::get('/juego/{juegoId}', [ModController::class, 'getModsByGame']);
     Route::get('/{id}', [ModController::class, 'show']);
     
     // Rutas para las versiones de mods

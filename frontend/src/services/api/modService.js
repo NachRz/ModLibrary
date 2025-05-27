@@ -42,6 +42,16 @@ const modService = {
     }
   },
   
+  // Obtener mods por ID de juego
+  getModsByGame: async (juegoId) => {
+    try {
+      const response = await apiClient.get(`/mods/juego/${juegoId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener los mods del juego' };
+    }
+  },
+  
   // Obtener mods del usuario autenticado con todos los detalles
   getMyMods: async () => {
     const user = authService.getCurrentUser();

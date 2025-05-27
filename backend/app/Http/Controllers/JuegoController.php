@@ -92,7 +92,7 @@ class JuegoController extends Controller
         $juego = Juego::select([
             'id', 'titulo', 'descripcion', 'imagen_fondo',
             'mods_totales', 'rating', 'fecha_lanzamiento'
-        ])->where('rawg_id', $id)->first();
+        ])->find($id);
 
         if (!$juego) {
             return response()->json(['error' => 'Juego no encontrado'], 404);
