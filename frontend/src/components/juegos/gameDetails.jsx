@@ -19,6 +19,8 @@ const GameDetails = () => {
   const [error, setError] = useState(null);
   const [filtroMods, setFiltroMods] = useState('todos');
   const [ordenMods, setOrdenMods] = useState('populares');
+  const [esFavorito, setEsFavorito] = useState(false);
+  const [cargandoFavorito, setCargandoFavorito] = useState(false);
 
   // Cargar datos del juego
   useEffect(() => {
@@ -144,6 +146,29 @@ const GameDetails = () => {
     return stars;
   };
 
+  // Función para manejar favoritos
+  const toggleFavorito = async () => {
+    if (cargandoFavorito) return;
+    
+    try {
+      setCargandoFavorito(true);
+      
+      // Aquí iría la lógica para añadir/quitar de favoritos usando el servicio
+      // await favoritosService.toggleFavorito(juego.id);
+      
+      setEsFavorito(!esFavorito);
+      showNotification(
+        esFavorito ? 'Juego eliminado de favoritos' : 'Juego añadido a favoritos',
+        'success'
+      );
+    } catch (err) {
+      console.error('Error al actualizar favoritos:', err);
+      showNotification('Error al actualizar favoritos', 'error');
+    } finally {
+      setCargandoFavorito(false);
+    }
+  };
+
   if (cargandoJuego) {
     return (
       <PageContainer>
@@ -205,9 +230,48 @@ const GameDetails = () => {
             
             {/* Información del juego */}
             <div className="flex-1 pt-16">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
-                {juego.titulo || juego.title}
-              </h1>
+              <div className="flex items-start justify-between mb-4">
+                <h1 className="text-4xl md:text-5xl font-bold text-white">
+                  {juego.titulo || juego.title}
+                </h1>
+                
+                {/* Botón de favoritos */}
+                <button
+                  onClick={toggleFavorito}
+                  disabled={cargandoFavorito}
+                  className={`ml-4 p-3 rounded-full transition-all duration-300 ${
+                    esFavorito 
+                      ? 'bg-red-500 hover:bg-red-600 text-white' 
+                      : 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-red-400'
+                  } ${cargandoFavorito ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
+                  title={esFavorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                >
+                  {cargandoFavorito ? (
+                    <div className="animate-spin h-6 w-6">
+                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" strokeWidth="2" strokeDasharray="31.416" strokeDashoffset="31.416">
+                          <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                          <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                        </circle>
+                      </svg>
+                    </div>
+                  ) : (
+                    <svg 
+                      className="h-6 w-6" 
+                      fill={esFavorito ? "currentColor" : "none"} 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                      strokeWidth={esFavorito ? 0 : 2}
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
               
               {/* Estadísticas */}
               <div className="flex flex-wrap items-center gap-6 mb-6 text-gray-300">
