@@ -26,6 +26,14 @@ Route::prefix('juegos')->group(function () {
     Route::get('/{id}', [JuegoController::class, 'show']);
     Route::post('/{id}/sincronizar', [JuegoController::class, 'syncGame']);
     Route::post('/{id}/verify-sync', [JuegoController::class, 'verifyAndSync']);
+    
+    // Rutas de favoritos (requieren autenticación)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/favoritos', [JuegoController::class, 'obtenerFavoritos']);
+        Route::get('/{id}/favorito', [JuegoController::class, 'esFavorito']);
+        Route::post('/{id}/favorito', [JuegoController::class, 'agregarFavorito']);
+        Route::delete('/{id}/favorito', [JuegoController::class, 'quitarFavorito']);
+    });
 });
 
 // Rutas para juegos

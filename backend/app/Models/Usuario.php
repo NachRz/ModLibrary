@@ -59,4 +59,11 @@ class Usuario extends Authenticatable
             ->withTimestamps()
             ->withPivot('fecha_guardado');
     }
+
+    public function juegosFavoritos(): BelongsToMany
+    {
+        return $this->belongsToMany(Juego::class, 'juegos_favoritos', 'usuario_id', 'juego_id')
+            ->withTimestamps()
+            ->withPivot('fecha_agregado');
+    }
 } 

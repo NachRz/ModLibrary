@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Juego extends Model
 {
@@ -41,6 +42,13 @@ class Juego extends Model
     public function mods(): HasMany
     {
         return $this->hasMany(Mod::class, 'juego_id');
+    }
+
+    public function usuariosFavoritos(): BelongsToMany
+    {
+        return $this->belongsToMany(Usuario::class, 'juegos_favoritos', 'juego_id', 'usuario_id')
+            ->withTimestamps()
+            ->withPivot('fecha_agregado');
     }
 
     /**
