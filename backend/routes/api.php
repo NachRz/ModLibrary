@@ -21,26 +21,27 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middle
 
 // Rutas de juegos
 Route::prefix('juegos')->group(function () {
+    // Rutas de favoritos (requieren autenticación) - DEBEN IR ANTES de las rutas con parámetros
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/favoritos', [JuegoController::class, 'obtenerFavoritos']);
+    });
+    
+    // Rutas públicas
     Route::get('/', [JuegoController::class, 'index']);
     Route::get('/buscar', [JuegoController::class, 'search']);
+    
+    // Rutas específicas de juegos con ID - DEBEN IR AL FINAL
     Route::get('/{id}', [JuegoController::class, 'show']);
     Route::post('/{id}/sincronizar', [JuegoController::class, 'syncGame']);
     Route::post('/{id}/verify-sync', [JuegoController::class, 'verifyAndSync']);
     
-    // Rutas de favoritos (requieren autenticación)
+    // Rutas de favoritos por juego específico (requieren autenticación)
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/favoritos', [JuegoController::class, 'obtenerFavoritos']);
         Route::get('/{id}/favorito', [JuegoController::class, 'esFavorito']);
         Route::post('/{id}/favorito', [JuegoController::class, 'agregarFavorito']);
         Route::delete('/{id}/favorito', [JuegoController::class, 'quitarFavorito']);
     });
 });
-
-// Rutas para juegos
-Route::get('/juegos', [JuegoController::class, 'index']);
-Route::get('/juegos/buscar', [JuegoController::class, 'search']);
-Route::post('/juegos/{id}/verify-sync', [JuegoController::class, 'verifyAndSync']);
-Route::get('/juegos/{id}', [JuegoController::class, 'show']);
 
 // Rutas de mods
 Route::prefix('mods')->group(function () {

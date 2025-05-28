@@ -5,6 +5,7 @@ import ModCard from '../common/Cards/ModCard';
 import gameService from '../../services/api/gameService';
 import modService from '../../services/api/modService';
 import { useNotification } from '../../context/NotificationContext';
+import { useFavorite } from '../../hooks/useFavorites';
 import '../../assets/styles/components/juegos/gameDetails.css';
 
 const GameDetails = () => {
@@ -19,8 +20,22 @@ const GameDetails = () => {
   const [error, setError] = useState(null);
   const [filtroMods, setFiltroMods] = useState('todos');
   const [ordenMods, setOrdenMods] = useState('populares');
-  const [esFavorito, setEsFavorito] = useState(false);
-  const [cargandoFavorito, setCargandoFavorito] = useState(false);
+  
+  // Hook para manejar favoritos
+  const [esFavorito, toggleFavorito, cargandoFavorito, errorFavorito, mensaje] = useFavorite(parseInt(id));
+
+  // Mostrar notificaciones cuando cambien los mensajes del hook de favoritos
+  useEffect(() => {
+    if (mensaje) {
+      showNotification(mensaje, 'success');
+    }
+  }, [mensaje, showNotification]);
+
+  useEffect(() => {
+    if (errorFavorito) {
+      showNotification(errorFavorito, 'error');
+    }
+  }, [errorFavorito, showNotification]);
 
   // Cargar datos del juego
   useEffect(() => {
@@ -144,29 +159,6 @@ const GameDetails = () => {
     }
 
     return stars;
-  };
-
-  // Función para manejar favoritos
-  const toggleFavorito = async () => {
-    if (cargandoFavorito) return;
-    
-    try {
-      setCargandoFavorito(true);
-      
-      // Aquí iría la lógica para añadir/quitar de favoritos usando el servicio
-      // await favoritosService.toggleFavorito(juego.id);
-      
-      setEsFavorito(!esFavorito);
-      showNotification(
-        esFavorito ? 'Juego eliminado de favoritos' : 'Juego añadido a favoritos',
-        'success'
-      );
-    } catch (err) {
-      console.error('Error al actualizar favoritos:', err);
-      showNotification('Error al actualizar favoritos', 'error');
-    } finally {
-      setCargandoFavorito(false);
-    }
   };
 
   if (cargandoJuego) {

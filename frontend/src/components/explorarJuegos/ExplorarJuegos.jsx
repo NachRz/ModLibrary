@@ -32,9 +32,12 @@ const ExplorarJuegos = () => {
       const response = await gameService.getAllGames();
       setJuegos(response.map(game => ({
         id: game.id,
+        titulo: game.titulo,
         title: game.titulo,
         image: game.imagen_fondo,
+        background_image: game.imagen_fondo,
         totalMods: game.total_mods,
+        mods_totales: game.total_mods,
         rating: game.rating,
         release_date: game.fecha_lanzamiento
       })));
@@ -303,10 +306,18 @@ const ExplorarJuegos = () => {
                       key={juego.id}
                       game={{
                         id: juego.id,
-                        title: juego.titulo,
+                        titulo: juego.titulo,
+                        title: juego.title,
+                        imagen_fondo: juego.image,
+                        background_image: juego.background_image,
                         image: juego.image,
                         totalMods: juego.totalMods,
+                        mods_totales: juego.mods_totales,
+                        total_mods: juego.totalMods,
+                        rating: juego.rating,
+                        release_date: juego.release_date
                       }}
+                      showFavoriteButton={true}
                     />
                   ))}
                 </div>

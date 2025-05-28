@@ -342,6 +342,52 @@ const gameService = {
       console.error('Error en verifyAndSyncGame:', error);
       throw error.response?.data || { message: 'Error al verificar/sincronizar el juego' };
     }
+  },
+
+  // ========== FUNCIONES DE FAVORITOS ==========
+
+  // Obtener juegos favoritos del usuario
+  getFavoriteGames: async () => {
+    try {
+      const response = await apiClient.get('/juegos/favoritos');
+      return response.data.data || [];
+    } catch (error) {
+      console.error('Error al obtener juegos favoritos:', error);
+      throw error.response?.data || { message: 'Error al obtener juegos favoritos' };
+    }
+  },
+
+  // Verificar si un juego está en favoritos
+  isFavorite: async (gameId) => {
+    try {
+      const response = await apiClient.get(`/juegos/${gameId}/favorito`);
+      return response.data.data?.es_favorito || false;
+    } catch (error) {
+      console.error('Error al verificar favorito:', error);
+      throw error.response?.data || { message: 'Error al verificar el estado del favorito' };
+    }
+  },
+
+  // Añadir juego a favoritos
+  addToFavorites: async (gameId) => {
+    try {
+      const response = await apiClient.post(`/juegos/${gameId}/favorito`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al añadir a favoritos:', error);
+      throw error.response?.data || { message: 'Error al añadir el juego a favoritos' };
+    }
+  },
+
+  // Quitar juego de favoritos
+  removeFromFavorites: async (gameId) => {
+    try {
+      const response = await apiClient.delete(`/juegos/${gameId}/favorito`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al quitar de favoritos:', error);
+      throw error.response?.data || { message: 'Error al quitar el juego de favoritos' };
+    }
   }
 };
 

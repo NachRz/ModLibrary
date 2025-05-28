@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Mod;
 use App\Models\ModGuardado;
+use App\Models\JuegoFavorito;
 use App\Models\Usuario;
+use App\Models\Juego;
 use Illuminate\Database\Seeder;
 
 class ModGuardadoSeeder extends Seeder
@@ -50,5 +52,45 @@ class ModGuardadoSeeder extends Seeder
         }
 
         $this->command->info('Mods guardados creados correctamente.');
+
+        // Crear juegos favoritos de ejemplo
+        $juegosFavoritos = [
+            'usuario1' => ['The Witcher 3: Wild Hunt', 'Cyberpunk 2077'],
+            'usuario2' => ['Grand Theft Auto V', 'The Witcher 3: Wild Hunt'],
+            'usuario3' => ['Minecraft', 'Stardew Valley']
+        ];
+
+        foreach ($juegosFavoritos as $username => $juegosTitulos) {
+            $usuario = Usuario::where('nome', $username)->first();
+            
+            if (!$usuario) {
+                $this->command->error("Usuario '$username' no encontrado para juegos favoritos.");
+                continue;
+            }
+
+            foreach ($juegosTitulos as $titulo) {
+                $juego = Juego::where('titulo', $titulo)->first();
+                
+                if (!$juego) {
+                    $this->command->info("Juego '$titulo' no encontrado, omitiendo.");
+                    continue;
+                }
+
+                // Verificar si ya existe este favorito
+                $existente = JuegoFavorito::where('usuario_id', $usuario->id)
+                                          ->where('juego_id', $juego->id)
+                                          ->exists();
+                
+                if (!$existente) {
+                    JuegoFavorito::create([
+                        'usuario_id' => $usuario->id,
+                        'juego_id' => $juego->id,
+                        'fecha_agregado' => now()->subDays(rand(0, 60))
+                    ]);
+                }
+            }
+        }
+
+        $this->command->info('Juegos favoritos creados correctamente.');
     }
 } 
