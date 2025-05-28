@@ -1,7 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNotification } from '../../../context/NotificationContext';
 
 const GameCard = ({ game, showStats = true }) => {
+  // Estados para favoritos
+  const [esFavorito, setEsFavorito] = useState(false);
+  const [cargandoFavorito, setCargandoFavorito] = useState(false);
+  const { showNotification } = useNotification();
+
+  // Función para manejar favoritos
+  const toggleFavorito = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (cargandoFavorito) return;
+    
+    try {
+      setCargandoFavorito(true);
+      
+      // Aquí iría la lógica para añadir/quitar de favoritos usando el servicio
+      // await favoritosService.toggleFavorito(game.id);
+      
+      setEsFavorito(!esFavorito);
+      showNotification(
+        esFavorito ? 'Juego eliminado de favoritos' : 'Juego añadido a favoritos',
+        'success'
+      );
+    } catch (err) {
+      console.error('Error al actualizar favoritos:', err);
+      showNotification('Error al actualizar favoritos', 'error');
+    } finally {
+      setCargandoFavorito(false);
+    }
+  };
+
   // Función para mostrar estrellas según la valoración
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -62,11 +94,41 @@ const GameCard = ({ game, showStats = true }) => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
           
-          {/* Botón de guardar */}
-          <button className="absolute top-2 right-2 bg-black/40 hover:bg-black/60 p-1.5 rounded-full transition-colors duration-300">
-            <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-            </svg>
+          {/* Botón de favoritos */}
+          <button 
+            className={`absolute top-2 right-2 p-1.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg backdrop-blur-sm z-20 ${
+              esFavorito 
+                ? 'bg-red-500/80 hover:bg-red-600/80' 
+                : 'bg-black/40 hover:bg-red-500/80'
+            } ${cargandoFavorito ? 'opacity-50 cursor-not-allowed' : ''}`}
+            title={esFavorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+            onClick={toggleFavorito}
+            disabled={cargandoFavorito}
+          >
+            {cargandoFavorito ? (
+              <div className="animate-spin h-4 w-4">
+                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" strokeWidth="2" strokeDasharray="31.416" strokeDashoffset="31.416">
+                    <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                    <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                  </circle>
+                </svg>
+              </div>
+            ) : (
+              <svg 
+                className="h-4 w-4 text-white transition-all duration-300" 
+                fill={esFavorito ? "currentColor" : "none"} 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+                strokeWidth={esFavorito ? 0 : 2}
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                />
+              </svg>
+            )}
           </button>
 
           {/* Información del juego */}
