@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Usuario;
+use App\Models\Mod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -177,5 +179,307 @@ class AuthController extends Controller
             'is_admin' => $usuario->rol === 'admin',
             'rol' => $usuario->rol
         ]);
+    }
+
+    // Métodos de administración de usuarios
+    public function getAllUsers(Request $request)
+    {
+        try {
+            $usuarios = Usuario::select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'created_at')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $usuarios->map(function ($usuario) {
+                    return [
+                        'id' => $usuario->id,
+                        'nome' => $usuario->nome,
+                        'correo' => $usuario->correo,
+                        'rol' => $usuario->rol,
+                        'nombre_completo' => $usuario->nombre . ' ' . $usuario->apelidos,
+                        'estado' => 'activo', // Por defecto, puedes añadir este campo a la BD si lo necesitas
+                        'fecha_registro' => $usuario->created_at->format('Y-m-d')
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener usuarios', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al obtener usuarios'
+            ], 500);
+        }
+    }
+
+    public function getUserDetails(Request $request, $id)
+    {
+        try {
+            $usuario = Usuario::findOrFail($id);
+            
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'id' => $usuario->id,
+                    'nome' => $usuario->nome,
+                    'correo' => $usuario->correo,
+                    'rol' => $usuario->rol,
+                    'nombre' => $usuario->nombre,
+                    'apelidos' => $usuario->apelidos,
+                    'fecha_registro' => $usuario->created_at->format('Y-m-d H:i:s'),
+                    'foto_perfil' => $usuario->foto_perfil
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Usuario no encontrado'
+            ], 404);
+        }
+    }
+
+    public function updateUserRole(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'rol' => 'required|in:usuario,admin',
+                'nome' => 'sometimes|string|max:255|unique:usuarios,nome,' . $id,
+                'nombre' => 'sometimes|string|max:255',
+                'apelidos' => 'sometimes|string|max:255',
+                'foto_perfil' => 'sometimes|nullable|string'
+            ]);
+
+            $usuario = Usuario::findOrFail($id);
+            
+            // Evitar que el usuario se elimine a sí mismo el rol de admin
+            if ($usuario->id === $request->user()->id && $request->rol !== 'admin') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No puedes cambiar tu propio rol de administrador'
+                ], 403);
+            }
+
+            // Solo los administradores pueden cambiar nombres de usuario
+            if ($request->has('nome') && $request->user()->rol !== 'admin') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Solo los administradores pueden cambiar nombres de usuario'
+                ], 403);
+            }
+
+            $usuario->rol = $request->rol;
+            
+            // Actualizar otros campos si se proporcionan
+            if ($request->has('nome') && $request->user()->rol === 'admin') {
+                $usuario->nome = $request->nome;
+            }
+            if ($request->has('nombre')) {
+                $usuario->nombre = $request->nombre;
+            }
+            if ($request->has('apelidos')) {
+                $usuario->apelidos = $request->apelidos;
+            }
+            if ($request->has('foto_perfil')) {
+                $usuario->foto_perfil = $request->foto_perfil;
+            }
+            
+            $usuario->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario actualizado correctamente',
+                'data' => $usuario
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al actualizar el usuario'
+            ], 500);
+        }
+    }
+
+    public function updateUserStatus(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'estado' => 'required|in:activo,suspendido,inactivo'
+            ]);
+
+            // Por ahora solo retornamos éxito ya que no tenemos campo estado en la BD
+            // Puedes añadir el campo 'estado' a la tabla usuarios si lo necesitas
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Estado actualizado correctamente (simulado)'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al actualizar el estado'
+            ], 500);
+        }
+    }
+
+    public function deleteUser(Request $request, $id)
+    {
+        try {
+            $usuario = Usuario::findOrFail($id);
+            
+            // Evitar que el usuario se elimine a sí mismo
+            if ($usuario->id === $request->user()->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No puedes eliminar tu propia cuenta'
+                ], 403);
+            }
+
+            // Verificar si el usuario tiene mods asociados
+            if ($usuario->mods()->count() > 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No se puede eliminar un usuario que tiene mods publicados'
+                ], 422);
+            }
+
+            $usuario->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario eliminado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al eliminar el usuario'
+            ], 500);
+        }
+    }
+
+    public function forceDeleteUser(Request $request, $id)
+    {
+        try {
+            $usuario = Usuario::findOrFail($id);
+            
+            // Evitar que el usuario se elimine a sí mismo
+            if ($usuario->id === $request->user()->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No puedes eliminar tu propia cuenta'
+                ], 403);
+            }
+
+            // Eliminar todos los mods del usuario y sus relaciones
+            $mods = $usuario->mods;
+            
+            foreach ($mods as $mod) {
+                // Eliminar imagen del mod si existe
+                if ($mod->imagen && \Storage::exists('public/' . $mod->imagen)) {
+                    \Storage::delete('public/' . $mod->imagen);
+                }
+
+                // Eliminar relaciones
+                $mod->etiquetas()->detach();
+                $mod->usuariosGuardados()->detach();
+                
+                // Eliminar valoraciones
+                $mod->valoraciones()->delete();
+                
+                // Eliminar comentarios
+                $mod->comentarios()->delete();
+                
+                // Eliminar versiones del mod y sus archivos
+                foreach ($mod->versiones as $version) {
+                    if ($version->archivo && \Storage::exists('public/' . $version->archivo)) {
+                        \Storage::delete('public/' . $version->archivo);
+                    }
+                    $version->delete();
+                }
+
+                // Eliminar el mod
+                $mod->delete();
+            }
+
+            // Eliminar otras relaciones del usuario
+            $usuario->modsGuardados()->detach();
+            $usuario->juegosFavoritos()->detach();
+            $usuario->valoraciones()->delete();
+            $usuario->comentarios()->delete();
+            $usuario->redesSociales()->delete();
+
+            // Eliminar imagen de perfil si existe
+            if ($usuario->foto_perfil && \Storage::exists('public/' . $usuario->foto_perfil)) {
+                \Storage::delete('public/' . $usuario->foto_perfil);
+            }
+
+            // Eliminar el usuario
+            $usuario->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario y todos sus mods eliminados correctamente'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar usuario forzadamente', [
+                'error' => $e->getMessage(),
+                'user_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al eliminar el usuario'
+            ], 500);
+        }
+    }
+
+    public function uploadProfileImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120' // 5MB máximo
+            ]);
+
+            $image = $request->file('image');
+            
+            // Generar nombre único para la imagen
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            
+            // Crear directorio si no existe
+            $uploadPath = public_path('uploads/profile-images');
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            // Mover archivo
+            $image->move($uploadPath, $imageName);
+            
+            // Generar URL completa
+            $imageUrl = url('uploads/profile-images/' . $imageName);
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Imagen subida correctamente',
+                'data' => [
+                    'url' => $imageUrl,
+                    'filename' => $imageName
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al subir imagen', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al subir la imagen'
+            ], 500);
+        }
     }
 } 

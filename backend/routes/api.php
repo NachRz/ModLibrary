@@ -22,6 +22,20 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middle
 // Ruta para verificar si el usuario es admin
 Route::middleware('auth:sanctum')->get('/user/is-admin', [AuthController::class, 'isAdmin']);
 
+// Rutas de administración (requieren middleware admin)
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    // Gestión de usuarios
+    Route::get('/users', [AuthController::class, 'getAllUsers']);
+    Route::get('/users/{id}', [AuthController::class, 'getUserDetails']);
+    Route::put('/users/{id}/role', [AuthController::class, 'updateUserRole']);
+    Route::put('/users/{id}/status', [AuthController::class, 'updateUserStatus']);
+    Route::delete('/users/{id}', [AuthController::class, 'deleteUser']);
+    Route::delete('/users/{id}/force', [AuthController::class, 'forceDeleteUser']);
+    
+    // Subida de imágenes de perfil
+    Route::post('/upload/profile-image', [AuthController::class, 'uploadProfileImage']);
+});
+
 // Rutas de juegos
 Route::prefix('juegos')->group(function () {
     // Rutas de favoritos (requieren autenticación) - DEBEN IR ANTES de las rutas con parámetros

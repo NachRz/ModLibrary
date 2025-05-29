@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const ModsAdmin = () => {
   const [mods, setMods] = useState([]);
@@ -132,9 +134,12 @@ const ModsAdmin = () => {
               placeholder="Buscar mods..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-64"
+              className="bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-64"
             />
-            <span className="absolute right-3 top-2.5 text-gray-400">🔍</span>
+            <FontAwesomeIcon 
+              icon={faSearch} 
+              className="absolute right-3 top-3 text-gray-400 pointer-events-none"
+            />
           </div>
         </div>
       </div>

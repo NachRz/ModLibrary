@@ -32,34 +32,6 @@ const Dashboard = ({ defaultTab = 0 }) => {
     2: '/dashboard/juegos-favoritos',
     3: '/dashboard/guardados'
   };
-  
-  // Actualizar la pestaña activa basada en la ruta actual
-  useEffect(() => {
-    const tabIndex = pathToTabIndex[location.pathname] !== undefined 
-      ? pathToTabIndex[location.pathname] 
-      : defaultTab;
-    
-    setCurrentTab(tabIndex);
-  }, [location.pathname, defaultTab]);
-
-  // Función para manejar cambios de pestaña
-  const handleTabChange = (index) => {
-    // Si está en modo admin, no cambiar rutas
-    if (adminModeActive) {
-      setCurrentTab(index);
-      return;
-    }
-    
-    // Navegar a la ruta correspondiente para modo normal
-    navigate(tabIndexToPath[index]);
-  };
-
-  // Función para manejar el toggle de admin
-  const handleAdminToggle = (isActive) => {
-    setAdminModeActive(isActive);
-    // Resetear a la primera pestaña cuando se cambie de modo
-    setCurrentTab(0);
-  };
 
   // Configuración de pestañas para modo normal
   const normalTabConfig = [
@@ -95,6 +67,53 @@ const Dashboard = ({ defaultTab = 0 }) => {
 
   // Seleccionar configuración de pestañas según el modo
   const tabConfig = adminModeActive ? adminTabConfig : normalTabConfig;
+  
+  // Actualizar la pestaña activa basada en la ruta actual (solo en modo normal)
+  useEffect(() => {
+    if (!adminModeActive) {
+      const tabIndex = pathToTabIndex[location.pathname] !== undefined 
+        ? pathToTabIndex[location.pathname] 
+        : defaultTab;
+      
+      // Validar que el índice esté dentro del rango
+      if (tabIndex >= 0 && tabIndex < normalTabConfig.length) {
+        setCurrentTab(tabIndex);
+      } else {
+        setCurrentTab(0);
+      }
+    }
+  }, [location.pathname, defaultTab, adminModeActive]);
+
+  // Función para manejar cambios de pestaña
+  const handleTabChange = (index) => {
+    // Validar que el índice esté dentro del rango de la configuración actual
+    if (index < 0 || index >= tabConfig.length) {
+      console.warn('Índice de pestaña fuera de rango:', index);
+      return;
+    }
+    
+    setCurrentTab(index);
+    
+    // Si está en modo admin, no cambiar rutas
+    if (adminModeActive) {
+      return;
+    }
+    
+    // Navegar a la ruta correspondiente para modo normal
+    if (tabIndexToPath[index]) {
+      navigate(tabIndexToPath[index]);
+    }
+  };
+
+  // Función para manejar el toggle de admin
+  const handleAdminToggle = (isActive) => {
+    setAdminModeActive(isActive);
+    // Resetear a la primera pestaña cuando se cambie de modo
+    setCurrentTab(0);
+  };
+
+  // Asegurar que currentTab esté dentro del rango válido para la configuración actual
+  const safeCurrentTab = currentTab >= 0 && currentTab < tabConfig.length ? currentTab : 0;
 
   return (
     <PageContainer>
@@ -119,7 +138,7 @@ const Dashboard = ({ defaultTab = 0 }) => {
         
         <Tabs 
           tabs={tabConfig} 
-          defaultTab={currentTab} 
+          defaultTab={safeCurrentTab} 
           onTabChange={handleTabChange}
         />
       </div>
