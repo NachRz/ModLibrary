@@ -390,7 +390,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
       </div>
 
       {/* Estilos para scroll personalizado */}
-      <style jsx>{`
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }

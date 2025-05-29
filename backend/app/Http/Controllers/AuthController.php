@@ -186,7 +186,8 @@ class AuthController extends Controller
     {
         try {
             $usuarios = Usuario::select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'created_at')
-                ->orderBy('created_at', 'desc')
+                ->withCount('mods')
+                ->orderBy('nome', 'asc')
                 ->get();
 
             return response()->json([
@@ -199,7 +200,8 @@ class AuthController extends Controller
                         'rol' => $usuario->rol,
                         'nombre_completo' => $usuario->nombre . ' ' . $usuario->apelidos,
                         'estado' => 'activo', // Por defecto, puedes añadir este campo a la BD si lo necesitas
-                        'fecha_registro' => $usuario->created_at->format('Y-m-d')
+                        'fecha_registro' => $usuario->created_at->format('Y-m-d'),
+                        'tiene_mods' => $usuario->mods_count > 0
                     ];
                 })
             ]);
@@ -378,13 +380,178 @@ class AuthController extends Controller
                 ], 403);
             }
 
+            // Eliminar solo las relaciones directas del usuario, NO los mods
+            $usuario->modsGuardados()->detach();
+            $usuario->juegosFavoritos()->detach();
+            $usuario->valoraciones()->delete();
+            $usuario->comentarios()->delete();
+            $usuario->redesSociales()->delete();
+
+            // Eliminar imagen de perfil si existe
+            if ($usuario->foto_perfil && Storage::exists('public/' . $usuario->foto_perfil)) {
+                Storage::delete('public/' . $usuario->foto_perfil);
+            }
+
+            // Eliminar el usuario PERMANENTEMENTE (los mods quedan huérfanos pero visibles)
+            $usuario->forceDelete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario eliminado correctamente (los mods se mantienen)'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al eliminar el usuario'
+            ], 500);
+        }
+    }
+
+    public function softDeleteUser(Request $request, $id)
+    {
+        try {
+            $usuario = Usuario::findOrFail($id);
+            
+            // Evitar que el usuario se elimine a sí mismo
+            if ($usuario->id === $request->user()->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No puedes eliminar tu propia cuenta'
+                ], 403);
+            }
+
+            // Hacer soft delete del usuario (mantiene los mods)
+            $usuario->delete(); // Con SoftDeletes, esto hace soft delete
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario desactivado correctamente (los mods se mantienen)'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al desactivar usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al desactivar el usuario'
+            ], 500);
+        }
+    }
+
+    // Obtener usuarios eliminados (soft deleted)
+    public function getDeletedUsers(Request $request)
+    {
+        try {
+            $usuarios = Usuario::onlyTrashed()
+                ->select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'created_at', 'deleted_at')
+                ->withCount('mods')
+                ->orderBy('deleted_at', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $usuarios->map(function ($usuario) {
+                    return [
+                        'id' => $usuario->id,
+                        'nome' => $usuario->nome,
+                        'correo' => $usuario->correo,
+                        'rol' => $usuario->rol,
+                        'nombre_completo' => $usuario->nombre . ' ' . $usuario->apelidos,
+                        'fecha_registro' => $usuario->created_at->format('Y-m-d'),
+                        'fecha_eliminacion' => $usuario->deleted_at->format('Y-m-d H:i:s'),
+                        'tiene_mods' => $usuario->mods_count > 0
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener usuarios eliminados', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al obtener usuarios eliminados'
+            ], 500);
+        }
+    }
+
+    // Restaurar usuario eliminado
+    public function restoreUser(Request $request, $id)
+    {
+        try {
+            $usuario = Usuario::onlyTrashed()->findOrFail($id);
+            $usuario->restore();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario restaurado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al restaurar usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al restaurar el usuario'
+            ], 500);
+        }
+    }
+
+    // Eliminar usuario definitivamente (force delete)
+    public function permanentDeleteUser(Request $request, $id)
+    {
+        try {
+            $usuario = Usuario::onlyTrashed()->findOrFail($id);
+
+            // Eliminar relaciones del usuario
+            $usuario->modsGuardados()->detach();
+            $usuario->juegosFavoritos()->detach();
+            $usuario->valoraciones()->delete();
+            $usuario->comentarios()->delete();
+            $usuario->redesSociales()->delete();
+
+            // Eliminar imagen de perfil si existe
+            if ($usuario->foto_perfil && Storage::exists('public/' . $usuario->foto_perfil)) {
+                Storage::delete('public/' . $usuario->foto_perfil);
+            }
+
+            // Eliminar definitivamente
+            $usuario->forceDelete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario eliminado definitivamente'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar usuario definitivamente', [
+                'error' => $e->getMessage(),
+                'user_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al eliminar el usuario definitivamente'
+            ], 500);
+        }
+    }
+
+    // Eliminar usuario definitivamente con todos sus mods
+    public function permanentDeleteUserWithMods(Request $request, $id)
+    {
+        try {
+            $usuario = Usuario::onlyTrashed()->findOrFail($id);
+
             // Eliminar todos los mods del usuario y sus relaciones
             $mods = $usuario->mods;
             
             foreach ($mods as $mod) {
                 // Eliminar imagen del mod si existe
-                if ($mod->imagen && \Storage::exists('public/' . $mod->imagen)) {
-                    \Storage::delete('public/' . $mod->imagen);
+                if ($mod->imagen && Storage::exists('public/' . $mod->imagen)) {
+                    Storage::delete('public/' . $mod->imagen);
                 }
 
                 // Eliminar relaciones
@@ -399,8 +566,8 @@ class AuthController extends Controller
                 
                 // Eliminar versiones del mod y sus archivos
                 foreach ($mod->versiones as $version) {
-                    if ($version->archivo && \Storage::exists('public/' . $version->archivo)) {
-                        \Storage::delete('public/' . $version->archivo);
+                    if ($version->archivo && Storage::exists('public/' . $version->archivo)) {
+                        Storage::delete('public/' . $version->archivo);
                     }
                     $version->delete();
                 }
@@ -409,7 +576,7 @@ class AuthController extends Controller
                 $mod->delete();
             }
 
-            // Eliminar otras relaciones del usuario
+            // Eliminar relaciones del usuario
             $usuario->modsGuardados()->detach();
             $usuario->juegosFavoritos()->detach();
             $usuario->valoraciones()->delete();
@@ -417,25 +584,25 @@ class AuthController extends Controller
             $usuario->redesSociales()->delete();
 
             // Eliminar imagen de perfil si existe
-            if ($usuario->foto_perfil && \Storage::exists('public/' . $usuario->foto_perfil)) {
-                \Storage::delete('public/' . $usuario->foto_perfil);
+            if ($usuario->foto_perfil && Storage::exists('public/' . $usuario->foto_perfil)) {
+                Storage::delete('public/' . $usuario->foto_perfil);
             }
 
-            // Eliminar el usuario
-            $usuario->delete();
+            // Eliminar definitivamente
+            $usuario->forceDelete();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Usuario y todos sus mods eliminados correctamente'
+                'message' => 'Usuario y todos sus mods eliminados definitivamente'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al eliminar usuario forzadamente', [
+            Log::error('Error al eliminar usuario con mods definitivamente', [
                 'error' => $e->getMessage(),
                 'user_id' => $id
             ]);
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error al eliminar el usuario'
+                'message' => 'Error al eliminar el usuario con mods definitivamente'
             ], 500);
         }
     }

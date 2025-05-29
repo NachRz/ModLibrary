@@ -26,11 +26,16 @@ Route::middleware('auth:sanctum')->get('/user/is-admin', [AuthController::class,
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     // Gestión de usuarios
     Route::get('/users', [AuthController::class, 'getAllUsers']);
+    Route::get('/users/deleted', [AuthController::class, 'getDeletedUsers']);
     Route::get('/users/{id}', [AuthController::class, 'getUserDetails']);
     Route::put('/users/{id}/role', [AuthController::class, 'updateUserRole']);
     Route::put('/users/{id}/status', [AuthController::class, 'updateUserStatus']);
     Route::delete('/users/{id}', [AuthController::class, 'deleteUser']);
+    Route::delete('/users/{id}/soft', [AuthController::class, 'softDeleteUser']);
     Route::delete('/users/{id}/force', [AuthController::class, 'forceDeleteUser']);
+    Route::post('/users/{id}/restore', [AuthController::class, 'restoreUser']);
+    Route::delete('/users/{id}/permanent', [AuthController::class, 'permanentDeleteUser']);
+    Route::delete('/users/{id}/permanent-with-mods', [AuthController::class, 'permanentDeleteUserWithMods']);
     
     // Subida de imágenes de perfil
     Route::post('/upload/profile-image', [AuthController::class, 'uploadProfileImage']);

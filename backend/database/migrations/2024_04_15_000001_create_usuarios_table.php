@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('foto_perfil')->nullable();
             $table->string('correo')->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
