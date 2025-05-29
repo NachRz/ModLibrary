@@ -4,12 +4,15 @@ import modService from '../../services/api/modService';
 import useSavedStatus from '../../hooks/useSavedStatus';
 import useRating from '../../hooks/useRating';
 import Breadcrumb from '../common/Breadcrumb/Breadcrumb';
+import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
+import { useNotification } from '../../context/NotificationContext';
 import '../../assets/styles/components/mods/ModDetails.css';
 import authService from '../../services/api/authService';
 
 const ModDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
   const [mod, setMod] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,6 +22,12 @@ const ModDetails = () => {
   const [showSaveMsg, setShowSaveMsg] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isOwner, setIsOwner] = useState(false);
+  
+  // Estados para el modal de eliminación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   
   // Usar el hook personalizado para manejar el estado de guardado
   const [isGuardado, toggleSavedStatus, isSaving, savedError] = useSavedStatus(id);
@@ -38,10 +47,18 @@ const ModDetails = () => {
   const [lastSaveAction, setLastSaveAction] = useState(null); // 'guardado' | 'eliminado' | null
 
   useEffect(() => {
-    // Verificar si el usuario está autenticado
+    // Verificar si el usuario está autenticado y obtener su información
     const user = authService.getCurrentUser();
     setIsAuthenticated(!!user);
+    setCurrentUser(user);
   }, []);
+
+  // Verificar si el usuario actual es el propietario del mod
+  useEffect(() => {
+    if (currentUser && mod) {
+      setIsOwner(currentUser.id === mod.creador?.id);
+    }
+  }, [currentUser, mod]);
 
   useEffect(() => {
     const fetchModDetails = async () => {
@@ -171,6 +188,41 @@ const ModDetails = () => {
     { label: 'Mods', path: '/mods' },
     { label: mod?.titulo || 'Detalles del Mod', path: `/mods/${id}` }
   ];
+
+  // Manejar eliminación del mod
+  const handleDeleteMod = () => {
+    setShowDeleteModal(true);
+  };
+
+  // Confirmar eliminación
+  const confirmDeleteMod = async () => {
+    try {
+      setDeleting(true);
+      const response = await modService.deleteMod(mod.id);
+      
+      if (response.status === 'success') {
+        showNotification(`Mod "${mod.titulo}" eliminado exitosamente`, 'success');
+        navigate('/dashboard/mis-mods');
+      } else {
+        throw new Error(response.message || 'Error al eliminar el mod');
+      }
+    } catch (err) {
+      showNotification(err.message || 'Error al eliminar el mod', 'error');
+    } finally {
+      setDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  // Cancelar eliminación
+  const cancelDeleteMod = () => {
+    setShowDeleteModal(false);
+  };
+
+  // Editar mod
+  const handleEditMod = () => {
+    navigate(`/mods/editar/${mod.id}`);
+  };
 
   if (loading) {
     return (
@@ -307,6 +359,29 @@ const ModDetails = () => {
             <i className="fas fa-thumbs-up"></i> Votar
           </button>
           
+          {/* Botones para el propietario del mod */}
+          {isOwner && (
+            <>
+              <button 
+                className="mod-action-btn edit"
+                onClick={handleEditMod}
+                title="Editar mod"
+              >
+                <i className="fas fa-edit"></i> Editar
+              </button>
+              
+              <button 
+                className="mod-action-btn delete"
+                onClick={handleDeleteMod}
+                disabled={deleting}
+                title="Eliminar mod"
+              >
+                <i className={`fas ${deleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i> 
+                {deleting ? 'Eliminando...' : 'Eliminar'}
+              </button>
+            </>
+          )}
+          
           <button className="mod-action-btn download-main">
             <i className="fas fa-download"></i> Descargar
           </button>
@@ -427,6 +502,14 @@ const ModDetails = () => {
           <span>Inicia sesión para valorar y descargar este mod</span>
         </div>
       )}
+
+      {/* Modal de eliminación */}
+      <ModDeleteConfirmationModal
+        modTitle={mod?.titulo || ''}
+        onConfirm={confirmDeleteMod}
+        onCancel={cancelDeleteMod}
+        isOpen={showDeleteModal}
+      />
     </div>
   );
 };

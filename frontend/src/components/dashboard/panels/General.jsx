@@ -236,7 +236,7 @@ const General = () => {
   ];
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 mb-8">
       {/* Tarjetas de estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {statCardData.map((stat, index) => (

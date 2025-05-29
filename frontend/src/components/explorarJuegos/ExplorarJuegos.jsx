@@ -341,7 +341,7 @@ const ExplorarJuegos = () => {
 
               {/* Paginación */}
               {!cargando && juegosEnPagina.length > 0 && (
-                <div className="pagination-container mt-8 flex justify-between items-center">
+                <div className="pagination-container mt-8 mb-8 flex justify-between items-center">
                   <div className="text-sm text-custom-detail">
                     Mostrando <span className="font-medium text-custom-text">{indiceInicial + 1}</span> a{' '}
                     <span className="font-medium text-custom-text">

@@ -19,7 +19,7 @@ const JuegosFavoritos = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-8">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h3 className="text-xl font-bold text-white">Juegos Favoritos</h3>

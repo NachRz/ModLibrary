@@ -1070,7 +1070,7 @@ const ExplorarMods = () => {
 
                       {/* Paginación */}
                       {totalPaginas > 1 && (
-                        <div className="pagination-container mt-8 flex justify-center items-center gap-2">
+                        <div className="pagination-container mt-8 mb-8 flex justify-center items-center gap-2">
                           <button
                             onClick={() => handlePaginaChange(1)}
                             disabled={paginacion.paginaActual === 1}

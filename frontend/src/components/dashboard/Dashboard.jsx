@@ -6,7 +6,7 @@ import MisMods from './panels/MisMods';
 import JuegosFavoritos from './panels/JuegosFavoritos';
 import ModsGuardados from './panels/ModsGuardados';
 import PageContainer from '../layout/PageContainer';
-import AdminToggle from '../common/AdminToggle';
+import AdminToggle from './AdminToggle';
 import UsuariosAdmin from './adminPanels/UsuariosAdmin';
 import ModsAdmin from './adminPanels/ModsAdmin';
 
@@ -117,7 +117,7 @@ const Dashboard = ({ defaultTab = 0 }) => {
 
   return (
     <PageContainer>
-      <div className="bg-custom-card rounded-lg shadow-lg p-6">
+      <div className="bg-custom-card rounded-lg shadow-lg p-6 mb-8">
         {/* Header con toggle de admin */}
         <div className="flex justify-between items-center mb-6">
           <div>

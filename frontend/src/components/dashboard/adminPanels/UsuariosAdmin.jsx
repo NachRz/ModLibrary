@@ -5,6 +5,7 @@ import { UserHasModsModal, FinalConfirmationModal, PermanentDeleteModal } from '
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEdit, faTrash, faUndo, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { NotificationsAdminUserDeleteProvider, useAdminUserDeleteNotifications } from '../../../context/notifications/notificationsAdmin/NotificationsAdminUserDelete';
+import Pagination from '../../common/Pagination';
 
 const UsuariosAdminContent = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -15,6 +16,10 @@ const UsuariosAdminContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('active'); // Nueva pestaña activa
   const [deletedUsers, setDeletedUsers] = useState([]); // Usuarios eliminados
+  
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
   
   // Estados para los modales de eliminación
   const [showUserHasModsModal, setShowUserHasModsModal] = useState(false);
@@ -118,6 +123,38 @@ const UsuariosAdminContent = () => {
     usuario.correo.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (usuario.nombre_completo && usuario.nombre_completo.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Lógica de paginación para usuarios activos
+  const totalPagesActive = Math.ceil(filteredUsuarios.length / itemsPerPage);
+  const startIndexActive = (currentPage - 1) * itemsPerPage;
+  const endIndexActive = startIndexActive + itemsPerPage;
+  const paginatedUsuarios = filteredUsuarios.slice(startIndexActive, endIndexActive);
+
+  // Filtrado y paginación para usuarios eliminados
+  const filteredDeletedUsers = deletedUsers.filter(usuario =>
+    usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    usuario.correo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (usuario.nombre_completo && usuario.nombre_completo.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const totalPagesDeleted = Math.ceil(filteredDeletedUsers.length / itemsPerPage);
+  const startIndexDeleted = (currentPage - 1) * itemsPerPage;
+  const endIndexDeleted = startIndexDeleted + itemsPerPage;
+  const paginatedDeletedUsers = filteredDeletedUsers.slice(startIndexDeleted, endIndexDeleted);
+
+  // Resetear página cuando cambian los filtros o pestañas
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeTab]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
 
   const handleRoleChange = async (userId, newRole) => {
     try {
@@ -391,7 +428,7 @@ const UsuariosAdminContent = () => {
             </thead>
             <tbody className="divide-y divide-gray-600">
               {activeTab === 'active' ? (
-                filteredUsuarios.map((usuario) => (
+                paginatedUsuarios.map((usuario) => (
                   <tr key={usuario.id} className="hover:bg-gray-600">
                     <td className="px-6 py-4">
                       <UserAvatar user={usuario} />
@@ -424,7 +461,7 @@ const UsuariosAdminContent = () => {
                       <div className="flex space-x-2">
                         <button 
                           onClick={() => handleEditUser(usuario)}
-                          className="flex items-center space-x-1 px-3 py-1.5 bg-blue-500 bg-opacity-20 text-blue-400 border border-blue-500 border-opacity-50 rounded-lg hover:bg-blue-500 hover:bg-opacity-30 hover:border-blue-400 transition-all duration-200 text-sm font-medium"
+                          className="flex items-center space-x-1 px-3 py-1.5 bg-green-500 bg-opacity-20 text-green-400 border border-green-500 border-opacity-50 rounded-lg hover:bg-green-500 hover:bg-opacity-30 hover:border-green-400 transition-all duration-200 text-sm font-medium"
                         >
                           <FontAwesomeIcon icon={faEdit} className="w-3 h-3" />
                           <span>Editar</span>
@@ -441,11 +478,7 @@ const UsuariosAdminContent = () => {
                   </tr>
                 ))
               ) : (
-                deletedUsers.filter(usuario =>
-                  usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  usuario.correo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  (usuario.nombre_completo && usuario.nombre_completo.toLowerCase().includes(searchTerm.toLowerCase()))
-                ).map((usuario) => (
+                paginatedDeletedUsers.map((usuario) => (
                   <tr key={usuario.id} className="hover:bg-gray-600">
                     <td className="px-6 py-4">
                       <UserAvatar user={usuario} />
@@ -491,16 +524,29 @@ const UsuariosAdminContent = () => {
         </div>
       </div>
 
-      {activeTab === 'active' && filteredUsuarios.length === 0 && !loading && (
+      {activeTab === 'active' && paginatedUsuarios.length === 0 && !loading && (
         <div className="text-center py-8">
           <p className="text-gray-400">No se encontraron usuarios activos con ese criterio de búsqueda.</p>
         </div>
       )}
 
-      {activeTab === 'deleted' && deletedUsers.length === 0 && !loading && (
+      {activeTab === 'deleted' && paginatedDeletedUsers.length === 0 && !loading && (
         <div className="text-center py-8">
           <p className="text-gray-400">No hay usuarios eliminados.</p>
         </div>
+      )}
+
+      {/* Paginación */}
+      {((activeTab === 'active' && filteredUsuarios.length > 0) || 
+        (activeTab === 'deleted' && filteredDeletedUsers.length > 0)) && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={activeTab === 'active' ? totalPagesActive : totalPagesDeleted}
+          onPageChange={handlePageChange}
+          itemsPerPage={itemsPerPage}
+          totalItems={activeTab === 'active' ? filteredUsuarios.length : filteredDeletedUsers.length}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
       )}
 
       {/* Modal de edición */}

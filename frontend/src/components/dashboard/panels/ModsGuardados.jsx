@@ -53,7 +53,7 @@ const ModsGuardados = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-8">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-bold text-custom-text">Mods Guardados</h3>
         <div className="flex items-center space-x-2">

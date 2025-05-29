@@ -226,7 +226,37 @@
 }
 
 .mod-action-btn.download-main:hover {
-  background: linear-gradient(135deg, #2980B9 0%, #3498DB 100%);
+  background: rgba(34, 197, 94, 0.3);
+  transform: translateY(-2px);
+}
+
+.mod-action-btn.edit {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+}
+
+.mod-action-btn.edit:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.mod-action-btn.delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+}
+
+.mod-action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.mod-action-btn.delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mod-action-btn.delete:disabled:hover {
+  background: rgba(239, 68, 68, 0.1);
+  transform: none;
 }
 
 /* Sección de galería */
@@ -335,8 +365,6 @@
   color: #E2E8F0;
   font-weight: 500;
 }
-
-
 
 /* Etiquetas del mod */
 .mod-tags-section {
