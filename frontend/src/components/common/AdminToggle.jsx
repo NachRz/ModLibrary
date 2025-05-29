@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 
-const AdminToggle = () => {
+const AdminToggle = ({ isEnabled = false, onToggle }) => {
   const { isAdmin } = useAuth();
-  const [isEnabled, setIsEnabled] = useState(false);
 
   // No mostrar nada si el usuario no es admin
   if (!isAdmin) {
@@ -11,9 +10,10 @@ const AdminToggle = () => {
   }
 
   const handleToggle = () => {
-    setIsEnabled(!isEnabled);
+    const newState = !isEnabled;
+    onToggle && onToggle(newState);
     // Aquí puedes añadir la lógica que quieras ejecutar cuando se active/desactive
-    console.log('Modo admin:', !isEnabled ? 'activado' : 'desactivado');
+    console.log('Modo admin:', newState ? 'activado' : 'desactivado');
   };
 
   return (

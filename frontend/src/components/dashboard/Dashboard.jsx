@@ -7,12 +7,15 @@ import JuegosFavoritos from './panels/JuegosFavoritos';
 import ModsGuardados from './panels/ModsGuardados';
 import PageContainer from '../layout/PageContainer';
 import AdminToggle from '../common/AdminToggle';
+import UsuariosAdmin from './adminPanels/UsuariosAdmin';
+import ModsAdmin from './adminPanels/ModsAdmin';
 
 const Dashboard = ({ defaultTab = 0 }) => {
   // Obtener la ubicación actual y navegación
   const location = useLocation();
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState(defaultTab);
+  const [adminModeActive, setAdminModeActive] = useState(false);
   
   // Mapeo de rutas a índices de pestañas
   const pathToTabIndex = {
@@ -41,12 +44,25 @@ const Dashboard = ({ defaultTab = 0 }) => {
 
   // Función para manejar cambios de pestaña
   const handleTabChange = (index) => {
-    // Navegar a la ruta correspondiente
+    // Si está en modo admin, no cambiar rutas
+    if (adminModeActive) {
+      setCurrentTab(index);
+      return;
+    }
+    
+    // Navegar a la ruta correspondiente para modo normal
     navigate(tabIndexToPath[index]);
   };
 
-  // Configuración de pestañas con sus componentes correspondientes
-  const tabConfig = [
+  // Función para manejar el toggle de admin
+  const handleAdminToggle = (isActive) => {
+    setAdminModeActive(isActive);
+    // Resetear a la primera pestaña cuando se cambie de modo
+    setCurrentTab(0);
+  };
+
+  // Configuración de pestañas para modo normal
+  const normalTabConfig = [
     {
       label: 'General',
       content: <General />
@@ -65,13 +81,40 @@ const Dashboard = ({ defaultTab = 0 }) => {
     }
   ];
 
+  // Configuración de pestañas para modo admin
+  const adminTabConfig = [
+    {
+      label: 'Usuarios',
+      content: <UsuariosAdmin />
+    },
+    {
+      label: 'Mods',
+      content: <ModsAdmin />
+    }
+  ];
+
+  // Seleccionar configuración de pestañas según el modo
+  const tabConfig = adminModeActive ? adminTabConfig : normalTabConfig;
+
   return (
     <PageContainer>
       <div className="bg-custom-card rounded-lg shadow-lg p-6">
         {/* Header con toggle de admin */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <AdminToggle />
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              {adminModeActive ? 'Panel de Administración' : 'Dashboard'}
+            </h1>
+            {adminModeActive && (
+              <p className="text-sm text-gray-400 mt-1">
+                Gestión avanzada del sistema
+              </p>
+            )}
+          </div>
+          <AdminToggle 
+            isEnabled={adminModeActive} 
+            onToggle={handleAdminToggle} 
+          />
         </div>
         
         <Tabs 
