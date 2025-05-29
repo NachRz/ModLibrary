@@ -6,6 +6,7 @@ import MisMods from './panels/MisMods';
 import JuegosFavoritos from './panels/JuegosFavoritos';
 import ModsGuardados from './panels/ModsGuardados';
 import PageContainer from '../layout/PageContainer';
+import AdminToggle from '../common/AdminToggle';
 
 const Dashboard = ({ defaultTab = 0 }) => {
   // Obtener la ubicación actual y navegación
@@ -67,6 +68,12 @@ const Dashboard = ({ defaultTab = 0 }) => {
   return (
     <PageContainer>
       <div className="bg-custom-card rounded-lg shadow-lg p-6">
+        {/* Header con toggle de admin */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+          <AdminToggle />
+        </div>
+        
         <Tabs 
           tabs={tabConfig} 
           defaultTab={currentTab} 

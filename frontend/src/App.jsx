@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import { NotificationProvider } from './context/NotificationContext';
+import { AuthProvider } from './context/AuthContext';
 import './assets/styles/context/notifications/Notification.css';
 import AppRoutes from './routes';
 
@@ -14,15 +15,17 @@ function App() {
   const shouldShowLayout = !noLayoutRoutes.includes(location.pathname);
 
   return (
-    <NotificationProvider>
-      <div className="flex flex-col min-h-screen bg-custom-bg text-custom-text">
-        {shouldShowLayout && <Navbar />}
-        <main className="flex-grow">
-          <AppRoutes />
-        </main>
-        {shouldShowLayout && <Footer />}
-      </div>
-    </NotificationProvider>
+    <AuthProvider>
+      <NotificationProvider>
+        <div className="flex flex-col min-h-screen bg-custom-bg text-custom-text">
+          {shouldShowLayout && <Navbar />}
+          <main className="flex-grow">
+            <AppRoutes />
+          </main>
+          {shouldShowLayout && <Footer />}
+        </div>
+      </NotificationProvider>
+    </AuthProvider>
   );
 }
 

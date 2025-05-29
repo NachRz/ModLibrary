@@ -168,4 +168,14 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function isAdmin(Request $request)
+    {
+        $usuario = $request->user();
+        
+        return response()->json([
+            'is_admin' => $usuario->rol === 'admin',
+            'rol' => $usuario->rol
+        ]);
+    }
 } 

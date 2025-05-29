@@ -19,6 +19,9 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('auth:sanctum');
 
+// Ruta para verificar si el usuario es admin
+Route::middleware('auth:sanctum')->get('/user/is-admin', [AuthController::class, 'isAdmin']);
+
 // Rutas de juegos
 Route::prefix('juegos')->group(function () {
     // Rutas de favoritos (requieren autenticación) - DEBEN IR ANTES de las rutas con parámetros
