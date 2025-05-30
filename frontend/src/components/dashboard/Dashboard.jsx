@@ -122,11 +122,15 @@ const Dashboard = ({ defaultTab = 0 }) => {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">
-              {adminModeActive ? 'Panel de Administración' : 'Dashboard'}
+              {adminModeActive ? 'Panel de Administración' : 'Mi panel'}
             </h1>
-            {adminModeActive && (
+            {adminModeActive ? (
               <p className="text-sm text-gray-400 mt-1">
                 Gestión avanzada del sistema
+              </p>
+            ) : (
+              <p className="text-sm text-gray-400 mt-1">
+                Tu espacio personal de gestión
               </p>
             )}
           </div>
