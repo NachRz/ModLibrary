@@ -1,0 +1,376 @@
+/* Estilos para tablas de administración responsive */
+
+/* Contenedor principal de tabla */
+.admin-table-container {
+  background: #374151;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Sin scroll horizontal - tabla siempre se adapta */
+.admin-table-scroll {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Tabla principal */
+.admin-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+/* Encabezados de tabla */
+.admin-table thead {
+  background: #4b5563;
+}
+
+.admin-table th {
+  padding: 0.75rem 1.5rem;
+  color: #d1d5db;
+  font-weight: 500;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* Filas de datos */
+.admin-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: #4b5563;
+}
+
+.admin-table td {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #4b5563;
+  overflow: visible;
+}
+
+/* Anchos de columnas responsivos */
+.admin-table .col-user { 
+  min-width: 120px; 
+  width: auto;
+}
+
+.admin-table .col-email { 
+  min-width: 140px; 
+  width: auto;
+}
+
+.admin-table .col-name { 
+  min-width: 120px; 
+  width: auto;
+}
+
+.admin-table .col-role { 
+  min-width: 80px; 
+  width: auto;
+}
+
+.admin-table .col-status { 
+  min-width: 70px; 
+  width: auto;
+}
+
+.admin-table .col-date { 
+  min-width: 100px; 
+  width: auto;
+}
+
+.admin-table .col-downloads { 
+  min-width: 80px; 
+  width: auto;
+}
+
+.admin-table .col-rating { 
+  min-width: 80px; 
+  width: auto;
+}
+
+/* Columna de acciones - Siempre compacta */
+.admin-table .actions-column {
+  min-width: 100px;
+  width: auto;
+}
+
+/* ========================================
+   SISTEMA DE BOTONES SOLO ICONOS
+   ======================================== */
+
+/* Contenedor de botones - Siempre flex horizontal compacto */
+.action-buttons-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+  overflow: visible;
+  min-height: 2rem;
+}
+
+/* Botones siempre circulares con solo iconos */
+.action-btn-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  outline: none;
+  text-decoration: none;
+  font-family: inherit;
+  position: relative;
+  font-size: 0.75rem;
+}
+
+.action-btn-text:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Icono siempre visible */
+.action-btn-icon {
+  display: block;
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* Texto SIEMPRE oculto */
+.btn-text-full,
+.btn-text-short {
+  display: none !important;
+}
+
+/* ========================================
+   RESPONSIVE SOLO PARA TAMAÑOS DE ICONOS
+   ======================================== */
+
+/* Pantallas muy pequeñas: Botones más compactos */
+@media (max-width: 640px) {
+  .admin-table .actions-column {
+    min-width: 90px;
+  }
+  
+  .action-buttons-container {
+    gap: 0.125rem;
+  }
+  
+  .action-btn-text {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  
+  .action-btn-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  
+  .admin-table th,
+  .admin-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Pantallas muy pequeñas: Botones extra compactos */
+@media (max-width: 480px) {
+  .admin-table .actions-column {
+    min-width: 80px;
+  }
+  
+  .action-buttons-container {
+    gap: 0.125rem;
+  }
+  
+  .action-btn-text {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  
+  .action-btn-icon {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+  
+  .admin-table th,
+  .admin-table td {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .admin-table .col-user { 
+    min-width: 100px; 
+  }
+  
+  .admin-table .col-role { 
+    min-width: 70px; 
+  }
+}
+
+/* Pantallas grandes: Botones un poco más grandes */
+@media (min-width: 1024px) {
+  .admin-table .actions-column {
+    min-width: 120px;
+  }
+  
+  .action-buttons-container {
+    gap: 0.375rem;
+  }
+  
+  .action-btn-text {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  
+  .action-btn-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  /* Columnas más anchas en pantallas grandes */
+  .admin-table .col-user { min-width: 140px; }
+  .admin-table .col-email { min-width: 160px; }
+  .admin-table .col-name { min-width: 130px; }
+  .admin-table .col-role { min-width: 90px; }
+  .admin-table .col-status { min-width: 80px; }
+  .admin-table .col-date { min-width: 110px; }
+}
+
+/* ========================================
+   COLORES DE BOTONES
+   ======================================== */
+
+.action-btn-text.view {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.action-btn-text.view:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: #60a5fa;
+}
+
+.action-btn-text.edit {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.action-btn-text.edit:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.3);
+  border-color: #4ade80;
+}
+
+.action-btn-text.delete {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.action-btn-text.delete:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #f87171;
+}
+
+.action-btn-text.restore {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.action-btn-text.restore:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.3);
+  border-color: #4ade80;
+}
+
+/* ========================================
+   CONTENIDO DE TEXTO RESPONSIVO
+   ======================================== */
+
+.admin-table .text-cell {
+  max-width: none;
+  overflow: visible;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Solo truncar en pantallas muy pequeñas */
+@media (max-width: 640px) {
+  .admin-table .text-cell {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* ========================================
+   ANIMACIONES Y ESTADOS
+   ======================================== */
+
+.action-btn-text {
+  transform: scale(1);
+}
+
+.action-btn-text:active {
+  transform: scale(0.95);
+}
+
+.action-btn-loading .action-btn-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   ESTADOS DE TABLA
+   ======================================== */
+
+.table-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
+.table-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.table-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* ========================================
+   SCROLL PERSONALIZADO (OCULTO)
+   ======================================== */
+
+.admin-table-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-table-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+} 

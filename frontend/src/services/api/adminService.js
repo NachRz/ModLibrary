@@ -167,6 +167,26 @@ const adminService = {
     } catch (error) {
       throw error.response?.data || { message: 'Error al subir la imagen' };
     }
+  },
+
+  // Crear nuevo usuario
+  createUser: async (userData) => {
+    try {
+      const response = await apiClient.post('/admin/users', userData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al crear usuario' };
+    }
+  },
+
+  // Obtener estadísticas de un usuario
+  getUserStats: async (userId) => {
+    try {
+      const response = await apiClient.get(`/admin/users/${userId}/stats`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener estadísticas del usuario' };
+    }
   }
 };
 

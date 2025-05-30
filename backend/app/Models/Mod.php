@@ -7,16 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Mod extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'mods';
 
     protected $fillable = [
         'titulo',
         'imagen',
+        'imagen_banner',
+        'imagenes_adicionales',
         'edad_recomendada',
         'juego_id',
         'version_juego_necesaria',
@@ -27,7 +30,10 @@ class Mod extends Model
         'estado',
         'total_descargas',
         'num_valoraciones',
-        'val_media'
+        'val_media',
+        'es_destacado',
+        'permitir_comentarios',
+        'visible_en_busqueda'
     ];
 
     protected static function boot()

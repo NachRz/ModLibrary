@@ -549,9 +549,21 @@ class AuthController extends Controller
             $mods = $usuario->mods;
             
             foreach ($mods as $mod) {
-                // Eliminar imagen del mod si existe
-                if ($mod->imagen && Storage::exists('public/' . $mod->imagen)) {
-                    Storage::delete('public/' . $mod->imagen);
+                // Eliminar imagen banner del mod si existe
+                if ($mod->imagen_banner && Storage::exists('public/' . $mod->imagen_banner)) {
+                    Storage::delete('public/' . $mod->imagen_banner);
+                }
+
+                // Eliminar imágenes adicionales si existen
+                if ($mod->imagenes_adicionales) {
+                    $imagenesAdicionales = json_decode($mod->imagenes_adicionales, true);
+                    if (is_array($imagenesAdicionales)) {
+                        foreach ($imagenesAdicionales as $imagenPath) {
+                            if (Storage::exists('public/' . $imagenPath)) {
+                                Storage::delete('public/' . $imagenPath);
+                            }
+                        }
+                    }
                 }
 
                 // Eliminar relaciones

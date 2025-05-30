@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEye, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEye, faEdit, faTrash, faUndo, faTrashAlt, faPlus } from '@fortawesome/free-solid-svg-icons';
 import modService from '../../../services/api/modService';
 import ModDeleteConfirmationModal from './modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import EditModAdmin from './modalsAdmin/ModAdminModal/EditModAdmin';
 import { useNotification } from '../../../context/NotificationContext';
 import Pagination from '../../common/Pagination';
+import '../../../assets/styles/components/dashboard/adminPanel/adminTables.css';
 
 const ModsAdmin = () => {
   const { showNotification } = useNotification();
+  const navigate = useNavigate();
   const [mods, setMods] = useState([]);
+  const [deletedMods, setDeletedMods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('todos');
+  const [activeTab, setActiveTab] = useState('active'); // Nueva pestaña activa
   
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,41 +32,119 @@ const ModsAdmin = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [modToEdit, setModToEdit] = useState(null);
 
-  // Cargar mods desde la API
-  useEffect(() => {
-    const fetchMods = async () => {
-      try {
-        setLoading(true);
-        const response = await modService.getModsWithDetails();
-        
-        if (response.status === 'success') {
-          // Formatear los datos para el panel de admin
-          const formattedMods = response.data.map(mod => ({
-            id: mod.id,
-            nombre: mod.titulo,
-            creador: mod.creador?.nome || 'Usuario eliminado',
-            juego: mod.juego?.titulo || 'Juego no especificado',
-            estado: mod.estado || 'borrador',
-            descargas: mod.estadisticas?.total_descargas || mod.total_descargas || 0,
-            valoracion: mod.estadisticas?.valoracion_media || mod.val_media || 0,
-            fecha_creacion: mod.created_at ? new Date(mod.created_at).toLocaleDateString() : 'N/A',
-            titulo: mod.titulo // Guardar el título original para el modal
-          }));
-          setMods(formattedMods);
-        } else {
-          throw new Error(response.message || 'Error al cargar los mods');
-        }
-      } catch (err) {
-        console.error('Error al cargar los mods:', err);
-        showNotification('Error al cargar los mods', 'error');
-        setMods([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Estados para eliminación permanente
+  const [showPermanentDeleteModal, setShowPermanentDeleteModal] = useState(false);
 
-    fetchMods();
-  }, [showNotification]);
+  // Cargar datos iniciales
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  // Función para cargar todos los datos iniciales
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      
+      // Cargar ambos tipos de datos en paralelo
+      const [modsResponse, deletedModsResponse] = await Promise.all([
+        modService.getModsWithDetails(),
+        modService.getDeletedMods()
+      ]);
+      
+      // Procesar mods activos
+      if (modsResponse.status === 'success') {
+        const formattedMods = modsResponse.data.map(mod => ({
+          id: mod.id,
+          nombre: mod.titulo,
+          creador: mod.creador?.nome || 'Usuario eliminado',
+          juego: mod.juego?.titulo || 'Juego no especificado',
+          estado: mod.estado || 'borrador',
+          descargas: mod.estadisticas?.total_descargas || mod.total_descargas || 0,
+          valoracion: mod.estadisticas?.valoracion_media || mod.val_media || 0,
+          fecha_creacion: mod.created_at ? new Date(mod.created_at).toLocaleDateString() : 'N/A',
+          titulo: mod.titulo
+        }));
+        setMods(formattedMods);
+      } else {
+        throw new Error(modsResponse.message || 'Error al cargar los mods');
+      }
+      
+      // Procesar mods eliminados
+      if (deletedModsResponse.status === 'success') {
+        setDeletedMods(deletedModsResponse.data || []);
+      } else {
+        throw new Error(deletedModsResponse.message || 'Error al cargar mods eliminados');
+      }
+    } catch (err) {
+      console.error('Error al cargar datos:', err);
+      showNotification('Error al cargar datos', 'error');
+      setMods([]);
+      setDeletedMods([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMods = async () => {
+    try {
+      setLoading(true);
+      const response = await modService.getModsWithDetails();
+      
+      if (response.status === 'success') {
+        // Formatear los datos para el panel de admin
+        const formattedMods = response.data.map(mod => ({
+          id: mod.id,
+          nombre: mod.titulo,
+          creador: mod.creador?.nome || 'Usuario eliminado',
+          juego: mod.juego?.titulo || 'Juego no especificado',
+          estado: mod.estado || 'borrador',
+          descargas: mod.estadisticas?.total_descargas || mod.total_descargas || 0,
+          valoracion: mod.estadisticas?.valoracion_media || mod.val_media || 0,
+          fecha_creacion: mod.created_at ? new Date(mod.created_at).toLocaleDateString() : 'N/A',
+          titulo: mod.titulo // Guardar el título original para el modal
+        }));
+        setMods(formattedMods);
+      } else {
+        throw new Error(response.message || 'Error al cargar los mods');
+      }
+    } catch (err) {
+      console.error('Error al cargar los mods:', err);
+      showNotification('Error al cargar los mods', 'error');
+      setMods([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar mods eliminados
+  const loadDeletedMods = async () => {
+    try {
+      setLoading(true);
+      const response = await modService.getDeletedMods();
+      
+      if (response.status === 'success') {
+        setDeletedMods(response.data || []);
+      } else {
+        throw new Error(response.message || 'Error al cargar mods eliminados');
+      }
+    } catch (err) {
+      console.error('Error al cargar mods eliminados:', err);
+      showNotification('Error al cargar mods eliminados', 'error');
+      setDeletedMods([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cambiar pestaña y cargar datos correspondientes
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === 'active') {
+      loadMods();
+    } else {
+      loadDeletedMods();
+    }
+  };
 
   const filteredMods = mods.filter(mod => {
     const matchesSearch = mod.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,16 +156,29 @@ const ModsAdmin = () => {
     return matchesSearch && matchesFilter;
   });
 
-  // Lógica de paginación
-  const totalPages = Math.ceil(filteredMods.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedMods = filteredMods.slice(startIndex, endIndex);
+  // Filtrado para mods eliminados
+  const filteredDeletedMods = deletedMods.filter(mod =>
+    mod.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (mod.creador?.nome && mod.creador.nome.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (mod.juego?.titulo && mod.juego.titulo.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
-  // Resetear página cuando cambian los filtros
+  // Lógica de paginación para mods activos
+  const totalPagesActive = Math.ceil(filteredMods.length / itemsPerPage);
+  const startIndexActive = (currentPage - 1) * itemsPerPage;
+  const endIndexActive = startIndexActive + itemsPerPage;
+  const paginatedMods = filteredMods.slice(startIndexActive, endIndexActive);
+
+  // Lógica de paginación para mods eliminados
+  const totalPagesDeleted = Math.ceil(filteredDeletedMods.length / itemsPerPage);
+  const startIndexDeleted = (currentPage - 1) * itemsPerPage;
+  const endIndexDeleted = startIndexDeleted + itemsPerPage;
+  const paginatedDeletedMods = filteredDeletedMods.slice(startIndexDeleted, endIndexDeleted);
+
+  // Resetear página cuando cambian los filtros o pestañas
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterStatus]);
+  }, [searchTerm, filterStatus, activeTab]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -110,24 +206,29 @@ const ModsAdmin = () => {
     }
   };
 
-  // Manejar eliminación de mod
+  // Manejar eliminación de mod (soft delete)
   const handleDeleteMod = (mod) => {
     setModToDelete(mod);
     setShowDeleteModal(true);
   };
 
-  // Confirmar eliminación
+  // Confirmar eliminación (soft delete)
   const confirmDelete = async () => {
     if (!modToDelete) return;
     
     try {
       setDeleting(true);
-      const response = await modService.deleteMod(modToDelete.id);
+      const response = await modService.softDeleteMod(modToDelete.id);
       
       if (response.status === 'success') {
         // Eliminar el mod de la lista local
         setMods(prevMods => prevMods.filter(mod => mod.id !== modToDelete.id));
-        showNotification(`Mod "${modToDelete.titulo}" eliminado exitosamente`, 'success');
+        // Añadir el mod a la lista de eliminados para actualizar el contador
+        setDeletedMods(prevDeleted => [...prevDeleted, { 
+          ...modToDelete, 
+          fecha_eliminacion: new Date().toLocaleString() 
+        }]);
+        showNotification(`Mod "${modToDelete.titulo}" desactivado correctamente (puede ser restaurado)`, 'success');
       } else {
         throw new Error(response.message || 'Error al eliminar el mod');
       }
@@ -140,9 +241,72 @@ const ModsAdmin = () => {
     }
   };
 
+  // Restaurar mod eliminado
+  const handleRestoreMod = async (modId) => {
+    try {
+      const response = await modService.restoreMod(modId);
+      
+      if (response.status === 'success') {
+        // Encontrar el mod restaurado y añadirlo a la lista de activos
+        const restoredMod = deletedMods.find(mod => mod.id === modId);
+        if (restoredMod) {
+          // Formatear el mod restaurado para la lista de activos
+          const formattedMod = {
+            id: restoredMod.id,
+            nombre: restoredMod.titulo,
+            creador: restoredMod.creador?.nome || 'Usuario eliminado',
+            juego: restoredMod.juego?.titulo || 'Juego no especificado',
+            estado: restoredMod.estado || 'borrador',
+            descargas: restoredMod.total_descargas || 0,
+            valoracion: restoredMod.val_media || 0,
+            fecha_creacion: restoredMod.fecha_creacion || 'N/A',
+            titulo: restoredMod.titulo
+          };
+          setMods(prevMods => [...prevMods, formattedMod]);
+        }
+        
+        setDeletedMods(prev => prev.filter(mod => mod.id !== modId));
+        showNotification('Mod restaurado correctamente', 'success');
+      } else {
+        throw new Error(response.message || 'Error al restaurar el mod');
+      }
+    } catch (err) {
+      showNotification(err.message || 'Error al restaurar mod', 'error');
+    }
+  };
+
+  // Eliminar mod permanentemente
+  const handlePermanentDelete = (mod) => {
+    setModToDelete(mod);
+    setShowPermanentDeleteModal(true);
+  };
+
+  const confirmPermanentDelete = async () => {
+    if (!modToDelete) return;
+    
+    try {
+      setDeleting(true);
+      const response = await modService.forceDeleteMod(modToDelete.id);
+      
+      if (response.status === 'success') {
+        setDeletedMods(prev => prev.filter(mod => mod.id !== modToDelete.id));
+        showNotification(`Mod "${modToDelete.titulo}" eliminado definitivamente`, 'success');
+      } else {
+        throw new Error(response.message || 'Error al eliminar definitivamente');
+      }
+    } catch (err) {
+      showNotification(err.message || 'Error al eliminar definitivamente', 'error');
+    } finally {
+      setDeleting(false);
+      setShowPermanentDeleteModal(false);
+      setModToDelete(null);
+    }
+  };
+
   // Cancelar eliminación
   const cancelDelete = () => {
     setShowDeleteModal(false);
+    setShowPermanentDeleteModal(false);
     setModToDelete(null);
   };
 
@@ -156,7 +320,13 @@ const ModsAdmin = () => {
     // Actualizar el mod en la lista local
     setMods(prevMods => 
       prevMods.map(mod => 
-        mod.id === updatedMod.id ? { ...mod, ...updatedMod } : mod
+        mod.id === updatedMod.id ? {
+          ...mod, // Mantener los campos existentes
+          ...updatedMod, // Sobrescribir con los campos actualizados
+          // Asegurar que los campos críticos para la tabla estén presentes
+          nombre: updatedMod.titulo || updatedMod.nombre || mod.nombre,
+          estado: updatedMod.estado || mod.estado
+        } : mod
       )
     );
   };
@@ -201,15 +371,26 @@ const ModsAdmin = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-gray-700 text-white px-3 lg:px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 text-sm w-full sm:w-auto"
-            >
-              <option value="todos">Todos los estados</option>
-              <option value="publicado">Publicados</option>
-              <option value="borrador">Borradores</option>
-            </select>
+            {activeTab === 'active' && (
+              <>
+                <button
+                  onClick={() => navigate('/mods/crear')}
+                  className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                  <span>Crear Mod</span>
+                </button>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="bg-gray-700 text-white px-3 lg:px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 text-sm w-full sm:w-auto"
+                >
+                  <option value="todos">Todos los estados</option>
+                  <option value="publicado">Publicados</option>
+                  <option value="borrador">Borradores</option>
+                </select>
+              </>
+            )}
             
             <div className="relative w-full sm:w-auto">
               <input
@@ -227,191 +408,271 @@ const ModsAdmin = () => {
           </div>
         </div>
 
-        {/* Estadísticas */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
-          <div className="bg-gray-700 p-3 lg:p-4 rounded-lg">
-            <h3 className="text-gray-300 text-xs lg:text-sm">Total Mods</h3>
-            <p className="text-xl lg:text-2xl font-bold text-white">{mods.length}</p>
-          </div>
-          <div className="bg-gray-700 p-3 lg:p-4 rounded-lg">
-            <h3 className="text-gray-300 text-xs lg:text-sm">Publicados</h3>
-            <p className="text-xl lg:text-2xl font-bold text-green-400">
-              {mods.filter(m => m.estado === 'publicado').length}
-            </p>
-          </div>
-          <div className="bg-gray-700 p-3 lg:p-4 rounded-lg">
-            <h3 className="text-gray-300 text-xs lg:text-sm">Borradores</h3>
-            <p className="text-xl lg:text-2xl font-bold text-yellow-400">
-              {mods.filter(m => m.estado === 'borrador').length}
-            </p>
-          </div>
+        {/* Pestañas */}
+        <div className="border-b border-gray-600">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => handleTabChange('active')}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'active'
+                  ? 'border-purple-500 text-purple-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300'
+              }`}
+            >
+              Mods Activos ({mods.length})
+            </button>
+            <button
+              onClick={() => handleTabChange('deleted')}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'deleted'
+                  ? 'border-purple-500 text-purple-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300'
+              }`}
+            >
+              Mods Eliminados ({deletedMods.length})
+            </button>
+          </nav>
         </div>
 
+        {/* Estadísticas */}
+        {activeTab === 'active' && (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
+            <div className="bg-gray-700 p-3 lg:p-4 rounded-lg">
+              <h3 className="text-gray-300 text-xs lg:text-sm">Total Mods</h3>
+              <p className="text-xl lg:text-2xl font-bold text-white">{mods.length}</p>
+            </div>
+            <div className="bg-gray-700 p-3 lg:p-4 rounded-lg">
+              <h3 className="text-gray-300 text-xs lg:text-sm">Publicados</h3>
+              <p className="text-xl lg:text-2xl font-bold text-green-400">
+                {mods.filter(m => m.estado === 'publicado').length}
+              </p>
+            </div>
+            <div className="bg-gray-700 p-3 lg:p-4 rounded-lg">
+              <h3 className="text-gray-300 text-xs lg:text-sm">Borradores</h3>
+              <p className="text-xl lg:text-2xl font-bold text-yellow-400">
+                {mods.filter(m => m.estado === 'borrador').length}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Tabla de mods */}
-        <div className="bg-gray-700 rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left min-w-[800px]">
-              <thead className="bg-gray-600">
+        <div className="admin-table-container">
+          <div className="admin-table-scroll">
+            <table className="admin-table">
+              <thead>
                 <tr>
-                  <th className="px-3 lg:px-6 py-3 text-gray-300 font-medium text-sm">Mod</th>
-                  <th className="px-3 lg:px-6 py-3 text-gray-300 font-medium text-sm hidden sm:table-cell">Creador</th>
-                  <th className="px-3 lg:px-6 py-3 text-gray-300 font-medium text-sm hidden md:table-cell">Juego</th>
-                  <th className="px-3 lg:px-6 py-3 text-gray-300 font-medium text-sm">Estado</th>
-                  <th className="px-3 lg:px-6 py-3 text-gray-300 font-medium text-sm hidden lg:table-cell">Descargas</th>
-                  <th className="px-3 lg:px-6 py-3 text-gray-300 font-medium text-sm hidden lg:table-cell">Valoración</th>
-                  <th className="px-3 lg:px-6 py-3 text-gray-300 font-medium text-sm w-32 lg:w-40">Acciones</th>
+                  <th className="col-user">Mod</th>
+                  <th className="col-email hidden sm:table-cell">Creador</th>
+                  <th className="col-name hidden md:table-cell">Juego</th>
+                  {activeTab === 'active' && (
+                    <th className="col-status">Estado</th>
+                  )}
+                  {activeTab === 'deleted' && (
+                    <th className="col-date hidden lg:table-cell">Fecha Eliminación</th>
+                  )}
+                  <th className="col-downloads hidden lg:table-cell">Descargas</th>
+                  <th className="col-rating hidden lg:table-cell">Valoración</th>
+                  <th className="actions-column">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-600">
-                {paginatedMods.map((mod) => (
-                  <tr key={mod.id} className="hover:bg-gray-600">
-                    <td className="px-3 lg:px-6 py-4">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-2 lg:mr-3 flex-shrink-0">
-                          <span className="text-white font-bold text-xs lg:text-sm">MOD</span>
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-white font-medium text-sm lg:text-base truncate">{mod.nombre}</div>
-                          <div className="text-gray-400 text-xs lg:text-sm">{mod.fecha_creacion}</div>
-                          {/* Mostrar info adicional en móvil */}
-                          <div className="sm:hidden text-gray-400 text-xs mt-1">
-                            <span>{mod.creador}</span>
-                            <span className="mx-2">•</span>
-                            <span>{mod.juego}</span>
+                {activeTab === 'active' ? (
+                  paginatedMods.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="px-6 py-8 text-center text-gray-400">
+                        No se encontraron mods activos.
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedMods.map((mod) => (
+                      <tr key={mod.id}>
+                        <td className="col-user">
+                          <div className="flex items-center">
+                            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-2 lg:mr-3 flex-shrink-0">
+                              <span className="text-white font-bold text-xs lg:text-sm">MOD</span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-white font-medium text-sm lg:text-base truncate">{mod.nombre}</div>
+                              <div className="text-gray-400 text-xs lg:text-sm">{mod.fecha_creacion}</div>
+                              <div className="sm:hidden text-gray-400 text-xs mt-1">
+                                <span>{mod.creador}</span>
+                                <span className="mx-2">•</span>
+                                <span>{mod.juego}</span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-3 lg:px-6 py-4 text-gray-300 text-sm hidden sm:table-cell">
-                      <div className="truncate max-w-[120px]">{mod.creador}</div>
-                    </td>
-                    <td className="px-3 lg:px-6 py-4 text-gray-300 text-sm hidden md:table-cell">
-                      <div className="truncate max-w-[100px]">{mod.juego}</div>
-                    </td>
-                    <td className="px-3 lg:px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${getStatusBadge(mod.estado)}`}></span>
-                        <select
-                          value={mod.estado}
-                          onChange={(e) => handleStatusChange(mod.id, e.target.value)}
-                          className="bg-gray-600 text-white px-2 py-1 rounded text-xs lg:text-sm border border-gray-500 focus:border-purple-500 min-w-0 flex-1 max-w-[100px]"
-                        >
-                          <option value="borrador">Borrador</option>
-                          <option value="publicado">Publicado</option>
-                        </select>
-                      </div>
-                      {/* Mostrar estadísticas en móvil */}
-                      <div className="lg:hidden mt-2 flex items-center gap-3 text-xs text-gray-400">
-                        <span>{mod.descargas.toLocaleString()} desc.</span>
-                        <span className="flex items-center">
-                          <span className="text-yellow-400 mr-1">⭐</span>
-                          {mod.valoracion && mod.valoracion > 0 ? Number(mod.valoracion).toFixed(1) : 'N/A'}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-3 lg:px-6 py-4 text-gray-300 text-sm hidden lg:table-cell">
-                      {mod.descargas.toLocaleString()}
-                    </td>
-                    <td className="px-3 lg:px-6 py-4 hidden lg:table-cell">
-                      <div className="flex items-center">
-                        <span className="text-yellow-400">⭐</span>
-                        <span className="text-gray-300 ml-1 text-sm">
-                          {mod.valoracion && mod.valoracion > 0 ? Number(mod.valoracion).toFixed(1) : 'N/A'}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-3 lg:px-6 py-4 w-32 lg:w-40">
-                      <div className="flex items-center justify-start gap-1 lg:gap-2">
-                        <button 
-                          onClick={() => window.open(`/mods/${mod.id}`, '_blank')}
-                          className="flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-colors duration-200 flex-shrink-0"
-                          title="Ver mod"
-                        >
-                          <FontAwesomeIcon icon={faEye} className="w-3 h-3" />
-                        </button>
-                        
-                        {/* Botón editar responsive */}
-                        <button 
-                          onClick={() => handleEditMod(mod)}
-                          className="flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-full transition-colors duration-200 flex-shrink-0 xl:hidden"
-                          title="Editar mod"
-                        >
-                          <FontAwesomeIcon icon={faEdit} className="w-3 h-3" />
-                        </button>
-                        
-                        {/* Botón editar expandido para pantallas muy grandes */}
-                        <button 
-                          onClick={() => handleEditMod(mod)}
-                          className="hidden xl:flex items-center space-x-1 px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 border border-green-500 border-opacity-50 rounded-md hover:bg-green-500 hover:bg-opacity-30 hover:border-green-400 transition-all duration-200 text-xs font-medium flex-shrink-0"
-                        >
-                          <FontAwesomeIcon icon={faEdit} className="w-3 h-3" />
-                          <span>Editar</span>
-                        </button>
-                        
-                        <button 
-                          onClick={() => handleDeleteMod(mod)}
-                          className="flex items-center justify-center w-7 h-7 lg:w-8 lg:h-8 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full transition-colors duration-200 flex-shrink-0"
-                          title="Eliminar mod"
-                          disabled={deleting && modToDelete?.id === mod.id}
-                        >
-                          <FontAwesomeIcon 
-                            icon={faTrash} 
-                            className={`w-3 h-3 ${deleting && modToDelete?.id === mod.id ? 'animate-spin' : ''}`} 
-                          />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                        </td>
+                        <td className="col-email text-cell hidden sm:table-cell">{mod.creador}</td>
+                        <td className="col-name text-cell hidden md:table-cell">{mod.juego}</td>
+                        <td className="col-status">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${getStatusBadge(mod.estado)}`}></span>
+                            <select
+                              value={mod.estado}
+                              onChange={(e) => handleStatusChange(mod.id, e.target.value)}
+                              className="bg-gray-600 text-white px-2 py-1 rounded text-xs border border-gray-500 focus:border-purple-500 w-full max-w-[100px]"
+                            >
+                              <option value="borrador">Borrador</option>
+                              <option value="publicado">Publicado</option>
+                            </select>
+                          </div>
+                          <div className="lg:hidden mt-2 flex items-center gap-3 text-xs text-gray-400">
+                            <span>{mod.descargas.toLocaleString()} desc.</span>
+                            <span className="flex items-center">
+                              <span className="text-yellow-400 mr-1">⭐</span>
+                              {mod.valoracion && mod.valoracion > 0 ? Number(mod.valoracion).toFixed(1) : 'N/A'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="col-downloads text-cell hidden lg:table-cell">
+                          {mod.descargas.toLocaleString()}
+                        </td>
+                        <td className="col-rating hidden lg:table-cell">
+                          <div className="flex items-center">
+                            <span className="text-yellow-400">⭐</span>
+                            <span className="text-gray-300 ml-1 text-sm">
+                              {mod.valoracion && mod.valoracion > 0 ? Number(mod.valoracion).toFixed(1) : 'N/A'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="actions-column">
+                          <div className="action-buttons-container">
+                            <button 
+                              onClick={() => navigate(`/mods/${mod.id}`)}
+                              className="action-btn-text view"
+                              title="Ver mod"
+                            >
+                              <FontAwesomeIcon icon={faEye} className="action-btn-icon" />
+                              <span className="btn-text-full">Ver</span>
+                              <span className="btn-text-short">V</span>
+                            </button>
+                            
+                            <button 
+                              onClick={() => handleEditMod(mod)}
+                              className="action-btn-text edit"
+                              title="Editar mod"
+                            >
+                              <FontAwesomeIcon icon={faEdit} className="action-btn-icon" />
+                              <span className="btn-text-full">Editar</span>
+                              <span className="btn-text-short">E</span>
+                            </button>
+                            
+                            <button 
+                              onClick={() => handleDeleteMod(mod)}
+                              className="action-btn-text delete"
+                              title="Eliminar mod"
+                              disabled={deleting && modToDelete?.id === mod.id}
+                            >
+                              <FontAwesomeIcon 
+                                icon={faTrash} 
+                                className={`action-btn-icon ${deleting && modToDelete?.id === mod.id ? 'animate-spin' : ''}`} 
+                              />
+                              <span className="btn-text-full">Eliminar</span>
+                              <span className="btn-text-short">X</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )
+                ) : (
+                  paginatedDeletedMods.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="px-6 py-8 text-center text-gray-400">
+                        No hay mods eliminados.
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedDeletedMods.map((mod) => (
+                      <tr key={mod.id}>
+                        <td className="col-user">
+                          <div className="flex items-center">
+                            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-r from-gray-500 to-gray-600 rounded-lg flex items-center justify-center mr-2 lg:mr-3 flex-shrink-0">
+                              <span className="text-white font-bold text-xs lg:text-sm">MOD</span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="text-gray-300 font-medium text-sm lg:text-base truncate">{mod.titulo}</div>
+                              <div className="text-gray-500 text-xs lg:text-sm">{mod.fecha_creacion}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="col-email text-cell hidden sm:table-cell">{mod.creador?.nome || 'Usuario eliminado'}</td>
+                        <td className="col-name text-cell hidden md:table-cell">{mod.juego?.titulo || 'N/A'}</td>
+                        <td className="col-date text-cell hidden lg:table-cell">{mod.fecha_eliminacion}</td>
+                        <td className="col-downloads text-cell hidden lg:table-cell">
+                          {mod.total_descargas?.toLocaleString() || 0}
+                        </td>
+                        <td className="col-rating hidden lg:table-cell">
+                          <div className="flex items-center">
+                            <span className="text-yellow-600">⭐</span>
+                            <span className="text-gray-400 ml-1 text-sm">
+                              {mod.val_media && mod.val_media > 0 ? Number(mod.val_media).toFixed(1) : 'N/A'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="actions-column">
+                          <div className="action-buttons-container">
+                            <button 
+                              onClick={() => handleRestoreMod(mod.id)}
+                              className="action-btn-text restore"
+                              title="Restaurar mod"
+                            >
+                              <FontAwesomeIcon icon={faUndo} className="action-btn-icon" />
+                              <span className="btn-text-full">Restaurar</span>
+                              <span className="btn-text-short">R</span>
+                            </button>
+                            <button 
+                              onClick={() => handlePermanentDelete(mod)}
+                              className="action-btn-text delete"
+                              title="Eliminar definitivamente"
+                            >
+                              <FontAwesomeIcon icon={faTrashAlt} className="action-btn-icon" />
+                              <span className="btn-text-full">Eliminar</span>
+                              <span className="btn-text-short">X</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {paginatedMods.length === 0 && !loading && (
-          <div className="text-center py-8 px-4">
-            <div className="max-w-md mx-auto">
-              <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <h3 className="text-lg font-medium text-white mb-2">No se encontraron mods</h3>
-              <p className="text-gray-400 text-sm">
-                No hay mods que coincidan con los criterios de búsqueda especificados.
-              </p>
-              {(searchTerm || filterStatus !== 'todos') && (
-                <button 
-                  onClick={() => {
-                    setSearchTerm('');
-                    setFilterStatus('todos');
-                  }}
-                  className="mt-4 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors text-sm"
-                >
-                  Limpiar filtros
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Paginación */}
-        {filteredMods.length > 0 && (
+        {((activeTab === 'active' && filteredMods.length > 0) || (activeTab === 'deleted' && filteredDeletedMods.length > 0)) && (
           <Pagination
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={activeTab === 'active' ? totalPagesActive : totalPagesDeleted}
             onPageChange={handlePageChange}
             itemsPerPage={itemsPerPage}
-            totalItems={filteredMods.length}
+            totalItems={activeTab === 'active' ? filteredMods.length : filteredDeletedMods.length}
             onItemsPerPageChange={handleItemsPerPageChange}
           />
         )}
       </div>
 
-      {/* Modal de confirmación para eliminar */}
+      {/* Modal de confirmación para eliminar (soft delete) */}
       <ModDeleteConfirmationModal
-        modTitle={modToDelete?.nombre || ''}
+        modTitle={modToDelete?.nombre || modToDelete?.titulo || ''}
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
         isOpen={showDeleteModal}
+        message="¿Estás seguro de que quieres desactivar este mod? Podrá ser restaurado posteriormente."
+      />
+
+      {/* Modal de confirmación para eliminación permanente */}
+      <ModDeleteConfirmationModal
+        modTitle={modToDelete?.titulo || ''}
+        onConfirm={confirmPermanentDelete}
+        onCancel={cancelDelete}
+        isOpen={showPermanentDeleteModal}
+        message="⚠️ ¿Estás seguro de que quieres eliminar DEFINITIVAMENTE este mod? Esta acción NO se puede deshacer y se eliminarán todos los archivos asociados."
+        confirmText="Eliminar Definitivamente"
+        isDangerous={true}
       />
 
       {/* Modal de edición de mod */}

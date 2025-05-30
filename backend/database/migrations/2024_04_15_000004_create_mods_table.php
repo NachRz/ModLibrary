@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::create('mods', function (Blueprint $table) {
             $table->id();
             $table->string('titulo');
-            $table->string('imagen');
+            $table->string('imagen_banner');
+            $table->json('imagenes_adicionales')->nullable();
             $table->integer('edad_recomendada');
             $table->foreignId('juego_id')->constrained('juegos')->onDelete('cascade');
             $table->string('version_juego_necesaria');
@@ -23,7 +24,14 @@ return new class extends Migration
             $table->integer('num_valoraciones')->default(0);
             $table->decimal('val_media', 3, 1)->default(0.0);
             $table->string('estado')->default('publicado');
+            
+            // Campos booleanos para configuraciones del mod
+            $table->boolean('es_destacado')->default(false);
+            $table->boolean('permitir_comentarios')->default(true);
+            $table->boolean('visible_en_busqueda')->default(true);
+            
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

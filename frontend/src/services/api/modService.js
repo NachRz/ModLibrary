@@ -70,6 +70,16 @@ const modService = {
     }
   },
   
+  // Obtener mods eliminados del usuario autenticado
+  getMyDeletedMods: async () => {
+    try {
+      const response = await apiClient.get('/mods/mis-mods/eliminados');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener tus mods eliminados' };
+    }
+  },
+  
   // Obtener un mod específico por ID
   getModById: async (modId) => {
     try {
@@ -118,11 +128,21 @@ const modService = {
   // Actualizar un mod existente
   updateMod: async (modId, formData) => {
     try {
-      const response = await apiClient.put(`/mods/${modId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data' // Necesario para enviar archivos
-        }
-      });
+      let config = {};
+      
+      // Si formData es una instancia de FormData, configurar headers para multipart
+      if (formData instanceof FormData) {
+        config.headers = {
+          'Content-Type': 'multipart/form-data'
+        };
+      } else {
+        // Si son datos JSON, dejar que axios configure automáticamente el Content-Type
+        config.headers = {
+          'Content-Type': 'application/json'
+        };
+      }
+      
+      const response = await apiClient.put(`/mods/${modId}`, formData, config);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error al actualizar el mod' };
@@ -252,6 +272,60 @@ const modService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error al obtener los juegos' };
+    }
+  },
+
+  // =============== MÉTODOS DE SOFT DELETE (SOLO ADMINS) ===============
+  
+  // Eliminar mod con soft delete
+  softDeleteMod: async (modId) => {
+    try {
+      const response = await apiClient.delete(`/admin/mods/${modId}/soft`);
+      return response.data;
+    } catch (error) {
+      const backendError = error.response?.data;
+      if (backendError && backendError.message) {
+        throw new Error(backendError.message);
+      }
+      throw new Error('Error al desactivar mod');
+    }
+  },
+
+  // Obtener mods eliminados (soft deleted)
+  getDeletedMods: async () => {
+    try {
+      const response = await apiClient.get('/admin/mods/deleted');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener mods eliminados' };
+    }
+  },
+
+  // Restaurar mod eliminado
+  restoreMod: async (modId) => {
+    try {
+      const response = await apiClient.post(`/admin/mods/${modId}/restore`);
+      return response.data;
+    } catch (error) {
+      const backendError = error.response?.data;
+      if (backendError && backendError.message) {
+        throw new Error(backendError.message);
+      }
+      throw new Error('Error al restaurar mod');
+    }
+  },
+
+  // Eliminar mod definitivamente (force delete)
+  forceDeleteMod: async (modId) => {
+    try {
+      const response = await apiClient.delete(`/admin/mods/${modId}/force`);
+      return response.data;
+    } catch (error) {
+      const backendError = error.response?.data;
+      if (backendError && backendError.message) {
+        throw new Error(backendError.message);
+      }
+      throw new Error('Error al eliminar mod definitivamente');
     }
   },
 };

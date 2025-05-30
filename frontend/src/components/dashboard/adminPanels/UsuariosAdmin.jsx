@@ -3,9 +3,12 @@ import adminService from '../../../services/api/adminService';
 import UserEditModalAdmin from './modalsAdmin/UsersAdminModal/UserEditModalAdmin';
 import { UserHasModsModal, FinalConfirmationModal, PermanentDeleteModal } from './modalsAdmin/UsersAdminModal/UserDeleteConfirmationModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faTrash, faUndo, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faTrash, faUndo, faTrashAlt, faPlus, faEye } from '@fortawesome/free-solid-svg-icons';
 import { NotificationsAdminUserDeleteProvider, useAdminUserDeleteNotifications } from '../../../context/notifications/notificationsAdmin/NotificationsAdminUserDelete';
 import Pagination from '../../common/Pagination';
+import CreateUserAdminModal from './modalsAdmin/UsersAdminModal/CreateUserAdminModal';
+import UserProfileViewModal from './modalsAdmin/UsersAdminModal/UserProfileViewModal';
+import '../../../assets/styles/components/dashboard/adminPanel/adminTables.css';
 
 const UsuariosAdminContent = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -16,6 +19,11 @@ const UsuariosAdminContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('active'); // Nueva pestaña activa
   const [deletedUsers, setDeletedUsers] = useState([]); // Usuarios eliminados
+  
+  // Estados para los nuevos modales
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [viewingUser, setViewingUser] = useState(null);
   
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,8 +39,30 @@ const UsuariosAdminContent = () => {
 
   // Cargar usuarios desde la API
   useEffect(() => {
-    loadUsers();
+    loadInitialData();
   }, []);
+
+  // Función para cargar todos los datos iniciales
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Cargar ambos tipos de datos en paralelo
+      const [usersResponse, deletedUsersResponse] = await Promise.all([
+        adminService.getAllUsers(),
+        adminService.getDeletedUsers()
+      ]);
+      
+      setUsuarios(usersResponse.data || []);
+      setDeletedUsers(deletedUsersResponse.data || []);
+    } catch (error) {
+      setError(error.message || 'Error al cargar datos');
+      console.error('Error al cargar datos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadUsers = async () => {
     try {
@@ -258,6 +288,28 @@ const UsuariosAdminContent = () => {
     setUserToDelete(null);
   };
 
+  // Funciones para los nuevos modales
+  const handleCreateUser = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const handleUserCreated = (newUser) => {
+    setUsuarios(prev => [newUser, ...prev]);
+    showNotification(`Usuario "${newUser.nome}" creado correctamente`, 'success');
+  };
+
+  const handleViewProfile = (user) => {
+    setViewingUser(user);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleEditFromProfile = (user) => {
+    setIsProfileModalOpen(false);
+    setViewingUser(null);
+    setEditingUser(user);
+    setIsModalOpen(true);
+  };
+
   // Componente para mostrar avatar del usuario
   const UserAvatar = ({ user }) => {
     const [imageError, setImageError] = useState(false);
@@ -301,7 +353,7 @@ const UsuariosAdminContent = () => {
         <p className="font-medium">Error al cargar usuarios</p>
         <p className="text-sm">{error}</p>
         <button 
-          onClick={loadUsers}
+          onClick={loadInitialData}
           className="mt-2 text-sm text-red-300 hover:text-red-200 underline"
         >
           Reintentar
@@ -318,43 +370,56 @@ const UsuariosAdminContent = () => {
           <h2 className="text-xl font-semibold text-white">Gestión de Usuarios</h2>
           <p className="text-gray-400">Administra los usuarios del sistema</p>
         </div>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Buscar usuarios..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-64"
-          />
-          <FontAwesomeIcon 
-            icon={faSearch} 
-            className="absolute right-3 top-3 text-gray-400 pointer-events-none"
-          />
+        <div className="flex items-center space-x-4">
+          {activeTab === 'active' && (
+            <button
+              onClick={handleCreateUser}
+              className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+            >
+              <FontAwesomeIcon icon={faPlus} />
+              <span>Crear Usuario</span>
+            </button>
+          )}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Buscar usuarios..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-64"
+            />
+            <FontAwesomeIcon 
+              icon={faSearch} 
+              className="absolute right-3 top-3 text-gray-400 pointer-events-none"
+            />
+          </div>
         </div>
       </div>
 
       {/* Pestañas */}
-      <div className="flex space-x-1 bg-gray-700 rounded-lg p-1">
+      <div className="border-b border-gray-600">
+        <nav className="-mb-px flex space-x-8">
         <button
           onClick={() => handleTabChange('active')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
             activeTab === 'active'
-              ? 'bg-purple-500 text-white'
-              : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                ? 'border-purple-500 text-purple-400'
+                : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300'
           }`}
         >
-          Usuarios Activos
+            Usuarios Activos ({usuarios.length})
         </button>
         <button
           onClick={() => handleTabChange('deleted')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
             activeTab === 'deleted'
-              ? 'bg-purple-500 text-white'
-              : 'text-gray-300 hover:text-white hover:bg-gray-600'
+                ? 'border-purple-500 text-purple-400'
+                : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300'
           }`}
         >
-          Usuarios Eliminados
+            Usuarios Eliminados ({deletedUsers.length})
         </button>
+        </nav>
       </div>
 
       {/* Estadísticas rápidas */}
@@ -402,52 +467,52 @@ const UsuariosAdminContent = () => {
       </div>
 
       {/* Tabla de usuarios */}
-      <div className="bg-gray-700 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-gray-600">
+      <div className="admin-table-container">
+        <div className="admin-table-scroll">
+          <table className="admin-table">
+            <thead>
               <tr>
-                <th className="px-6 py-3 text-gray-300 font-medium">Usuario</th>
-                <th className="px-6 py-3 text-gray-300 font-medium">Correo</th>
-                <th className="px-6 py-3 text-gray-300 font-medium">Nombre Completo</th>
+                <th className="col-user">Usuario</th>
+                <th className="col-email hidden sm:table-cell">Correo</th>
+                <th className="col-name hidden md:table-cell">Nombre Completo</th>
                 {activeTab === 'active' ? (
                   <>
-                    <th className="px-6 py-3 text-gray-300 font-medium">Rol</th>
-                    <th className="px-6 py-3 text-gray-300 font-medium">Mods</th>
-                    <th className="px-6 py-3 text-gray-300 font-medium">Registro</th>
+                    <th className="col-role">Rol</th>
+                    <th className="col-status hidden lg:table-cell">Mods</th>
+                    <th className="col-date hidden lg:table-cell">Registro</th>
                   </>
                 ) : (
                   <>
-                    <th className="px-6 py-3 text-gray-300 font-medium">Rol</th>
-                    <th className="px-6 py-3 text-gray-300 font-medium">Mods</th>
-                    <th className="px-6 py-3 text-gray-300 font-medium">Eliminado</th>
+                    <th className="col-role hidden lg:table-cell">Rol</th>
+                    <th className="col-status hidden lg:table-cell">Mods</th>
+                    <th className="col-date hidden lg:table-cell">Eliminado</th>
                   </>
                 )}
-                <th className="px-6 py-3 text-gray-300 font-medium">Acciones</th>
+                <th className="actions-column">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-600">
+            <tbody>
               {activeTab === 'active' ? (
                 paginatedUsuarios.map((usuario) => (
-                  <tr key={usuario.id} className="hover:bg-gray-600">
-                    <td className="px-6 py-4">
+                  <tr key={usuario.id}>
+                    <td className="col-user">
                       <UserAvatar user={usuario} />
                     </td>
-                    <td className="px-6 py-4 text-gray-300">{usuario.correo}</td>
-                    <td className="px-6 py-4 text-gray-300">
+                    <td className="col-email text-cell hidden sm:table-cell">{usuario.correo}</td>
+                    <td className="col-name text-cell hidden md:table-cell">
                       {usuario.nombre_completo || 'No especificado'}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="col-role">
                       <select
                         value={usuario.rol}
                         onChange={(e) => handleRoleChange(usuario.id, e.target.value)}
-                        className="bg-gray-600 text-white px-3 py-1 rounded border border-gray-500 focus:border-purple-500"
+                        className="bg-gray-600 text-white px-2 py-1 rounded border border-gray-500 focus:border-purple-500 text-xs w-full max-w-[80px]"
                       >
                         <option value="usuario">Usuario</option>
                         <option value="admin">Admin</option>
                       </select>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="col-status hidden lg:table-cell">
                       <span className={`px-2 py-1 rounded text-xs ${
                         usuario.tiene_mods 
                           ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' 
@@ -456,22 +521,35 @@ const UsuariosAdminContent = () => {
                         {usuario.tiene_mods ? 'Sí' : 'No'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-300">{usuario.fecha_registro}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex space-x-2">
+                    <td className="col-date text-cell hidden lg:table-cell">{usuario.fecha_registro}</td>
+                    <td className="actions-column">
+                      <div className="action-buttons-container">
+                        <button 
+                          onClick={() => handleViewProfile(usuario)}
+                          className="action-btn-text view"
+                          title="Ver perfil"
+                        >
+                          <FontAwesomeIcon icon={faEye} className="action-btn-icon" />
+                          <span className="btn-text-full">Ver</span>
+                          <span className="btn-text-short">V</span>
+                        </button>
                         <button 
                           onClick={() => handleEditUser(usuario)}
-                          className="flex items-center space-x-1 px-3 py-1.5 bg-green-500 bg-opacity-20 text-green-400 border border-green-500 border-opacity-50 rounded-lg hover:bg-green-500 hover:bg-opacity-30 hover:border-green-400 transition-all duration-200 text-sm font-medium"
+                          className="action-btn-text edit"
+                          title="Editar usuario"
                         >
-                          <FontAwesomeIcon icon={faEdit} className="w-3 h-3" />
-                          <span>Editar</span>
+                          <FontAwesomeIcon icon={faEdit} className="action-btn-icon" />
+                          <span className="btn-text-full">Editar</span>
+                          <span className="btn-text-short">E</span>
                         </button>
                         <button 
                           onClick={() => handleDeleteUser(usuario.id)}
-                          className="flex items-center space-x-1 px-3 py-1.5 bg-red-500 bg-opacity-20 text-red-400 border border-red-500 border-opacity-50 rounded-lg hover:bg-red-500 hover:bg-opacity-30 hover:border-red-400 transition-all duration-200 text-sm font-medium"
+                          className="action-btn-text delete"
+                          title="Eliminar usuario"
                         >
-                          <FontAwesomeIcon icon={faTrash} className="w-3 h-3" />
-                          <span>Eliminar</span>
+                          <FontAwesomeIcon icon={faTrash} className="action-btn-icon" />
+                          <span className="btn-text-full">Eliminar</span>
+                          <span className="btn-text-short">X</span>
                         </button>
                       </div>
                     </td>
@@ -479,16 +557,16 @@ const UsuariosAdminContent = () => {
                 ))
               ) : (
                 paginatedDeletedUsers.map((usuario) => (
-                  <tr key={usuario.id} className="hover:bg-gray-600">
-                    <td className="px-6 py-4">
+                  <tr key={usuario.id}>
+                    <td className="col-user">
                       <UserAvatar user={usuario} />
                     </td>
-                    <td className="px-6 py-4 text-gray-300">{usuario.correo}</td>
-                    <td className="px-6 py-4 text-gray-300">
+                    <td className="col-email text-cell hidden sm:table-cell">{usuario.correo}</td>
+                    <td className="col-name text-cell hidden md:table-cell">
                       {usuario.nombre_completo || 'No especificado'}
                     </td>
-                    <td className="px-6 py-4 text-gray-300">{usuario.rol}</td>
-                    <td className="px-6 py-4">
+                    <td className="col-role text-cell hidden lg:table-cell">{usuario.rol}</td>
+                    <td className="col-status hidden lg:table-cell">
                       <span className={`px-2 py-1 rounded text-xs ${
                         usuario.tiene_mods 
                           ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' 
@@ -497,22 +575,26 @@ const UsuariosAdminContent = () => {
                         {usuario.tiene_mods ? 'Sí' : 'No'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-300">{usuario.fecha_eliminacion}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex space-x-2">
+                    <td className="col-date text-cell hidden lg:table-cell">{usuario.fecha_eliminacion}</td>
+                    <td className="actions-column">
+                      <div className="action-buttons-container">
                         <button 
                           onClick={() => handleRestoreUser(usuario.id)}
-                          className="flex items-center space-x-1 px-3 py-1.5 bg-green-500 bg-opacity-20 text-green-400 border border-green-500 border-opacity-50 rounded-lg hover:bg-green-500 hover:bg-opacity-30 hover:border-green-400 transition-all duration-200 text-sm font-medium"
+                          className="action-btn-text restore"
+                          title="Restaurar usuario"
                         >
-                          <FontAwesomeIcon icon={faUndo} className="w-3 h-3" />
-                          <span>Restaurar</span>
+                          <FontAwesomeIcon icon={faUndo} className="action-btn-icon" />
+                          <span className="btn-text-full">Restaurar</span>
+                          <span className="btn-text-short">R</span>
                         </button>
                         <button 
                           onClick={() => handlePermanentDelete(usuario.id)}
-                          className="flex items-center space-x-1 px-3 py-1.5 bg-red-500 bg-opacity-20 text-red-400 border border-red-500 border-opacity-50 rounded-lg hover:bg-red-500 hover:bg-opacity-30 hover:border-red-400 transition-all duration-200 text-sm font-medium"
+                          className="action-btn-text delete"
+                          title="Eliminar definitivamente"
                         >
-                          <FontAwesomeIcon icon={faTrashAlt} className="w-3 h-3" />
-                          <span>Eliminar Definitivamente</span>
+                          <FontAwesomeIcon icon={faTrashAlt} className="action-btn-icon" />
+                          <span className="btn-text-full">Eliminar</span>
+                          <span className="btn-text-short">X</span>
                         </button>
                       </div>
                     </td>
@@ -584,6 +666,23 @@ const UsuariosAdminContent = () => {
         onDeleteWithMods={handlePermanentDeleteWithMods}
         onCancel={handleCancelModals}
         isOpen={showPermanentDeleteModal}
+      />
+
+      {/* Nuevos modales */}
+      <CreateUserAdminModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onUserCreated={handleUserCreated}
+      />
+
+      <UserProfileViewModal
+        user={viewingUser}
+        isOpen={isProfileModalOpen}
+        onClose={() => {
+          setIsProfileModalOpen(false);
+          setViewingUser(null);
+        }}
+        onEdit={handleEditFromProfile}
       />
     </div>
   );

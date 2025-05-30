@@ -5,7 +5,7 @@ import modService from '../../../services/api/modService';
 import ModDeleteConfirmationModal from '../adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import { useNotification } from '../../../context/NotificationContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash, faUndo } from '@fortawesome/free-solid-svg-icons';
 
 const MisMods = () => {
   const navigate = useNavigate();
@@ -57,27 +57,35 @@ const MisMods = () => {
     imagen: mod.imagen || '/images/mod-placeholder.jpg',
     descripcion: mod.descripcion || '',
     estado: mod.estado || 'publicado',
-    url: mod.url
+    url: mod.url,
+    is_deleted: mod.is_deleted || false,
+    deleted_at: mod.deleted_at
   });
 
-  // Manejar la eliminación del mod
+  // Manejar la eliminación del mod (soft delete)
   const handleDeleteMod = (mod) => {
     setModToDelete(mod);
     setShowDeleteModal(true);
   };
 
-  // Confirmar eliminación
+  // Confirmar eliminación (soft delete)
   const confirmDelete = async () => {
     if (!modToDelete) return;
     
     try {
       setDeleting(true);
-      const response = await modService.deleteMod(modToDelete.id);
+      const response = await modService.softDeleteMod(modToDelete.id);
       
       if (response.status === 'success') {
-        // Eliminar el mod de la lista local
-        setMyMods(prevMods => prevMods.filter(mod => mod.id !== modToDelete.id));
-        showNotification(`Mod "${modToDelete.titulo}" eliminado exitosamente`, 'success');
+        // Marcar el mod como eliminado en lugar de quitarlo de la lista
+        setMyMods(prevMods => 
+          prevMods.map(mod => 
+            mod.id === modToDelete.id 
+              ? { ...mod, is_deleted: true, deleted_at: new Date().toISOString() }
+              : mod
+          )
+        );
+        showNotification(`Mod "${modToDelete.titulo}" desactivado correctamente (puede ser restaurado)`, 'success');
       } else {
         throw new Error(response.message || 'Error al eliminar el mod');
       }
@@ -87,6 +95,29 @@ const MisMods = () => {
       setDeleting(false);
       setShowDeleteModal(false);
       setModToDelete(null);
+    }
+  };
+
+  // Restaurar mod eliminado
+  const handleRestoreMod = async (modId) => {
+    try {
+      const response = await modService.restoreMod(modId);
+      
+      if (response.status === 'success') {
+        // Marcar el mod como activo
+        setMyMods(prevMods => 
+          prevMods.map(mod => 
+            mod.id === modId 
+              ? { ...mod, is_deleted: false, deleted_at: null }
+              : mod
+          )
+        );
+        showNotification('Mod restaurado correctamente', 'success');
+      } else {
+        throw new Error(response.message || 'Error al restaurar el mod');
+      }
+    } catch (err) {
+      showNotification(err.message || 'Error al restaurar mod', 'error');
     }
   };
 
@@ -101,9 +132,23 @@ const MisMods = () => {
     navigate(`/mods/editar/${modId}`);
   };
   
-  const filteredMods = activeFilter === 'todos' 
-    ? myMods 
-    : myMods.filter(mod => mod.estado === activeFilter);
+  // Filtrado mejorado para incluir mods eliminados
+  const getFilteredMods = () => {
+    switch (activeFilter) {
+      case 'todos':
+        return myMods.filter(mod => !mod.is_deleted);
+      case 'publicado':
+        return myMods.filter(mod => mod.estado === 'publicado' && !mod.is_deleted);
+      case 'borrador':
+        return myMods.filter(mod => mod.estado === 'borrador' && !mod.is_deleted);
+      case 'eliminados':
+        return myMods.filter(mod => mod.is_deleted);
+      default:
+        return myMods.filter(mod => !mod.is_deleted);
+    }
+  };
+
+  const filteredMods = getFilteredMods();
 
   // Componentes para los diferentes estados
   const renderLoading = () => (
@@ -129,7 +174,12 @@ const MisMods = () => {
 
   const renderEmptyState = () => (
     <div className="text-center py-8">
-      <p className="text-custom-detail">No tienes mods en esta categoría.</p>
+      <p className="text-custom-detail">
+        {activeFilter === 'eliminados' 
+          ? 'No tienes mods eliminados.' 
+          : 'No tienes mods en esta categoría.'
+        }
+      </p>
       {activeFilter !== 'todos' && (
         <button 
           onClick={() => setActiveFilter('todos')} 
@@ -142,47 +192,78 @@ const MisMods = () => {
   );
 
   // Crear acciones personalizadas para cada mod
-  const createModActions = (mod) => (
-    <div className="flex items-center space-x-2">
-      <button 
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleEditMod(mod.id);
-        }}
-        className="flex items-center justify-center w-8 h-8 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-colors duration-200"
-        title="Editar mod"
-      >
-        <FontAwesomeIcon icon={faEdit} className="w-3 h-3" />
-      </button>
-      <button 
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          handleDeleteMod(mod);
-        }}
-        className="flex items-center justify-center w-8 h-8 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full transition-colors duration-200"
-        title="Eliminar mod"
-        disabled={deleting && modToDelete?.id === mod.id}
-      >
-        <FontAwesomeIcon 
-          icon={faTrash} 
-          className={`w-3 h-3 ${deleting && modToDelete?.id === mod.id ? 'animate-spin' : ''}`} 
-        />
-      </button>
-    </div>
-  );
+  const createModActions = (mod) => {
+    if (mod.is_deleted) {
+      // Acciones para mods eliminados
+      return (
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleRestoreMod(mod.id);
+            }}
+            className="flex items-center justify-center w-9 h-9 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-full transition-colors duration-200 flex-shrink-0"
+            title="Restaurar mod"
+          >
+            <FontAwesomeIcon icon={faUndo} className="w-4 h-4" />
+          </button>
+        </div>
+      );
+    } else {
+      // Acciones para mods activos
+      return (
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleEditMod(mod.id);
+            }}
+            className="flex items-center justify-center w-9 h-9 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-colors duration-200 flex-shrink-0"
+            title="Editar mod"
+          >
+            <FontAwesomeIcon icon={faEdit} className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleDeleteMod(mod);
+            }}
+            className="flex items-center justify-center w-9 h-9 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full transition-colors duration-200 flex-shrink-0"
+            title="Eliminar mod"
+            disabled={deleting && modToDelete?.id === mod.id}
+          >
+            <FontAwesomeIcon 
+              icon={faTrash} 
+              className={`w-4 h-4 ${deleting && modToDelete?.id === mod.id ? 'animate-spin' : ''}`} 
+            />
+          </button>
+        </div>
+      );
+    }
+  };
 
   const renderModGrid = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredMods.map(mod => (
-        <ModCard 
-          key={mod.id} 
-          mod={mod} 
-          isOwner={true} 
-          showSaveButton={false}
-          actions={createModActions(mod)}
-        />
+        <div key={mod.id} className={mod.is_deleted ? 'opacity-75' : ''}>
+          <ModCard 
+            mod={mod} 
+            isOwner={true} 
+            showSaveButton={false}
+            actions={createModActions(mod)}
+            isDeleted={mod.is_deleted}
+          />
+          {mod.is_deleted && (
+            <div className="mt-2 text-center">
+              <span className="text-red-400 text-sm">
+                🗑️ Mod eliminado - {new Date(mod.deleted_at).toLocaleDateString()}
+              </span>
+            </div>
+          )}
+        </div>
       ))}
     </div>
   );
@@ -194,16 +275,22 @@ const MisMods = () => {
         : 'bg-custom-bg text-custom-detail hover:text-custom-text'
     }`;
 
+    const activeMods = myMods.filter(mod => !mod.is_deleted);
+    const deletedMods = myMods.filter(mod => mod.is_deleted);
+
     return (
       <div className="flex space-x-2 mb-4 overflow-x-auto hide-scrollbar">
         <button onClick={() => setActiveFilter('todos')} className={buttonClass('todos')}>
-          Todos
+          Todos ({activeMods.length})
         </button>
         <button onClick={() => setActiveFilter('publicado')} className={buttonClass('publicado')}>
-          Publicados
+          Publicados ({activeMods.filter(mod => mod.estado === 'publicado').length})
         </button>
         <button onClick={() => setActiveFilter('borrador')} className={buttonClass('borrador')}>
-          Borradores
+          Borradores ({activeMods.filter(mod => mod.estado === 'borrador').length})
+        </button>
+        <button onClick={() => setActiveFilter('eliminados')} className={buttonClass('eliminados')}>
+          Eliminados ({deletedMods.length})
         </button>
       </div>
     );
@@ -241,6 +328,7 @@ const MisMods = () => {
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
         isOpen={showDeleteModal}
+        message="¿Estás seguro de que quieres desactivar este mod? Podrá ser restaurado posteriormente."
       />
     </>
   );

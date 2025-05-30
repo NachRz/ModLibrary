@@ -158,7 +158,7 @@ class ModSeeder extends Seeder
             // Crear el mod
             $mod = Mod::create([
                 'titulo' => $modData['Titulo'],
-                'imagen' => $modData['Imagen'],
+                'imagen_banner' => $modData['Imagen'],
                 'edad_recomendada' => $modData['EdadRecomendada'],
                 'juego_id' => $juego->id,
                 'version_juego_necesaria' => $modData['VersionJuegoNecesaria'],

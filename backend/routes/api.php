@@ -39,6 +39,12 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     
     // Subida de imágenes de perfil
     Route::post('/upload/profile-image', [AuthController::class, 'uploadProfileImage']);
+    
+    // Gestión de mods (solo administradores)
+    Route::get('/mods/deleted', [ModController::class, 'getDeletedMods']);
+    Route::delete('/mods/{id}/soft', [ModController::class, 'softDelete']);
+    Route::post('/mods/{id}/restore', [ModController::class, 'restore']);
+    Route::delete('/mods/{id}/force', [ModController::class, 'forceDelete']);
 });
 
 // Rutas de juegos
@@ -129,6 +135,9 @@ Route::prefix('mods')->group(function () {
         
         // Cambiar el estado de un mod (borrador/publicado)
         Route::patch('/{id}/estado', [ModController::class, 'cambiarEstado']);
+        
+        // Obtener mods eliminados del usuario autenticado
+        Route::get('/mis-mods/eliminados', [ModController::class, 'getMyDeletedMods']);
     });
 });
 
