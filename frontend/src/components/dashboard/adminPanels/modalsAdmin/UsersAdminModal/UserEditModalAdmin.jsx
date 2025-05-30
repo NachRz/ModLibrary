@@ -388,28 +388,6 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
             </div>
         )}
       </div>
-
-      {/* Estilos para scroll personalizado */}
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #374151;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #6b7280;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
-        }
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: #6b7280 #374151;
-        }
-      `}</style>
     </div>
   );
 };

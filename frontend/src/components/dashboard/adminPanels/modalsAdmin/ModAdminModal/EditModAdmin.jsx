@@ -17,15 +17,64 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useNotification } from '../../../../../context/NotificationContext';
 import modService from '../../../../../services/api/modService';
+import gameService from '../../../../../services/api/gameService';
 import etiquetasService from '../../../../../services/api/etiquetasService';
 import AsyncSelect from 'react-select/async';
+import '../../../../../assets/styles/components/mods/CrearMod.css';
+import '../../../../../assets/styles/components/common/modals/ModModals/EditModModal.css';
+
+// Componente personalizado para la opción del select de juegos
+const CustomGameOption = ({ innerProps, label, data }) => (
+  <div {...innerProps} className="game-option">
+    <div className="game-option-image">
+      {data.game?.background_image || data.game?.imagen_fondo ? (
+        <img 
+          src={data.game.background_image || data.game.imagen_fondo} 
+          alt={label} 
+        />
+      ) : (
+        <div className="no-image">Sin imagen</div>
+      )}
+    </div>
+    <div className="game-option-info">
+      <div className="game-option-title">{label}</div>
+      <div className="game-option-rating">
+        <span className="rating-star">★</span>
+        {data.game?.rating ? data.game.rating.toFixed(1) : 'N/A'}
+      </div>
+    </div>
+  </div>
+);
+
+// Componente personalizado para el valor seleccionado del juego
+const CustomGameSingleValue = ({ children, data }) => (
+  <div className="game-single-value">
+    <div className="game-single-image">
+      {data.game?.background_image || data.game?.imagen_fondo ? (
+        <img 
+          src={data.game.background_image || data.game.imagen_fondo} 
+          alt={children} 
+        />
+      ) : (
+        <div className="no-image">Sin imagen</div>
+      )}
+    </div>
+    <div className="game-single-info">
+      <div className="game-single-title">{children}</div>
+      <div className="game-single-rating">
+        <span className="rating-star">★</span>
+        {data.game?.rating ? data.game.rating.toFixed(1) : 'N/A'}
+      </div>
+    </div>
+  </div>
+);
 
 // Componente personalizado para la opción de etiqueta en AsyncSelect
 const CustomTagOption = ({ innerProps, label, data }) => (
-  <div {...innerProps} className="flex items-center p-2 hover:bg-gray-600 cursor-pointer">
-    <div className="flex-1">
-      <div className="text-white text-sm font-medium">{data.label}</div>
-      <div className="text-gray-400 text-xs">
+  <div {...innerProps} className="tag-option">
+    <div className="tag-option-info">
+      <div className="tag-option-name">{data.label}</div>
+      <div className="tag-option-count">
         {data.juegos_count?.toLocaleString() || 0} juegos
       </div>
     </div>
@@ -92,13 +141,22 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
     descargas_semana_actual: 0
   });
 
+  // Estados para los juegos
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [loadingGames, setLoadingGames] = useState(false);
+  const [errorGames, setErrorGames] = useState(null);
+  const [initialGameOptions, setInitialGameOptions] = useState([]);
+
   // Limpiar estado cuando se cierra el modal
   useEffect(() => {
     if (!isOpen) {
       // Resetear todos los estados cuando se cierra el modal
       setSelectedTags([]);
+      setSelectedGame(null);
       setActiveTab('general');
       setLoading(false);
+      setLoadingGames(false);
+      setErrorGames(null);
       
       // Limpiar URLs de vista previa para evitar memory leaks
       setFormData(prev => {
@@ -180,13 +238,50 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       // Configurar etiquetas seleccionadas
       if (modCompleto.etiquetas && Array.isArray(modCompleto.etiquetas)) {
         const formattedTags = modCompleto.etiquetas.map(tag => ({
-          value: tag.id || tag.rawg_id,
+          value: tag.id,  // Usar el ID local de la base de datos
           label: tag.nombre || tag.name,
           juegos_count: tag.juegos_count || 0
         }));
         setSelectedTags(formattedTags);
+        
+        // También establecer las etiquetas en formData con el formato correcto
+        setFormData(prev => ({
+          ...prev,
+          etiquetas: modCompleto.etiquetas.map(tag => ({
+            id: tag.id,
+            nombre: tag.nombre || tag.name,
+            rawg_id: tag.rawg_id
+          }))
+        }));
       } else {
         setSelectedTags([]);
+        setFormData(prev => ({
+          ...prev,
+          etiquetas: []
+        }));
+      }
+
+      // Configurar juego seleccionado
+      if (modCompleto.juego_id && modCompleto.juego) {
+        console.log('Datos del juego encontrados:', modCompleto.juego);
+        const gameOption = {
+          value: modCompleto.juego.rawg_id || modCompleto.juego.id,
+          label: modCompleto.juego.titulo || modCompleto.juego.title || modCompleto.juego.nombre || modCompleto.juego.name,
+          game: {
+            id: modCompleto.juego.rawg_id || modCompleto.juego.id,
+            title: modCompleto.juego.titulo || modCompleto.juego.title || modCompleto.juego.nombre || modCompleto.juego.name,
+            background_image: modCompleto.juego.imagen_fondo || modCompleto.juego.background_image || modCompleto.juego.imagen,
+            rating: modCompleto.juego.rating || modCompleto.juego.valoracion || 0
+          }
+        };
+        console.log('Juego configurado para select:', gameOption);
+        setSelectedGame(gameOption);
+      } else {
+        console.log('No se encontraron datos del juego:', {
+          juego_id: modCompleto.juego_id,
+          juego: modCompleto.juego
+        });
+        setSelectedGame(null);
       }
 
       // Cargar estadísticas
@@ -218,15 +313,11 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   // Función para cargar opciones de etiquetas usando AsyncSelect
   const loadTagOptions = async (inputValue) => {
     try {
-      if (!inputValue || inputValue.length < 2) {
-        return [];
-      }
-
       const response = await etiquetasService.searchTags(inputValue);
       
       if (response.etiquetas) {
         return response.etiquetas.map(tag => ({
-          value: tag.id || tag.rawg_id,
+          value: tag.id, // Este es el rawg_id cuando viene de RAWG
           label: tag.name || tag.nombre,
           juegos_count: tag.juegos_count || 0
         }));
@@ -236,6 +327,96 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
     } catch (error) {
       console.error('Error al cargar etiquetas:', error);
       return [];
+    }
+  };
+
+  // Función para cargar opciones iniciales de juegos
+  useEffect(() => {
+    const loadInitialGames = async () => {
+      try {
+        console.log('Cargando juegos iniciales...');
+        const games = await gameService.getInitialGames();
+        console.log('Juegos iniciales cargados:', games);
+        const options = games.map(game => ({
+          value: game.id,
+          label: game.title,
+          game: game
+        }));
+        console.log('Opciones de juegos creadas:', options);
+        setInitialGameOptions(options);
+      } catch (error) {
+        console.error('Error al cargar juegos iniciales:', error);
+        setErrorGames(error.message);
+      }
+    };
+
+    if (isOpen) {
+      loadInitialGames();
+    }
+  }, [isOpen]);
+
+  // Función para cargar opciones de juegos
+  const loadGameOptions = async (inputValue) => {
+    try {
+      setLoadingGames(true);
+      setErrorGames(null);
+      
+      if (!inputValue) {
+        return initialGameOptions;
+      }
+      
+      const games = await gameService.searchRawgGames(inputValue);
+      return games.map(game => ({
+        value: game.id,
+        label: game.title,
+        game: game
+      }));
+    } catch (error) {
+      setErrorGames(error.message);
+      return [];
+    } finally {
+      setLoadingGames(false);
+    }
+  };
+
+  // Manejador para cambios en el select de juegos
+  const handleGameChange = async (selectedOption) => {
+    if (selectedOption) {
+      try {
+        setLoadingGames(true);
+        setErrorGames(null);
+
+        // Verificar y sincronizar el juego
+        const syncedGame = await gameService.verifyAndSyncGame(selectedOption.value);
+
+        // Actualizar el formData con el ID del juego sincronizado
+        setFormData(prev => ({
+          ...prev,
+          juego_id: syncedGame.id // Usamos el ID de nuestra base de datos
+        }));
+
+        // Actualizar el juego seleccionado para mostrar en el select
+        setSelectedGame(selectedOption);
+        
+        showNotification('Juego actualizado correctamente', 'success');
+      } catch (error) {
+        console.error('Error al sincronizar el juego:', error);
+        setErrorGames(error.message || 'Error al sincronizar el juego');
+        setSelectedGame(null);
+        setFormData(prev => ({
+          ...prev,
+          juego_id: null
+        }));
+      } finally {
+        setLoadingGames(false);
+      }
+    } else {
+      // Si no hay selección, limpiar
+      setSelectedGame(null);
+      setFormData(prev => ({
+        ...prev,
+        juego_id: null
+      }));
     }
   };
 
@@ -327,16 +508,56 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   };
 
   // Manejador para cambios en la selección de etiquetas con AsyncSelect
-  const handleTagChange = (selectedOptions) => {
+  const handleTagChange = async (selectedOptions) => {
     setSelectedTags(selectedOptions || []);
-    setFormData(prev => ({
-      ...prev,
-      etiquetas: selectedOptions ? selectedOptions.map(option => ({
-        id: option.value,
-        nombre: option.label,
-        rawg_id: option.value
-      })) : []
-    }));
+    
+    // Sincronizar etiquetas con la base de datos local para obtener los IDs correctos
+    if (selectedOptions && selectedOptions.length > 0) {
+      try {
+        const syncedTags = await Promise.all(
+          selectedOptions.map(async (option) => {
+            try {
+              // Sincronizar la etiqueta para obtener el ID local
+              const syncedTag = await etiquetasService.syncTag(option.value);
+              return {
+                id: syncedTag.id, // ID local de la base de datos
+                nombre: syncedTag.nombre,
+                rawg_id: syncedTag.rawg_id
+              };
+            } catch (error) {
+              console.error(`Error al sincronizar etiqueta ${option.label}:`, error);
+              // En caso de error, usar el valor original como fallback
+              return {
+                id: option.value,
+                nombre: option.label,
+                rawg_id: option.value
+              };
+            }
+          })
+        );
+
+        setFormData(prev => ({
+          ...prev,
+          etiquetas: syncedTags
+        }));
+      } catch (error) {
+        console.error('Error al sincronizar etiquetas:', error);
+        // En caso de error, usar los valores originales
+        setFormData(prev => ({
+          ...prev,
+          etiquetas: selectedOptions ? selectedOptions.map(option => ({
+            id: option.value,
+            nombre: option.label,
+            rawg_id: option.value
+          })) : []
+        }));
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        etiquetas: []
+      }));
+    }
   };
 
   const handleSave = async () => {
@@ -379,6 +600,11 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         updateData.append('permitir_comentarios', Boolean(formData.permitir_comentarios));
         updateData.append('visible_en_busqueda', Boolean(formData.visible_en_busqueda));
         
+        // Agregar juego_id si está seleccionado
+        if (formData.juego_id) {
+          updateData.append('juego_id', formData.juego_id);
+        }
+        
         // Agregar imagen banner como archivo si hay una nueva
         if (formData.imagenFile) {
           updateData.append('imagen_banner', formData.imagenFile);
@@ -391,10 +617,12 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           console.log(`Agregando imagen adicional ${index}:`, file.name);
         });
         
-        // Agregar etiquetas
-        selectedTags.forEach(tag => {
-          updateData.append('etiquetas[]', tag.value);
-        });
+        // Agregar etiquetas usando los IDs locales sincronizados
+        if (formData.etiquetas && formData.etiquetas.length > 0) {
+          formData.etiquetas.forEach(tag => {
+            updateData.append('etiquetas[]', tag.id);
+          });
+        }
         
         console.log('FormData preparado con archivos');
       } else {
@@ -408,11 +636,16 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           version_actual: formData.version,
           version_juego_necesaria: formData.version_juego_necesaria,
           url: formData.url || '',
-          etiquetas: selectedTags.map(tag => tag.value),
+          etiquetas: formData.etiquetas ? formData.etiquetas.map(tag => tag.id) : [],
           es_destacado: Boolean(formData.es_destacado),
           permitir_comentarios: Boolean(formData.permitir_comentarios),
           visible_en_busqueda: Boolean(formData.visible_en_busqueda)
         };
+        
+        // Agregar juego_id si está seleccionado
+        if (formData.juego_id) {
+          updateData.juego_id = formData.juego_id;
+        }
         
         console.log('Datos JSON a enviar:', updateData);
       }
@@ -448,11 +681,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             es_destacado: formData.es_destacado,
             permitir_comentarios: formData.permitir_comentarios,
             visible_en_busqueda: formData.visible_en_busqueda,
-            etiquetas: selectedTags.map(tag => ({
-              id: tag.value,
-              nombre: tag.label,
-              rawg_id: tag.value
-            }))
+            etiquetas: formData.etiquetas || []
           };
           
           onSave(updatedModForTable);
@@ -539,6 +768,41 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
+              Juego asociado *
+            </label>
+            <AsyncSelect
+              value={selectedGame}
+              onChange={handleGameChange}
+              loadOptions={loadGameOptions}
+              defaultOptions={initialGameOptions}
+              cacheOptions
+              placeholder="Seleccionar juego..."
+              loadingMessage={() => "Buscando juegos..."}
+              noOptionsMessage={() => "No se encontraron juegos"}
+              isDisabled={loadingGames}
+              className={`select-container ${errorGames ? 'error' : ''}`}
+              classNamePrefix="select"
+              components={{
+                Option: CustomGameOption,
+                SingleValue: CustomGameSingleValue
+              }}
+            />
+            {errorGames && (
+              <p className="text-red-400 text-sm mt-1">{errorGames}</p>
+            )}
+            {loadingGames && (
+              <p className="text-gray-400 text-sm mt-1">Sincronizando juego...</p>
+            )}
+            <small className="text-gray-400 text-sm mt-1 block">
+              Busca y selecciona el juego para el cual es este mod
+            </small>
+          </div>
+        </div>
+
+        {/* Configuraciones */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Estado
             </label>
             <select
@@ -571,23 +835,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               <option value={16}>16+ años</option>
               <option value={18}>18+ años</option>
             </select>
-          </div>
-        </div>
-
-        {/* Configuraciones */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              URL del mod
-            </label>
-            <input
-              type="url"
-              name="url"
-              value={formData.url}
-              onChange={handleInputChange}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-              placeholder="https://ejemplo.com/mi-mod"
-            />
           </div>
 
           <div>
@@ -667,13 +914,13 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           <AsyncSelect
             isMulti
             cacheOptions
-            defaultOptions={false}
+            defaultOptions={true}
             value={selectedTags}
             onChange={handleTagChange}
             loadOptions={loadTagOptions}
             placeholder="Buscar etiquetas..."
             loadingMessage={() => "Buscando etiquetas..."}
-            noOptionsMessage={() => "Escribe al menos 2 caracteres para buscar"}
+            noOptionsMessage={() => "No se encontraron etiquetas"}
             components={{
               Option: CustomTagOption,
               MultiValue: CustomMultiValue
@@ -730,7 +977,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             className="text-white"
           />
           <small className="text-gray-400 text-sm mt-1 block">
-            Busca etiquetas escribiendo al menos 2 caracteres. Las etiquetas se sincronizan automáticamente con RAWG.
+            Busca etiquetas escribiendo el nombre. Las etiquetas se sincronizan automáticamente con RAWG.
           </small>
         </div>
         
@@ -1421,48 +1668,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           </button>
         </div>
       </div>
-
-      {/* Estilos para scroll personalizado */}
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #374151;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #6b7280;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
-        }
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: #6b7280 #374151;
-        }
-        
-        /* Scrollbar horizontal para tabs */
-        .custom-scrollbar-horizontal::-webkit-scrollbar {
-          height: 4px;
-        }
-        .custom-scrollbar-horizontal::-webkit-scrollbar-track {
-          background: #374151;
-          border-radius: 2px;
-        }
-        .custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
-          background: #6b7280;
-          border-radius: 2px;
-        }
-        .custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
-        }
-        .custom-scrollbar-horizontal {
-          scrollbar-width: thin;
-          scrollbar-color: #6b7280 #374151;
-        }
-      `}</style>
     </div>
   );
 };

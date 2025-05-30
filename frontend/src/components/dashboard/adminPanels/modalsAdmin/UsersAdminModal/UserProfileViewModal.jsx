@@ -389,26 +389,6 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
           </button>
         </div>
       </div>
-
-      <style jsx>{`
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: #6b7280 #374151;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #374151;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #6b7280;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background-color: #9ca3af;
-        }
-      `}</style>
     </div>
   );
 };

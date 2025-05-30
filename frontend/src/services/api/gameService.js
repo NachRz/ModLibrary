@@ -291,11 +291,9 @@ const gameService = {
     try {
       const response = await apiClient.get('/juegos/buscar', {
         params: { 
-          search: '',
-          ordering: 'name',
+          query: '',
           page: 1,
-          page_size: 40,
-          key: process.env.REACT_APP_RAWG_API_KEY
+          page_size: 40
         }
       });
       
