@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 
 class ModController extends Controller
 {
@@ -221,13 +220,6 @@ class ModController extends Controller
             ], 404);
         }
 
-        // Log de datos recibidos
-        \Log::info('Datos recibidos para actualizar mod:', [
-            'mod_id' => $id,
-            'datos' => $request->all(),
-            'files' => $request->files->all()
-        ]);
-
         // Obtenemos el usuario autenticado
         $usuario = $request->user();
 
@@ -258,7 +250,6 @@ class ModController extends Controller
         ]);
 
         if ($validator->fails()) {
-            \Log::error('Errores de validación:', $validator->errors()->toArray());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Datos inválidos',
@@ -305,11 +296,6 @@ class ModController extends Controller
 
         // Guardar cambios
         $mod->save();
-        
-        \Log::info('Mod actualizado exitosamente:', [
-            'mod_id' => $mod->id,
-            'cambios' => $mod->getDirty()
-        ]);
 
         // Actualizar etiquetas si se proporcionaron
         if ($request->has('etiquetas') && is_array($request->etiquetas)) {
@@ -400,10 +386,6 @@ class ModController extends Controller
                 'message' => 'Mod desactivado correctamente (puede ser restaurado)'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al desactivar mod', [
-                'error' => $e->getMessage(),
-                'mod_id' => $id
-            ]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al desactivar el mod'
@@ -448,9 +430,6 @@ class ModController extends Controller
                 })
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al obtener mods eliminados', [
-                'error' => $e->getMessage()
-            ]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al obtener mods eliminados'
@@ -488,10 +467,6 @@ class ModController extends Controller
                 'message' => 'Mod restaurado correctamente'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al restaurar mod', [
-                'error' => $e->getMessage(),
-                'mod_id' => $id
-            ]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al restaurar el mod'
@@ -563,10 +538,6 @@ class ModController extends Controller
                 'message' => 'Mod eliminado definitivamente'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al eliminar mod definitivamente', [
-                'error' => $e->getMessage(),
-                'mod_id' => $id
-            ]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al eliminar el mod definitivamente'
@@ -1133,10 +1104,6 @@ class ModController extends Controller
                 })
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al obtener mods eliminados del usuario', [
-                'error' => $e->getMessage(),
-                'user_id' => $request->user()->id
-            ]);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al obtener mods eliminados'
