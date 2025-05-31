@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Juego;
+use App\Models\Genero;
+use App\Models\Usuario;
 use App\Models\JuegoFavorito;
 use App\Services\RawgService;
 use Illuminate\Http\Request;
@@ -18,9 +20,42 @@ class JuegoController extends Controller
         $this->rawgService = $rawgService;
     }
 
+    /**
+     * Extraer y asociar géneros de un juego desde RAWG
+     */
+    private function extraerYAsociarGeneros(Juego $juego, array $gameData): void
+    {
+        try {
+            $generosIds = [];
+
+            // Verificar si el juego tiene géneros en los datos de RAWG
+            if (isset($gameData['genres']) && is_array($gameData['genres'])) {
+                foreach ($gameData['genres'] as $generoData) {
+                    // Crear o actualizar el género sin duplicar
+                    $genero = Genero::updateOrCreate(
+                        ['rawg_id' => $generoData['id']],
+                        [
+                            'nombre' => $generoData['name'],
+                            'slug' => $generoData['slug'],
+                            'games_count' => $generoData['games_count'] ?? 0
+                        ]
+                    );
+                    
+                    $generosIds[] = $genero->id;
+                }
+            }
+
+            // Sincronizar la relación (esto reemplaza los géneros existentes del juego)
+            $juego->generos()->sync($generosIds);
+
+        } catch (\Exception $e) {
+            // Silenciar errores para mantener consistencia con la limpieza de logs
+        }
+    }
+
     public function index()
     {
-        $juegos = Juego::select([
+        $juegos = Juego::with('generos')->select([
             'id', 'titulo', 'imagen_fondo', 'mods_totales',
             'rating', 'fecha_lanzamiento'
         ])->get();
@@ -34,7 +69,8 @@ class JuegoController extends Controller
                     'imagen_fondo' => $juego->imagen_fondo,
                     'total_mods' => $juego->mods_totales,
                     'rating' => $juego->rating,
-                    'fecha_lanzamiento' => $juego->fecha_lanzamiento
+                    'fecha_lanzamiento' => $juego->fecha_lanzamiento,
+                    'generos' => $juego->generos
                 ];
             })
         ]);
@@ -86,12 +122,15 @@ class JuegoController extends Controller
         // Recalcular mods totales después de sincronizar
         $juego->recalcularModsTotales();
 
+        // Extraer y asociar géneros
+        $this->extraerYAsociarGeneros($juego, $gameData);
+
         return response()->json($juego);
     }
 
     public function show($id)
     {
-        $juego = Juego::select([
+        $juego = Juego::with('generos')->select([
             'id', 'titulo', 'descripcion', 'imagen_fondo',
             'mods_totales', 'rating', 'fecha_lanzamiento'
         ])->find($id);
@@ -109,7 +148,8 @@ class JuegoController extends Controller
                 'imagen_fondo' => $juego->imagen_fondo,
                 'total_mods' => $juego->mods_totales,
                 'rating' => $juego->rating,
-                'fecha_lanzamiento' => $juego->fecha_lanzamiento
+                'fecha_lanzamiento' => $juego->fecha_lanzamiento,
+                'generos' => $juego->generos
             ]
         ]);
     }
@@ -158,6 +198,9 @@ class JuegoController extends Controller
                 'mods_totales' => 0
             ]);
 
+            // Extraer y asociar géneros
+            $this->extraerYAsociarGeneros($juego, $gameData);
+
             return response()->json([
                 'status' => 'success',
                 'data' => $juego,
@@ -178,6 +221,7 @@ class JuegoController extends Controller
     public function obtenerFavoritos()
     {
         try {
+            /** @var Usuario $usuario */
             $usuario = Auth::user();
             
             if (!$usuario) {

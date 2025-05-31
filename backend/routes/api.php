@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModController;
 use App\Http\Controllers\VersionModController;
 use App\Http\Controllers\EtiquetaController;
+use App\Http\Controllers\GeneroController;
 
 // Ruta de prueba
 Route::get('/test', function() {
@@ -147,5 +148,22 @@ Route::prefix('mods')->group(function () {
 Route::prefix('etiquetas')->group(function () {
     Route::get('/buscar-rawg', [EtiquetaController::class, 'buscarEnRawg']);
     Route::post('/{id}/sincronizar', [EtiquetaController::class, 'sincronizarConRawg'])->middleware('auth:sanctum');
+});
+
+// Rutas de géneros
+Route::prefix('generos')->group(function () {
+    // Rutas públicas
+    Route::get('/', [GeneroController::class, 'index']);
+    Route::get('/estadisticas', [GeneroController::class, 'getEstadisticas']);
+    Route::get('/{generoId}/juegos', [GeneroController::class, 'getJuegosPorGenero']);
+    
+    // Rutas de filtros
+    Route::get('/filtros/juegos', [GeneroController::class, 'getJuegosConFiltrosGeneros']);
+    
+    // Rutas que requieren autenticación de administrador
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+        Route::post('/sincronizar-rawg', [GeneroController::class, 'sincronizarDesdeRawg']);
+        Route::post('/juego/{juegoId}/sincronizar', [GeneroController::class, 'sincronizarGenerosJuego']);
+    });
 });
 

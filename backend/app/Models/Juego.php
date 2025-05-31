@@ -52,6 +52,15 @@ class Juego extends Model
     }
 
     /**
+     * Relación muchos a muchos con géneros
+     */
+    public function generos(): BelongsToMany
+    {
+        return $this->belongsToMany(Genero::class, 'juegos_generos', 'juego_id', 'genero_id')
+                    ->withTimestamps();
+    }
+
+    /**
      * Incrementa el contador de mods
      */
     public function incrementarModsTotales(): void

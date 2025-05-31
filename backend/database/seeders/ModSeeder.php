@@ -6,6 +6,7 @@ use App\Models\Mod;
 use App\Models\Juego;
 use App\Models\Usuario;
 use App\Models\Etiqueta;
+use App\Models\Genero;
 use App\Models\VersionMod;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
@@ -19,6 +20,39 @@ class ModSeeder extends Seeder
     public function __construct(RawgService $rawgService)
     {
         $this->rawgService = $rawgService;
+    }
+
+    /**
+     * Extraer y asociar géneros de un juego desde RAWG
+     */
+    private function extraerYAsociarGeneros(Juego $juego, array $gameData): void
+    {
+        try {
+            $generosIds = [];
+
+            // Verificar si el juego tiene géneros en los datos de RAWG
+            if (isset($gameData['genres']) && is_array($gameData['genres'])) {
+                foreach ($gameData['genres'] as $generoData) {
+                    // Crear o actualizar el género sin duplicar
+                    $genero = Genero::updateOrCreate(
+                        ['rawg_id' => $generoData['id']],
+                        [
+                            'nombre' => $generoData['name'],
+                            'slug' => $generoData['slug'],
+                            'games_count' => $generoData['games_count'] ?? 0
+                        ]
+                    );
+                    
+                    $generosIds[] = $genero->id;
+                }
+            }
+
+            // Sincronizar la relación (esto reemplaza los géneros existentes del juego)
+            $juego->generos()->sync($generosIds);
+
+        } catch (\Exception $e) {
+            // Silenciar errores para mantener consistencia
+        }
     }
 
     public function run()
@@ -84,6 +118,15 @@ class ModSeeder extends Seeder
                     'rating_top' => $rawgData['rating_top'] ?? 5
                 ]
             );
+
+            // Extraer y asociar géneros automáticamente si tenemos datos de RAWG
+            if ($rawgData && $rawgId) {
+                // Obtener datos completos del juego para extraer géneros
+                $gameFullData = $this->rawgService->getGame($rawgId);
+                if ($gameFullData) {
+                    $this->extraerYAsociarGeneros($juego, $gameFullData);
+                }
+            }
             
             $juegosMap[$juegoNombre] = $juego;
             $progressBar->advance();
@@ -91,6 +134,7 @@ class ModSeeder extends Seeder
         
         $progressBar->finish();
         $this->command->newLine(2);
+        $this->command->info('Juegos creados con géneros extraídos automáticamente.');
         $this->command->info('Creando mods...');
 
         // Recopilar todas las etiquetas únicas primero
