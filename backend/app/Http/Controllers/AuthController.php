@@ -661,4 +661,76 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    // Obtener estadísticas de un usuario específico
+    public function getUserStats(Request $request, $id)
+    {
+        try {
+            $usuario = Usuario::with(['mods.valoraciones', 'mods.versiones'])->findOrFail($id);
+            
+            // Calcular estadísticas de mods
+            $totalMods = $usuario->mods->count();
+            $modsPublicados = $usuario->mods->where('estado', 'publicado')->count();
+            $modsBorradores = $usuario->mods->where('estado', 'borrador')->count();
+            
+            // Calcular descargas totales
+            $totalDescargas = 0;
+            foreach ($usuario->mods as $mod) {
+                foreach ($mod->versiones as $version) {
+                    $totalDescargas += $version->descargas;
+                }
+            }
+            
+            // Calcular valoración promedio
+            $totalValoraciones = 0;
+            $sumaValoraciones = 0;
+            foreach ($usuario->mods as $mod) {
+                foreach ($mod->valoraciones as $valoracion) {
+                    $totalValoraciones++;
+                    $sumaValoraciones += $valoracion->puntuacion;
+                }
+            }
+            $valoracionPromedio = $totalValoraciones > 0 ? round($sumaValoraciones / $totalValoraciones, 2) : 0;
+            
+            // Calcular mods guardados por otros usuarios
+            $totalGuardados = 0;
+            foreach ($usuario->mods as $mod) {
+                $totalGuardados += $mod->usuariosGuardados()->count();
+            }
+            
+            // Fecha del primer mod
+            $primerMod = $usuario->mods->sortBy('created_at')->first();
+            $fechaPrimerMod = $primerMod ? $primerMod->created_at->format('Y-m-d') : null;
+            
+            // Fecha del último mod
+            $ultimoMod = $usuario->mods->sortByDesc('created_at')->first();
+            $fechaUltimoMod = $ultimoMod ? $ultimoMod->created_at->format('Y-m-d') : null;
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'total_mods' => $totalMods,
+                    'mods_publicados' => $modsPublicados,
+                    'mods_borradores' => $modsBorradores,
+                    'total_descargas' => $totalDescargas,
+                    'total_valoraciones' => $totalValoraciones,
+                    'valoracion_promedio' => $valoracionPromedio,
+                    'total_guardados' => $totalGuardados,
+                    'fecha_primer_mod' => $fechaPrimerMod,
+                    'fecha_ultimo_mod' => $fechaUltimoMod,
+                    'fecha_registro' => $usuario->created_at->format('Y-m-d'),
+                    'dias_activo' => $usuario->created_at->diffInDays(now())
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener estadísticas del usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al obtener estadísticas del usuario'
+            ], 500);
+        }
+    }
 } 
