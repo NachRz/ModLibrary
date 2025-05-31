@@ -43,7 +43,7 @@ const GameCard = ({ game, showStats = true, showFavoriteButton = false, onFavori
           {/* Botón de favoritos - solo mostrar si showFavoriteButton es true */}
           {showFavoriteButton && (
             <button 
-              className={`absolute top-2 right-2 p-1.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg backdrop-blur-sm z-20 ${
+              className={`absolute top-2 right-2 p-1.5 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-lg backdrop-blur-sm z-5 ${
                 esFavorito 
                   ? 'bg-red-500/80 hover:bg-red-600/80' 
                   : 'bg-black/40 hover:bg-red-500/80'
