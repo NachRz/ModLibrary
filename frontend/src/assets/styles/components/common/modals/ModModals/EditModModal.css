@@ -36,3 +36,410 @@
     scrollbar-width: thin;
     scrollbar-color: #6b7280 #374151;
   }
+
+/* Estilos para el select de juegos */
+.select-container {
+  width: 100%;
+}
+
+.select-container .select__control {
+  background-color: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+
+.select-container .select__control:hover {
+  border-color: #475569;
+}
+
+.select-container .select__control--is-focused {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 1px #3B82F6;
+}
+
+.select-container .select__menu {
+  background-color: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+}
+
+.select-container .select__menu-list {
+  max-height: 300px;
+  padding: 0;
+}
+
+.select-container .select__option {
+  padding: 0;
+  margin: 0;
+  background-color: transparent !important;
+}
+
+.select-container .select__option--is-focused {
+  background-color: transparent !important;
+}
+
+.select-container .select__option:hover {
+  background-color: #334155;
+}
+
+.select-container .select__option--is-selected {
+  background-color: #3B82F6;
+}
+
+.select-container .select__value-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.select-container .select__input-container {
+  margin: 0;
+  padding: 0;
+  color: #FFFFFF !important;
+}
+
+.select-container .select__indicators {
+  margin-left: auto;
+}
+
+.select-container.error .select__control {
+  border-color: #EF4444;
+}
+
+/* Estilos para las opciones del juego */
+.game-option {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.game-option:hover {
+  background-color: #334155;
+}
+
+.game-option-image,
+.game-single-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 1rem;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.game-option-image img,
+.game-single-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image {
+  width: 100%;
+  height: 100%;
+  background-color: #1E293B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #94A3B8;
+}
+
+.game-option-info,
+.game-single-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-option-title,
+.game-single-title {
+  font-size: 1rem;
+  color: #FFFFFF;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.game-option-rating,
+.game-single-rating {
+  font-size: 0.875rem;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rating-star {
+  color: #F59E0B;
+}
+
+.game-single-value {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  max-width: calc(100% - 20px);
+  min-width: 0;
+}
+
+.game-single-image {
+  width: 32px;
+  height: 32px;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.game-single-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.game-single-title {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.game-single-rating {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.select-container .select__option--is-selected .game-option {
+  background-color: #3B82F6;
+}
+
+.select-container .select__option--is-focused .game-option {
+  background-color: #334155;
+}
+
+/* Estilos para el selector de etiquetas */
+.tag-option {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.tag-option:hover {
+  background-color: #334155;
+}
+
+.tag-option-info {
+  flex: 1;
+}
+
+.tag-option-name {
+  font-weight: 500;
+  color: #FFFFFF;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.tag-option-count {
+  font-size: 0.75rem;
+  color: #94A3B8;
+}
+
+/* Estilos para los valores múltiples de etiquetas personalizados */
+.custom-multi-value {
+  display: inline-flex;
+  align-items: center;
+  background-color: #3B82F6;
+  color: white;
+  font-size: 0.875rem;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+  transition: background-color 0.2s ease;
+}
+
+.custom-multi-value:hover {
+  background-color: #2563EB;
+}
+
+.custom-multi-value button {
+  margin-left: 0.5rem;
+  color: #E5E7EB;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.custom-multi-value button:hover {
+  color: white;
+}
+
+/* Estados del select de juegos */
+.game-select-error {
+  color: #EF4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.game-select-loading {
+  color: #94A3B8;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.game-select-info {
+  color: #94A3B8;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+  line-height: 1.4;
+}
+
+/* Estilos adicionales para react-select */
+.select-container .select__multi-value {
+  background-color: transparent !important;
+  margin: 2px 2px 2px 0 !important;
+}
+
+.select-container .select__multi-value__label {
+  color: transparent !important;
+  padding: 0 !important;
+}
+
+.select-container .select__multi-value__remove {
+  display: none !important;
+}
+
+.select-container .select__clear-indicator {
+  color: #94A3B8 !important;
+}
+
+.select-container .select__clear-indicator:hover {
+  color: #EF4444 !important;
+}
+
+.select-container .select__placeholder {
+  color: #94A3B8 !important;
+}
+
+.select-container .select__single-value {
+  color: white !important;
+}
+
+.select-container .select__indicators {
+  color: #94A3B8 !important;
+}
+
+.select-container .select__indicator-separator {
+  background-color: #334155 !important;
+}
+
+.select-container .select__dropdown-indicator {
+  color: #94A3B8 !important;
+}
+
+.select-container .select__dropdown-indicator:hover {
+  color: #3B82F6 !important;
+}
+
+.select-container .select__loading-indicator {
+  color: #3B82F6 !important;
+}
+
+/* Estilos para el estado de carga */
+.select-container.loading .select__control {
+  cursor: wait !important;
+}
+
+.select-container.loading .select__dropdown-indicator {
+  display: none !important;
+}
+
+/* Animación para el estado de carga */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.select-container .select__loading-indicator div {
+  animation: spin 1s linear infinite;
+}
+
+/* Mejoras para el select de juegos en responsive */
+@media (max-width: 768px) {
+  .game-option {
+    padding: 0.5rem;
+  }
+  
+  .game-option-image,
+  .game-single-image {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.75rem;
+  }
+  
+  .game-option-title {
+    font-size: 0.875rem;
+  }
+  
+  .game-option-rating {
+    font-size: 0.75rem;
+  }
+  
+  .game-single-image {
+    width: 28px;
+    height: 28px;
+    margin-right: 0.5rem;
+  }
+  
+  .game-single-title {
+    font-size: 0.75rem;
+  }
+  
+  .game-single-rating {
+    font-size: 0.65rem;
+  }
+  
+  .select-container .select__control {
+    min-height: 38px;
+  }
+
+  .tag-option {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+  
+  .tag-option-name {
+    font-size: 0.75rem;
+  }
+  
+  .tag-option-count {
+    font-size: 0.65rem;
+  }
+  
+  .custom-multi-value {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
