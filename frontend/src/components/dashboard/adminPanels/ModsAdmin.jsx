@@ -5,6 +5,7 @@ import { faSearch, faEye, faEdit, faTrash, faUndo, faTrashAlt, faPlus } from '@f
 import modService from '../../../services/api/modService';
 import ModDeleteConfirmationModal from './modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import EditModAdmin from './modalsAdmin/ModAdminModal/EditModAdmin';
+import ModViewModal from './modalsAdmin/ModAdminModal/ModViewModal';
 import { useNotification } from '../../../context/NotificationContext';
 import Pagination from '../../common/Pagination';
 import '../../../assets/styles/components/dashboard/adminPanel/adminTables.css';
@@ -31,6 +32,10 @@ const ModsAdmin = () => {
   // Estados para el modal de edición
   const [showEditModal, setShowEditModal] = useState(false);
   const [modToEdit, setModToEdit] = useState(null);
+
+  // Estados para el modal de vista de mod
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [modToView, setModToView] = useState(null);
 
   // Estados para eliminación permanente
   const [showPermanentDeleteModal, setShowPermanentDeleteModal] = useState(false);
@@ -336,6 +341,24 @@ const ModsAdmin = () => {
     setModToEdit(null);
   };
 
+  // Funciones para vista de mod
+  const handleViewMod = (mod) => {
+    setModToView(mod);
+    setShowViewModal(true);
+  };
+
+  const handleViewClose = () => {
+    setShowViewModal(false);
+    setModToView(null);
+  };
+
+  const handleEditFromView = (mod) => {
+    setShowViewModal(false);
+    setModToView(null);
+    setModToEdit(mod);
+    setShowEditModal(true);
+  };
+
   const getStatusColor = (estado) => {
     switch (estado) {
       case 'publicado': return 'text-green-400';
@@ -539,7 +562,7 @@ const ModsAdmin = () => {
                         <td className="actions-column">
                           <div className="action-buttons-container">
                             <button 
-                              onClick={() => navigate(`/mods/${mod.id}`)}
+                              onClick={() => handleViewMod(mod)}
                               className="action-btn-text view"
                               title="Ver mod"
                             >
@@ -681,6 +704,14 @@ const ModsAdmin = () => {
         isOpen={showEditModal}
         onClose={handleEditClose}
         onSave={handleEditSave}
+      />
+
+      {/* Modal de vista de mod */}
+      <ModViewModal
+        mod={modToView}
+        isOpen={showViewModal}
+        onClose={handleViewClose}
+        onEdit={handleEditFromView}
       />
     </>
   );
