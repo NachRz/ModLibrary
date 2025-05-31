@@ -15,7 +15,6 @@ return new class extends Migration
             $table->json('imagenes_adicionales')->nullable();
             $table->integer('edad_recomendada');
             $table->foreignId('juego_id')->constrained('juegos')->onDelete('cascade');
-            $table->string('version_juego_necesaria');
             $table->string('version_actual');
             $table->string('url');
             $table->foreignId('creador_id')->constrained('usuarios')->onDelete('cascade');

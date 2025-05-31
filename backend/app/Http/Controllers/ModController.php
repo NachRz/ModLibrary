@@ -47,7 +47,6 @@ class ModController extends Controller
             'imagenes_adicionales.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'edad_recomendada' => 'required|integer|min:0|max:18',
             'juego_id' => 'required|exists:juegos,id',
-            'version_juego_necesaria' => 'required|string|max:50',
             'version_actual' => 'required|string|max:50',
             'url' => 'nullable|url|max:255',
             'etiquetas' => 'array',
@@ -93,7 +92,6 @@ class ModController extends Controller
             'imagenes_adicionales' => json_encode($imagenesAdicionales),
             'edad_recomendada' => $request->edad_recomendada,
             'juego_id' => $request->juego_id,
-            'version_juego_necesaria' => $request->version_juego_necesaria,
             'version_actual' => $request->version_actual,
             'url' => $request->url,
             'creador_id' => $usuario->id,
@@ -248,7 +246,6 @@ class ModController extends Controller
             'imagenes_adicionales' => 'sometimes|array',
             'imagenes_adicionales.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'edad_recomendada' => 'sometimes|integer|min:0|max:18',
-            'version_juego_necesaria' => 'sometimes|string|max:50',
             'version_actual' => 'sometimes|string|max:50',
             'url' => 'nullable|url|max:255',
             'etiquetas' => 'sometimes|array',
@@ -296,7 +293,6 @@ class ModController extends Controller
         if ($request->filled('titulo')) $mod->titulo = $request->titulo;
         if ($request->filled('descripcion')) $mod->descripcion = $request->descripcion;
         if ($request->filled('edad_recomendada')) $mod->edad_recomendada = $request->edad_recomendada;
-        if ($request->filled('version_juego_necesaria')) $mod->version_juego_necesaria = $request->version_juego_necesaria;
         if ($request->filled('version_actual')) $mod->version_actual = $request->version_actual;
         if ($request->filled('url')) $mod->url = $request->url;
         if ($request->filled('estado')) $mod->estado = $request->estado;

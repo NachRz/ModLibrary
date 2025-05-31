@@ -119,7 +119,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
     visible_en_busqueda: true,
     // Campos funcionales
     juego_id: null,
-    version_juego_necesaria: '',
     url: '',
     // Campos adicionales para gestión de archivos
     tamaño_archivo: 0,
@@ -220,7 +219,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         imagenesAdicionalesFiles: [],
         // Campos funcionales
         juego_id: modCompleto.juego_id || null,
-        version_juego_necesaria: modCompleto.version_juego_necesaria || '',
         url: modCompleto.url || '',
         es_destacado: Boolean(modCompleto.es_destacado),
         permitir_comentarios: modCompleto.permitir_comentarios !== false,
@@ -594,7 +592,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         updateData.append('estado', formData.estado);
         updateData.append('edad_recomendada', parseInt(formData.edad_recomendada, 10));
         updateData.append('version_actual', formData.version);
-        updateData.append('version_juego_necesaria', formData.version_juego_necesaria);
         updateData.append('url', formData.url || '');
         updateData.append('es_destacado', Boolean(formData.es_destacado));
         updateData.append('permitir_comentarios', Boolean(formData.permitir_comentarios));
@@ -634,7 +631,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           estado: formData.estado,
           edad_recomendada: parseInt(formData.edad_recomendada, 10),
           version_actual: formData.version,
-          version_juego_necesaria: formData.version_juego_necesaria,
           url: formData.url || '',
           etiquetas: formData.etiquetas ? formData.etiquetas.map(tag => tag.id) : [],
           es_destacado: Boolean(formData.es_destacado),
@@ -675,7 +671,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             imagen_banner: response.data.imagen_banner || formData.imagen_banner,
             descripcion: formData.descripcion,
             edad_recomendada: formData.edad_recomendada,
-            version_juego_necesaria: formData.version_juego_necesaria,
             version_actual: formData.version || formData.version_actual,
             url: formData.url,
             es_destacado: formData.es_destacado,
@@ -749,20 +744,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               onChange={handleInputChange}
               className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
               placeholder="1.0"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Versión del juego requerida
-            </label>
-            <input
-              type="text"
-              name="version_juego_necesaria"
-              value={formData.version_juego_necesaria}
-              onChange={handleInputChange}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-              placeholder="Ej: 1.20.4"
             />
           </div>
 

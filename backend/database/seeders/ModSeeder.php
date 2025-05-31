@@ -161,7 +161,6 @@ class ModSeeder extends Seeder
                 'imagen_banner' => $modData['Imagen'],
                 'edad_recomendada' => $modData['EdadRecomendada'],
                 'juego_id' => $juego->id,
-                'version_juego_necesaria' => $modData['VersionJuegoNecesaria'],
                 'version_actual' => $modData['VersionActual'],
                 'url' => $modData['Url'],
                 'creador_id' => $creador->id,

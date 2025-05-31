@@ -12,7 +12,6 @@
             ],
             "Juego": "Resident Evil 4",
             "NumDescargas": 5000,
-            "VersionJuegoNecesaria": "1.4.2",
             "VersionesAnteriores": [
                 "1.3.0",
                 "1.2.1"
@@ -35,7 +34,6 @@
             ],
             "Juego": "Resident Evil 4",
             "NumDescargas": 4000,
-            "VersionJuegoNecesaria": "1.4.2",
             "VersionesAnteriores": [],
             "VersionActual": "1.0.0",
             "Url": "https://www.nuevasfronterasmod.com",
@@ -55,7 +53,6 @@
             ],
             "Juego": "Resident Evil 4",
             "NumDescargas": 3000,
-            "VersionJuegoNecesaria": "1.4.2",
             "VersionesAnteriores": [
                 "1.2.5",
                 "1.3.7"
@@ -78,7 +75,6 @@
             ],
             "Juego": "Resident Evil 4",
             "NumDescargas": 3500,
-            "VersionJuegoNecesaria": "1.4.2",
             "VersionesAnteriores": [
                 "1.1.0",
                 "1.3.3"
@@ -100,7 +96,6 @@
             ],
             "Juego": "Resident Evil 4",
             "NumDescargas": 4500,
-            "VersionJuegoNecesaria": "1.4.2",
             "VersionesAnteriores": [
                 "1.3.9",
                 "1.4.0"
@@ -123,7 +118,6 @@
             ],
             "Juego": "Dark Souls: Remastered",
             "NumDescargas": 5200,
-            "VersionJuegoNecesaria": "2.0.1",
             "VersionesAnteriores": [
                 "1.9.0",
                 "2.0.0"
@@ -146,7 +140,6 @@
             ],
             "Juego": "Dark Souls: Remastered",
             "NumDescargas": 4800,
-            "VersionJuegoNecesaria": "2.0.1",
             "VersionesAnteriores": [],
             "VersionActual": "2.2.0",
             "Url": "https://www.Mysterysantiguosmod.com",
@@ -165,7 +158,6 @@
             ],
             "Juego": "Persona 5 Royal",
             "NumDescargas": 5300,
-            "VersionJuegoNecesaria": "1.7.3",
             "VersionesAnteriores": [
                 "1.6.0",
                 "1.6.5"
@@ -188,7 +180,6 @@
             ],
             "Juego": "Sekiro: Shadows Die Twice",
             "NumDescargas": 4200,
-            "VersionJuegoNecesaria": "2.5.0",
             "VersionesAnteriores": [
                 "2.4.0",
                 "2.4.5"
@@ -211,7 +202,6 @@
             ],
             "Juego": "Cyberpunk 2077",
             "NumDescargas": 5600,
-            "VersionJuegoNecesaria": "3.1.4",
             "VersionesAnteriores": [
                 "3.0.0",
                 "3.1.0"
@@ -234,7 +224,6 @@
             ],
             "Juego": "Cyberpunk 2077",
             "NumDescargas": 3200,
-            "VersionJuegoNecesaria": "3.1.4",
             "VersionesAnteriores": [
                 "3.0.5"
             ],
@@ -256,7 +245,6 @@
             ],
             "Juego": "Cyberpunk 2077",
             "NumDescargas": 3000,
-            "VersionJuegoNecesaria": "3.1.4",
             "VersionesAnteriores": [
                 "3.0.1",
                 "3.1.0"
@@ -279,7 +267,6 @@
             ],
             "Juego": "Cyberpunk 2077",
             "NumDescargas": 3500,
-            "VersionJuegoNecesaria": "3.1.4",
             "VersionesAnteriores": [
                 "3.1.3"
             ],
@@ -301,7 +288,6 @@
             ],
             "Juego": "Cyberpunk 2077",
             "NumDescargas": 3700,
-            "VersionJuegoNecesaria": "3.1.4",
             "VersionesAnteriores": [],
             "VersionActual": "3.5.0",
             "Url": "https://www.speedenelvaciomod.com",
@@ -321,7 +307,6 @@
             ],
             "Juego": "Cyberpunk 2077",
             "NumDescargas": 4100,
-            "VersionJuegoNecesaria": "3.1.4",
             "VersionesAnteriores": [
                 "3.0.0",
                 "3.1.2"
@@ -344,7 +329,6 @@
             ],
             "Juego": "Minecraft",
             "NumDescargas": 2000,
-            "VersionJuegoNecesaria": "1.2.5",
             "VersionesAnteriores": [
                 "1.2.0"
             ],
@@ -366,7 +350,6 @@
             ],
             "Juego": "Minecraft",
             "NumDescargas": 2500,
-            "VersionJuegoNecesaria": "1.2.5",
             "VersionesAnteriores": [],
             "VersionActual": "1.4.0",
             "Url": "https://www.construyetuestacionmod.com",
@@ -386,7 +369,6 @@
             ],
             "Juego": "Minecraft",
             "NumDescargas": 1500,
-            "VersionJuegoNecesaria": "1.2.5",
             "VersionesAnteriores": [
                 "1.1.0",
                 "1.2.0"
@@ -409,7 +391,6 @@
             ],
             "Juego": "Minecraft",
             "NumDescargas": 1800,
-            "VersionJuegoNecesaria": "1.2.5",
             "VersionesAnteriores": [
                 "1.2.3"
             ],
@@ -431,7 +412,6 @@
             ],
             "Juego": "Minecraft",
             "NumDescargas": 2200,
-            "VersionJuegoNecesaria": "1.2.5",
             "VersionesAnteriores": [
                 "1.0.0",
                 "1.2.0"
@@ -454,7 +434,6 @@
             ],
             "Juego": "Sea of Thieves",
             "NumDescargas": 3000,
-            "VersionJuegoNecesaria": "3.4.1",
             "VersionesAnteriores": [
                 "3.3.0",
                 "3.3.5"
@@ -477,7 +456,6 @@
             ],
             "Juego": "Sea of Thieves",
             "NumDescargas": 2500,
-            "VersionJuegoNecesaria": "3.4.1",
             "VersionesAnteriores": [],
             "VersionActual": "3.6.0",
             "Url": "https://www.nuevasislasmod.com",
@@ -497,7 +475,6 @@
             ],
             "Juego": "Sea of Thieves",
             "NumDescargas": 3200,
-            "VersionJuegoNecesaria": "3.4.1",
             "VersionesAnteriores": [
                 "3.3.8",
                 "3.4.0"
@@ -520,7 +497,6 @@
             ],
             "Juego": "Sea of Thieves",
             "NumDescargas": 2800,
-            "VersionJuegoNecesaria": "3.4.1",
             "VersionesAnteriores": [
                 "3.2.0",
                 "3.3.0"
@@ -543,7 +519,6 @@
             ],
             "Juego": "Sea of Thieves",
             "NumDescargas": 2900,
-            "VersionJuegoNecesaria": "3.4.1",
             "VersionesAnteriores": [
                 "3.4.0"
             ],
@@ -565,7 +540,6 @@
             ],
             "Juego": "Outer Wilds",
             "NumDescargas": 4100,
-            "VersionJuegoNecesaria": "2.2.0",
             "VersionesAnteriores": [
                 "2.1.5",
                 "2.1.8"
@@ -588,7 +562,6 @@
             ],
             "Juego": "Outer Wilds",
             "NumDescargas": 4300,
-            "VersionJuegoNecesaria": "2.2.0",
             "VersionesAnteriores": [],
             "VersionActual": "2.4.0",
             "Url": "https://www.armasavanzadasmod.com",
@@ -608,7 +581,6 @@
             ],
             "Juego": "Outer Wilds",
             "NumDescargas": 3900,
-            "VersionJuegoNecesaria": "2.2.0",
             "VersionesAnteriores": [
                 "2.1.0",
                 "2.1.9"
@@ -631,7 +603,6 @@
             ],
             "Juego": "Outer Wilds",
             "NumDescargas": 4200,
-            "VersionJuegoNecesaria": "2.2.0",
             "VersionesAnteriores": [
                 "2.2.0"
             ],
@@ -653,7 +624,6 @@
             ],
             "Juego": "Outer Wilds",
             "NumDescargas": 4000,
-            "VersionJuegoNecesaria": "2.2.0",
             "VersionesAnteriores": [
                 "2.0.0",
                 "2.1.0"
@@ -676,7 +646,6 @@
             ],
             "Juego": "Dark Souls III: The Ringed City",
             "NumDescargas": 3200,
-            "VersionJuegoNecesaria": "1.5.7",
             "VersionesAnteriores": [
                 "1.5.0",
                 "1.5.5"
@@ -699,7 +668,6 @@
             ],
             "Juego": "Dark Souls III: The Ringed City",
             "NumDescargas": 2900,
-            "VersionJuegoNecesaria": "1.5.7",
             "VersionesAnteriores": [],
             "VersionActual": "1.7.0",
             "Url": "https://www.hechizosdesombramod.com",
@@ -719,7 +687,6 @@
             ],
             "Juego": "Dark Souls III: The Ringed City",
             "NumDescargas": 3500,
-            "VersionJuegoNecesaria": "1.5.7",
             "VersionesAnteriores": [
                 "1.4.8",
                 "1.5.0"
@@ -742,7 +709,6 @@
             ],
             "Juego": "Dark Souls III: The Ringed City",
             "NumDescargas": 3000,
-            "VersionJuegoNecesaria": "1.5.7",
             "VersionesAnteriores": [
                 "1.5.2"
             ],
@@ -764,7 +730,6 @@
             ],
             "Juego": "Dark Souls III: The Ringed City",
             "NumDescargas": 2800,
-            "VersionJuegoNecesaria": "1.5.7",
             "VersionesAnteriores": [
                 "1.4.5",
                 "1.5.3"
@@ -787,7 +752,6 @@
             ],
             "Juego": "Assetto Corsa",
             "NumDescargas": 2100,
-            "VersionJuegoNecesaria": "4.0.3",
             "VersionesAnteriores": [
                 "3.9.5",
                 "4.0.0"
@@ -810,7 +774,6 @@
             ],
             "Juego": "Assetto Corsa",
             "NumDescargas": 2300,
-            "VersionJuegoNecesaria": "4.0.3",
             "VersionesAnteriores": [],
             "VersionActual": "4.2.0",
             "Url": "https://www.desafiosdeepocamod.com",
@@ -830,7 +793,6 @@
             ],
             "Juego": "Assetto Corsa",
             "NumDescargas": 2500,
-            "VersionJuegoNecesaria": "4.0.3",
             "VersionesAnteriores": [
                 "4.0.1",
                 "4.0.2"
@@ -853,7 +815,6 @@
             ],
             "Juego": "Assetto Corsa",
             "NumDescargas": 1900,
-            "VersionJuegoNecesaria": "4.0.3",
             "VersionesAnteriores": [
                 "3.8.0",
                 "4.0.0"
@@ -876,7 +837,6 @@
             ],
             "Juego": "Assetto Corsa",
             "NumDescargas": 2200,
-            "VersionJuegoNecesaria": "4.0.3",
             "VersionesAnteriores": [
                 "4.0.0",
                 "4.0.2"

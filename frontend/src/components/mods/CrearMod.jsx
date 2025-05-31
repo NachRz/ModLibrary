@@ -106,7 +106,7 @@ const CrearMod = () => {
   const [initialGameOptions, setInitialGameOptions] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   
-  // Estados para los campos del formulario
+  // Estado del formulario
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
@@ -116,7 +116,6 @@ const CrearMod = () => {
     imagenesAdicionalesFiles: [],
     juego_id: null,
     edad_recomendada: 12,
-    version_juego_necesaria: '',
     version_actual: '1.0.0',
     url: '',
     etiquetas: [],
@@ -464,10 +463,6 @@ const CrearMod = () => {
       newErrors.juego_id = 'Debes seleccionar un juego';
     }
     
-    if (!formData.version_juego_necesaria.trim()) {
-      newErrors.version_juego_necesaria = 'La versión del juego es obligatoria';
-    }
-    
     if (!formData.version_actual.trim()) {
       newErrors.version_actual = 'La versión del mod es obligatoria';
     }
@@ -514,7 +509,6 @@ const CrearMod = () => {
           edad_recomendada: parseInt(formData.edad_recomendada, 10),
           creador_id: user.id,
           version_actual: formData.version_actual,
-          version_juego_necesaria: formData.version_juego_necesaria,
           url: formData.url,
           estado: formData.estado,
           juego_id: formData.juego_id,
@@ -710,44 +704,6 @@ const CrearMod = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Versión del juego necesaria *
-              </label>
-                  <input
-                    type="text"
-                    name="version_juego_necesaria"
-                    value={formData.version_juego_necesaria}
-                    onChange={handleChange}
-                className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                  errors.version_juego_necesaria ? 'border-red-500' : 'border-gray-600'
-                }`}
-                    disabled={submitting}
-                placeholder="Ej: 1.20.4"
-                  />
-              {errors.version_juego_necesaria && <span className="text-red-400 text-sm mt-1 block">{errors.version_juego_necesaria}</span>}
-                </div>
-                
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Versión del mod *
-              </label>
-                  <input
-                    type="text"
-                    name="version_actual"
-                    value={formData.version_actual}
-                    onChange={handleChange}
-                className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                  errors.version_actual ? 'border-red-500' : 'border-gray-600'
-                }`}
-                    disabled={submitting}
-                placeholder="Ej: 1.0.0"
-                  />
-              {errors.version_actual && <span className="text-red-400 text-sm mt-1 block">{errors.version_actual}</span>}
-            </div>
-                </div>
-                
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Edad recomendada
               </label>
               <select
@@ -779,10 +735,30 @@ const CrearMod = () => {
                 <option value="borrador">Borrador</option>
                 <option value="publicado">Publicado</option>
               </select>
-                        </div>
-                    </div>
-                  </div>
-                </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Versión del mod *
+              </label>
+                  <input
+                    type="text"
+                    name="version_actual"
+                    value={formData.version_actual}
+                    onChange={handleChange}
+                className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                  errors.version_actual ? 'border-red-500' : 'border-gray-600'
+                }`}
+                    disabled={submitting}
+                placeholder="Ej: 1.0.0"
+                  />
+              {errors.version_actual && <span className="text-red-400 text-sm mt-1 block">{errors.version_actual}</span>}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
