@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationTriangle, faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export const UserHasModsModal = ({ userName, userHasMods, onConfirm, onSoftDelete, onCancel, isOpen }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+  const modalContent = (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
       <div className="bg-gray-800 rounded-lg max-w-lg w-full mx-auto border border-yellow-500">
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center space-x-3">
@@ -90,6 +91,8 @@ export const UserHasModsModal = ({ userName, userHasMods, onConfirm, onSoftDelet
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCancel, isOpen }) => {
@@ -106,8 +109,8 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+  const modalContent = (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
       <div className="bg-gray-800 rounded-lg max-w-lg w-full mx-auto border border-red-500">
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center space-x-3">
@@ -183,7 +186,7 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
             disabled={!isValid}
             className={`px-4 py-2 rounded transition-colors flex items-center space-x-2 ${
               isValid 
-                ? 'bg-red-600 text-white hover:bg-red-700' 
+                ? 'bg-red-600 text-white hover:bg-red-700'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
             }`}
           >
@@ -194,13 +197,15 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export const PermanentDeleteModal = ({ userName, onDeleteKeepMods, onDeleteWithMods, onCancel, isOpen }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+  const modalContent = (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
       <div className="bg-gray-800 rounded-lg max-w-lg w-full mx-auto border border-red-500">
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center space-x-3">
@@ -275,4 +280,6 @@ export const PermanentDeleteModal = ({ userName, onDeleteKeepMods, onDeleteWithM
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 }; 

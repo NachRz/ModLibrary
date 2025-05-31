@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import adminService from '../../../../../services/api/adminService';
 
 const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
@@ -173,8 +174,8 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  const modalContent = (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
       <div className="bg-gray-800 rounded-lg w-full max-w-lg mx-auto overflow-hidden">
         {/* Header fijo */}
         <div className="flex justify-between items-center p-6 border-b border-gray-700">
@@ -390,6 +391,9 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
       </div>
     </div>
   );
+
+  // Renderizar el modal usando un portal al body del documento
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default UserEditModal; 

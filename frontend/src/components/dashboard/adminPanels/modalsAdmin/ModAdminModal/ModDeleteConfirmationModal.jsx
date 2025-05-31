@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationTriangle, faTrash, faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -36,8 +37,8 @@ const ModDeleteConfirmationModal = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+  const modalContent = (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
       <div className={`bg-gray-800 rounded-lg max-w-lg w-full mx-auto border ${isDangerous ? 'border-red-500' : 'border-yellow-500'}`}>
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center space-x-3">
@@ -149,6 +150,8 @@ const ModDeleteConfirmationModal = ({
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default ModDeleteConfirmationModal; 
