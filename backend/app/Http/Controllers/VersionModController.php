@@ -84,7 +84,7 @@ class VersionModController extends Controller
         // Verificar que el usuario autenticado es el creador del mod
         $usuario = $request->user();
         
-        if ($usuario->id !== $mod->creador_id && !$usuario->es_admin) {
+        if ($usuario->id !== $mod->creador_id && $usuario->rol !== 'admin') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tiene permiso para añadir versiones a este mod'
@@ -172,7 +172,7 @@ class VersionModController extends Controller
         // Verificar que el usuario autenticado es el creador del mod
         $usuario = $request->user();
         
-        if ($usuario->id !== $mod->creador_id && !$usuario->es_admin) {
+        if ($usuario->id !== $mod->creador_id && $usuario->rol !== 'admin') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tiene permiso para actualizar versiones de este mod'
@@ -266,7 +266,7 @@ class VersionModController extends Controller
         // Verificar que el usuario autenticado es el creador del mod
         $usuario = $request->user();
         
-        if ($usuario->id !== $mod->creador_id && !$usuario->es_admin) {
+        if ($usuario->id !== $mod->creador_id && $usuario->rol !== 'admin') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tiene permiso para eliminar versiones de este mod'

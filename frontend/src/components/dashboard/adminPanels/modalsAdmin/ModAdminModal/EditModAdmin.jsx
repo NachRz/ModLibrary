@@ -668,8 +668,8 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             descargas: mod.descargas || 0, // Mantener el valor existente
             valoracion: mod.valoracion || 0, // Mantener el valor existente
             fecha_creacion: mod.fecha_creacion || new Date().toLocaleDateString(),
-            creador: mod.creador || 'Usuario', // Mantener el creador existente
-            juego: mod.juego || 'Juego', // Mantener el juego existente
+            creador: mod.creador?.nome || mod.creador?.nombre || 'Usuario', // Usar el nombre del creador
+            juego: mod.juego?.titulo || mod.juego?.title || mod.juego?.nombre || 'Juego', // Usar el título del juego
             // Campos adicionales para que el modal funcione correctamente
             imagen_banner: response.data.imagen_banner || formData.imagen_banner,
             descripcion: formData.descripcion,

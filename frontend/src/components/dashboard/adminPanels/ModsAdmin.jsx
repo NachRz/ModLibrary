@@ -519,15 +519,15 @@ const ModsAdmin = () => {
                               <div className="text-white font-medium text-sm lg:text-base truncate">{mod.nombre}</div>
                               <div className="text-gray-400 text-xs lg:text-sm">{mod.fecha_creacion}</div>
                               <div className="sm:hidden text-gray-400 text-xs mt-1">
-                                <span>{mod.creador}</span>
+                                <span>{mod.creador?.nome || mod.creador?.nombre || 'Usuario'}</span>
                                 <span className="mx-2">•</span>
-                                <span>{mod.juego}</span>
+                                <span>{mod.juego?.titulo || mod.juego?.title || mod.juego?.nombre || 'Juego'}</span>
                               </div>
                             </div>
                           </div>
                         </td>
-                        <td className="col-email text-cell hidden sm:table-cell">{mod.creador}</td>
-                        <td className="col-name text-cell hidden md:table-cell">{mod.juego}</td>
+                        <td className="col-email text-cell hidden sm:table-cell">{mod.creador?.nome || mod.creador?.nombre || 'Usuario'}</td>
+                        <td className="col-name text-cell hidden md:table-cell">{mod.juego?.titulo || mod.juego?.title || mod.juego?.nombre || 'Juego'}</td>
                         <td className="col-status">
                           <div className="flex items-center gap-2">
                             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${getStatusBadge(mod.estado)}`}></span>

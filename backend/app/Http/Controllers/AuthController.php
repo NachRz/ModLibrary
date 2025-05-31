@@ -733,4 +733,68 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    // Crear usuario desde panel de administración
+    public function createUser(Request $request)
+    {
+        try {
+            $request->validate([
+                'nome' => 'required|string|max:255|unique:usuarios',
+                'correo' => 'required|string|email|max:255|unique:usuarios',
+                'contrasina' => 'required|string|min:6',
+                'nombre' => 'required|string|max:255',
+                'apelidos' => 'required|string|max:255',
+                'rol' => 'required|in:usuario,admin'
+            ]);
+
+            $usuario = Usuario::create([
+                'nome' => $request->nome,
+                'correo' => $request->correo,
+                'contrasina' => Hash::make($request->contrasina),
+                'nombre' => $request->nombre,
+                'apelidos' => $request->apelidos,
+                'foto_perfil' => null,
+                'rol' => $request->rol
+            ]);
+
+            Log::info('Usuario creado por administrador', [
+                'usuario_creado_id' => $usuario->id,
+                'admin_id' => $request->user()->id
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario creado exitosamente',
+                'data' => [
+                    'id' => $usuario->id,
+                    'nome' => $usuario->nome,
+                    'correo' => $usuario->correo,
+                    'rol' => $usuario->rol,
+                    'nombre_completo' => $usuario->nombre . ' ' . $usuario->apelidos,
+                    'estado' => 'activo',
+                    'fecha_registro' => $usuario->created_at->format('Y-m-d'),
+                    'tiene_mods' => false
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error al crear usuario', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Si es un error de validación, devolver los errores específicos
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Error de validación',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al crear el usuario'
+            ], 500);
+        }
+    }
 } 

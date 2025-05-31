@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ModController extends Controller
 {
@@ -231,7 +232,7 @@ class ModController extends Controller
         $usuario = $request->user();
 
         // Verificar que el usuario es el creador del mod o un administrador
-        if ($usuario->id !== $mod->creador_id && !$usuario->es_admin) {
+        if ($usuario->id !== $mod->creador_id && $usuario->rol !== 'admin') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tiene permiso para actualizar este mod'
@@ -793,7 +794,7 @@ class ModController extends Controller
         $usuario = $request->user();
 
         // Verificar que el usuario es el creador del mod o un administrador
-        if ($usuario->id !== $mod->creador_id && !$usuario->es_admin) {
+        if ($usuario->id !== $mod->creador_id && $usuario->rol !== 'admin') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tiene permiso para actualizar este mod'

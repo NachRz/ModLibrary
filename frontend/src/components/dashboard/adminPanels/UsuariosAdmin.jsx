@@ -215,10 +215,21 @@ const UsuariosAdminContent = () => {
     setIsModalOpen(true);
   };
 
-  const handleSaveUser = (updatedUser) => {
-    setUsuarios(prev => prev.map(user => 
-      user.id === updatedUser.id ? updatedUser : user
-    ));
+  const handleSaveUser = async (updatedUser) => {
+    try {
+      // Actualizar el usuario en la lista local
+      setUsuarios(prev => prev.map(user => 
+        user.id === updatedUser.id ? updatedUser : user
+      ));
+      
+      // Recargar los datos del usuario para asegurar que las estadísticas estén actualizadas
+      // Esto es especialmente importante si se ha navegado desde la edición de mods
+      await loadUsers();
+    } catch (error) {
+      console.error('Error al recargar usuarios:', error);
+      // Mostrar notificación si hay un error
+      showNotification('Usuario actualizado, pero hubo un problema al recargar los datos', 'warning');
+    }
   };
 
   const handleDeleteUser = async (userId) => {

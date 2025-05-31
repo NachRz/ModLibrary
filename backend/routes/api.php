@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->get('/user/is-admin', [AuthController::class,
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     // Gestión de usuarios
     Route::get('/users', [AuthController::class, 'getAllUsers']);
+    Route::post('/users', [AuthController::class, 'createUser']);
     Route::get('/users/deleted', [AuthController::class, 'getDeletedUsers']);
     Route::get('/users/{id}', [AuthController::class, 'getUserDetails']);
     Route::get('/users/{id}/stats', [AuthController::class, 'getUserStats']);

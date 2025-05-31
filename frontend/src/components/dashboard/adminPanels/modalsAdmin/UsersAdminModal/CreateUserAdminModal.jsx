@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import adminService from '../../../../../services/api/adminService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -35,6 +35,13 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+
+  // Limpiar formulario cuando se abre el modal
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
 
   const resetForm = () => {
     setFormData({
@@ -171,8 +178,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
       const createData = {
         nome: formData.nome.trim(),
         correo: formData.correo.trim(),
-        password: formData.password,
-        password_confirmation: formData.password_confirmation,
+        contrasina: formData.password,
         nombre: formData.nombre.trim(),
         apelidos: formData.apelidos.trim(),
         rol: formData.rol,
@@ -240,7 +246,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
 
         {/* Contenido */}
         <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <form onSubmit={handleSubmit} className="p-5 space-y-5">
+          <form onSubmit={handleSubmit} className="p-5 space-y-5" autoComplete="off">
             {/* Error general */}
             {error && (
               <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg">
@@ -330,6 +336,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   value={formData.nome}
                   onChange={handleChange}
                   placeholder="usuario123"
+                  autoComplete="off"
                   className={`w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border transition-all duration-300 ${
                     validationErrors.nome ? 'border-red-500/50' : 'border-gray-600/50'
                   } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
@@ -352,6 +359,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   value={formData.correo}
                   onChange={handleChange}
                   placeholder="usuario@ejemplo.com"
+                  autoComplete="off"
                   className={`w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border transition-all duration-300 ${
                     validationErrors.correo ? 'border-red-500/50' : 'border-gray-600/50'
                   } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
@@ -402,6 +410,10 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                 Seguridad
               </h3>
 
+              {/* Campos ocultos para confundir el auto-completado */}
+              <input type="text" style={{display: 'none'}} />
+              <input type="password" style={{display: 'none'}} />
+
               {/* Contraseña */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -414,6 +426,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="••••••••"
+                    autoComplete="new-password"
                     className={`w-full bg-gray-700/50 text-white px-3 py-2 pr-10 rounded-lg border transition-all duration-300 ${
                       validationErrors.password ? 'border-red-500/50' : 'border-gray-600/50'
                     } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
@@ -444,6 +457,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                     value={formData.password_confirmation}
                     onChange={handleChange}
                     placeholder="••••••••"
+                    autoComplete="new-password"
                     className={`w-full bg-gray-700/50 text-white px-3 py-2 pr-10 rounded-lg border transition-all duration-300 ${
                       validationErrors.password_confirmation ? 'border-red-500/50' : 'border-gray-600/50'
                     } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
