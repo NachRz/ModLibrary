@@ -3,14 +3,18 @@ import { Link } from 'react-router-dom';
 import PageContainer from '../layout/PageContainer';
 import GameCard from '../common/Cards/GameCard';
 import gameService from '../../services/api/gameService';
+import genreService from '../../services/api/genreService';
 import '../../assets/styles/components/explorarJuegos/ExplorarJuegos.css';
 
 const ExplorarJuegos = () => {
   // Estados
   const [juegos, setJuegos] = useState([]);
+  const [generos, setGeneros] = useState([]);
   const [showFilters, setShowFilters] = useState(true);
   const [filtros, setFiltros] = useState({
     busqueda: '',
+    busquedaGenero: '',
+    generosSeleccionados: [],
     ordenarPor: 'nombre',
     orden: 'asc'
   });
@@ -20,8 +24,23 @@ const ExplorarJuegos = () => {
     totalPaginas: 1
   });
   const [cargando, setCargando] = useState(true);
+  const [cargandoGeneros, setCargandoGeneros] = useState(true);
   const [error, setError] = useState(null);
   const [isUpdatingResults, setIsUpdatingResults] = useState(false);
+
+  // Cargar géneros disponibles
+  const cargarGeneros = useCallback(async () => {
+    try {
+      setCargandoGeneros(true);
+      const generosDisponibles = await genreService.getAllGenres();
+      setGeneros(generosDisponibles);
+    } catch (err) {
+      console.error('Error al cargar géneros:', err);
+      // Los géneros de ejemplo ya están incluidos en el servicio
+    } finally {
+      setCargandoGeneros(false);
+    }
+  }, []);
 
   // Cargar juegos desde la base de datos
   const cargarJuegos = useCallback(async () => {
@@ -39,7 +58,8 @@ const ExplorarJuegos = () => {
         totalMods: game.total_mods,
         mods_totales: game.total_mods,
         rating: game.rating,
-        release_date: game.fecha_lanzamiento
+        release_date: game.fecha_lanzamiento,
+        generos: game.generos || []
       })));
     } catch (err) {
       setError('Error al cargar los juegos');
@@ -50,8 +70,9 @@ const ExplorarJuegos = () => {
   }, []);
 
   useEffect(() => {
+    cargarGeneros();
     cargarJuegos();
-  }, [cargarJuegos]);
+  }, [cargarGeneros, cargarJuegos]);
 
   // Efecto para animar el contador de resultados
   useEffect(() => {
@@ -69,25 +90,66 @@ const ExplorarJuegos = () => {
     }));
   };
 
+  // Manejar selección de géneros
+  const handleGeneroToggle = (generoId) => {
+    setFiltros(prev => ({
+      ...prev,
+      generosSeleccionados: prev.generosSeleccionados.includes(generoId)
+        ? prev.generosSeleccionados.filter(id => id !== generoId)
+        : [...prev.generosSeleccionados, generoId]
+    }));
+  };
+
   // Limpiar todos los filtros
   const handleClearFilters = () => {
     setFiltros({
       busqueda: '',
+      busquedaGenero: '',
+      generosSeleccionados: [],
       ordenarPor: 'nombre',
       orden: 'asc'
     });
   };
 
   // Verificar si hay filtros activos
-  const hayFiltrosActivos = filtros.busqueda;
+  const hayFiltrosActivos = filtros.busqueda || filtros.generosSeleccionados.length > 0;
+
+  // Calcular contadores de juegos por género
+  const calcularContadorGenero = (generoId) => {
+    return juegos.filter(juego => {
+      const juegoGeneros = juego.generos || [];
+      return juegoGeneros.some(genero => genero.id === generoId);
+    }).length;
+  };
+
+  // Filtrar géneros por búsqueda
+  const generosFiltrados = generos.filter(genero => {
+    if (!filtros.busquedaGenero) return true;
+    return genero.nombre.toLowerCase().includes(filtros.busquedaGenero.toLowerCase());
+  });
 
   // Filtrar y ordenar los juegos
   const juegosFiltrados = juegos
     .filter(juego => {
+      // Filtro por búsqueda
       if (filtros.busqueda) {
         const searchTerm = filtros.busqueda.toLowerCase();
-        return juego.title.toLowerCase().includes(searchTerm);
+        if (!juego.title.toLowerCase().includes(searchTerm)) {
+          return false;
+        }
       }
+      
+      // Filtro por géneros
+      if (filtros.generosSeleccionados.length > 0) {
+        const juegoGeneros = juego.generos || [];
+        const hasMatchingGenre = filtros.generosSeleccionados.some(generoId => 
+          juegoGeneros.some(genero => genero.id === generoId)
+        );
+        if (!hasMatchingGenre) {
+          return false;
+        }
+      }
+      
       return true;
     })
     .sort((a, b) => {
@@ -125,6 +187,12 @@ const ExplorarJuegos = () => {
       ...prev,
       paginaActual: nuevaPagina
     }));
+  };
+
+  // Obtener nombre del género por ID
+  const obtenerNombreGenero = (generoId) => {
+    const genero = generos.find(g => g.id === generoId);
+    return genero ? genero.nombre : `Género ${generoId}`;
   };
 
   return (
@@ -181,18 +249,52 @@ const ExplorarJuegos = () => {
                     />
                   </div>
 
-                  {/* Filtro de género - Próximamente */}
-                  <div className="filter-section mt-4">
-                    <div className="filter-section-header">
-                      <h3 className="text-custom-text font-medium mb-2">Género de juego</h3>
-                    </div>
-                    <div className="p-4 bg-custom-bg/20 rounded-md text-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto text-custom-detail/50 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                      </svg>
-                      <p className="text-sm text-custom-detail">
-                        El filtrado por géneros estará disponible próximamente
-                      </p>
+                  {/* Filtro de género */}
+                  <div className="filter-section">
+                    <div className="game-genre-section">
+                      <h3 className="game-genre-title">GAME GENRE</h3>
+                      
+                      {/* Campo de búsqueda de géneros */}
+                      <div className="genre-search-container">
+                        <input
+                          type="text"
+                          name="busquedaGenero"
+                          value={filtros.busquedaGenero}
+                          onChange={handleFiltroChange}
+                          placeholder="Game genre search"
+                          className="genre-search-input"
+                        />
+                      </div>
+                      
+                      {cargandoGeneros ? (
+                        <div className="p-4 bg-custom-bg/20 rounded-md text-center">
+                          <div className="loading-spinner w-6 h-6 border-2 border-custom-primary/20 border-t-custom-primary rounded-full animate-spin mx-auto mb-2"></div>
+                          <p className="text-sm text-custom-detail">Cargando géneros...</p>
+                        </div>
+                      ) : (
+                        <div className="genre-list">
+                          <div className="space-y-1">
+                            {generosFiltrados.map(genero => {
+                              const contador = calcularContadorGenero(genero.id);
+                              return (
+                                <label
+                                  key={genero.id}
+                                  className="genre-item"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={filtros.generosSeleccionados.includes(genero.id)}
+                                    onChange={() => handleGeneroToggle(genero.id)}
+                                    className="genre-checkbox"
+                                  />
+                                  <span className="genre-name">{genero.nombre}</span>
+                                  <span className="genre-count">({contador})</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -227,6 +329,19 @@ const ExplorarJuegos = () => {
                         </span>
                       </div>
                     )}
+                    
+                    {filtros.generosSeleccionados.map(generoId => (
+                      <div key={generoId} className="filtro-tag">
+                        <span className="tipo">Género:</span>
+                        <span>{obtenerNombreGenero(generoId)}</span>
+                        <span
+                          className="remove ml-2 cursor-pointer"
+                          onClick={() => handleGeneroToggle(generoId)}
+                        >
+                          ×
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -315,7 +430,8 @@ const ExplorarJuegos = () => {
                         mods_totales: juego.mods_totales,
                         total_mods: juego.totalMods,
                         rating: juego.rating,
-                        release_date: juego.release_date
+                        release_date: juego.release_date,
+                        generos: juego.generos
                       }}
                       showFavoriteButton={true}
                     />

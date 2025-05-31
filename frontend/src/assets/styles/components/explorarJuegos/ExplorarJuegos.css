@@ -164,6 +164,192 @@
   color: var(--color-primary);
 }
 
+/* Filtro de géneros */
+.genre-filters {
+  background: rgba(30, 41, 59, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.genre-filters::-webkit-scrollbar {
+  width: 6px;
+}
+
+.genre-filters::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 3px;
+}
+
+.genre-filters::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+
+.genre-filters::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+.genre-filters label {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.genre-filters label:hover {
+  background: rgba(30, 41, 59, 0.4) !important;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.genre-filters input[type="checkbox"] {
+  accent-color: var(--color-primary);
+  transition: all 0.2s ease;
+}
+
+.genre-filters input[type="checkbox"]:checked {
+  transform: scale(1.1);
+}
+
+.genre-filters input[type="checkbox"]:focus {
+  outline: 2px solid rgba(var(--color-primary-rgb), 0.3);
+  outline-offset: 2px;
+}
+
+/* Sección de géneros con estilo similar a la imagen */
+.game-genre-section {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  border-radius: 8px;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.game-genre-title {
+  background: rgba(30, 41, 59, 0.8);
+  color: #94A3B8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+  border-radius: 8px 8px 0 0;
+  text-transform: uppercase;
+}
+
+.genre-search-container {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+}
+
+.genre-search-input {
+  width: 100%;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(71, 85, 105, 0.4);
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #F1F5F9;
+  transition: all 0.2s ease;
+}
+
+.genre-search-input::placeholder {
+  color: #64748B;
+  font-style: italic;
+}
+
+.genre-search-input:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.genre-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.genre-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.genre-list::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 3px;
+  margin: 4px;
+}
+
+.genre-list::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.6);
+  border-radius: 3px;
+}
+
+.genre-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.8);
+}
+
+.genre-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  background: transparent;
+}
+
+.genre-item:hover {
+  background: rgba(30, 41, 59, 0.6);
+}
+
+.genre-checkbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #3B82F6;
+  flex-shrink: 0;
+}
+
+.genre-name {
+  flex: 1;
+  margin-left: 0.75rem;
+  font-size: 0.875rem;
+  color: #F1F5F9;
+  font-weight: 400;
+}
+
+.genre-count {
+  color: #94A3B8;
+  font-size: 0.875rem;
+  font-weight: 400;
+  margin-left: auto;
+}
+
+/* Efectos hover para elementos del género */
+.genre-item:hover .genre-name {
+  color: #3B82F6;
+}
+
+.genre-item:hover .genre-count {
+  color: #F1F5F9;
+}
+
+/* Estado checked del checkbox */
+.genre-item:has(.genre-checkbox:checked) {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.genre-item:has(.genre-checkbox:checked) .genre-name {
+  color: #3B82F6;
+  font-weight: 500;
+}
+
+.genre-item:has(.genre-checkbox:checked) .genre-count {
+  color: #3B82F6;
+  font-weight: 500;
+}
+
 /* Checkboxes personalizados */
 .custom-checkbox {
   position: relative;
