@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamationTriangle, faTrash, faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faExclamationTriangle, 
+  faTrash, 
+  faTimes, 
+  faTrashAlt,
+  faGamepad,
+  faArchive
+} from '@fortawesome/free-solid-svg-icons';
 
 const ModDeleteConfirmationModal = ({ 
   modTitle, 
@@ -38,39 +45,49 @@ const ModDeleteConfirmationModal = ({
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
-      <div className={`bg-gray-800 rounded-lg max-w-lg w-full mx-auto border ${isDangerous ? 'border-red-500' : 'border-yellow-500'}`}>
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <div className="flex items-center space-x-3">
-            <FontAwesomeIcon 
-              icon={isDangerous ? faTrashAlt : faTrash} 
-              className={`text-xl ${isDangerous ? 'text-red-500' : 'text-yellow-500'}`} 
-            />
-            <h2 className="text-lg font-bold text-white">
-              {isDangerous ? 'Eliminar Definitivamente' : 'Desactivar Mod'}
-            </h2>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className={`bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl max-w-lg w-full mx-auto border ${isDangerous ? 'border-red-500/50' : 'border-yellow-500/50'}`}>
+        {/* Header con gradiente mejorado */}
+        <div className={`bg-gradient-to-r ${isDangerous ? 'from-red-600/10 to-red-700/10' : 'from-yellow-600/10 to-orange-600/10'} border-b border-gray-700/50`}>
+          <div className="flex items-center justify-between p-5">
+            <div className="flex items-center space-x-3">
+              <div className={`p-2 bg-gradient-to-br ${isDangerous ? 'from-red-500/20 to-red-600/30' : 'from-yellow-500/20 to-yellow-600/30'} rounded-lg`}>
+                <FontAwesomeIcon 
+                  icon={isDangerous ? faTrashAlt : faArchive} 
+                  className={`${isDangerous ? 'text-red-400' : 'text-yellow-400'}`} 
+                />
+              </div>
+              <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                {isDangerous ? 'Eliminar Definitivamente' : 'Desactivar Mod'}
+              </h2>
+            </div>
+            <button 
+              onClick={handleCancel} 
+              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
           </div>
-          <button onClick={handleCancel} className="text-gray-400 hover:text-white">
-            <FontAwesomeIcon icon={faTimes} />
-          </button>
         </div>
         
-        <div className="p-6">
+        <div className="p-5">
           {isDangerous ? (
             // Modal para eliminación permanente
             <>
-              <div className="bg-red-500 bg-opacity-20 border border-red-500 rounded p-4 mb-6">
+              <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4 mb-6">
                 <div className="flex items-center space-x-2 mb-3">
-                  <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-400" />
-                  <h3 className="text-red-400 font-bold">ADVERTENCIA CRÍTICA</h3>
+                  <div className="p-1 bg-gradient-to-br from-red-400/20 to-red-500/30 rounded-lg">
+                    <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-400 text-sm" />
+                  </div>
+                  <h3 className="text-red-300 font-bold">ADVERTENCIA CRÍTICA</h3>
                 </div>
-                <p className="text-red-300 mb-3">
+                <p className="text-red-200 mb-3">
                   {message}
                 </p>
-                <p className="text-red-300 mb-3">
+                <p className="text-red-200 mb-3">
                   Mod: <span className="font-bold text-white">"{modTitle}"</span>
                 </p>
-                <ul className="text-red-300 text-sm space-y-1 list-disc list-inside">
+                <ul className="text-red-200 text-sm space-y-1 list-disc list-inside">
                   <li>Eliminación PERMANENTE del mod</li>
                   <li>Se eliminarán todas las versiones del mod</li>
                   <li>Se perderán todas las valoraciones y comentarios</li>
@@ -80,20 +97,22 @@ const ModDeleteConfirmationModal = ({
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    id="understand"
-                    checked={understood}
-                    onChange={(e) => setUnderstood(e.target.checked)}
-                    className="mt-1"
-                  />
-                  <label htmlFor="understand" className="text-gray-300 text-sm">
-                    Entiendo las consecuencias y acepto la responsabilidad de esta acción irreversible
-                  </label>
+                <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-4 border border-gray-600/30">
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      id="understand"
+                      checked={understood}
+                      onChange={(e) => setUnderstood(e.target.checked)}
+                      className="mt-1 accent-red-500"
+                    />
+                    <label htmlFor="understand" className="text-gray-300 text-sm">
+                      Entiendo las consecuencias y acepto la responsabilidad de esta acción irreversible
+                    </label>
+                  </div>
                 </div>
 
-                <div>
+                <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-4 border border-gray-600/30">
                   <label className="block text-gray-300 text-sm font-medium mb-2">
                     Para confirmar, escribe exactamente: <span className="text-red-400 font-bold">ELIMINAR MOD</span>
                   </label>
@@ -101,7 +120,7 @@ const ModDeleteConfirmationModal = ({
                     type="text"
                     value={inputConfirmText}
                     onChange={(e) => setInputConfirmText(e.target.value)}
-                    className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                    className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-300"
                     placeholder="Escribe: ELIMINAR MOD"
                   />
                 </div>
@@ -109,43 +128,54 @@ const ModDeleteConfirmationModal = ({
             </>
           ) : (
             // Modal para soft delete
-            <div className="bg-yellow-500 bg-opacity-20 border border-yellow-500 rounded p-4 mb-6">
-              <div className="flex items-center space-x-2 mb-3">
-                <FontAwesomeIcon icon={faExclamationTriangle} className="text-yellow-400" />
-                <h3 className="text-yellow-400 font-bold">Confirmación</h3>
+            <div className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/30 border border-yellow-500/50 rounded-xl p-4 mb-6">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="p-1 bg-gradient-to-br from-yellow-400/20 to-yellow-500/30 rounded-lg">
+                  <FontAwesomeIcon icon={faExclamationTriangle} className="text-yellow-400 text-sm" />
+                </div>
+                <h3 className="text-yellow-300 font-bold">Confirmación</h3>
               </div>
-              <p className="text-yellow-100 mb-3">
+              <p className="text-yellow-200 mb-3">
                 {message}
               </p>
-              <p className="text-yellow-100">
+              <p className="text-yellow-200 mb-3">
                 Mod: <span className="font-bold text-white">"{modTitle}"</span>
               </p>
-              <p className="text-yellow-200 text-sm mt-2">
-                El mod será desactivado pero podrá ser restaurado posteriormente desde la pestaña "Mods Eliminados".
-              </p>
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/20 p-3 rounded-lg border border-blue-500/30 mt-3">
+                <p className="text-blue-200 text-sm flex items-center">
+                  <FontAwesomeIcon icon={faGamepad} className="mr-2 text-blue-400" />
+                  El mod será desactivado pero podrá ser restaurado posteriormente desde la pestaña "Mods Eliminados".
+                </p>
+              </div>
             </div>
           )}
         </div>
 
-        <div className="flex justify-end space-x-3 p-6 border-t border-gray-700">
-          <button
-            onClick={handleCancel}
-            className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleConfirm}
-            disabled={!isValid}
-            className={`px-4 py-2 rounded transition-colors flex items-center space-x-2 ${
-              isValid 
-                ? (isDangerous ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-yellow-600 text-white hover:bg-yellow-700')
-                : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-            }`}
-          >
-            <FontAwesomeIcon icon={isDangerous ? faTrashAlt : faTrash} />
-            <span>{confirmText}</span>
-          </button>
+        {/* Footer mejorado */}
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5">
+          <div className="flex justify-end space-x-3">
+            <button
+              onClick={handleCancel}
+              className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={!isValid}
+              className={`px-5 py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 ${
+                isValid 
+                  ? (isDangerous 
+                      ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white' 
+                      : 'bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white'
+                    )
+                  : 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              <FontAwesomeIcon icon={isDangerous ? faTrashAlt : faArchive} />
+              <span>{confirmText}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

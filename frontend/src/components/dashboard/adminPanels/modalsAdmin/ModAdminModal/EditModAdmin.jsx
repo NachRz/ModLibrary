@@ -14,7 +14,9 @@ import {
   faComments,
   faExclamationTriangle,
   faTag,
-  faGamepad
+  faGamepad,
+  faEdit,
+  faCog
 } from '@fortawesome/free-solid-svg-icons';
 import { useNotification } from '../../../../../context/NotificationContext';
 import modService from '../../../../../services/api/modService';
@@ -61,11 +63,11 @@ const CustomGameSingleValue = ({ children, data }) => (
       )}
     </div>
     <div className="game-single-info">
-      <div className="game-single-title">{children}</div>
-      <div className="game-single-rating">
-        <span className="rating-star">★</span>
+      <span className="game-single-title">{children}</span>
+      <span className="game-single-rating" style={{ marginLeft: '8px', color: '#9CA3AF', fontSize: '0.875rem' }}>
+        <span style={{ color: '#F59E0B' }}>★</span>
         {data.game?.rating ? data.game.rating.toFixed(1) : 'N/A'}
-      </div>
+      </span>
     </div>
   </div>
 );
@@ -711,170 +713,195 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const renderTabGeneral = () => (
     <div className="space-y-6">
       {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+        <div className="flex items-center justify-center py-16">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500/20 border-t-purple-500"></div>
+            <div className="absolute inset-0 animate-ping rounded-full h-12 w-12 border-4 border-purple-500/10"></div>
+          </div>
           <span className="ml-3 text-gray-300">Cargando datos del mod...</span>
         </div>
       ) : (
         <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Información básica */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Título *
-            </label>
-            <input
-              type="text"
-              name="titulo"
-              value={formData.titulo}
-              onChange={handleInputChange}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-              placeholder="Título del mod"
-            />
-          </div>
+          {/* Información básica */}
+          <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
+            <h4 className="text-lg font-bold text-white mb-4 flex items-center">
+              <div className="p-2 bg-gradient-to-br from-blue-500/20 to-blue-600/30 rounded-lg mr-2">
+                <FontAwesomeIcon icon={faEye} className="text-blue-400" />
+              </div>
+              Información Básica
+            </h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Información básica */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Título *
+                  </label>
+                  <input
+                    type="text"
+                    name="titulo"
+                    value={formData.titulo}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                    placeholder="Título del mod"
+                  />
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Versión
-            </label>
-            <input
-              type="text"
-              name="version"
-              value={formData.version}
-              onChange={handleInputChange}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-              placeholder="1.0"
-            />
-          </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Versión
+                  </label>
+                  <input
+                    type="text"
+                    name="version"
+                    value={formData.version}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                    placeholder="1.0"
+                  />
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Juego asociado *
-            </label>
-            <AsyncSelect
-              value={selectedGame}
-              onChange={handleGameChange}
-              loadOptions={loadGameOptions}
-              defaultOptions={initialGameOptions}
-              cacheOptions
-              placeholder="Seleccionar juego..."
-              loadingMessage={() => "Buscando juegos..."}
-              noOptionsMessage={() => "No se encontraron juegos"}
-              isDisabled={loadingGames}
-              className={`select-container ${errorGames ? 'error' : ''}`}
-              classNamePrefix="select"
-              components={{
-                Option: CustomGameOption,
-                SingleValue: CustomGameSingleValue
-              }}
-            />
-            {errorGames && (
-              <p className="text-red-400 text-sm mt-1">{errorGames}</p>
-            )}
-            {loadingGames && (
-              <p className="text-gray-400 text-sm mt-1">Sincronizando juego...</p>
-            )}
-            <small className="text-gray-400 text-sm mt-1 block">
-              Busca y selecciona el juego para el cual es este mod
-            </small>
-          </div>
-        </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                    <FontAwesomeIcon icon={faGamepad} className="mr-2 text-green-400" />
+                    Juego asociado *
+                  </label>
+                  <AsyncSelect
+                    value={selectedGame}
+                    onChange={handleGameChange}
+                    loadOptions={loadGameOptions}
+                    defaultOptions={initialGameOptions}
+                    cacheOptions
+                    placeholder="Seleccionar juego..."
+                    loadingMessage={() => "Buscando juegos..."}
+                    noOptionsMessage={() => "No se encontraron juegos"}
+                    isDisabled={loadingGames}
+                    className={`select-container ${errorGames ? 'error' : ''}`}
+                    classNamePrefix="select"
+                    components={{
+                      Option: CustomGameOption,
+                      SingleValue: CustomGameSingleValue
+                    }}
+                  />
+                  {errorGames && (
+                    <p className="text-red-400 text-sm mt-1">{errorGames}</p>
+                  )}
+                  {loadingGames && (
+                    <p className="text-gray-400 text-sm mt-1">Sincronizando juego...</p>
+                  )}
+                  <small className="text-gray-400 text-sm mt-1 block">
+                    Busca y selecciona el juego para el cual es este mod
+                  </small>
+                </div>
+              </div>
 
-        {/* Configuraciones */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Estado
-            </label>
-            <select
-              name="estado"
-              value={formData.estado}
-              onChange={handleInputChange}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-            >
-              <option value="borrador">Borrador</option>
-              <option value="publicado">Publicado</option>
-              <option value="revision">En revisión</option>
-              <option value="suspendido">Suspendido</option>
-            </select>
-          </div>
+              {/* Configuraciones */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Estado
+                  </label>
+                  <select
+                    name="estado"
+                    value={formData.estado}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                    style={{
+                      backgroundColor: '#374151',
+                      borderColor: '#4B5563',
+                      minHeight: '45px'
+                    }}
+                  >
+                    <option value="borrador" style={{ backgroundColor: '#374151', color: 'white' }}>Borrador</option>
+                    <option value="publicado" style={{ backgroundColor: '#374151', color: 'white' }}>Publicado</option>
+                  </select>
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Edad recomendada
-            </label>
-            <select
-              name="edad_recomendada"
-              value={formData.edad_recomendada}
-              onChange={handleInputChange}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-            >
-              <option value={0}>Sin clasificar</option>
-              <option value={3}>3+ años</option>
-              <option value={7}>7+ años</option>
-              <option value={12}>12+ años</option>
-              <option value={16}>16+ años</option>
-              <option value={18}>18+ años</option>
-            </select>
-          </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Edad recomendada
+                  </label>
+                  <select
+                    name="edad_recomendada"
+                    value={formData.edad_recomendada}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                    style={{
+                      backgroundColor: '#374151',
+                      borderColor: '#4B5563',
+                      minHeight: '45px'
+                    }}
+                  >
+                    <option value={0} style={{ backgroundColor: '#374151', color: 'white' }}>Sin clasificar</option>
+                    <option value={3} style={{ backgroundColor: '#374151', color: 'white' }}>3+ años</option>
+                    <option value={7} style={{ backgroundColor: '#374151', color: 'white' }}>7+ años</option>
+                    <option value={12} style={{ backgroundColor: '#374151', color: 'white' }}>12+ años</option>
+                    <option value={16} style={{ backgroundColor: '#374151', color: 'white' }}>16+ años</option>
+                    <option value={18} style={{ backgroundColor: '#374151', color: 'white' }}>18+ años</option>
+                  </select>
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Configuraciones
-            </label>
-            <div className="space-y-3">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="es_destacado"
-                  checked={formData.es_destacado}
-                  onChange={handleInputChange}
-                  className="mr-2 bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
-                />
-                <span className="text-sm text-gray-300">Marcar como destacado</span>
-              </label>
+                <div className="bg-gradient-to-br from-gray-700/40 to-gray-600/30 rounded-lg p-4 border border-gray-600/30">
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Configuraciones
+                  </label>
+                  <div className="space-y-3">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="es_destacado"
+                        checked={formData.es_destacado}
+                        onChange={handleInputChange}
+                        className="mr-2 bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500 accent-purple-500"
+                      />
+                      <span className="text-sm text-gray-300">Marcar como destacado</span>
+                    </label>
 
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="permitir_comentarios"
-                  checked={formData.permitir_comentarios}
-                  onChange={handleInputChange}
-                  className="mr-2 bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
-                />
-                <span className="text-sm text-gray-300">Permitir comentarios</span>
-              </label>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="permitir_comentarios"
+                        checked={formData.permitir_comentarios}
+                        onChange={handleInputChange}
+                        className="mr-2 bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500 accent-purple-500"
+                      />
+                      <span className="text-sm text-gray-300">Permitir comentarios</span>
+                    </label>
 
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="visible_en_busqueda"
-                  checked={formData.visible_en_busqueda}
-                  onChange={handleInputChange}
-                  className="mr-2 bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500"
-                />
-                <span className="text-sm text-gray-300">Visible en búsquedas</span>
-              </label>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="visible_en_busqueda"
+                        checked={formData.visible_en_busqueda}
+                        onChange={handleInputChange}
+                        className="mr-2 bg-gray-700 border-gray-600 text-purple-500 focus:ring-purple-500 accent-purple-500"
+                      />
+                      <span className="text-sm text-gray-300">Visible en búsquedas</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Descripción completa */}
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Descripción completa *
-        </label>
-        <textarea
-          name="descripcion"
-          value={formData.descripcion}
-          onChange={handleInputChange}
-          rows={6}
-          className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-          placeholder="Descripción detallada del mod..."
-        />
-      </div>
+          {/* Descripción completa */}
+          <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
+            <h4 className="text-lg font-bold text-white mb-4 flex items-center">
+              <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-600/30 rounded-lg mr-2">
+                <FontAwesomeIcon icon={faComments} className="text-green-400" />
+              </div>
+              Descripción Completa
+            </h4>
+            <textarea
+              name="descripcion"
+              value={formData.descripcion}
+              onChange={handleInputChange}
+              rows={6}
+              className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+              placeholder="Descripción detallada del mod..."
+            />
+          </div>
         </>
       )}
     </div>
@@ -882,9 +909,11 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
 
   const renderTabEtiquetas = () => (
     <div className="space-y-6">
-      <div>
-        <h4 className="text-lg font-medium text-white mb-4 flex items-center">
-          <FontAwesomeIcon icon={faTag} className="mr-2" />
+      <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
+        <h4 className="text-lg font-bold text-white mb-4 flex items-center">
+          <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-600/30 rounded-lg mr-2">
+            <FontAwesomeIcon icon={faTag} className="text-green-400" />
+          </div>
           Gestión de Etiquetas
         </h4>
         
@@ -907,41 +936,23 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               Option: CustomTagOption,
               MultiValue: CustomMultiValue
             }}
+            className="select-container-tags"
+            classNamePrefix="select"
             styles={{
               control: (provided) => ({
                 ...provided,
                 backgroundColor: '#374151',
                 borderColor: '#4B5563',
                 color: 'white',
-                minHeight: '45px',
-                '&:hover': {
-                  borderColor: '#8B5CF6'
-                }
-              }),
-              menu: (provided) => ({
-                ...provided,
-                backgroundColor: '#374151',
-                border: '1px solid #4B5563'
-              }),
-              option: (provided, state) => ({
-                ...provided,
-                backgroundColor: state.isFocused ? '#4B5563' : '#374151',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: '#4B5563'
-                }
+                minHeight: '45px'
               }),
               multiValue: (provided) => ({
                 ...provided,
-                backgroundColor: 'transparent'
+                backgroundColor: '#7C3AED'
               }),
               multiValueLabel: (provided) => ({
                 ...provided,
-                color: 'transparent'
-              }),
-              multiValueRemove: (provided) => ({
-                ...provided,
-                display: 'none'
+                color: 'white'
               }),
               input: (provided) => ({
                 ...provided,
@@ -951,57 +962,61 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                 ...provided,
                 color: '#9CA3AF'
               }),
-              singleValue: (provided) => ({
+              menu: (provided) => ({
                 ...provided,
-                color: 'white'
+                backgroundColor: '#374151',
+                border: '1px solid #4B5563'
               })
             }}
-            className="text-white"
           />
           <small className="text-gray-400 text-sm mt-1 block">
-            Busca etiquetas escribiendo el nombre. Las etiquetas se sincronizan automáticamente con RAWG.
+            Las etiquetas ayudan a categorizar y encontrar tu mod más fácilmente
           </small>
         </div>
-        
-        {/* Etiquetas seleccionadas */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Etiquetas seleccionadas ({selectedTags?.length || 0})
-          </label>
-          <div className="flex flex-wrap gap-2 min-h-[60px] p-3 bg-gray-700 rounded-lg border border-gray-600">
-            {selectedTags?.map(etiqueta => (
-              <span
-                key={etiqueta.value}
-                className="inline-flex items-center px-3 py-1 bg-purple-500 text-white text-sm rounded-full"
-              >
-                {etiqueta.label}
-                <button
-                  onClick={() => {
-                    const newTags = selectedTags.filter(tag => tag.value !== etiqueta.value);
-                    handleTagChange(newTags);
-                  }}
-                  className="ml-2 text-purple-200 hover:text-white"
-                >
-                  <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-            {(!selectedTags || selectedTags.length === 0) && (
-              <span className="text-gray-400 text-sm">No hay etiquetas seleccionadas</span>
-            )}
-          </div>
-        </div>
 
-        {/* Información adicional sobre etiquetas */}
-        <div className="bg-gray-700 rounded-lg p-4">
-          <h5 className="text-white font-medium mb-2">Información sobre etiquetas</h5>
-          <ul className="text-gray-300 text-sm space-y-1">
-            <li>• Las etiquetas ayudan a los usuarios a encontrar tu mod</li>
-            <li>• Selecciona etiquetas relevantes para el contenido de tu mod</li>
-            <li>• Las etiquetas se sincronizan automáticamente con la base de datos RAWG</li>
-            <li>• Puedes seleccionar múltiples etiquetas que describan tu mod</li>
-          </ul>
+        {/* Mostrar etiquetas seleccionadas */}
+        {selectedTags && selectedTags.length > 0 && (
+          <div className="bg-gradient-to-br from-gray-700/40 to-gray-600/30 rounded-lg p-4 border border-gray-600/30">
+            <h5 className="text-white font-medium mb-3 flex items-center">
+              <FontAwesomeIcon icon={faTag} className="mr-2 text-green-400" />
+              Etiquetas Seleccionadas ({selectedTags.length})
+            </h5>
+            <div className="flex flex-wrap gap-2">
+              {selectedTags.map((tag, index) => (
+                <div key={index} className="inline-flex items-center bg-gradient-to-r from-green-600/80 to-green-700/80 text-white text-sm rounded-full px-3 py-1 border border-green-500/30">
+                  <span>{tag.label}</span>
+                  <button
+                    onClick={() => {
+                      const newTags = selectedTags.filter((_, i) => i !== index);
+                      setSelectedTags(newTags);
+                      setFormData(prev => ({
+                        ...prev,
+                        etiquetas: newTags.map(t => t.value)
+                      }));
+                    }}
+                    className="ml-2 text-green-200 hover:text-white focus:outline-none transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Información sobre etiquetas */}
+      <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <FontAwesomeIcon icon={faTag} className="text-blue-400" />
+          <h5 className="text-blue-400 font-medium">Consejos sobre Etiquetas</h5>
         </div>
+        <ul className="text-blue-200 text-sm space-y-1">
+          <li>• Usa etiquetas específicas y relevantes para tu mod</li>
+          <li>• Las etiquetas populares ayudan a que tu mod sea más descubrible</li>
+          <li>• Evita usar demasiadas etiquetas (5-10 es ideal)</li>
+          <li>• Puedes crear nuevas etiquetas si no encuentras las que necesitas</li>
+        </ul>
       </div>
     </div>
   );
@@ -1089,20 +1104,23 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       </div>
       
       {/* Información y restricciones */}
-      <div className="bg-gray-700 rounded-lg p-4">
-        <h5 className="text-white font-medium mb-2">Información sobre Archivos</h5>
+      <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <FontAwesomeIcon icon={faFile} className="text-blue-400" />
+          <h5 className="text-blue-400 font-medium">Información sobre Archivos</h5>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div>
-            <h6 className="text-gray-300 font-medium mb-2">Formatos Soportados:</h6>
-            <ul className="text-gray-300 text-sm space-y-1">
+            <h6 className="text-blue-300 font-medium mb-2">Formatos Soportados:</h6>
+            <ul className="text-blue-200 text-sm space-y-1">
               <li>• <strong>Archivos:</strong> ZIP, RAR, 7Z, JAR</li>
               <li>• <strong>Documentación:</strong> PDF, TXT, MD</li>
               <li>• <strong>Código:</strong> JS, JSON, XML, YML</li>
             </ul>
           </div>
           <div>
-            <h6 className="text-gray-300 font-medium mb-2">Límites de Tamaño:</h6>
-            <ul className="text-gray-300 text-sm space-y-1">
+            <h6 className="text-blue-300 font-medium mb-2">Límites de Tamaño:</h6>
+            <ul className="text-blue-200 text-sm space-y-1">
               <li>• <strong>Archivo principal:</strong> Máximo 50MB</li>
               <li>• <strong>Documentación:</strong> Máximo 5MB</li>
             </ul>
@@ -1267,9 +1285,12 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       </div>
 
           {/* Información adicional sobre las estadísticas */}
-          <div className="bg-gray-700 rounded-lg p-4">
-            <h5 className="text-white font-medium mb-2">Información sobre las estadísticas</h5>
-            <ul className="text-gray-300 text-sm space-y-1">
+          <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
+            <div className="flex items-center space-x-2 mb-2">
+              <FontAwesomeIcon icon={faStar} className="text-blue-400" />
+              <h5 className="text-blue-400 font-medium">Información sobre las estadísticas</h5>
+            </div>
+            <ul className="text-blue-200 text-sm space-y-1">
               <li>• Las estadísticas se actualizan automáticamente desde la base de datos</li>
               <li>• Los datos se obtienen en tiempo real del backend</li>
               <li>• Las estimaciones se marcan claramente cuando no hay datos precisos</li>
@@ -1534,9 +1555,12 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       </div>
       
       {/* Información sobre imágenes */}
-      <div className="bg-gray-700 rounded-lg p-4">
-        <h5 className="text-white font-medium mb-2">Información sobre Imágenes</h5>
-        <ul className="text-gray-300 text-sm space-y-1">
+      <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <FontAwesomeIcon icon={faImage} className="text-blue-400" />
+          <h5 className="text-blue-400 font-medium">Información sobre Imágenes</h5>
+        </div>
+        <ul className="text-blue-200 text-sm space-y-1">
           <li>• <strong>Imagen Banner:</strong> Imagen principal que aparece en listas y páginas de detalle</li>
           <li>• <strong>Imágenes Adicionales:</strong> Galería de capturas de pantalla y contenido visual extra</li>
           <li>• Se recomienda usar una relación de aspecto 16:10 para el banner (ej: 1600x1000px)</li>
@@ -1545,64 +1569,60 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           <li>• Las imágenes se optimizarán automáticamente para diferentes dispositivos</li>
         </ul>
       </div>
-      
-      {/* Nota informativa sobre la nueva organización */}
-      <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
-        <div className="flex items-center space-x-2 mb-2">
-          <FontAwesomeIcon icon={faImage} className="text-blue-400" />
-          <h5 className="text-blue-400 font-medium">Nueva Organización</h5>
-        </div>
-        <p className="text-blue-300 text-sm">
-          La gestión de imágenes ahora está organizada en esta pestaña dedicada para un mejor control y organización de los recursos visuales de tu mod.
-        </p>
-      </div>
     </div>
   );
 
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
-      <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl h-full max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-700 flex-shrink-0">
-          <div>
-            <h3 className="text-lg sm:text-xl font-bold text-white">
-              Editar Mod: {mod?.titulo || 'Sin título'}
-            </h3>
-            <p className="text-gray-400 text-xs sm:text-sm">
-              ID: {mod?.id} | Administración avanzada
-            </p>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-4xl h-full max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden border border-gray-700/50">
+        {/* Header con gradiente mejorado */}
+        <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-gray-700/50 flex-shrink-0">
+          <div className="flex items-center justify-between p-5">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-br from-purple-500/20 to-purple-600/30 rounded-lg">
+                <FontAwesomeIcon icon={faEdit} className="text-purple-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  Editar Mod: {mod?.titulo || 'Sin título'}
+                </h3>
+                <p className="text-sm text-gray-400 mt-1">
+                  ID: {mod?.id} | Administración avanzada
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors p-1"
-          >
-            <FontAwesomeIcon icon={faTimes} className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
         </div>
 
-        {/* Tabs */}
-        <div className="border-b border-gray-700 flex-shrink-0">
-          <div className="flex space-x-2 sm:space-x-4 px-3 sm:px-6 overflow-x-auto custom-scrollbar-horizontal">
+        {/* Tabs con mejor diseño */}
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-b border-gray-700/50 flex-shrink-0">
+          <div className="flex space-x-1 px-5 overflow-x-auto custom-scrollbar-horizontal">
             {[
-              { id: 'general', label: 'General', icon: faEye },
-              { id: 'etiquetas', label: 'Etiquetas', icon: faComments },
-              { id: 'imagenes', label: 'Imágenes', icon: faImage },
-              { id: 'archivos', label: 'Archivos', icon: faFile },
-              { id: 'estadisticas', label: 'Estadísticas', icon: faStar },
-              { id: 'avanzado', label: 'Avanzado', icon: faExclamationTriangle }
+              { id: 'general', label: 'General', icon: faEye, color: 'blue' },
+              { id: 'etiquetas', label: 'Etiquetas', icon: faTag, color: 'green' },
+              { id: 'imagenes', label: 'Imágenes', icon: faImage, color: 'purple' },
+              { id: 'archivos', label: 'Archivos', icon: faFile, color: 'orange' },
+              { id: 'estadisticas', label: 'Estadísticas', icon: faStar, color: 'yellow' },
+              { id: 'avanzado', label: 'Avanzado', icon: faCog, color: 'red' }
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                className={`py-3 px-4 text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${
                   activeTab === tab.id
-                    ? 'border-purple-500 text-purple-400'
-                    : 'border-transparent text-gray-400 hover:text-white'
+                    ? `bg-gradient-to-r from-${tab.color}-600/20 to-${tab.color}-700/30 text-${tab.color}-300 border-b-2 border-${tab.color}-500`
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                 }`}
               >
-                <FontAwesomeIcon icon={tab.icon} className="mr-1 sm:mr-2" />
+                <FontAwesomeIcon icon={tab.icon} className="mr-2" />
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">
                   {tab.id === 'general' ? 'Gen' : 
@@ -1618,7 +1638,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         </div>
 
         {/* Content - Área scrolleable */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
           {activeTab === 'general' && renderTabGeneral()}
           {activeTab === 'etiquetas' && renderTabEtiquetas()}
           {activeTab === 'imagenes' && renderTabImagenes()}
@@ -1627,27 +1647,29 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           {activeTab === 'avanzado' && renderTabAvanzado()}
         </div>
 
-        {/* Footer - Siempre visible */}
-        <div className="flex items-center justify-end space-x-3 p-4 sm:p-6 border-t border-gray-700 flex-shrink-0 bg-gray-800">
-          <button
-            onClick={onClose}
-            className="px-3 sm:px-4 py-2 text-gray-300 hover:text-white transition-colors text-sm sm:text-base"
-            disabled={loading}
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={loading}
-            className="flex items-center space-x-2 px-4 sm:px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors disabled:opacity-50 text-sm sm:text-base"
-          >
-            <FontAwesomeIcon 
-              icon={faSave} 
-              className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
-            />
-            <span className="hidden sm:inline">{loading ? 'Guardando...' : 'Guardar Cambios'}</span>
-            <span className="sm:hidden">{loading ? 'Guardando...' : 'Guardar'}</span>
-          </button>
+        {/* Footer mejorado */}
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5 flex-shrink-0">
+          <div className="flex items-center justify-end space-x-3">
+            <button
+              onClick={onClose}
+              className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50"
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={loading}
+              className="flex items-center space-x-2 px-5 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50"
+            >
+              <FontAwesomeIcon 
+                icon={faSave} 
+                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+              />
+              <span className="hidden sm:inline">{loading ? 'Guardando...' : 'Guardar Cambios'}</span>
+              <span className="sm:hidden">{loading ? 'Guardando...' : 'Guardar'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

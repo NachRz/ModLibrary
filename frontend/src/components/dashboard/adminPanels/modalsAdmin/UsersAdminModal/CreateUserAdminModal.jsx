@@ -2,8 +2,19 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import adminService from '../../../../../services/api/adminService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faUpload, faTrash } from '@fortawesome/free-solid-svg-icons';
-import '../../../../../assets/styles/components/dashboard/adminPanel/UserAdminModal/UserCreateAdminModal.css';
+import { 
+  faEye, 
+  faEyeSlash, 
+  faUpload, 
+  faTrash,
+  faUser,
+  faEnvelope,
+  faLock,
+  faUserPlus,
+  faShieldAlt,
+  faImage,
+  faCrown
+} from '@fortawesome/free-solid-svg-icons';
 
 const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
   const [formData, setFormData] = useState({
@@ -202,49 +213,69 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
-      <div className="bg-gray-800 rounded-lg w-full max-w-lg mx-auto overflow-hidden">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
-          <div>
-            <h2 className="text-xl font-bold text-white">Crear Nuevo Usuario</h2>
-            <p className="text-xs text-gray-400 mt-1">Panel de administración - Creación de usuario</p>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg mx-auto overflow-hidden border border-gray-700/50">
+        {/* Header con gradiente mejorado */}
+        <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-gray-700/50">
+          <div className="flex justify-between items-center p-5">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-600/30 rounded-lg">
+                <FontAwesomeIcon icon={faUserPlus} className="text-green-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  Crear Nuevo Usuario
+                </h2>
+                <p className="text-sm text-gray-400 mt-1">Panel de administración - Creación de usuario</p>
+              </div>
+            </div>
+            <button
+              onClick={handleClose}
+              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+            >
+              ✕
+            </button>
           </div>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            ✕
-          </button>
         </div>
 
         {/* Contenido */}
         <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-5 space-y-5">
             {/* Error general */}
             {error && (
-              <div className="bg-red-500 bg-opacity-20 border border-red-500 text-red-400 px-4 py-3 rounded">
+              <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg">
+                <FontAwesomeIcon icon={faUser} className="mr-2" />
                 {error}
               </div>
             )}
 
             {/* Foto de perfil */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
+              <label className="block text-lg font-bold text-white mb-4 flex items-center">
+                <div className="p-2 bg-gradient-to-br from-blue-500/20 to-blue-600/30 rounded-lg mr-2">
+                  <FontAwesomeIcon icon={faImage} className="text-blue-400" />
+                </div>
                 Foto de Perfil (Opcional)
               </label>
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center overflow-hidden">
-                  {previewUrl ? (
-                    <img 
-                      src={previewUrl} 
-                      alt="Preview"
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-gray-400 text-2xl">
-                      {formData.nome ? formData.nome.charAt(0).toUpperCase() : '?'}
-                    </span>
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden">
+                    {previewUrl ? (
+                      <img 
+                        src={previewUrl} 
+                        alt="Preview"
+                        className="w-16 h-16 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white text-2xl font-bold">
+                        {formData.nome ? formData.nome.charAt(0).toUpperCase() : '?'}
+                      </span>
+                    )}
+                  </div>
+                  {formData.rol === 'admin' && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                      <FontAwesomeIcon icon={faCrown} className="text-white text-xs" />
+                    </div>
                   )}
                 </div>
                 <div className="flex-1">
@@ -259,7 +290,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   <div className="flex space-x-2">
                     <label
                       htmlFor="profile-upload"
-                      className="cursor-pointer bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded text-sm flex items-center space-x-2 disabled:opacity-50"
+                      className="cursor-pointer bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-all duration-300 disabled:opacity-50"
                     >
                       <FontAwesomeIcon icon={faUpload} />
                       <span>{uploadingImage ? 'Subiendo...' : 'Subir'}</span>
@@ -268,7 +299,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                       <button
                         type="button"
                         onClick={clearImage}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm flex items-center space-x-2"
+                        className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 py-2 rounded-lg text-sm flex items-center space-x-2 transition-all duration-300"
                       >
                         <FontAwesomeIcon icon={faTrash} />
                         <span>Quitar</span>
@@ -279,8 +310,15 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
               </div>
             </div>
 
-            {/* Datos básicos */}
-            <div className="grid grid-cols-1 gap-4">
+            {/* Información básica del usuario */}
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30 space-y-4">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-600/30 rounded-lg mr-2">
+                  <FontAwesomeIcon icon={faUser} className="text-green-400" />
+                </div>
+                Información Básica
+              </h3>
+
               {/* Nombre de usuario */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -292,8 +330,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   value={formData.nome}
                   onChange={handleChange}
                   placeholder="usuario123"
-                  className={`w-full bg-gray-700 text-white px-4 py-2 rounded-lg border ${
-                    validationErrors.nome ? 'border-red-500' : 'border-gray-600'
+                  className={`w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border transition-all duration-300 ${
+                    validationErrors.nome ? 'border-red-500/50' : 'border-gray-600/50'
                   } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
                   required
                 />
@@ -304,7 +342,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
 
               {/* Correo */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                  <FontAwesomeIcon icon={faEnvelope} className="mr-2 text-blue-400" />
                   Correo Electrónico *
                 </label>
                 <input
@@ -313,8 +352,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   value={formData.correo}
                   onChange={handleChange}
                   placeholder="usuario@ejemplo.com"
-                  className={`w-full bg-gray-700 text-white px-4 py-2 rounded-lg border ${
-                    validationErrors.correo ? 'border-red-500' : 'border-gray-600'
+                  className={`w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border transition-all duration-300 ${
+                    validationErrors.correo ? 'border-red-500/50' : 'border-gray-600/50'
                   } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
                   required
                 />
@@ -322,6 +361,46 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   <p className="text-red-400 text-xs mt-1">{validationErrors.correo}</p>
                 )}
               </div>
+
+              {/* Nombre y apellidos */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Nombre
+                  </label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    placeholder="Juan"
+                    className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Apellidos
+                  </label>
+                  <input
+                    type="text"
+                    name="apelidos"
+                    value={formData.apelidos}
+                    onChange={handleChange}
+                    placeholder="Pérez García"
+                    className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Seguridad */}
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30 space-y-4">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/30 rounded-lg mr-2">
+                  <FontAwesomeIcon icon={faLock} className="text-red-400" />
+                </div>
+                Seguridad
+              </h3>
 
               {/* Contraseña */}
               <div>
@@ -335,15 +414,15 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="••••••••"
-                    className={`w-full bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg border ${
-                      validationErrors.password ? 'border-red-500' : 'border-gray-600'
+                    className={`w-full bg-gray-700/50 text-white px-3 py-2 pr-10 rounded-lg border transition-all duration-300 ${
+                      validationErrors.password ? 'border-red-500/50' : 'border-gray-600/50'
                     } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-3 text-gray-400 hover:text-white transition-colors"
                   >
                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                   </button>
@@ -365,15 +444,15 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                     value={formData.password_confirmation}
                     onChange={handleChange}
                     placeholder="••••••••"
-                    className={`w-full bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg border ${
-                      validationErrors.password_confirmation ? 'border-red-500' : 'border-gray-600'
+                    className={`w-full bg-gray-700/50 text-white px-3 py-2 pr-10 rounded-lg border transition-all duration-300 ${
+                      validationErrors.password_confirmation ? 'border-red-500/50' : 'border-gray-600/50'
                     } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-3 text-gray-400 hover:text-white transition-colors"
                   >
                     <FontAwesomeIcon icon={showPasswordConfirmation ? faEyeSlash : faEye} />
                   </button>
@@ -382,47 +461,26 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   <p className="text-red-400 text-xs mt-1">{validationErrors.password_confirmation}</p>
                 )}
               </div>
+            </div>
 
-              {/* Nombre y apellidos */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    placeholder="Juan"
-                    className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                  />
+            {/* Configuración de rol */}
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                <div className="p-2 bg-gradient-to-br from-orange-500/20 to-orange-600/30 rounded-lg mr-2">
+                  <FontAwesomeIcon icon={faShieldAlt} className="text-orange-400" />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Apellidos
-                  </label>
-                  <input
-                    type="text"
-                    name="apelidos"
-                    value={formData.apelidos}
-                    onChange={handleChange}
-                    placeholder="Pérez García"
-                    className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                  />
-                </div>
-              </div>
+                Configuración de Rol
+              </h3>
 
-              {/* Rol */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Rol
+                  Rol del Usuario
                 </label>
                 <select
                   name="rol"
                   value={formData.rol}
                   onChange={handleChange}
-                  className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                  className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
                 >
                   <option value="usuario">Usuario</option>
                   <option value="admin">Administrador</option>
@@ -433,29 +491,39 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
         </div>
 
         {/* Footer con botones */}
-        <div className="flex justify-end space-x-3 p-6 border-t border-gray-700">
-          <button
-            type="button"
-            onClick={handleClose}
-            className="px-4 py-2 text-gray-300 hover:text-white border border-gray-600 hover:border-gray-500 rounded-lg transition-colors"
-            disabled={loading}
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading || uploadingImage}
-            className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-          >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                <span>Creando...</span>
-              </>
-            ) : (
-              <span>Crear Usuario</span>
-            )}
-          </button>
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5">
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50"
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading || uploadingImage}
+              className="px-5 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Creando usuario...</span>
+                </>
+              ) : uploadingImage ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Subiendo imagen...</span>
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faUserPlus} />
+                  <span>Crear Usuario</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import adminService from '../../../../../services/api/adminService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faUser, 
+  faEnvelope, 
+  faEdit,
+  faShieldAlt,
+  faCrown,
+  faImage
+} from '@fortawesome/free-solid-svg-icons';
 
 const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -175,65 +184,88 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, margin: 0 }}>
-      <div className="bg-gray-800 rounded-lg w-full max-w-lg mx-auto overflow-hidden">
-        {/* Header fijo */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
-          <div>
-            <h2 className="text-xl font-bold text-white">Editar Usuario</h2>
-            <p className="text-xs text-gray-400 mt-1">Panel de administración - Edición completa</p>
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg mx-auto overflow-hidden border border-gray-700/50">
+        {/* Header con gradiente mejorado */}
+        <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-gray-700/50">
+          <div className="flex justify-between items-center p-5">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-br from-purple-500/20 to-purple-600/30 rounded-lg">
+                <FontAwesomeIcon icon={faEdit} className="text-purple-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  Editar Usuario
+                </h2>
+                <p className="text-sm text-gray-400 mt-1">Panel de administración - Edición completa</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+            >
+              ✕
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            ✕
-          </button>
         </div>
 
         {/* Contenido con scroll personalizado */}
         <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <div className="p-6">
-        {loading && !formData.nome && (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-          </div>
-        )}
+          <div className="p-5">
+            {loading && !formData.nome && (
+              <div className="flex justify-center py-16">
+                <div className="relative">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500/20 border-t-purple-500"></div>
+                  <div className="absolute inset-0 animate-ping rounded-full h-12 w-12 border-4 border-purple-500/10"></div>
+                </div>
+              </div>
+            )}
 
-        {error && (
-          <div className="bg-red-500 bg-opacity-20 border border-red-500 text-red-400 px-4 py-2 rounded mb-4">
-            {error}
-          </div>
-        )}
+            {error && (
+              <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg mb-4">
+                <FontAwesomeIcon icon={faUser} className="mr-2" />
+                {error}
+              </div>
+            )}
 
-        {formData.nome && (
+            {formData.nome && (
               <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Foto de perfil */}
-            <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-3">
-                Foto de Perfil
-              </label>
+                {/* Foto de perfil */}
+                <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
+                  <label className="block text-lg font-bold text-white mb-4 flex items-center">
+                    <div className="p-2 bg-gradient-to-br from-blue-500/20 to-blue-600/30 rounded-lg mr-2">
+                      <FontAwesomeIcon icon={faImage} className="text-blue-400" />
+                    </div>
+                    Foto de Perfil
+                  </label>
                   
                   {/* Preview e interfaz de subida */}
-              <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                      {previewUrl ? (
-                    <img 
-                          src={previewUrl} 
-                          alt="Preview" 
-                      className="w-16 h-16 rounded-full object-cover"
-                          onError={() => setPreviewUrl('')}
-                    />
-                      ) : (
-                    <span className="text-white font-bold text-xl">
-                      {formData.nome.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {previewUrl ? (
+                          <img 
+                            src={previewUrl} 
+                            alt="Preview" 
+                            className="w-16 h-16 rounded-full object-cover"
+                            onError={() => setPreviewUrl('')}
+                          />
+                        ) : (
+                          <span className="text-white font-bold text-xl">
+                            {formData.nome.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      {formData.rol === 'admin' && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                          <FontAwesomeIcon icon={faCrown} className="text-white text-xs" />
+                        </div>
+                      )}
+                    </div>
                     
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center space-x-3">
-                  <input
+                        <input
                           type="file"
                           id="file-upload"
                           accept="image/*"
@@ -242,7 +274,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                         />
                         <label
                           htmlFor="file-upload"
-                          className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm transition-colors inline-block"
+                          className="cursor-pointer bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-4 py-2 rounded-lg text-sm transition-all duration-300 inline-block"
                         >
                           Subir Imagen
                         </label>
@@ -267,126 +299,149 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                       <p className="text-xs text-gray-400">
                         Formatos: JPG, PNG, GIF. Máximo 5MB
                       </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Nombre de Usuario
-                <span className="text-purple-400 text-xs ml-2">(Solo Admin)</span>
-              </label>
-              <input
-                type="text"
-                name="nome"
-                value={formData.nome}
-                onChange={handleChange}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                placeholder="Nombre de usuario único"
-                required
-                minLength="3"
-                maxLength="50"
-              />
-              <p className="text-xs text-gray-400 mt-1">
-                    Solo administradores pueden modificar nombres de usuario. 
-                Debe ser único (3-50 caracteres: letras, números, puntos, guiones y guiones bajos)
-              </p>
-            </div>
+                {/* Información de usuario */}
+                <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30 space-y-4">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                    <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-600/30 rounded-lg mr-2">
+                      <FontAwesomeIcon icon={faUser} className="text-green-400" />
+                    </div>
+                    Información de Usuario
+                  </h3>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Correo Electrónico
-              </label>
-              <input
-                type="email"
-                name="correo"
-                value={formData.correo}
-                onChange={handleChange}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                disabled
-              />
-              <p className="text-xs text-gray-400 mt-1">El correo no se puede modificar</p>
-            </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Nombre de Usuario
+                      <span className="text-purple-400 text-xs ml-2">(Solo Admin)</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="nome"
+                      value={formData.nome}
+                      onChange={handleChange}
+                      className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                      placeholder="Nombre de usuario único"
+                      required
+                      minLength="3"
+                      maxLength="50"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Solo administradores pueden modificar nombres de usuario. 
+                      Debe ser único (3-50 caracteres: letras, números, puntos, guiones y guiones bajos)
+                    </p>
+                  </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Nombre Real
-              </label>
-              <input
-                type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                placeholder="Nombre del usuario"
-              />
-            </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
+                      <FontAwesomeIcon icon={faEnvelope} className="mr-2 text-blue-400" />
+                      Correo Electrónico
+                    </label>
+                    <input
+                      type="email"
+                      name="correo"
+                      value={formData.correo}
+                      onChange={handleChange}
+                      className="w-full bg-gray-600/30 text-gray-300 px-3 py-2 rounded-lg border border-gray-600/50 cursor-not-allowed"
+                      disabled
+                    />
+                    <p className="text-xs text-gray-400 mt-1">El correo no se puede modificar</p>
+                  </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Apellidos
-              </label>
-              <input
-                type="text"
-                name="apelidos"
-                value={formData.apelidos}
-                onChange={handleChange}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                placeholder="Apellidos del usuario"
-              />
-            </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Nombre Real
+                    </label>
+                    <input
+                      type="text"
+                      name="nombre"
+                      value={formData.nombre}
+                      onChange={handleChange}
+                      className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                      placeholder="Nombre del usuario"
+                    />
+                  </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Rol
-              </label>
-              <select
-                name="rol"
-                value={formData.rol}
-                onChange={handleChange}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-              >
-                <option value="usuario">Usuario</option>
-                <option value="admin">Administrador</option>
-              </select>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Apellidos
+                    </label>
+                    <input
+                      type="text"
+                      name="apelidos"
+                      value={formData.apelidos}
+                      onChange={handleChange}
+                      className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                      placeholder="Apellidos del usuario"
+                    />
+                  </div>
+                </div>
+
+                {/* Configuración de rol */}
+                <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                    <div className="p-2 bg-gradient-to-br from-orange-500/20 to-orange-600/30 rounded-lg mr-2">
+                      <FontAwesomeIcon icon={faShieldAlt} className="text-orange-400" />
+                    </div>
+                    Configuración de Rol
+                  </h3>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Rol del Usuario
+                    </label>
+                    <select
+                      name="rol"
+                      value={formData.rol}
+                      onChange={handleChange}
+                      className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                    >
+                      <option value="usuario">Usuario</option>
+                      <option value="admin">Administrador</option>
+                    </select>
+                  </div>
                 </div>
               </form>
             )}
           </div>
-            </div>
+        </div>
 
-        {/* Footer fijo con bordes redondeados */}
+        {/* Footer mejorado */}
         {formData.nome && (
-          <div className="flex justify-end space-x-3 p-6 border-t border-gray-700 bg-gray-800 rounded-b-lg">
+          <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5">
+            <div className="flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={onClose}
-              disabled={loading || uploadingImage}
-              className="px-4 py-2 text-gray-300 hover:text-white transition-colors disabled:opacity-50"
+                disabled={loading || uploadingImage}
+                className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-              onClick={handleSubmit}
-              disabled={loading || uploadingImage}
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                onClick={handleSubmit}
+                disabled={loading || uploadingImage}
+                className="px-5 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
               >
-              {uploadingImage ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Subiendo imagen...</span>
-                </>
-              ) : loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Guardando...</span>
-                </>
-              ) : (
-                <span>Guardar Cambios</span>
-              )}
+                {uploadingImage ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Subiendo imagen...</span>
+                  </>
+                ) : loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Guardando...</span>
+                  </>
+                ) : (
+                  <span>Guardar Cambios</span>
+                )}
               </button>
             </div>
+          </div>
         )}
       </div>
     </div>
