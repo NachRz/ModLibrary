@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import modService from '../../services/api/modService';
 import useSavedStatus from '../../hooks/useSavedStatus';
@@ -28,6 +28,28 @@ const ModDetails = () => {
   // Estados para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  
+  // Estados para el carrusel de imágenes
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Array dinámico de imágenes que incluye la imagen principal del mod
+  const imagenesCarrusel = useMemo(() => {
+    const imagenesPorDefecto = [
+      'https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80',
+      'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2126&q=80',
+      'https://images.unsplash.com/photo-1585504198199-20277593b94f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2079&q=80',
+      'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80'
+    ];
+
+    // Si el mod tiene imagen principal, la incluimos al principio
+    if (mod?.imagen_principal) {
+      return [mod.imagen_principal, ...imagenesPorDefecto];
+    }
+    
+    return imagenesPorDefecto;
+  }, [mod?.imagen_principal]);
   
   // Usar el hook personalizado para manejar el estado de guardado
   const [isGuardado, toggleSavedStatus, isSaving, savedError] = useSavedStatus(id);
@@ -224,6 +246,38 @@ const ModDetails = () => {
     navigate(`/mods/editar/${mod.id}`);
   };
 
+  // Calcular las imágenes visibles (siempre 5)
+  const getVisibleImages = () => {
+    const visibleImages = [];
+    for (let i = 0; i < 5; i++) {
+      const index = currentImageIndex + i;
+      if (index < imagenesCarrusel.length) {
+        visibleImages.push({
+          src: imagenesCarrusel[index],
+          originalIndex: index
+        });
+      }
+    }
+    return visibleImages;
+  };
+
+  // Verificar si se puede navegar
+  const canGoPrev = currentImageIndex > 0;
+  const canGoNext = currentImageIndex < imagenesCarrusel.length - 5;
+
+  // Funciones de navegación no infinitas
+  const handlePrev = () => {
+    if (canGoPrev) {
+      setCurrentImageIndex(prev => prev - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (canGoNext) {
+      setCurrentImageIndex(prev => prev + 1);
+    }
+  };
+
   if (loading) {
     return (
       <div className="mod-details-container">
@@ -266,242 +320,295 @@ const ModDetails = () => {
 
   return (
     <div className="mod-details-container">
-      {/* Breadcrumb */}
+      {/* Sección de navegación */}
       <div className="mod-navigation">
         <Breadcrumb items={breadcrumbItems} />
       </div>
 
-      {/* Mensajes de estado */}
-      {ratingMessage && (
-        <div className="rating-message-banner">
-          <i className="fas fa-check-circle"></i>
-          <span>{ratingMessage}</span>
+      {/* Banner Hero Section */}
+      <div className="mod-header-banner">
+        <div className="mod-header-content">
+          <div className="mod-header-main">
+            <h1 className="mod-title-main">{mod.titulo}</h1>
+          </div>
         </div>
-      )}
-      
-      {ratingError && (
-        <div className="error-message-banner">
-          <i className="fas fa-exclamation-circle"></i>
-          <span>{ratingError}</span>
-        </div>
-      )}
-      
-      {showSaveMsg && !saveError && lastSaveAction && (
-        <div className="save-message-banner">
-          <i className="fas fa-check-circle"></i>
-          <span>{lastSaveAction === 'guardado' ? '¡Mod guardado!' : 'Mod eliminado de guardados'}</span>
-        </div>
-      )}
-
-      {saveError && (
-        <div className="error-message-banner">
-          <i className="fas fa-exclamation-circle"></i>
-          <span>{saveError}</span>
-        </div>
-      )}
-      
-      {/* Header con título principal */}
-      <div className="mod-header-main">
-        <h1 className="mod-title-main">{mod.titulo}</h1>
       </div>
-      
-      {/* Estadísticas y botones de acción */}
-      <div className="mod-stats-actions">
-        <div className="mod-stats-group">
-          <div className="mod-stat-box">
-            <div className="stat-icon"><i className="fas fa-thumbs-up"></i></div>
-            <div className="stat-content">
-              <div className="stat-label">Valoraciones</div>
-              <div className="stat-value">{mod.estadisticas?.total_valoraciones || 0}</div>
-            </div>
-              </div>
-          
-          <div className="mod-stat-box">
-            <div className="stat-icon"><i className="fas fa-download"></i></div>
-            <div className="stat-content">
-              <div className="stat-label">Descargas</div>
-              <div className="stat-value">{mod.estadisticas?.total_descargas || 0}</div>
-                </div>
-              </div>
-          
-          <div className="mod-stat-box">
-            <div className="stat-icon"><i className="fas fa-eye"></i></div>
-            <div className="stat-content">
-              <div className="stat-label">Visitas</div>
-              <div className="stat-value">Próximamente</div>
-            </div>
-          </div>
-          
-          <div className="mod-stat-box">
-            <div className="stat-icon"><i className="fas fa-code-branch"></i></div>
-            <div className="stat-content">
-              <div className="stat-label">Versión</div>
-              <div className="stat-value">v{ultimaVersion ? ultimaVersion.version : mod.version}</div>
-        </div>
-          </div>
-        </div>
 
-        <div className="mod-actions-group">
-          <button className="mod-action-btn track">
-            <i className="fas fa-bell"></i> Seguir
-          </button>
-          
-          <button 
-            className={`mod-action-btn endorse ${isGuardado ? 'active' : ''}`}
-            onClick={handleGuardarClick}
-            disabled={isSaving || !isAuthenticated}
-          >
-            <i className={isGuardado ? 'fas fa-bookmark' : 'far fa-bookmark'}></i> 
-            {isGuardado ? 'Guardado' : 'Guardar'}
-          </button>
-          
-          <button className="mod-action-btn vote">
-            <i className="fas fa-thumbs-up"></i> Votar
-          </button>
-          
-          {/* Botones para el propietario del mod */}
-          {isOwner && (
-            <>
-              <button 
-                className="mod-action-btn edit"
-                onClick={handleEditMod}
-                title="Editar mod"
-              >
-                <i className="fas fa-edit"></i> Editar
-              </button>
-              
-              <button 
-                className="mod-action-btn delete"
-                onClick={handleDeleteMod}
-                disabled={deleting}
-                title="Eliminar mod"
-              >
-                <i className={`fas ${deleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i> 
-                {deleting ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </>
-          )}
-          
-          <button className="mod-action-btn download-main">
-            <i className="fas fa-download"></i> Descargar
-          </button>
-        </div>
-                    </div>
+      {/* Contenido principal */}
+      <div className="mod-main-content">
+        {/* Mensajes de estado */}
+        {ratingMessage && (
+          <div className="rating-message-banner">
+            <i className="fas fa-check-circle"></i>
+            <span>{ratingMessage}</span>
+          </div>
+        )}
+        
+        {ratingError && (
+          <div className="error-message-banner">
+            <i className="fas fa-exclamation-circle"></i>
+            <span>{ratingError}</span>
+          </div>
+        )}
+        
+        {showSaveMsg && !saveError && lastSaveAction && (
+          <div className="save-message-banner">
+            <i className="fas fa-check-circle"></i>
+            <span>{lastSaveAction === 'guardado' ? '¡Mod guardado!' : 'Mod eliminado de guardados'}</span>
+          </div>
+        )}
 
-      {/* Galería y detalles del mod */}
-      <div className="mod-gallery-section">
-        <div className="mod-gallery">
-          <div className="gallery-placeholder">
-            <i className="fas fa-images"></i>
-            <p>Imágenes próximamente</p>
-                  </div>
-                  </div>
-                </div>
-      
-      {/* Información del mod */}
-      <div className="mod-info-section">
-        <div className="mod-info-left">
-          <div className="mod-dates">
-            <div className="mod-date-box">
-              <div className="date-label">Última actualización</div>
-              <div className="date-value">
-                {mod.fecha_actualizacion ? new Date(mod.fecha_actualizacion).toLocaleDateString() : 'No disponible'}
-                </div>
+        {saveError && (
+          <div className="error-message-banner">
+            <i className="fas fa-exclamation-circle"></i>
+            <span>{saveError}</span>
+          </div>
+        )}
+        
+        {/* Estadísticas y botones de acción */}
+        <div className="mod-stats-actions">
+          <div className="mod-stats-group">
+            <div className="mod-stat-box">
+              <div className="stat-icon"><i className="fas fa-thumbs-up"></i></div>
+              <div className="stat-content">
+                <div className="stat-label">Valoraciones</div>
+                <div className="stat-value">{mod.estadisticas?.total_valoraciones || 0}</div>
+              </div>
+            </div>
+          
+            <div className="mod-stat-box">
+              <div className="stat-icon"><i className="fas fa-download"></i></div>
+              <div className="stat-content">
+                <div className="stat-label">Descargas</div>
+                <div className="stat-value">{mod.estadisticas?.total_descargas || 0}</div>
+              </div>
+            </div>
+          
+            <div className="mod-stat-box">
+              <div className="stat-icon"><i className="fas fa-eye"></i></div>
+              <div className="stat-content">
+                <div className="stat-label">Visitas</div>
+                <div className="stat-value">Próximamente</div>
+              </div>
             </div>
             
-            <div className="mod-date-box">
-              <div className="date-label">Subido originalmente</div>
-              <div className="date-value">
-                {mod.fecha_creacion ? new Date(mod.fecha_creacion).toLocaleDateString() : 'No disponible'}
+            <div className="mod-stat-box">
+              <div className="stat-icon"><i className="fas fa-code-branch"></i></div>
+              <div className="stat-content">
+                <div className="stat-label">Versión</div>
+                <div className="stat-value">v{ultimaVersion ? ultimaVersion.version : mod.version}</div>
               </div>
             </div>
           </div>
-          
-          <div className="mod-creator-box">
-            <div className="creator-header">Creado por</div>
-            <div className="creator-content">
-              <img src={mod.creador?.foto_perfil || '/images/user-placeholder.jpg'} alt={mod.creador?.nome} />
-              <span className="creator-name">{mod.creador?.nome || 'Anónimo'}</span>
+
+          <div className="mod-actions-group">
+            {/* Botones que solo aparecen si NO es el propietario */}
+            {!isOwner && (
+              <>
+                <button className="mod-action-btn track" title="Seguir">
+                  <i className="fas fa-bell"></i>
+                  <span>Seguir</span>
+                </button>
+                
+                <button 
+                  className={`mod-action-btn endorse ${isGuardado ? 'active' : ''}`}
+                  onClick={handleGuardarClick}
+                  disabled={isSaving || !isAuthenticated}
+                  title={isGuardado ? 'Guardado' : 'Guardar'}
+                >
+                  <i className={isGuardado ? 'fas fa-bookmark' : 'far fa-bookmark'}></i>
+                  <span>{isGuardado ? 'Guardado' : 'Guardar'}</span>
+                </button>
+                
+                <button className="mod-action-btn vote" title="Votar">
+                  <i className="fas fa-thumbs-up"></i>
+                  <span>Votar</span>
+                </button>
+              </>
+            )}
+            
+            {/* Botones para el propietario del mod */}
+            {isOwner && (
+              <>
+                <button 
+                  className="mod-action-btn edit"
+                  onClick={handleEditMod}
+                  title="Editar mod"
+                >
+                  <i className="fas fa-edit"></i>
+                  <span>Editar</span>
+                </button>
+                
+                <button 
+                  className="mod-action-btn delete"
+                  onClick={handleDeleteMod}
+                  disabled={deleting}
+                  title={deleting ? 'Eliminando...' : 'Eliminar mod'}
+                >
+                  <i className={`fas ${deleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
+                  <span>{deleting ? 'Eliminando...' : 'Eliminar'}</span>
+                </button>
+              </>
+            )}
+            
+            <button className="mod-action-btn download-main" title="Descargar">
+              <i className="fas fa-download"></i>
+              <span>Descargar</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Información del mod */}
+        <div className="mod-info-section">
+          <div className="mod-info-left">
+            <div className="mod-dates">
+              <div className="mod-date-box">
+                <div className="date-label">Última actualización</div>
+                <div className="date-value">
+                  {mod.fecha_actualizacion ? new Date(mod.fecha_actualizacion).toLocaleDateString() : 'No disponible'}
+                </div>
+              </div>
+              
+              <div className="mod-date-box">
+                <div className="date-label">Subido originalmente</div>
+                <div className="date-value">
+                  {mod.fecha_creacion ? new Date(mod.fecha_creacion).toLocaleDateString() : 'No disponible'}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mod-creator-box">
+              <div className="creator-header">Creado por</div>
+              <div className="creator-content">
+                <img src={mod.creador?.foto_perfil || '/images/user-placeholder.jpg'} alt={mod.creador?.nome} />
+                <span className="creator-name">{mod.creador?.nome || 'Anónimo'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Galería y detalles del mod - Solo mostrar si hay 5 o más imágenes */}
+        {imagenesCarrusel.length >= 5 && (
+          <div className="mod-gallery-section">
+            <div className="mod-gallery-carousel">
+              <div className="carousel-container">
+                {/* Botón anterior */}
+                <button 
+                  className="carousel-nav-btn prev" 
+                  onClick={handlePrev}
+                  disabled={!canGoPrev}
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+
+                {/* Galería horizontal */}
+                <div className="gallery-horizontal">
+                  <div className="gallery-images-container">
+                    {getVisibleImages().map((image, index) => (
+                      <div 
+                        key={index}
+                        className={`gallery-image-item`}
+                      >
+                        <img src={image.src} alt={`Imagen ${index + 1}`} />
+                        {/* Solo mostrar el contador en la imagen del centro (índice 2) */}
+                        {index === 2 && (
+                          <div className="image-counter-overlay">
+                            {imagenesCarrusel.length} imágenes
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Botón siguiente */}
+                <button 
+                  className="carousel-nav-btn next" 
+                  onClick={handleNext}
+                  disabled={!canGoNext}
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Etiquetas del mod */}
+        <div className="mod-tags-section">
+          <h3>Etiquetas para este mod</h3>
+          <div className="mod-tags-list">
+            {mod.etiquetas?.length > 0 ? 
+              mod.etiquetas.map(tag => (
+                <span key={tag.id} className="mod-tag-item">
+                  {tag.nombre}
+                </span>
+              )) : 
+              <span className="no-tags">Sin etiquetas</span>
+            }
+            <button className="add-tag-btn">+ Añadir etiqueta</button>
+          </div>
+        </div>
+      
+        {/* Pestañas de navegación */}
+        <div className="mod-content-tabs">
+          <button className="tab-btn active">
+            Descripción
+          </button>
+          <button className="tab-btn">
+            Archivos <span className="tab-count">1</span>
+          </button>
+          <button className="tab-btn">
+            Imágenes <span className="tab-count">0</span>
+          </button>
+          <button className="tab-btn">
+            Videos <span className="tab-count">0</span>
+          </button>
+          <button className="tab-btn">
+            Artículos <span className="tab-count">0</span>
+          </button>
+          <button className="tab-btn">
+            Comentarios <span className="tab-count">0</span>
+          </button>
+          <button className="tab-btn">
+            Estadísticas
+          </button>
+        </div>
+        
+        {/* Contenido de la pestaña activa */}
+        <div className="mod-tab-content active">
+          <div className="mod-description">
+            <h2>Sobre este mod</h2>
+            
+            {isAuthenticated && (
+              <div className="user-download-info">
+                <i className="fas fa-download"></i> Última descarga: {new Date().toLocaleDateString()}
+              </div>
+            )}
+            
+            <div className="description-content">
+              <p>{mod.descripcion}</p>
+            </div>
+            
+            <div className="mod-action-buttons">
+              <button className="report-btn">
+                <i className="fas fa-flag"></i> Reportar
+              </button>
+              
+              <button className="share-btn">
+                <i className="fas fa-share-alt"></i> Compartir
+              </button>
             </div>
           </div>
         </div>
         
-      </div>
-      
-      {/* Etiquetas del mod */}
-      <div className="mod-tags-section">
-        <h3>Etiquetas para este mod</h3>
-        <div className="mod-tags-list">
-          {mod.etiquetas?.length > 0 ? 
-            mod.etiquetas.map(tag => (
-              <span key={tag.id} className="mod-tag-item">
-                {tag.nombre}
-              </span>
-            )) : 
-            <span className="no-tags">Sin etiquetas</span>
-          }
-          <button className="add-tag-btn">+ Añadir etiqueta</button>
-                </div>
-              </div>
-      
-      {/* Pestañas de navegación */}
-      <div className="mod-content-tabs">
-        <button className="tab-btn active">
-          Descripción
-        </button>
-        <button className="tab-btn">
-          Archivos <span className="tab-count">1</span>
-        </button>
-        <button className="tab-btn">
-          Imágenes <span className="tab-count">0</span>
-        </button>
-        <button className="tab-btn">
-          Videos <span className="tab-count">0</span>
-        </button>
-        <button className="tab-btn">
-          Artículos <span className="tab-count">0</span>
-        </button>
-        <button className="tab-btn">
-          Comentarios <span className="tab-count">0</span>
-        </button>
-        <button className="tab-btn">
-          Estadísticas
-        </button>
-      </div>
-      
-      {/* Contenido de la pestaña activa */}
-      <div className="mod-tab-content active">
-        <div className="mod-description">
-          <h2>Sobre este mod</h2>
-          
-          {isAuthenticated && (
-            <div className="user-download-info">
-              <i className="fas fa-download"></i> Última descarga: {new Date().toLocaleDateString()}
-            </div>
-          )}
-          
-          <div className="description-content">
-            <p>{mod.descripcion}</p>
+        {!isAuthenticated && (
+          <div className="login-needed-card">
+            <i className="fas fa-info-circle"></i>
+            <span>Inicia sesión para valorar y descargar este mod</span>
           </div>
-          
-          <div className="mod-action-buttons">
-            <button className="report-btn">
-              <i className="fas fa-flag"></i> Reportar
-            </button>
-            
-            <button className="share-btn">
-              <i className="fas fa-share-alt"></i> Compartir
-            </button>
-          </div>
-        </div>
+        )}
       </div>
-      
-      {!isAuthenticated && (
-        <div className="login-needed-card">
-          <i className="fas fa-info-circle"></i>
-          <span>Inicia sesión para valorar y descargar este mod</span>
-        </div>
-      )}
 
       {/* Modal de eliminación */}
       <ModDeleteConfirmationModal
