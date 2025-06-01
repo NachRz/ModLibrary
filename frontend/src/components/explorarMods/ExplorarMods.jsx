@@ -8,11 +8,8 @@ import PageContainer from '../layout/PageContainer';
 import '../../assets/styles/components/explorarMods/ExplorarMods.css';
 
 const ExplorarMods = () => {
-  // Estados
-  const [mods, setMods] = useState([]);
-  const [showFilters, setShowFilters] = useState(true);
-  const [vistaActual, setVistaActual] = useState('compacta'); // 'compacta' o 'lista'
-  const [filtros, setFiltros] = useState({
+  // Constante para filtros por defecto (evitar duplicación)
+  const FILTROS_DEFAULT = {
     juego: '',
     categoria: '',
     etiquetas: [],
@@ -34,7 +31,21 @@ const ExplorarMods = () => {
     busquedaDescripcion: '',
     busquedaAutor: '',
     etiquetasExcluidas: []
-  });
+  };
+
+  // Lista de claves válidas para URL (evitar duplicación)
+  const CLAVES_FILTROS_VALIDAS = [
+    'juego', 'categoria', 'etiquetas', 'busqueda', 'ordenarPor', 'orden',
+    'edades_seleccionadas', 'popularidad', 'version', 'fechaDesde', 'fechaHasta',
+    'periodoTiempo', 'descargasMin', 'descargasMax', 'valoracionesMin', 'valoracionesMax',
+    'tamanoMin', 'tamanoMax', 'busquedaDescripcion', 'busquedaAutor', 'etiquetasExcluidas'
+  ];
+
+  // Estados
+  const [mods, setMods] = useState([]);
+  const [showFilters, setShowFilters] = useState(true);
+  const [vistaActual, setVistaActual] = useState('compacta'); // 'compacta' o 'lista'
+  const [filtros, setFiltros] = useState(FILTROS_DEFAULT);
   const [paginacion, setPaginacion] = useState({
     paginaActual: 1,
     resultadosPorPagina: 20,
@@ -61,6 +72,120 @@ const ExplorarMods = () => {
   // Estados para búsqueda de etiquetas
   const [busquedaEtiquetasIncluir, setBusquedaEtiquetasIncluir] = useState('');
   const [busquedaEtiquetasExcluir, setBusquedaEtiquetasExcluir] = useState('');
+  
+  // Estado para búsqueda de juegos
+  const [busquedaJuegos, setBusquedaJuegos] = useState('');
+  const [showJuegosDropdown, setShowJuegosDropdown] = useState(false);
+  
+  // Estados para controlar dropdowns de etiquetas
+  const [showEtiquetasIncluirDropdown, setShowEtiquetasIncluirDropdown] = useState(false);
+  const [showEtiquetasExcluirDropdown, setShowEtiquetasExcluirDropdown] = useState(false);
+
+  // Función helper para resetear estados de búsqueda
+  const resetearEstadosBusqueda = useCallback(() => {
+    setBusquedaJuegos('');
+    setBusquedaEtiquetasIncluir('');
+    setBusquedaEtiquetasExcluir('');
+    setShowJuegosDropdown(false);
+    setShowEtiquetasIncluirDropdown(false);
+    setShowEtiquetasExcluirDropdown(false);
+  }, []);
+
+  // Función helper para sincronizar búsqueda de juegos con filtros
+  const sincronizarBusquedaJuegos = useCallback((filtrosData) => {
+    if (filtrosData.juego) {
+      setBusquedaJuegos(filtrosData.juego);
+    } else {
+      setBusquedaJuegos('');
+    }
+  }, []);
+
+  // Función para obtener filtros desde la URL
+  const obtenerFiltrosDesdeURL = useCallback(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const filtrosURL = {};
+    
+    // Obtener cada filtro de la URL
+    CLAVES_FILTROS_VALIDAS.forEach(key => {
+      const valor = urlParams.get(key);
+      if (valor !== null) {
+        if (key === 'etiquetas' || key === 'edades_seleccionadas' || key === 'etiquetasExcluidas') {
+          filtrosURL[key] = valor ? valor.split(',') : [];
+        } else {
+          filtrosURL[key] = valor;
+        }
+      }
+    });
+    
+    return filtrosURL;
+  }, []);
+
+  // Función para guardar filtros en la URL
+  const guardarFiltrosEnURL = useCallback((nuevosFiltros) => {
+    const params = new URLSearchParams();
+    
+    Object.keys(nuevosFiltros).forEach(key => {
+      const valor = nuevosFiltros[key];
+      if (valor && valor !== '' && (Array.isArray(valor) ? valor.length > 0 : true)) {
+        if (Array.isArray(valor)) {
+          params.set(key, valor.join(','));
+        } else {
+          params.set(key, valor);
+        }
+      }
+    });
+    
+    const nuevaURL = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+    
+    // Usar replaceState para no agregar nueva entrada al historial en cambios normales
+    window.history.replaceState({ filtros: nuevosFiltros }, '', nuevaURL);
+  }, []);
+
+  // Restaurar filtros al cargar el componente
+  useEffect(() => {
+    const filtrosURL = obtenerFiltrosDesdeURL();
+    if (Object.keys(filtrosURL).length > 0) {
+      setFiltros(prev => ({ ...prev, ...filtrosURL }));
+      
+      // Sincronizar búsqueda de juegos
+      sincronizarBusquedaJuegos(filtrosURL);
+    }
+  }, [obtenerFiltrosDesdeURL, sincronizarBusquedaJuegos]);
+
+  // Manejar navegación del navegador (botones atrás/adelante)
+  useEffect(() => {
+    const manejarPopState = (event) => {
+      if (event.state && event.state.filtros) {
+        // Restaurar filtros desde el estado del historial
+        setFiltros(event.state.filtros);
+        
+        // Sincronizar búsqueda de juegos
+        sincronizarBusquedaJuegos(event.state.filtros);
+      } else {
+        // Si no hay estado, obtener filtros desde la URL
+        const filtrosURL = obtenerFiltrosDesdeURL();
+        if (Object.keys(filtrosURL).length > 0) {
+          setFiltros(prev => ({ ...prev, ...filtrosURL }));
+          sincronizarBusquedaJuegos(filtrosURL);
+        } else {
+          // Limpiar filtros si no hay parámetros en la URL
+          setFiltros(FILTROS_DEFAULT);
+          setBusquedaJuegos('');
+        }
+      }
+    };
+
+    window.addEventListener('popstate', manejarPopState);
+    
+    return () => {
+      window.removeEventListener('popstate', manejarPopState);
+    };
+  }, [obtenerFiltrosDesdeURL, sincronizarBusquedaJuegos]);
+
+  // Guardar filtros en URL cuando cambien
+  useEffect(() => {
+    guardarFiltrosEnURL(filtros);
+  }, [filtros, guardarFiltrosEnURL]);
 
   // Cargar mods desde la base de datos
   const cargarMods = useCallback(async () => {
@@ -103,18 +228,46 @@ const ExplorarMods = () => {
     cargarMods();
   }, [cargarMods]);
 
+  // Sincronizar búsqueda de juegos con filtro actual
+  useEffect(() => {
+    // Solo sincronizar si realmente hay una diferencia
+    if (filtros.juego !== busquedaJuegos) {
+      setBusquedaJuegos(filtros.juego || '');
+    }
+  }, [filtros.juego, busquedaJuegos]);
+
+  // Función para remover filtro de juego específicamente
+  const removeJuegoFilter = useCallback(() => {
+    setFiltros(prev => ({ ...prev, juego: '' }));
+    setBusquedaJuegos('');
+    setShowJuegosDropdown(false);
+  }, []);
+
+  // Función para seleccionar un juego específico
+  const selectJuego = useCallback((juego) => {
+    setFiltros(prev => ({ ...prev, juego }));
+    setBusquedaJuegos(juego);
+    setShowJuegosDropdown(false);
+  }, []);
+
+  // Función para limpiar selección de juego (todos los juegos)
+  const clearJuegoSelection = useCallback(() => {
+    setFiltros(prev => ({ ...prev, juego: '' }));
+    setBusquedaJuegos('');
+    setShowJuegosDropdown(false);
+  }, []);
+
   // Cerrar dropdowns cuando se hace clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.relative')) {
-        setBusquedaEtiquetasIncluir('');
-        setBusquedaEtiquetasExcluir('');
+        resetearEstadosBusqueda();
       }
     };
     
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [resetearEstadosBusqueda]);
 
   // Efecto para animar el contador de resultados
   useEffect(() => {
@@ -184,31 +337,11 @@ const ExplorarMods = () => {
 
   // Limpiar todos los filtros
   const handleClearFilters = () => {
-    setFiltros({
-      busqueda: '',
-      juego: '',
-      categoria: '',
-      etiquetas: [],
-      edades_seleccionadas: [],
-      popularidad: '',
-      version: '',
-      fechaDesde: '',
-      fechaHasta: '',
-      periodoTiempo: '',
-      descargasMin: '',
-      descargasMax: '',
-      valoracionesMin: '',
-      valoracionesMax: '',
-      tamanoMin: '',
-      tamanoMax: '',
-      busquedaDescripcion: '',
-      busquedaAutor: '',
-      etiquetasExcluidas: [],
-      ordenarPor: 'recientes',
-      orden: 'desc'
-    });
-    setBusquedaEtiquetasIncluir('');
-    setBusquedaEtiquetasExcluir('');
+    setFiltros(FILTROS_DEFAULT);
+    resetearEstadosBusqueda();
+    
+    // Limpiar la URL también
+    window.history.replaceState({ filtros: FILTROS_DEFAULT }, '', window.location.pathname);
   };
 
   // Cambiar entre vistas
@@ -282,33 +415,44 @@ const ExplorarMods = () => {
     }));
   };
 
+  // Función helper para filtrado por texto
+  const filtrarPorTexto = useCallback((texto, campo) => {
+    if (!texto) return true;
+    return campo.toLowerCase().includes(texto.toLowerCase());
+  }, []);
+
+  // Función helper para validar etiquetas disponibles
+  const validarEtiquetaDisponible = useCallback((etiqueta, busqueda, esIncluir) => {
+    // Filtrar por búsqueda solo si hay texto
+    const coincideBusqueda = !busqueda || etiqueta.toLowerCase().includes(busqueda.toLowerCase());
+    
+    if (esIncluir) {
+      // Para incluir: no debe estar ya incluida ni excluida
+      const noEstaIncluida = !filtros.etiquetas.includes(etiqueta);
+      const noEstaExcluida = !filtros.etiquetasExcluidas.includes(etiqueta);
+      return coincideBusqueda && noEstaIncluida && noEstaExcluida;
+    } else {
+      // Para excluir: no debe estar ya excluida ni incluida
+      const noEstaExcluida = !filtros.etiquetasExcluidas.includes(etiqueta);
+      const noEstaIncluida = !filtros.etiquetas.includes(etiqueta);
+      return coincideBusqueda && noEstaExcluida && noEstaIncluida;
+    }
+  }, [filtros.etiquetas, filtros.etiquetasExcluidas]);
+
   // Filtrar y ordenar los mods
   const modsFiltrados = mods
     .filter(mod => {
+      // Filtro por búsqueda general
       if (filtros.busqueda) {
-        const searchTerm = filtros.busqueda.toLowerCase();
-        return mod.titulo.toLowerCase().includes(searchTerm) ||
-          mod.descripcion.toLowerCase().includes(searchTerm) ||
-          mod.autor.toLowerCase().includes(searchTerm);
+        const searchTerm = filtros.busqueda;
+        return filtrarPorTexto(searchTerm, mod.titulo) ||
+               filtrarPorTexto(searchTerm, mod.descripcion) ||
+               filtrarPorTexto(searchTerm, mod.autor);
       }
       return true;
     })
-    .filter(mod => {
-      // Filtrar por descripción específicamente
-      if (filtros.busquedaDescripcion) {
-        const searchTerm = filtros.busquedaDescripcion.toLowerCase();
-        return mod.descripcion.toLowerCase().includes(searchTerm);
-      }
-      return true;
-    })
-    .filter(mod => {
-      // Filtrar por autor específicamente
-      if (filtros.busquedaAutor) {
-        const searchTerm = filtros.busquedaAutor.toLowerCase();
-        return mod.autor.toLowerCase().includes(searchTerm);
-      }
-      return true;
-    })
+    .filter(mod => filtrarPorTexto(filtros.busquedaDescripcion, mod.descripcion))
+    .filter(mod => filtrarPorTexto(filtros.busquedaAutor, mod.autor))
     .filter(mod => filtros.juego ? mod.juego.titulo === filtros.juego : true)
     .filter(mod => {
       // Filtrar por etiquetas incluidas (cualquiera de las seleccionadas)
@@ -444,7 +588,7 @@ const ExplorarMods = () => {
           </div>
         </div>
 
-        <div className="explorar-content max-w-7xl mx-auto px-4 sm:px-6 lg-custom:px-8 pt-8">
+        <div className="explorar-content max-w-7xl mx-auto px-4 sm:px-6 lg-custom:px-8 pt-8 pb-16">
           <div className="flex flex-col lg-custom:flex-row gap-8">
             {/* Panel de filtros */}
             <div className={`lg-custom:w-80 flex-shrink-0 transition-all duration-300 ${showFilters ? 'block' : 'hidden'}`}>
@@ -478,18 +622,49 @@ const ExplorarMods = () => {
 
                     {secciones.juego && (
                       <div className="filter-section-content p-2">
-                        <div className="custom-select">
-                          <select
-                            name="juego"
-                            value={filtros.juego}
-                            onChange={handleFiltroChange}
-                            className="w-full"
-                          >
-                            <option value="">Todos los juegos</option>
-                            {juegosUnicos.map(juego => (
-                              <option key={juego} value={juego}>{juego}</option>
-                            ))}
-                          </select>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={busquedaJuegos}
+                            onChange={(e) => {
+                              setBusquedaJuegos(e.target.value);
+                              setShowJuegosDropdown(true);
+                            }}
+                            onFocus={() => setShowJuegosDropdown(true)}
+                            placeholder="Buscar juego..."
+                            className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text text-sm"
+                          />
+                          {showJuegosDropdown && (
+                            <div className="absolute z-10 w-full mt-1 bg-custom-card border border-custom-detail/20 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                              <button
+                                onClick={() => clearJuegoSelection()}
+                                className="w-full text-left px-3 py-2 text-sm text-custom-text hover:bg-custom-bg/50 transition-colors border-b border-custom-detail/10"
+                              >
+                                Todos los juegos
+                              </button>
+                              {juegosUnicos
+                                .filter(juego => 
+                                  juego.toLowerCase().includes(busquedaJuegos.toLowerCase())
+                                )
+                                .map(juego => (
+                                  <button
+                                    key={juego}
+                                    onClick={() => selectJuego(juego)}
+                                    className="w-full text-left px-3 py-2 text-sm text-custom-text hover:bg-custom-bg/50 transition-colors"
+                                  >
+                                    {juego}
+                                  </button>
+                                ))
+                              }
+                              {juegosUnicos.filter(juego => 
+                                juego.toLowerCase().includes(busquedaJuegos.toLowerCase())
+                              ).length === 0 && (
+                                <div className="px-3 py-2 text-sm text-custom-detail">
+                                  No se encontraron juegos
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -516,23 +691,25 @@ const ExplorarMods = () => {
                             <input
                               type="text"
                               value={busquedaEtiquetasIncluir}
-                              onChange={(e) => setBusquedaEtiquetasIncluir(e.target.value)}
+                              onChange={(e) => {
+                                setBusquedaEtiquetasIncluir(e.target.value);
+                                setShowEtiquetasIncluirDropdown(true);
+                              }}
+                              onFocus={() => setShowEtiquetasIncluirDropdown(true)}
                               placeholder="Buscar etiquetas para incluir..."
                               className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text text-sm"
                             />
-                            {busquedaEtiquetasIncluir && (
+                            {showEtiquetasIncluirDropdown && (
                               <div className="absolute z-10 w-full mt-1 bg-custom-card border border-custom-detail/20 rounded-md shadow-lg max-h-40 overflow-y-auto">
                                 {etiquetasUnicas
-                                  .filter(etiqueta => 
-                                    etiqueta.toLowerCase().includes(busquedaEtiquetasIncluir.toLowerCase()) &&
-                                    !filtros.etiquetas.includes(etiqueta)
-                                  )
+                                  .filter(etiqueta => validarEtiquetaDisponible(etiqueta, busquedaEtiquetasIncluir, true))
                                   .map(etiqueta => (
                                     <button
                                       key={etiqueta}
                                       onClick={() => {
                                         handleEtiquetaIncluidaChange(etiqueta);
                                         setBusquedaEtiquetasIncluir('');
+                                        setShowEtiquetasIncluirDropdown(false);
                                       }}
                                       className="w-full text-left px-3 py-2 text-sm text-custom-text hover:bg-custom-bg/50 transition-colors"
                                     >
@@ -540,10 +717,7 @@ const ExplorarMods = () => {
                                     </button>
                                   ))
                                 }
-                                {etiquetasUnicas.filter(etiqueta => 
-                                  etiqueta.toLowerCase().includes(busquedaEtiquetasIncluir.toLowerCase()) &&
-                                  !filtros.etiquetas.includes(etiqueta)
-                                ).length === 0 && (
+                                {etiquetasUnicas.filter(etiqueta => validarEtiquetaDisponible(etiqueta, busquedaEtiquetasIncluir, true)).length === 0 && (
                                   <div className="px-3 py-2 text-sm text-custom-detail">
                                     No se encontraron etiquetas
                                   </div>
@@ -576,23 +750,25 @@ const ExplorarMods = () => {
                             <input
                               type="text"
                               value={busquedaEtiquetasExcluir}
-                              onChange={(e) => setBusquedaEtiquetasExcluir(e.target.value)}
+                              onChange={(e) => {
+                                setBusquedaEtiquetasExcluir(e.target.value);
+                                setShowEtiquetasExcluirDropdown(true);
+                              }}
+                              onFocus={() => setShowEtiquetasExcluirDropdown(true)}
                               placeholder="Buscar etiquetas para excluir..."
                               className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text text-sm"
                             />
-                            {busquedaEtiquetasExcluir && (
+                            {showEtiquetasExcluirDropdown && (
                               <div className="absolute z-10 w-full mt-1 bg-custom-card border border-custom-detail/20 rounded-md shadow-lg max-h-40 overflow-y-auto">
                                 {etiquetasUnicas
-                                  .filter(etiqueta => 
-                                    etiqueta.toLowerCase().includes(busquedaEtiquetasExcluir.toLowerCase()) &&
-                                    !filtros.etiquetasExcluidas.includes(etiqueta)
-                                  )
+                                  .filter(etiqueta => validarEtiquetaDisponible(etiqueta, busquedaEtiquetasExcluir, false))
                                   .map(etiqueta => (
                                     <button
                                       key={etiqueta}
                                       onClick={() => {
                                         handleEtiquetaExcluidaChange(etiqueta);
                                         setBusquedaEtiquetasExcluir('');
+                                        setShowEtiquetasExcluirDropdown(false);
                                       }}
                                       className="w-full text-left px-3 py-2 text-sm text-custom-text hover:bg-custom-bg/50 transition-colors"
                                     >
@@ -600,10 +776,7 @@ const ExplorarMods = () => {
                                     </button>
                                   ))
                                 }
-                                {etiquetasUnicas.filter(etiqueta => 
-                                  etiqueta.toLowerCase().includes(busquedaEtiquetasExcluir.toLowerCase()) &&
-                                  !filtros.etiquetasExcluidas.includes(etiqueta)
-                                ).length === 0 && (
+                                {etiquetasUnicas.filter(etiqueta => validarEtiquetaDisponible(etiqueta, busquedaEtiquetasExcluir, false)).length === 0 && (
                                   <div className="px-3 py-2 text-sm text-custom-detail">
                                     No se encontraron etiquetas
                                   </div>
@@ -1113,7 +1286,7 @@ const ExplorarMods = () => {
                       <span className="tipo">Juego:</span> {filtros.juego}
                       <span
                         className="remove"
-                        onClick={() => setFiltros(prev => ({ ...prev, juego: '' }))}
+                        onClick={() => removeJuegoFilter()}
                       >×</span>
                     </div>
                   )}
