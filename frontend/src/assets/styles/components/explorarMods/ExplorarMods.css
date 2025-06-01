@@ -513,5 +513,43 @@
 }
 
 .pagination-button:hover:not(:disabled) svg {
-  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Estilos para el selector de vista responsivo */
+.view-text {
+  margin-left: 0.375rem;
+}
+
+.view-icon-margin {
+  margin-right: 0.375rem;
+}
+
+@media (max-width: 1165px) {
+  .view-text {
+    display: none;
+  }
+  
+  .view-icon-margin {
+    margin-right: 0;
+  }
+}
+
+/* Estilos para elementos próximamente */
+.proximamente-feature {
+  opacity: 0.7;
+  position: relative;
+}
+
+.proximamente-feature::after {
+  content: 'Próximamente';
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 0.65rem;
+  background: var(--color-secondary);
+  color: white;
+  padding: 0.125rem 0.375rem;
+  border-radius: 9999px;
+  opacity: 0.8;
 } 

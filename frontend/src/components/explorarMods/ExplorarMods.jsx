@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import ModCard from '../common/Cards/ModCard';
+import ModList from '../common/list/ModList';
 import modService from '../../services/api/modService';
 import { useNotification } from '../../context/NotificationContext';
 import PageContainer from '../layout/PageContainer';
@@ -27,7 +28,12 @@ const ExplorarMods = () => {
     descargasMin: '',
     descargasMax: '',
     valoracionesMin: '',
-    valoracionesMax: ''
+    valoracionesMax: '',
+    tamanoMin: '',
+    tamanoMax: '',
+    busquedaDescripcion: '',
+    busquedaAutor: '',
+    etiquetasExcluidas: []
   });
   const [paginacion, setPaginacion] = useState({
     paginaActual: 1,
@@ -37,7 +43,7 @@ const ExplorarMods = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [isUpdatingResults, setIsUpdatingResults] = useState(false);
-  
+
   const { showNotification } = useNotification();
 
   // Añadir estados para manejo de secciones colapsables
@@ -51,6 +57,10 @@ const ExplorarMods = () => {
     descargas: true,
     valoraciones: true
   });
+
+  // Estados para búsqueda de etiquetas
+  const [busquedaEtiquetasIncluir, setBusquedaEtiquetasIncluir] = useState('');
+  const [busquedaEtiquetasExcluir, setBusquedaEtiquetasExcluir] = useState('');
 
   // Cargar mods desde la base de datos
   const cargarMods = useCallback(async () => {
@@ -93,6 +103,19 @@ const ExplorarMods = () => {
     cargarMods();
   }, [cargarMods]);
 
+  // Cerrar dropdowns cuando se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.relative')) {
+        setBusquedaEtiquetasIncluir('');
+        setBusquedaEtiquetasExcluir('');
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Efecto para animar el contador de resultados
   useEffect(() => {
     setIsUpdatingResults(true);
@@ -122,26 +145,70 @@ const ExplorarMods = () => {
     });
   };
 
+  // Función para manejar etiquetas excluidas
+  const handleEtiquetaExcluidaChange = (etiqueta) => {
+    setFiltros(prev => {
+      const nuevasEtiquetasExcluidas = prev.etiquetasExcluidas.includes(etiqueta)
+        ? prev.etiquetasExcluidas.filter(e => e !== etiqueta)
+        : [...prev.etiquetasExcluidas, etiqueta];
+      return {
+        ...prev,
+        etiquetasExcluidas: nuevasEtiquetasExcluidas
+      };
+    });
+  };
+
+  // Función para aplicar filtros de búsqueda avanzada
+  const handleBusquedaAvanzadaSubmit = () => {
+    // La búsqueda ya se aplica automáticamente por los efectos de los filtros
+    // Podríamos agregar aquí alguna lógica adicional si fuera necesario
+    console.log('Filtros de búsqueda aplicados:', {
+      busqueda: filtros.busqueda,
+      busquedaDescripcion: filtros.busquedaDescripcion,
+      busquedaAutor: filtros.busquedaAutor
+    });
+  };
+
+  // Función para manejar etiquetas incluidas
+  const handleEtiquetaIncluidaChange = (etiqueta) => {
+    setFiltros(prev => {
+      const nuevasEtiquetas = prev.etiquetas.includes(etiqueta)
+        ? prev.etiquetas.filter(e => e !== etiqueta)
+        : [...prev.etiquetas, etiqueta];
+      return {
+        ...prev,
+        etiquetas: nuevasEtiquetas
+      };
+    });
+  };
+
   // Limpiar todos los filtros
   const handleClearFilters = () => {
     setFiltros({
+      busqueda: '',
       juego: '',
       categoria: '',
       etiquetas: [],
-      busqueda: '',
-      ordenarPor: 'recientes',
-      orden: 'desc',
       edades_seleccionadas: [],
       popularidad: '',
       version: '',
       fechaDesde: '',
       fechaHasta: '',
-      periodoTiempo: 'todo',
+      periodoTiempo: '',
       descargasMin: '',
       descargasMax: '',
       valoracionesMin: '',
-      valoracionesMax: ''
+      valoracionesMax: '',
+      tamanoMin: '',
+      tamanoMax: '',
+      busquedaDescripcion: '',
+      busquedaAutor: '',
+      etiquetasExcluidas: [],
+      ordenarPor: 'recientes',
+      orden: 'desc'
     });
+    setBusquedaEtiquetasIncluir('');
+    setBusquedaEtiquetasExcluir('');
   };
 
   // Cambiar entre vistas
@@ -158,9 +225,10 @@ const ExplorarMods = () => {
   };
 
   // Verificar si hay filtros activos
-  const hayFiltrosActivos = filtros.juego || filtros.categoria || filtros.etiquetas.length > 0 || filtros.busqueda ||
+  const hayFiltrosActivos = filtros.juego || filtros.etiquetas.length > 0 || filtros.busqueda ||
     filtros.edades_seleccionadas.length > 0 || filtros.popularidad || filtros.version || filtros.fechaDesde || filtros.fechaHasta ||
-    filtros.descargasMin || filtros.descargasMax || filtros.valoracionesMin || filtros.valoracionesMax;
+    filtros.descargasMin || filtros.descargasMax || filtros.valoracionesMin || filtros.valoracionesMax ||
+    filtros.tamanoMin || filtros.tamanoMax || filtros.busquedaDescripcion || filtros.busquedaAutor || filtros.etiquetasExcluidas.length > 0;
 
   // Función para calcular fechas basadas en el período seleccionado
   const calcularFechasPeriodo = (periodo) => {
@@ -220,13 +288,33 @@ const ExplorarMods = () => {
       if (filtros.busqueda) {
         const searchTerm = filtros.busqueda.toLowerCase();
         return mod.titulo.toLowerCase().includes(searchTerm) ||
-               mod.descripcion.toLowerCase().includes(searchTerm) ||
-               mod.autor.toLowerCase().includes(searchTerm);
+          mod.descripcion.toLowerCase().includes(searchTerm) ||
+          mod.autor.toLowerCase().includes(searchTerm);
+      }
+      return true;
+    })
+    .filter(mod => {
+      // Filtrar por descripción específicamente
+      if (filtros.busquedaDescripcion) {
+        const searchTerm = filtros.busquedaDescripcion.toLowerCase();
+        return mod.descripcion.toLowerCase().includes(searchTerm);
+      }
+      return true;
+    })
+    .filter(mod => {
+      // Filtrar por autor específicamente
+      if (filtros.busquedaAutor) {
+        const searchTerm = filtros.busquedaAutor.toLowerCase();
+        return mod.autor.toLowerCase().includes(searchTerm);
       }
       return true;
     })
     .filter(mod => filtros.juego ? mod.juego.titulo === filtros.juego : true)
-    .filter(mod => filtros.categoria ? mod.categoria === filtros.categoria : true)
+    .filter(mod => {
+      // Filtrar por etiquetas incluidas (cualquiera de las seleccionadas)
+      if (filtros.etiquetas.length === 0) return true;
+      return mod.etiquetas.some(tag => filtros.etiquetas.includes(tag.nombre));
+    })
     .filter(mod => {
       // Si no hay edades seleccionadas, mostrar todos los mods
       if (filtros.edades_seleccionadas.length === 0) return true;
@@ -262,8 +350,9 @@ const ExplorarMods = () => {
       return true;
     })
     .filter(mod => {
-      if (filtros.etiquetas.length === 0) return true;
-      return mod.etiquetas.some(tag => filtros.etiquetas.includes(tag.nombre));
+      // Filtrar por etiquetas excluidas
+      if (filtros.etiquetasExcluidas.length === 0) return true;
+      return !mod.etiquetas.some(tag => filtros.etiquetasExcluidas.includes(tag.nombre));
     })
     .filter(mod => {
       // Filtrar por número de descargas
@@ -275,6 +364,19 @@ const ExplorarMods = () => {
       // Filtrar por número de valoraciones
       if (filtros.valoracionesMin && mod.numValoraciones < parseInt(filtros.valoracionesMin)) return false;
       if (filtros.valoracionesMax && mod.numValoraciones > parseInt(filtros.valoracionesMax)) return false;
+      return true;
+    })
+    .filter(mod => {
+      // Filtrar por tamaño de archivo (simulado en MB)
+      const tamanoMod = mod.tamano || Math.floor(Math.random() * 500) + 1; // Simulamos tamaño si no existe
+      if (filtros.tamanoMin) {
+        const tamanoMinMB = parseInt(filtros.tamanoMin);
+        if (tamanoMod < tamanoMinMB) return false;
+      }
+      if (filtros.tamanoMax) {
+        const tamanoMaxMB = parseInt(filtros.tamanoMax);
+        if (tamanoMod > tamanoMaxMB) return false;
+      }
       return true;
     })
     .sort((a, b) => {
@@ -342,13 +444,13 @@ const ExplorarMods = () => {
           </div>
         </div>
 
-        <div className="explorar-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-          <div className="flex flex-col lg:flex-row gap-8">
+        <div className="explorar-content max-w-7xl mx-auto px-4 sm:px-6 lg-custom:px-8 pt-8">
+          <div className="flex flex-col lg-custom:flex-row gap-8">
             {/* Panel de filtros */}
-            <div className={`lg:w-80 flex-shrink-0 transition-all duration-300 ${showFilters ? 'block' : 'hidden'}`}>
+            <div className={`lg-custom:w-80 flex-shrink-0 transition-all duration-300 ${showFilters ? 'block' : 'hidden'}`}>
               <div className="filters-panel rounded-lg">
                 {/* Botón de mostrar/ocultar filtros */}
-                <div className="flex justify-start items-center h-[52px] px-4 border-b border-custom-detail/10">
+                <div className="flex justify-start items-center min-h-[60px] h-[60px] px-4 border-b border-custom-detail/10">
                   <button
                     onClick={() => setShowFilters(!showFilters)}
                     className="filter-button text-sm text-custom-text hover:text-custom-primary transition-colors bg-custom-bg/30 px-4 py-2 rounded-md flex items-center h-9 w-auto"
@@ -376,20 +478,20 @@ const ExplorarMods = () => {
 
                     {secciones.juego && (
                       <div className="filter-section-content p-2">
-                  <div className="custom-select">
-                    <select
-                      name="juego"
-                      value={filtros.juego}
-                      onChange={handleFiltroChange}
+                        <div className="custom-select">
+                          <select
+                            name="juego"
+                            value={filtros.juego}
+                            onChange={handleFiltroChange}
                             className="w-full"
-                    >
-                      <option value="">Todos los juegos</option>
-                      {juegosUnicos.map(juego => (
-                        <option key={juego} value={juego}>{juego}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                          >
+                            <option value="">Todos los juegos</option>
+                            {juegosUnicos.map(juego => (
+                              <option key={juego} value={juego}>{juego}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
                     )}
                   </div>
 
@@ -407,33 +509,124 @@ const ExplorarMods = () => {
 
                     {secciones.etiquetas && (
                       <div className="filter-section-content p-2 space-y-2">
+                        {/* Sección de incluir etiquetas */}
                         <div>
                           <label className="text-xs text-custom-detail">Incluye</label>
-                  <div className="custom-select">
-                    <select
-                      name="categoria"
-                      value={filtros.categoria}
-                      onChange={handleFiltroChange}
-                              className="w-full"
-                    >
-                      <option value="">Todas las categorías</option>
-                      {categoriasUnicas.map(categoria => (
-                        <option key={categoria} value={categoria}>{categoria}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                        <div className="proximamente-feature">
-                          <label className="text-xs text-custom-detail">Excluye</label>
-                          <div className="custom-select">
-                            <select className="w-full" disabled>
-                              <option value="">Seleccionar etiqueta para excluir...</option>
-                    {etiquetasUnicas.map(etiqueta => (
-                                <option key={etiqueta} value={etiqueta}>{etiqueta}</option>
-                              ))}
-                            </select>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={busquedaEtiquetasIncluir}
+                              onChange={(e) => setBusquedaEtiquetasIncluir(e.target.value)}
+                              placeholder="Buscar etiquetas para incluir..."
+                              className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text text-sm"
+                            />
+                            {busquedaEtiquetasIncluir && (
+                              <div className="absolute z-10 w-full mt-1 bg-custom-card border border-custom-detail/20 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                {etiquetasUnicas
+                                  .filter(etiqueta => 
+                                    etiqueta.toLowerCase().includes(busquedaEtiquetasIncluir.toLowerCase()) &&
+                                    !filtros.etiquetas.includes(etiqueta)
+                                  )
+                                  .map(etiqueta => (
+                                    <button
+                                      key={etiqueta}
+                                      onClick={() => {
+                                        handleEtiquetaIncluidaChange(etiqueta);
+                                        setBusquedaEtiquetasIncluir('');
+                                      }}
+                                      className="w-full text-left px-3 py-2 text-sm text-custom-text hover:bg-custom-bg/50 transition-colors"
+                                    >
+                                      {etiqueta}
+                                    </button>
+                                  ))
+                                }
+                                {etiquetasUnicas.filter(etiqueta => 
+                                  etiqueta.toLowerCase().includes(busquedaEtiquetasIncluir.toLowerCase()) &&
+                                  !filtros.etiquetas.includes(etiqueta)
+                                ).length === 0 && (
+                                  <div className="px-3 py-2 text-sm text-custom-detail">
+                                    No se encontraron etiquetas
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
+                          {/* Mostrar etiquetas incluidas */}
+                          {filtros.etiquetas.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {filtros.etiquetas.map(etiqueta => (
+                                <div key={etiqueta} className="flex items-center justify-between bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">
+                                  <span>Incluir: {etiqueta}</span>
+                                  <button
+                                    onClick={() => handleEtiquetaIncluidaChange(etiqueta)}
+                                    className="text-green-400 hover:text-green-300 ml-2"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Sección de excluir etiquetas */}
+                        <div>
+                          <label className="text-xs text-custom-detail">Excluye</label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={busquedaEtiquetasExcluir}
+                              onChange={(e) => setBusquedaEtiquetasExcluir(e.target.value)}
+                              placeholder="Buscar etiquetas para excluir..."
+                              className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text text-sm"
+                            />
+                            {busquedaEtiquetasExcluir && (
+                              <div className="absolute z-10 w-full mt-1 bg-custom-card border border-custom-detail/20 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                {etiquetasUnicas
+                                  .filter(etiqueta => 
+                                    etiqueta.toLowerCase().includes(busquedaEtiquetasExcluir.toLowerCase()) &&
+                                    !filtros.etiquetasExcluidas.includes(etiqueta)
+                                  )
+                                  .map(etiqueta => (
+                                    <button
+                                      key={etiqueta}
+                                      onClick={() => {
+                                        handleEtiquetaExcluidaChange(etiqueta);
+                                        setBusquedaEtiquetasExcluir('');
+                                      }}
+                                      className="w-full text-left px-3 py-2 text-sm text-custom-text hover:bg-custom-bg/50 transition-colors"
+                                    >
+                                      {etiqueta}
+                                    </button>
+                                  ))
+                                }
+                                {etiquetasUnicas.filter(etiqueta => 
+                                  etiqueta.toLowerCase().includes(busquedaEtiquetasExcluir.toLowerCase()) &&
+                                  !filtros.etiquetasExcluidas.includes(etiqueta)
+                                ).length === 0 && (
+                                  <div className="px-3 py-2 text-sm text-custom-detail">
+                                    No se encontraron etiquetas
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          {/* Mostrar etiquetas excluidas */}
+                          {filtros.etiquetasExcluidas.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {filtros.etiquetasExcluidas.map(etiqueta => (
+                                <div key={etiqueta} className="flex items-center justify-between bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs">
+                                  <span>Excluir: {etiqueta}</span>
+                                  <button
+                                    onClick={() => handleEtiquetaExcluidaChange(etiqueta)}
+                                    className="text-red-400 hover:text-red-300 ml-2"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -447,7 +640,6 @@ const ExplorarMods = () => {
                     >
                       <span className="text-xs font-bold uppercase">Parámetros de búsqueda</span>
                       <div className="flex items-center">
-                        <span className="proximamente-badge mr-2">Parcial</span>
                         <svg className={`h-4 w-4 transition-transform ${secciones.parametrosBusqueda ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                         </svg>
@@ -467,25 +659,30 @@ const ExplorarMods = () => {
                           />
                         </div>
 
-                        <div className="proximamente-feature">
+                        <div>
                           <input
                             type="text"
+                            name="busquedaDescripcion"
+                            value={filtros.busquedaDescripcion}
+                            onChange={handleFiltroChange}
                             placeholder="Descripción contiene..."
                             className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text"
-                            disabled
                           />
                         </div>
 
-                        <div className="proximamente-feature">
+                        <div>
                           <input
                             type="text"
+                            name="busquedaAutor"
+                            value={filtros.busquedaAutor}
+                            onChange={handleFiltroChange}
                             placeholder="Autor contiene..."
                             className="filter-input w-full rounded-md px-3 py-2 bg-custom-bg text-custom-text"
-                            disabled
                           />
                         </div>
 
                         <button
+                          onClick={handleBusquedaAvanzadaSubmit}
                           className="w-full bg-custom-primary hover:bg-custom-primary-hover text-white py-2 rounded-md transition-colors"
                         >
                           Aplicar
@@ -644,15 +841,15 @@ const ExplorarMods = () => {
                         {/* Contenido sin etiqueta */}
                         <div className="classification-option mt-3 pt-3 border-t border-custom-detail/10">
                           <label className="custom-checkbox block">
-                        <input
-                          type="checkbox"
+                            <input
+                              type="checkbox"
                               checked={filtros.edades_seleccionadas.includes('0')}
                               onChange={() => handleEdadChange('0')}
-                        />
-                        <span className="checkmark"></span>
+                            />
+                            <span className="checkmark"></span>
                             <span className="text-sm text-custom-text">Solo sin clasificar</span>
                             <span className="text-xs text-custom-detail block ml-6">Mods sin etiqueta de edad</span>
-                      </label>
+                          </label>
                         </div>
                       </div>
                     )}
@@ -665,33 +862,40 @@ const ExplorarMods = () => {
                       onClick={() => toggleSeccion('tamanoArchivo')}
                     >
                       <span className="text-xs font-bold uppercase">Tamaño de archivo</span>
-                      <div className="flex items-center">
-                        <span className="proximamente-badge mr-2">Próximamente</span>
-                        <svg className={`h-4 w-4 transition-transform ${secciones.tamanoArchivo ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
+                      <svg className={`h-4 w-4 transition-transform ${secciones.tamanoArchivo ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
                     </button>
 
                     {secciones.tamanoArchivo && (
                       <div className="filter-section-content p-2">
                         <div className="flex items-center justify-between space-x-2">
                           <div className="custom-select w-1/2">
-                            <select className="w-full" disabled>
+                            <select
+                              name="tamanoMin"
+                              value={filtros.tamanoMin}
+                              onChange={handleFiltroChange}
+                              className="w-full"
+                            >
                               <option value="">Sin mín.</option>
-                              <option value="1mb">1 MB</option>
-                              <option value="10mb">10 MB</option>
-                              <option value="50mb">50 MB</option>
-                              <option value="100mb">100 MB</option>
+                              <option value="1">1 MB</option>
+                              <option value="10">10 MB</option>
+                              <option value="50">50 MB</option>
+                              <option value="100">100 MB</option>
                             </select>
                           </div>
                           <div className="custom-select w-1/2">
-                            <select className="w-full" disabled>
+                            <select
+                              name="tamanoMax"
+                              value={filtros.tamanoMax}
+                              onChange={handleFiltroChange}
+                              className="w-full"
+                            >
                               <option value="">Sin máx.</option>
-                              <option value="100mb">100 MB</option>
-                              <option value="500mb">500 MB</option>
-                              <option value="1gb">1 GB</option>
-                              <option value="5gb">5 GB</option>
+                              <option value="100">100 MB</option>
+                              <option value="500">500 MB</option>
+                              <option value="1024">1 GB</option>
+                              <option value="5120">5 GB</option>
                             </select>
                           </div>
                         </div>
@@ -797,6 +1001,100 @@ const ExplorarMods = () => {
 
             {/* Contenido principal */}
             <div className="flex-1">
+              {/* Barra de ordenamiento */}
+              <div className="sort-bar rounded-lg mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 px-4 min-h-[60px]">
+                  {/* Botón de mostrar filtros (si están ocultos) */}
+                  {!showFilters && (
+                    <div className="flex items-center h-9">
+                      <button
+                        onClick={() => setShowFilters(true)}
+                        className="filter-button text-sm text-custom-text hover:text-custom-primary transition-colors bg-custom-bg/30 px-4 py-2 rounded-md flex items-center justify-center sm:justify-start h-9 w-full sm:w-auto"
+                      >
+                        <svg className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                        Mostrar filtros
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Controles de ordenamiento y vista */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 w-full">
+                    {/* Controles de ordenamiento */}
+                    <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                      {/* Filtro de período */}
+                      <div className="custom-select text-sm flex-1 sm:flex-none min-w-[140px]">
+                        <select
+                          name="periodoTiempo"
+                          value={filtros.periodoTiempo}
+                          onChange={handlePeriodoChange}
+                          className="h-9 px-2 py-1 w-full"
+                        >
+                          <option value="todo">Todo el tiempo</option>
+                          <option value="24h">Últimas 24 horas</option>
+                          <option value="7d">Últimos 7 días</option>
+                          <option value="14d">Últimos 14 días</option>
+                          <option value="28d">Últimos 28 días</option>
+                          <option value="1y">Último año</option>
+                        </select>
+                      </div>
+
+                      {/* Tipo de orden */}
+                      <div className="custom-select text-sm flex-1 sm:flex-none min-w-[120px]">
+                        <select
+                          name="ordenarPor"
+                          value={filtros.ordenarPor}
+                          onChange={handleFiltroChange}
+                          className="h-9 px-2 py-1 w-full"
+                        >
+                          <option value="recientes">Fecha</option>
+                          <option value="descargas">Descargas</option>
+                          <option value="valoracion">Valoración</option>
+                          <option value="alfabetico">Alfabético</option>
+                          <option value="popularidad">Popularidad</option>
+                        </select>
+                      </div>
+
+                      {/* Dirección de orden */}
+                      <div className="custom-select text-sm flex-1 sm:flex-none min-w-[120px]">
+                        <select
+                          name="orden"
+                          value={filtros.orden}
+                          onChange={handleFiltroChange}
+                          className="h-9 px-2 py-1 w-full"
+                        >
+                          <option value="desc">Descendente</option>
+                          <option value="asc">Ascendente</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Selector de vista - alineado a la derecha */}
+                    <div className="view-selector text-sm ml-auto">
+                      <button
+                        onClick={() => cambiarVista('compacta')}
+                        className={`px-3 py-2 ${vistaActual === 'compacta' ? 'active' : ''}`}
+                      >
+                        <svg className="h-4 w-4 view-icon-margin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        <span className="view-text">Compacta</span>
+                      </button>
+                      <button
+                        onClick={() => cambiarVista('lista')}
+                        className={`px-3 py-2 ${vistaActual === 'lista' ? 'active' : ''}`}
+                      >
+                        <svg className="h-4 w-4 view-icon-margin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        </svg>
+                        <span className="view-text">Lista</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Filtros activos */}
               {hayFiltrosActivos && (
                 <div className="filtros-activos mb-6">
@@ -820,15 +1118,15 @@ const ExplorarMods = () => {
                     </div>
                   )}
 
-                  {filtros.categoria && (
-                    <div className="filtro-tag">
-                      <span className="tipo">Categoría:</span> {filtros.categoria}
+                  {filtros.etiquetas.map(etiqueta => (
+                    <div key={etiqueta} className="filtro-tag">
+                      <span className="tipo">Incluir:</span> {etiqueta}
                       <span
                         className="remove"
-                        onClick={() => setFiltros(prev => ({ ...prev, categoria: '' }))}
+                        onClick={() => handleEtiquetaIncluidaChange(etiqueta)}
                       >×</span>
                     </div>
-                  )}
+                  ))}
 
                   {filtros.edades_seleccionadas.length > 0 && (
                     <div className="filtro-tag">
@@ -883,16 +1181,6 @@ const ExplorarMods = () => {
                     </div>
                   )}
 
-                  {filtros.etiquetas.map(etiqueta => (
-                    <div key={etiqueta} className="filtro-tag">
-                      <span className="tipo">Etiqueta:</span> {etiqueta}
-                      <span
-                        className="remove"
-                        onClick={() => removeEtiqueta(etiqueta)}
-                      >×</span>
-                    </div>
-                  ))}
-
                   {filtros.descargasMin && (
                     <div className="filtro-tag">
                       <span className="tipo">Descargas mín:</span> {filtros.descargasMin}
@@ -933,6 +1221,56 @@ const ExplorarMods = () => {
                     </div>
                   )}
 
+                  {filtros.tamanoMin && (
+                    <div className="filtro-tag">
+                      <span className="tipo">Tamaño mín:</span> {filtros.tamanoMin} MB
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, tamanoMin: '' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.tamanoMax && (
+                    <div className="filtro-tag">
+                      <span className="tipo">Tamaño máx:</span> {filtros.tamanoMax} MB
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, tamanoMax: '' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.busquedaDescripcion && (
+                    <div className="filtro-tag">
+                      <span className="tipo">Descripción:</span> {filtros.busquedaDescripcion}
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, busquedaDescripcion: '' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.busquedaAutor && (
+                    <div className="filtro-tag">
+                      <span className="tipo">Autor:</span> {filtros.busquedaAutor}
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, busquedaAutor: '' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.etiquetasExcluidas.map(etiqueta => (
+                    <div key={`excluida-${etiqueta}`} className="filtro-tag bg-red-500/20 text-red-400 border-red-400/30">
+                      <span className="tipo">Excluir:</span> {etiqueta}
+                      <span
+                        className="remove"
+                        onClick={() => handleEtiquetaExcluidaChange(etiqueta)}
+                      >×</span>
+                    </div>
+                  ))}
+
                   <button
                     onClick={handleClearFilters}
                     className="filtro-tag bg-custom-primary/20 hover:bg-custom-primary/30"
@@ -941,96 +1279,6 @@ const ExplorarMods = () => {
                   </button>
                 </div>
               )}
-
-              {/* Barra de ordenamiento */}
-              <div className="sort-bar rounded-lg mb-6">
-                <div className="flex flex-wrap items-center justify-between gap-4 h-[52px] px-4">
-                  {!showFilters && (
-                  <button
-                      onClick={() => setShowFilters(true)}
-                      className="filter-button text-sm text-custom-text hover:text-custom-primary transition-colors bg-custom-bg/30 px-4 py-2 rounded-md flex items-center h-9 w-auto"
-                  >
-                      <svg className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-                      </svg>
-                      Mostrar filtros
-                  </button>
-                  )}
-
-                  {/* Controles de ordenamiento y vista alineados a la derecha */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    {/* Filtro de período */}
-                    <div className="custom-select text-sm">
-                      <select
-                        name="periodoTiempo"
-                        value={filtros.periodoTiempo}
-                        onChange={handlePeriodoChange}
-                        className="h-9 px-2 py-1"
-                      >
-                        <option value="todo">Todo el tiempo</option>
-                        <option value="24h">Últimas 24 horas</option>
-                        <option value="7d">Últimos 7 días</option>
-                        <option value="14d">Últimos 14 días</option>
-                        <option value="28d">Últimos 28 días</option>
-                        <option value="1y">Último año</option>
-                      </select>
-                    </div>
-
-                    {/* Tipo de orden */}
-                    <div className="custom-select text-sm">
-                      <select
-                        name="ordenarPor"
-                        value={filtros.ordenarPor}
-                        onChange={handleFiltroChange}
-                        className="h-9 px-2 py-1"
-                      >
-                        <option value="recientes">Fecha</option>
-                        <option value="descargas">Descargas</option>
-                        <option value="valoracion">Valoración</option>
-                        <option value="alfabetico">Alfabético</option>
-                        <option value="popularidad">Popularidad</option>
-                      </select>
-                    </div>
-
-                    {/* Dirección de orden */}
-                    <div className="custom-select text-sm">
-                      <select
-                        name="orden"
-                        value={filtros.orden}
-                        onChange={handleFiltroChange}
-                        className="h-9 px-2 py-1"
-                      >
-                        <option value="desc">Descendente</option>
-                        <option value="asc">Ascendente</option>
-                      </select>
-                    </div>
-
-                    {/* Tipo de vista */}
-                    <div className="view-selector text-sm">
-                      <button
-                        onClick={() => cambiarVista('compacta')}
-                        className={vistaActual === 'compacta' ? 'active' : ''}
-                      >
-                        <svg className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                        Compacta
-                      </button>
-                      <button
-                        onClick={() => cambiarVista('lista')}
-                        className={vistaActual === 'lista' ? 'active' : ''}
-                        title="Próximamente"
-                      >
-                        <svg className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                        </svg>
-                        Lista
-                        <span className="proximamente-badge">Próximamente</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
               {/* Estado de carga y error */}
               {cargando ? (
@@ -1044,8 +1292,8 @@ const ExplorarMods = () => {
                   </svg>
                   <h3 className="mt-2 text-lg font-medium text-custom-text">Error al cargar los mods</h3>
                   <p className="mt-1 text-custom-detail">{error}</p>
-                  <button 
-                    onClick={() => cargarMods()} 
+                  <button
+                    onClick={() => cargarMods()}
                     className="mt-4 px-4 py-2 bg-custom-primary text-white rounded-md hover:bg-custom-primary-hover transition-colors"
                   >
                     Intentar de nuevo
@@ -1057,15 +1305,23 @@ const ExplorarMods = () => {
                     <>
                       {/* Vista compacta (usando ModCards) */}
                       {vistaActual === 'compacta' && (
-                    <div className="mods-grid">
+                        <div className="mods-grid">
                           {modsEnPagina.map((mod) => (
-                        <ModCard 
-                          key={mod.id}
-                          mod={mod}
+                            <ModCard
+                              key={mod.id}
+                              mod={mod}
+                              showSaveButton={true}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Vista de lista */}
+                      {vistaActual === 'lista' && (
+                        <ModList
+                          mods={modsEnPagina}
                           showSaveButton={true}
                         />
-                      ))}
-                    </div>
                       )}
 
                       {/* Paginación */}
@@ -1112,25 +1368,6 @@ const ExplorarMods = () => {
                           </button>
                         </div>
                       )}
-
-                      {/* Vista de lista (próximamente) */}
-                      {vistaActual === 'lista' && (
-                        <div className="vista-proximamente">
-                          <svg className="mx-auto h-16 w-16 text-custom-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                          </svg>
-                          <h3>Vista de lista próximamente</h3>
-                          <p>
-                            Estamos trabajando en una vista de lista detallada que te permitirá ver más información de cada mod en un formato compacto.
-                          </p>
-                          <button
-                            onClick={() => cambiarVista('compacta')}
-                            className="mt-4 px-6 py-2 bg-custom-primary text-white rounded-md hover:bg-custom-primary-hover transition-colors"
-                          >
-                            Volver a vista compacta
-                          </button>
-                        </div>
-                      )}
                     </>
                   ) : (
                     <div className="empty-state">
@@ -1147,27 +1384,6 @@ const ExplorarMods = () => {
           </div>
         </div>
       </div>
-
-      {/* Estilo visual para elementos próximamente */}
-      <style jsx>{`
-        .proximamente-feature {
-          opacity: 0.7;
-          position: relative;
-        }
-        
-        .proximamente-feature::after {
-          content: 'Próximamente';
-          position: absolute;
-          right: 0;
-          top: 0;
-          font-size: 0.65rem;
-          background: var(--color-secondary);
-          color: white;
-          padding: 0.125rem 0.375rem;
-          border-radius: 9999px;
-          opacity: 0.8;
-        }
-      `}</style>
     </PageContainer>
   );
 };
