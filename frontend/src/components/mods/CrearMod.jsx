@@ -101,10 +101,10 @@ const CrearMod = () => {
   const [submitError, setSubmitError] = useState(null);
   
   // Estado para la lista de juegos (mejorado desde EditModAdmin)
-  const [loadingGames, setLoadingGames] = useState(false);
   const [errorGames, setErrorGames] = useState(null);
   const [initialGameOptions, setInitialGameOptions] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
+  const [isSyncingGame, setIsSyncingGame] = useState(false);
   
   // Estado del formulario
   const [formData, setFormData] = useState({
@@ -182,10 +182,12 @@ const CrearMod = () => {
   // Función para cargar opciones de juegos (mejorado desde EditModAdmin)
   const loadGameOptions = async (inputValue) => {
     try {
-      setLoadingGames(true);
-      setErrorGames(null);
+      // No poner loading cuando se está buscando, solo cuando no hay input inicial
+      if (inputValue && inputValue.trim()) {
+        setErrorGames(null);
+      }
       
-      if (!inputValue) {
+      if (!inputValue || inputValue.trim() === '') {
         return initialGameOptions;
       }
       
@@ -198,8 +200,6 @@ const CrearMod = () => {
     } catch (error) {
       setErrorGames(error.message);
       return [];
-    } finally {
-      setLoadingGames(false);
     }
   };
   
@@ -239,48 +239,58 @@ const CrearMod = () => {
     }
   };
   
-  // Manejador para cambios en la selección de juegos (mejorado desde EditModAdmin)
+  // Manejador para cambios en el select de juegos
   const handleGameChange = async (selectedOption) => {
     if (selectedOption) {
-      try {
-        setLoadingGames(true);
-        setErrorGames(null);
-
-        // Verificar y sincronizar el juego
-        const syncedGame = await gameService.verifyAndSyncGame(selectedOption.value);
-
-        // Actualizar el formData con el ID del juego sincronizado
-        setFormData(prev => ({
-          ...prev,
-          juego_id: syncedGame.id // Usamos el ID de nuestra base de datos
-        }));
-
-        // Actualizar el juego seleccionado para mostrar en el select
-    setSelectedGame(selectedOption);
-        
-        console.log('Juego sincronizado correctamente:', syncedGame);
-      } catch (error) {
-        console.error('Error al sincronizar el juego:', error);
-        setErrorGames(error.message || 'Error al sincronizar el juego');
-        setSelectedGame(null);
-    setFormData(prev => ({
-      ...prev,
-          juego_id: null
-        }));
-      } finally {
-        setLoadingGames(false);
-      }
+      // Inmediatamente actualizar el juego seleccionado en la UI
+      setSelectedGame(selectedOption);
+      
+      // Sincronizar en segundo plano sin bloquear la interfaz
+      syncGameInBackground(selectedOption);
     } else {
       // Si no hay selección, limpiar
       setSelectedGame(null);
       setFormData(prev => ({
         ...prev,
         juego_id: null
-    }));
+      }));
     }
 
     if (errors.juego_id) {
       setErrors(prev => ({ ...prev, juego_id: '' }));
+    }
+  };
+
+  // Función para sincronizar juego en segundo plano
+  const syncGameInBackground = async (selectedOption) => {
+    try {
+      setIsSyncingGame(true);
+      setErrorGames(null);
+      
+      // Mostrar que se está sincronizando pero sin bloquear
+      console.log('Sincronizando juego en segundo plano:', selectedOption.label);
+      
+      // Verificar y sincronizar el juego
+      const syncedGame = await gameService.verifyAndSyncGame(selectedOption.value);
+
+      // Actualizar el formData con el ID del juego sincronizado
+      setFormData(prev => ({
+        ...prev,
+        juego_id: syncedGame.id // Usamos el ID de nuestra base de datos
+      }));
+      
+      console.log('Juego sincronizado exitosamente:', syncedGame);
+    } catch (error) {
+      console.error('Error al sincronizar el juego:', error);
+      setErrorGames(`Error al sincronizar ${selectedOption.label}: ${error.message || 'Error desconocido'}`);
+      
+      // En caso de error, mantener la selección visual pero sin ID
+      setFormData(prev => ({
+        ...prev,
+        juego_id: null
+      }));
+    } finally {
+      setIsSyncingGame(false);
     }
   };
   
@@ -655,7 +665,7 @@ const CrearMod = () => {
               placeholder="Seleccionar juego..."
               loadingMessage={() => "Buscando juegos..."}
               noOptionsMessage={() => "No se encontraron juegos"}
-              isDisabled={loadingGames || submitting}
+              isDisabled={submitting}
               className={`select-container ${errorGames ? 'error' : ''}`}
               classNamePrefix="select"
                     components={{
@@ -692,8 +702,11 @@ const CrearMod = () => {
             {errorGames && (
               <p className="text-red-400 text-sm mt-1">{errorGames}</p>
             )}
-            {loadingGames && (
-              <p className="text-gray-400 text-sm mt-1">Sincronizando juego...</p>
+            {isSyncingGame && (
+              <p className="text-blue-400 text-sm mt-1 flex items-center">
+                <div className="animate-spin rounded-full h-3 w-3 border-2 border-blue-400 border-t-transparent mr-2"></div>
+                Sincronizando juego en segundo plano...
+              </p>
             )}
             <small className="text-gray-400 text-sm mt-1 block">
               Busca y selecciona el juego para el cual es este mod
