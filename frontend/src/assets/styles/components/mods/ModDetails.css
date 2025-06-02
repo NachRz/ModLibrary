@@ -908,6 +908,23 @@
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
+.creator-avatar-fallback {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.creator-avatar-fallback span {
+  color: white;
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+
 .creator-name {
   font-size: 0.9rem;
   color: #F8FAFC;

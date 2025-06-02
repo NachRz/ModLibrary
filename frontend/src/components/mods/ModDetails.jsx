@@ -20,6 +20,7 @@ const ModDetails = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [showSaveMsg, setShowSaveMsg] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [creatorImageUrl, setCreatorImageUrl] = useState('');
   
   // Estados para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -103,6 +104,16 @@ const ModDetails = () => {
 
     fetchModDetails();
   }, [id]);
+
+  // Actualizar URL de imagen del creador con cache-busting
+  useEffect(() => {
+    if (mod?.creador?.foto_perfil) {
+      const timestamp = Date.now();
+      setCreatorImageUrl(`http://localhost:8000/storage/${mod.creador.foto_perfil}?t=${timestamp}`);
+    } else {
+      setCreatorImageUrl('');
+    }
+  }, [mod?.creador?.foto_perfil]);
 
   // Función para manejar el clic en el botón de guardar
   const handleGuardarClick = async () => {
@@ -473,7 +484,18 @@ const ModDetails = () => {
             <div className="mod-creator-box">
               <div className="creator-header">Creado por</div>
               <div className="creator-content">
-                <img src={mod.creador?.foto_perfil || '/images/user-placeholder.jpg'} alt={mod.creador?.nome} />
+                {mod.creador?.foto_perfil && creatorImageUrl ? (
+                  <img 
+                    src={creatorImageUrl} 
+                    alt={mod.creador?.nome || 'Creador'} 
+                  />
+                ) : (
+                  <div className="creator-avatar-fallback">
+                    <span>
+                      {(mod.creador?.nome || 'A').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
                 <span className="creator-name">{mod.creador?.nome || 'Anónimo'}</span>
               </div>
             </div>

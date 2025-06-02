@@ -48,7 +48,8 @@ class AuthController extends Controller
                     'id' => $usuario->id,
                     'nome' => $usuario->nome,
                     'correo' => $usuario->correo,
-                    'rol' => $usuario->rol
+                    'rol' => $usuario->rol,
+                    'foto_perfil' => $usuario->foto_perfil
                 ]
             ]);
         } catch (\Exception $e) {
@@ -105,7 +106,8 @@ class AuthController extends Controller
                     'id' => $usuario->id,
                     'nome' => $usuario->nome,
                     'correo' => $usuario->correo,
-                    'rol' => $usuario->rol
+                    'rol' => $usuario->rol,
+                    'foto_perfil' => $usuario->foto_perfil
                 ]
             ], 201);
         } catch (\Exception $e) {
@@ -185,7 +187,7 @@ class AuthController extends Controller
     public function getAllUsers(Request $request)
     {
         try {
-            $usuarios = Usuario::select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'created_at')
+            $usuarios = Usuario::select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'foto_perfil', 'created_at')
                 ->withCount('mods')
                 ->orderBy('nome', 'asc')
                 ->get();
@@ -201,7 +203,8 @@ class AuthController extends Controller
                         'nombre_completo' => $usuario->nombre . ' ' . $usuario->apelidos,
                         'estado' => 'activo', // Por defecto, puedes añadir este campo a la BD si lo necesitas
                         'fecha_registro' => $usuario->created_at->format('Y-m-d'),
-                        'tiene_mods' => $usuario->mods_count > 0
+                        'tiene_mods' => $usuario->mods_count > 0,
+                        'foto_perfil' => $usuario->foto_perfil
                     ];
                 })
             ]);
@@ -448,7 +451,7 @@ class AuthController extends Controller
     {
         try {
             $usuarios = Usuario::onlyTrashed()
-                ->select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'created_at', 'deleted_at')
+                ->select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'foto_perfil', 'created_at', 'deleted_at')
                 ->withCount('mods')
                 ->orderBy('deleted_at', 'desc')
                 ->get();
@@ -464,7 +467,8 @@ class AuthController extends Controller
                         'nombre_completo' => $usuario->nombre . ' ' . $usuario->apelidos,
                         'fecha_registro' => $usuario->created_at->format('Y-m-d'),
                         'fecha_eliminacion' => $usuario->deleted_at->format('Y-m-d H:i:s'),
-                        'tiene_mods' => $usuario->mods_count > 0
+                        'tiene_mods' => $usuario->mods_count > 0,
+                        'foto_perfil' => $usuario->foto_perfil
                     ];
                 })
             ]);
@@ -623,41 +627,73 @@ class AuthController extends Controller
     {
         try {
             $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120' // 5MB máximo
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB máximo
+                'user_id' => 'nullable|integer|exists:usuarios,id' // Permitir especificar el usuario (para admins)
             ]);
 
             $image = $request->file('image');
             
-            // Generar nombre único para la imagen
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            // Determinar el ID del usuario
+            $userId = $request->input('user_id');
+            if (!$userId) {
+                // Si no se especifica user_id, usar el usuario autenticado
+                $userId = $request->user()->id;
+            } else {
+                // Verificar que el usuario sea admin para subir imagen de otro usuario
+                if ($request->user()->rol !== 'admin') {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'No tienes permisos para subir imagen de otro usuario'
+                    ], 403);
+                }
+            }
             
-            // Crear directorio si no existe
-            $uploadPath = public_path('uploads/profile-images');
+            // Crear estructura de carpetas: users/user_X/
+            $userFolder = "users/user_{$userId}";
+            $uploadPath = storage_path("app/public/{$userFolder}");
+            
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0755, true);
             }
             
+            // Eliminar imagen anterior si existe
+            $usuario = Usuario::find($userId);
+            if ($usuario && $usuario->foto_perfil) {
+                $oldImagePath = storage_path("app/public/{$usuario->foto_perfil}");
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+            
+            // Generar nombre de archivo: user_X_avatar.extension
+            $extension = $image->getClientOriginalExtension();
+            $imageName = "user_{$userId}_avatar.{$extension}";
+            
             // Mover archivo
             $image->move($uploadPath, $imageName);
             
-            // Generar URL completa
-            $imageUrl = url('uploads/profile-images/' . $imageName);
+            // Ruta relativa para guardar en la base de datos
+            $relativeImagePath = "{$userFolder}/{$imageName}";
+            
+            // Actualizar la foto de perfil del usuario en la base de datos
+            $usuario->update(['foto_perfil' => $relativeImagePath]);
             
             return response()->json([
                 'status' => 'success',
                 'message' => 'Imagen subida correctamente',
                 'data' => [
-                    'url' => $imageUrl,
+                    'url' => $relativeImagePath,
                     'filename' => $imageName
                 ]
             ]);
         } catch (\Exception $e) {
             Log::error('Error al subir imagen', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             return response()->json([
                 'status' => 'error',
-                'message' => 'Error al subir la imagen'
+                'message' => 'Error al subir la imagen: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -770,6 +806,7 @@ class AuthController extends Controller
                     'nome' => $usuario->nome,
                     'correo' => $usuario->correo,
                     'rol' => $usuario->rol,
+                    'foto_perfil' => $usuario->foto_perfil,
                     'nombre_completo' => $usuario->nombre . ' ' . $usuario->apelidos,
                     'estado' => 'activo',
                     'fecha_registro' => $usuario->created_at->format('Y-m-d'),

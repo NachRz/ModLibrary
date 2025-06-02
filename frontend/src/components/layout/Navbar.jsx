@@ -45,11 +45,12 @@ const NavLinkWithDropdown = ({ title, isActive, children }) => {
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState({ nome: '', correo: '', rol: '' });
+  const [userData, setUserData] = useState({ nome: '', correo: '', rol: '', foto_perfil: '' });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPanelMenuOpen, setIsPanelMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [profileImageUrl, setProfileImageUrl] = useState('');
   const searchInputRef = useRef(null);
   const location = useLocation();
 
@@ -63,12 +64,13 @@ const Navbar = () => {
           setUserData({
             nome: user.nome || 'Usuario',
             correo: user.correo || '',
-            rol: user.rol || 'usuario'
+            rol: user.rol || 'usuario',
+            foto_perfil: user.foto_perfil || ''
           });
         }
       } else {
         setIsLoggedIn(false);
-        setUserData({ nome: '', correo: '', rol: '' });
+        setUserData({ nome: '', correo: '', rol: '', foto_perfil: '' });
       }
     };
     
@@ -77,6 +79,16 @@ const Navbar = () => {
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
   }, []);
+
+  // Actualizar URL de imagen de perfil con cache-busting
+  useEffect(() => {
+    if (userData.foto_perfil) {
+      const timestamp = Date.now();
+      setProfileImageUrl(`http://localhost:8000/storage/${userData.foto_perfil}?t=${timestamp}`);
+    } else {
+      setProfileImageUrl('');
+    }
+  }, [userData.foto_perfil]);
 
   // Función para verificar ruta activa 
   const isActive = useCallback((path) => {
@@ -260,8 +272,18 @@ const Navbar = () => {
                   <p className="text-custom-text font-medium">{userData.nome}</p>
                   <p className="text-custom-detail text-xs capitalize">{userData.rol}</p>
                 </div>
-                <div className="h-10 w-10 rounded-full bg-custom-primary flex items-center justify-center text-custom-text shadow-sm cursor-pointer group-hover:ring-2 group-hover:ring-custom-secondary/50 transition-all">
-                  {userData.nome.charAt(0)}
+                <div className="h-10 w-10 rounded-full bg-custom-primary flex items-center justify-center text-custom-text shadow-sm cursor-pointer group-hover:ring-2 group-hover:ring-custom-secondary/50 transition-all overflow-hidden">
+                  {userData.foto_perfil && profileImageUrl ? (
+                    <img 
+                      src={profileImageUrl}
+                      alt={`Foto de perfil de ${userData.nome}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-white font-bold text-sm">
+                      {userData.nome.charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 
                 {/* Menú desplegable */}

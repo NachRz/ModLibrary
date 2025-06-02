@@ -217,18 +217,28 @@ const UsuariosAdminContent = () => {
 
   const handleSaveUser = async (updatedUser) => {
     try {
-      // Actualizar el usuario en la lista local
+      // Agregar timestamp al usuario actualizado para forzar actualización de imagen
+      const userWithTimestamp = {
+        ...updatedUser,
+        imageTimestamp: Date.now()
+      };
+      
+      // Actualizar el usuario en la lista local inmediatamente
       setUsuarios(prev => prev.map(user => 
-        user.id === updatedUser.id ? updatedUser : user
+        user.id === updatedUser.id ? userWithTimestamp : user
       ));
       
-      // Recargar los datos del usuario para asegurar que las estadísticas estén actualizadas
-      // Esto es especialmente importante si se ha navegado desde la edición de mods
-      await loadUsers();
+      // Recargar los datos del usuario de forma asíncrona para asegurar sincronización
+      setTimeout(async () => {
+        try {
+          await loadUsers();
+        } catch (error) {
+          console.error('Error al recargar usuarios:', error);
+        }
+      }, 100);
+      
     } catch (error) {
-      console.error('Error al recargar usuarios:', error);
-      // Mostrar notificación si hay un error
-      showNotification('Usuario actualizado, pero hubo un problema al recargar los datos', 'warning');
+      console.error('Error al manejar actualización de usuario:', error);
     }
   };
 
@@ -323,24 +333,29 @@ const UsuariosAdminContent = () => {
 
   // Componente para mostrar avatar del usuario
   const UserAvatar = ({ user }) => {
-    const [imageError, setImageError] = useState(false);
+    const [imageUrl, setImageUrl] = useState('');
 
-    const handleImageError = () => {
-      setImageError(true);
-    };
+    useEffect(() => {
+      if (user.foto_perfil) {
+        // Usar timestamp personalizado si existe, sino generar uno nuevo
+        const timestamp = user.imageTimestamp || Date.now();
+        setImageUrl(`http://localhost:8000/storage/${user.foto_perfil}?t=${timestamp}`);
+      } else {
+        setImageUrl('');
+      }
+    }, [user.foto_perfil, user.id, user.imageTimestamp]);
 
     return (
       <div className="flex items-center">
         <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3 overflow-hidden">
-          {user.foto_perfil && !imageError ? (
+          {user.foto_perfil && imageUrl ? (
             <img 
-              src={user.foto_perfil} 
+              src={imageUrl}
               alt={`Avatar de ${user.nome}`}
               className="w-8 h-8 rounded-full object-cover"
-              onError={handleImageError}
             />
           ) : (
-            <span className="text-white font-medium">
+            <span className="text-white font-bold text-sm">
               {user.nome.charAt(0).toUpperCase()}
             </span>
           )}

@@ -1,2 +1,19 @@
+# Ignorar todo por defecto
 *
+
+# Permitir este archivo .gitignore
 !.gitignore
+
+# Permitir toda la carpeta defaults y su contenido (imágenes por defecto)
+!defaults/
+!defaults/**
+
+# Ignorar carpetas específicas de usuarios (se crean dinámicamente)
+users/*/
+
+# Ignorar carpetas específicas de mods (se crean dinámicamente)
+mods/*/
+
+# Permitir la carpeta mods base pero no su contenido dinámico
+!mods/
+!users/

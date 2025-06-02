@@ -13,6 +13,16 @@ Thumbs.db
 /backend/.env
 /backend/storage/*
 !/backend/storage/.gitignore
+# Permitir carpetas por defecto de mods en storage
+!/backend/storage/app/
+!/backend/storage/app/public/
+!/backend/storage/app/public/.gitignore
+!/backend/storage/app/public/defaults/
+!/backend/storage/app/public/defaults/**
+!/backend/storage/app/public/mods/
+!/backend/storage/app/public/mods/.gitkeep
+!/backend/storage/app/public/users/
+!/backend/storage/app/public/users/.gitkeep
 
 # ---------------------
 # React (frontend)

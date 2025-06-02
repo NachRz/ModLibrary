@@ -153,12 +153,9 @@ const adminService = {
   },
 
   // Subir imagen de perfil
-  uploadProfileImage: async (file) => {
+  uploadProfileImage: async (formData) => {
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      
-      const response = await apiClient.post('/admin/upload/profile-image', formData, {
+      const response = await apiClient.post('/upload/profile-image', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

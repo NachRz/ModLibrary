@@ -19,20 +19,30 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [userStats, setUserStats] = useState(null);
-  const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     if (user && isOpen) {
-      loadUserProfile();
+      loadUserDetails();
     }
   }, [user, isOpen]);
 
-  const loadUserProfile = async () => {
+  useEffect(() => {
+    // Actualizar URL de imagen con cache-busting cuando cambie foto_perfil
+    if (userDetails?.foto_perfil) {
+      const timestamp = new Date().getTime();
+      setImageUrl(`http://localhost:8000/storage/${userDetails.foto_perfil}?t=${timestamp}`);
+    } else {
+      setImageUrl('');
+    }
+  }, [userDetails?.foto_perfil]);
+
+  const loadUserDetails = async () => {
     try {
       setLoading(true);
       setError('');
       
-      // Cargar detalles del usuario y estadísticas
+      // Cargar detalles del usuario y estadísticas en paralelo
       const [detailsResponse, statsResponse] = await Promise.all([
         adminService.getUserDetails(user.id),
         adminService.getUserStats(user.id)
@@ -46,10 +56,6 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleImageError = () => {
-    setImageError(true);
   };
 
   const formatDate = (dateString) => {
@@ -97,16 +103,15 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden">
-                  {userDetails?.foto_perfil && !imageError ? (
+                  {userDetails?.foto_perfil ? (
                     <img 
-                      src={userDetails.foto_perfil} 
-                      alt={`Avatar de ${userDetails.nome}`}
+                      src={imageUrl}
+                      alt={`Avatar de ${userDetails?.nome || user?.nome}`}
                       className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
-                      onError={handleImageError}
                     />
                   ) : (
-                    <span className="text-white text-lg sm:text-xl font-bold">
-                      {userDetails?.nome ? userDetails.nome.charAt(0).toUpperCase() : user?.nome?.charAt(0).toUpperCase()}
+                    <span className="text-white font-bold text-xl">
+                      {(userDetails?.nome || user?.nome || '').charAt(0).toUpperCase()}
                     </span>
                   )}
                 </div>

@@ -27,6 +27,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [imageTimestamp, setImageTimestamp] = useState(Date.now());
 
   useEffect(() => {
     if (user && isOpen) {
@@ -38,7 +39,11 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
   useEffect(() => {
     // Actualizar preview cuando cambie foto_perfil desde la carga de datos
     if (formData.foto_perfil && !selectedFile) {
-      setPreviewUrl(formData.foto_perfil);
+      const timestamp = Date.now();
+      setImageTimestamp(timestamp);
+      setPreviewUrl(`http://localhost:8000/storage/${formData.foto_perfil}?t=${timestamp}`);
+    } else if (!formData.foto_perfil) {
+      setPreviewUrl('');
     }
   }, [formData.foto_perfil, selectedFile]);
 
@@ -59,7 +64,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
       
       // Limpiar estados de archivo al cargar nuevos datos
       setSelectedFile(null);
-      setPreviewUrl(userData.foto_perfil || '');
+      setImageTimestamp(Date.now());
     } catch (error) {
       setError('Error al cargar detalles del usuario');
       console.error('Error:', error);
@@ -120,7 +125,15 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
     
     try {
       setUploadingImage(true);
-      const response = await adminService.uploadProfileImage(selectedFile);
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', selectedFile);
+      uploadFormData.append('user_id', user.id);
+      
+      const response = await adminService.uploadProfileImage(uploadFormData);
+      
+      // Actualizar timestamp para forzar actualización de imagen
+      setImageTimestamp(Date.now());
+      
       return response.data.url;
     } catch (error) {
       throw new Error('Error al subir la imagen: ' + error.message);
@@ -153,12 +166,16 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
 
       await adminService.updateUser(user.id, updateData);
       
-      onSave({
+      // Crear objeto de usuario actualizado con timestamp fresco
+      const updatedUser = {
         ...user,
         ...formData,
         foto_perfil: finalImageUrl,
-        nombre_completo: `${formData.nombre} ${formData.apelidos}`.trim()
-      });
+        nombre_completo: `${formData.nombre} ${formData.apelidos}`.trim(),
+        updated_at: new Date().toISOString() // Agregar timestamp de actualización
+      };
+      
+      onSave(updatedUser);
       onClose();
     } catch (error) {
       // Manejar errores específicos de validación
@@ -177,6 +194,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
   const clearImage = () => {
     setSelectedFile(null);
     setPreviewUrl('');
+    setImageTimestamp(Date.now());
     setFormData(prev => ({
       ...prev,
       foto_perfil: ''
@@ -245,12 +263,11 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {previewUrl ? (
+                        {(previewUrl || formData.foto_perfil) ? (
                           <img 
-                            src={previewUrl} 
+                            src={selectedFile ? previewUrl : `http://localhost:8000/storage/${formData.foto_perfil}?t=${imageTimestamp}`}
                             alt="Preview" 
                             className="w-16 h-16 rounded-full object-cover"
-                            onError={() => setPreviewUrl('')}
                           />
                         ) : (
                           <span className="text-white font-bold text-xl">

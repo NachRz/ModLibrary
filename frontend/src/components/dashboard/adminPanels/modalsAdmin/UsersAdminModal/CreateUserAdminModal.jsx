@@ -119,7 +119,10 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
     
     try {
       setUploadingImage(true);
-      const response = await adminService.uploadProfileImage(selectedFile);
+      const formData = new FormData();
+      formData.append('image', selectedFile);
+      
+      const response = await adminService.uploadProfileImage(formData);
       return response.data.url;
     } catch (error) {
       throw new Error('Error al subir la imagen: ' + error.message);
@@ -168,14 +171,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
     setError('');
 
     try {
-      let finalImageUrl = '';
-      
-      // Si hay un archivo seleccionado, subirlo primero
-      if (selectedFile) {
-        finalImageUrl = await uploadImage();
-      }
-      
-      // Preparar datos para crear usuario
+      // Primero crear el usuario sin foto
       const createData = {
         nome: formData.nome.trim(),
         correo: formData.correo.trim(),
@@ -183,12 +179,30 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
         nombre: formData.nombre.trim(),
         apelidos: formData.apelidos.trim(),
         rol: formData.rol,
-        foto_perfil: finalImageUrl || null
+        foto_perfil: null // Sin foto inicialmente
       };
 
       const response = await adminService.createUser(createData);
+      const newUser = response.data;
       
-      onUserCreated(response.data);
+      // Si hay un archivo seleccionado, subirlo después de crear el usuario
+      if (selectedFile) {
+        try {
+          const formDataImg = new FormData();
+          formDataImg.append('image', selectedFile);
+          formDataImg.append('user_id', newUser.id); // Usar el ID del usuario recién creado
+          
+          const imageResponse = await adminService.uploadProfileImage(formDataImg);
+          
+          // Actualizar los datos del usuario con la ruta de la imagen
+          newUser.foto_perfil = imageResponse.data.url;
+        } catch (imageError) {
+          console.warn('Error al subir imagen, pero usuario creado:', imageError);
+          // No fallar si la imagen no se puede subir, el usuario ya fue creado
+        }
+      }
+      
+      onUserCreated(newUser);
       resetForm();
       onClose();
     } catch (error) {

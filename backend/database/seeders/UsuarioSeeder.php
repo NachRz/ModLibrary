@@ -6,9 +6,32 @@ use App\Models\Usuario;
 use App\Models\RedSocial;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
 
 class UsuarioSeeder extends Seeder
 {
+    /**
+     * Crear carpeta de usuario y copiar avatar por defecto
+     */
+    private function crearCarpetaUsuario($usuarioId)
+    {
+        $userPath = storage_path('app/public/users/user_' . $usuarioId);
+        
+        // Crear carpeta del usuario
+        if (!File::exists($userPath)) {
+            File::makeDirectory($userPath, 0755, true);
+        }
+
+        // Copiar avatar por defecto con nuevo nombre: user_{id}_avatar.png
+        $defaultAvatar = storage_path('app/public/defaults/avatars/default_avatar.png');
+        $userAvatar = $userPath . '/user_' . $usuarioId . '_avatar.png';
+        if (File::exists($defaultAvatar) && !File::exists($userAvatar)) {
+            File::copy($defaultAvatar, $userAvatar);
+        }
+
+        return "users/user_{$usuarioId}/user_{$usuarioId}_avatar.png";
+    }
+
     public function run()
     {
         // Usuario 1 - Admin existente
@@ -22,6 +45,10 @@ class UsuarioSeeder extends Seeder
                 'foto_perfil' => 'perfilPre.png',
                 'correo' => 'admin@gmail.com'
             ]);
+
+            // Crear carpeta y actualizar foto de perfil
+            $avatarPath = $this->crearCarpetaUsuario($usuario1->id);
+            $usuario1->update(['foto_perfil' => $avatarPath]);
 
             // Redes sociales para usuario1
             $redes1 = ['Facebook', 'Twitter', 'LinkedIn'];
@@ -46,6 +73,10 @@ class UsuarioSeeder extends Seeder
                 'correo' => 'usuario2@gmail.com'
             ]);
 
+            // Crear carpeta y actualizar foto de perfil
+            $avatarPath = $this->crearCarpetaUsuario($usuario2->id);
+            $usuario2->update(['foto_perfil' => $avatarPath]);
+
             // Redes sociales para usuario2
             $redes2 = ['Instagram', 'Snapchat'];
             foreach ($redes2 as $red) {
@@ -68,6 +99,10 @@ class UsuarioSeeder extends Seeder
                 'foto_perfil' => 'perfilPre.png',
                 'correo' => 'usuario3@gmail.com'
             ]);
+
+            // Crear carpeta y actualizar foto de perfil
+            $avatarPath = $this->crearCarpetaUsuario($usuario3->id);
+            $usuario3->update(['foto_perfil' => $avatarPath]);
 
             // Redes sociales para usuario3
             RedSocial::create([

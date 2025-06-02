@@ -10,6 +10,7 @@ use App\Models\Genero;
 use App\Models\VersionMod;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use App\Services\RawgService;
 use Illuminate\Support\Facades\Log;
 
@@ -20,6 +21,88 @@ class ModSeeder extends Seeder
     public function __construct(RawgService $rawgService)
     {
         $this->rawgService = $rawgService;
+    }
+
+    /**
+     * Crear carpetas para un mod específico y copiar archivos por defecto
+     */
+    private function crearCarpetasMod($modTitulo, $versionActual, $versionesAnteriores = [], $modId)
+    {
+        $modSlug = strtolower(str_replace(' ', '_', $modTitulo));
+        $basePath = storage_path('app/public/mods/' . $modSlug);
+        
+        // Crear carpeta principal del mod
+        if (!File::exists($basePath)) {
+            File::makeDirectory($basePath, 0755, true);
+        }
+
+        // Crear subcarpetas
+        $subcarpetas = ['banners', 'imagenes_adicionales', 'versions'];
+        foreach ($subcarpetas as $subcarpeta) {
+            $subcarpetaPath = $basePath . '/' . $subcarpeta;
+            if (!File::exists($subcarpetaPath)) {
+                File::makeDirectory($subcarpetaPath, 0755, true);
+            }
+        }
+
+        // Crear carpetas de versiones y copiar archivos por defecto
+        $versiones = array_merge([$versionActual], $versionesAnteriores);
+        foreach ($versiones as $version) {
+            $versionPath = $basePath . '/versions/v' . $version;
+            if (!File::exists($versionPath)) {
+                File::makeDirectory($versionPath, 0755, true);
+            }
+
+            // Copiar archivo de mod por defecto con nuevo nombre: mod_{mod_id}_v{version}.zip
+            $defaultModFile = storage_path('app/public/defaults/files/default_mod.zip');
+            $modFile = $versionPath . '/mod_' . $modId . '_v' . $version . '.zip';
+            if (File::exists($defaultModFile) && !File::exists($modFile)) {
+                File::copy($defaultModFile, $modFile);
+            }
+        }
+
+        // Copiar banner por defecto: banner_{mod_id}_v{version}.jpg
+        $defaultBanner = storage_path('app/public/defaults/banners/default_banner.jpg');
+        $modBanner = $basePath . '/banners/banner_' . $modId . '_v' . $versionActual . '.jpg';
+        if (File::exists($defaultBanner) && !File::exists($modBanner)) {
+            File::copy($defaultBanner, $modBanner);
+        }
+
+        // Copiar imágenes adicionales por defecto
+        $imagenesAdicionales = [];
+        $defaultImagesPaths = [
+            storage_path('app/public/defaults/imagenes_adicionales/default_imagen_aditional1.jpg')
+        ];
+
+        // Verificar si hay más imágenes por defecto disponibles
+        $defaultImagesDir = storage_path('app/public/defaults/imagenes_adicionales/');
+        if (File::exists($defaultImagesDir)) {
+            $files = File::files($defaultImagesDir);
+            $defaultImagesPaths = [];
+            foreach ($files as $file) {
+                if (in_array(strtolower($file->getExtension()), ['jpg', 'jpeg', 'png', 'gif'])) {
+                    $defaultImagesPaths[] = $file->getPathname();
+                }
+            }
+        }
+
+        // Copiar hasta 3 imágenes adicionales por defecto
+        $maxImages = min(3, count($defaultImagesPaths));
+        for ($i = 0; $i < $maxImages; $i++) {
+            if (isset($defaultImagesPaths[$i]) && File::exists($defaultImagesPaths[$i])) {
+                $imageName = 'img_' . ($i + 1) . '.jpg';
+                $modImage = $basePath . '/imagenes_adicionales/' . $imageName;
+                
+                if (!File::exists($modImage)) {
+                    File::copy($defaultImagesPaths[$i], $modImage);
+                }
+                
+                // Agregar la ruta relativa para guardar en la base de datos
+                $imagenesAdicionales[] = "mods/{$modSlug}/imagenes_adicionales/{$imageName}";
+            }
+        }
+
+        return [$modSlug, 'banner_' . $modId . '_v' . $versionActual . '.jpg', $imagenesAdicionales];
     }
 
     /**
@@ -191,6 +274,10 @@ class ModSeeder extends Seeder
         $this->command->info('Procesamiento de etiquetas completado.');
 
         // Ahora, procesar los mods usando los juegos y etiquetas ya creados
+        $this->command->info('Creando mods y sus carpetas...');
+        $progressBarMods = $this->command->getOutput()->createProgressBar(count($mods));
+        $progressBarMods->start();
+
         foreach ($mods as $modData) {
             // Determinar el creador basado en el campo 'Creador'
             $creadorNombre = $modData['Creador'] ?? 'usuario1';
@@ -199,10 +286,10 @@ class ModSeeder extends Seeder
             // Obtener el juego ya creado
             $juego = $juegosMap[$modData['Juego']];
 
-            // Crear el mod
+            // Crear el mod primero (sin imagen_banner definitiva)
             $mod = Mod::create([
                 'titulo' => $modData['Titulo'],
-                'imagen_banner' => $modData['Imagen'],
+                'imagen_banner' => 'temporal', // Se actualizará después
                 'edad_recomendada' => $modData['EdadRecomendada'],
                 'juego_id' => $juego->id,
                 'version_actual' => $modData['VersionActual'],
@@ -211,6 +298,24 @@ class ModSeeder extends Seeder
                 'descripcion' => $modData['Descripcion'],
                 'estado' => $modData['Estado'],
                 'total_descargas' => $modData['NumDescargas']
+            ]);
+
+            // Crear carpetas para el mod usando el ID real
+            $resultado = $this->crearCarpetasMod(
+                $modData['Titulo'], 
+                $modData['VersionActual'], 
+                $modData['VersionesAnteriores'] ?? [],
+                $mod->id
+            );
+            
+            $modSlug = $resultado[0];
+            $bannerFileName = $resultado[1];
+            $imagenesAdicionales = $resultado[2];
+
+            // Actualizar la imagen_banner con la ruta correcta
+            $mod->update([
+                'imagen_banner' => "mods/{$modSlug}/banners/{$bannerFileName}",
+                'imagenes_adicionales' => !empty($imagenesAdicionales) ? json_encode($imagenesAdicionales) : null
             ]);
 
             // Asociar etiquetas usando el caché
@@ -252,8 +357,12 @@ class ModSeeder extends Seeder
                     );
                 }
             }
+            
+            $progressBarMods->advance();
         }
         
+        $progressBarMods->finish();
+        $this->command->newLine(2);
         $this->command->info('Seeder de mods completado con éxito.');
     }
 } 

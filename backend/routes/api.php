@@ -23,6 +23,9 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middle
 // Ruta para verificar si el usuario es admin
 Route::middleware('auth:sanctum')->get('/user/is-admin', [AuthController::class, 'isAdmin']);
 
+// Ruta para subir imágenes de perfil (disponible para usuarios autenticados)
+Route::middleware('auth:sanctum')->post('/upload/profile-image', [AuthController::class, 'uploadProfileImage']);
+
 // Rutas de administración (requieren middleware admin)
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     // Gestión de usuarios
@@ -39,9 +42,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::post('/users/{id}/restore', [AuthController::class, 'restoreUser']);
     Route::delete('/users/{id}/permanent', [AuthController::class, 'permanentDeleteUser']);
     Route::delete('/users/{id}/permanent-with-mods', [AuthController::class, 'permanentDeleteUserWithMods']);
-    
-    // Subida de imágenes de perfil
-    Route::post('/upload/profile-image', [AuthController::class, 'uploadProfileImage']);
     
     // Gestión de mods (solo administradores)
     Route::get('/mods/deleted', [ModController::class, 'getDeletedMods']);
