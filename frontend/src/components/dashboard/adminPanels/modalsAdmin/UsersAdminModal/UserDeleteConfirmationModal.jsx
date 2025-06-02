@@ -14,34 +14,35 @@ export const UserHasModsModal = ({ userName, userHasMods, onConfirm, onSoftDelet
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl max-w-lg w-full mx-auto border border-yellow-500/50">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg h-full max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] mx-auto flex flex-col overflow-hidden border border-yellow-500/50">
         {/* Header con gradiente mejorado */}
-        <div className="bg-gradient-to-r from-yellow-600/10 to-orange-600/10 border-b border-gray-700/50">
-          <div className="flex items-center justify-between p-5">
+        <div className="bg-gradient-to-r from-yellow-600/10 to-orange-600/10 border-b border-gray-700/50 flex-shrink-0">
+          <div className="flex items-center justify-between p-3 sm:p-5">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-yellow-500/20 to-yellow-600/30 rounded-lg">
                 <FontAwesomeIcon icon={faExclamationTriangle} className="text-yellow-400" />
               </div>
-              <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 Eliminar Usuario
               </h2>
             </div>
             <button 
               onClick={onCancel} 
-              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+              className="text-gray-400 hover:text-white transition-colors text-lg sm:text-xl hover:rotate-90 transition-transform duration-300"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
         </div>
         
-        <div className="p-5">
-          <div className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/30 border border-yellow-500/50 rounded-xl p-4 mb-6">
-            <p className="text-yellow-300 font-medium mb-2">
+        {/* Contenido con scroll personalizado */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 min-h-0">
+          <div className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/30 border border-yellow-500/50 rounded-xl p-4 mb-4 sm:mb-6">
+            <p className="text-yellow-300 font-medium mb-2 text-sm sm:text-base">
               Vas a eliminar al usuario <span className="font-bold text-white">"{userName}"</span>
             </p>
-            <p className="text-yellow-200 text-sm mb-3">
+            <p className="text-yellow-200 text-xs sm:text-sm mb-3">
               {userHasMods 
                 ? 'Este usuario ha creado contenido en el sistema. Tienes las siguientes opciones:'
                 : 'Elige cómo proceder con la eliminación:'
@@ -49,35 +50,35 @@ export const UserHasModsModal = ({ userName, userHasMods, onConfirm, onSoftDelet
             </p>
           </div>
           
-          <div className="space-y-4">
-            <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/30 border border-blue-500/50 rounded-xl p-4">
-              <h3 className="text-blue-300 font-bold mb-3 flex items-center">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/30 border border-blue-500/50 rounded-xl p-3 sm:p-4">
+              <h3 className="text-blue-300 font-bold mb-2 sm:mb-3 flex items-center text-sm sm:text-base">
                 <div className="p-1 bg-gradient-to-br from-blue-400/20 to-blue-500/30 rounded-lg mr-2">
                   <FontAwesomeIcon icon={faUserMinus} className="text-blue-400 text-sm" />
                 </div>
                 Opción 1: Desactivar Usuario
               </h3>
-              <p className="text-blue-200 text-sm mb-3">
+              <p className="text-blue-200 text-xs sm:text-sm mb-2 sm:mb-3">
                 El usuario será desactivado{userHasMods ? ' pero sus mods permanecerán visibles' : ' de forma temporal'} en la aplicación.
               </p>
-              <ul className="text-blue-200 text-sm space-y-1 list-disc list-inside">
+              <ul className="text-blue-200 text-xs space-y-1 list-disc list-inside">
                 <li>Usuario no podrá acceder al sistema</li>
                 {userHasMods && <li>Los mods seguirán disponibles para descarga</li>}
                 <li>Acción reversible desde el panel de admin</li>
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4">
-              <h3 className="text-red-300 font-bold mb-3 flex items-center">
+            <div className="bg-gradient-to-br from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-3 sm:p-4">
+              <h3 className="text-red-300 font-bold mb-2 sm:mb-3 flex items-center text-sm sm:text-base">
                 <div className="p-1 bg-gradient-to-br from-red-400/20 to-red-500/30 rounded-lg mr-2">
                   <FontAwesomeIcon icon={faTrash} className="text-red-400 text-sm" />
                 </div>
                 Opción 2: Eliminar Usuario
               </h3>
-              <p className="text-red-200 text-sm mb-3">
+              <p className="text-red-200 text-xs sm:text-sm mb-2 sm:mb-3">
                 El usuario será eliminado{userHasMods ? ' pero sus mods permanecerán' : ' completamente'} de la aplicación.
               </p>
-              <ul className="text-red-200 text-sm space-y-1 list-disc list-inside">
+              <ul className="text-red-200 text-xs space-y-1 list-disc list-inside">
                 <li>Eliminación permanente del usuario</li>
                 {userHasMods ? (
                   <>
@@ -94,27 +95,29 @@ export const UserHasModsModal = ({ userName, userHasMods, onConfirm, onSoftDelet
         </div>
 
         {/* Footer mejorado */}
-        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5">
-          <div className="flex justify-end space-x-3">
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-3 sm:p-5 flex-shrink-0">
+          <div className="flex justify-end space-x-2 sm:space-x-3">
             <button
               onClick={onCancel}
-              className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium"
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium text-sm"
             >
               Cancelar
             </button>
             <button
               onClick={onSoftDelete}
-              className="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 font-medium flex items-center space-x-2"
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 text-sm"
             >
               <FontAwesomeIcon icon={faUserMinus} />
-              <span>Desactivar Usuario</span>
+              <span className="hidden sm:inline">Desactivar Usuario</span>
+              <span className="sm:hidden">Desactivar</span>
             </button>
             <button
               onClick={onConfirm}
-              className="px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-300 font-medium flex items-center space-x-2"
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 text-sm"
             >
               <FontAwesomeIcon icon={faTrash} />
-              <span>Eliminar Usuario</span>
+              <span className="hidden sm:inline">Eliminar Usuario</span>
+              <span className="sm:hidden">Eliminar</span>
             </button>
           </div>
         </div>
@@ -140,40 +143,41 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl max-w-lg w-full mx-auto border border-red-500/50">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg h-full max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] mx-auto flex flex-col overflow-hidden border border-red-500/50">
         {/* Header con gradiente mejorado */}
-        <div className="bg-gradient-to-r from-red-600/10 to-red-700/10 border-b border-gray-700/50">
-          <div className="flex items-center justify-between p-5">
+        <div className="bg-gradient-to-r from-red-600/10 to-red-700/10 border-b border-gray-700/50 flex-shrink-0">
+          <div className="flex items-center justify-between p-3 sm:p-5">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/30 rounded-lg">
                 <FontAwesomeIcon icon={faTrash} className="text-red-400" />
               </div>
-              <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 Confirmación de Eliminación
               </h2>
             </div>
             <button 
               onClick={onCancel} 
-              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+              className="text-gray-400 hover:text-white transition-colors text-lg sm:text-xl hover:rotate-90 transition-transform duration-300"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
         </div>
         
-        <div className="p-5">
-          <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4 mb-6">
+        {/* Contenido con scroll personalizado */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 min-h-0">
+          <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4 mb-4 sm:mb-6">
             <div className="flex items-center space-x-2 mb-3">
               <div className="p-1 bg-gradient-to-br from-red-400/20 to-red-500/30 rounded-lg">
                 <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-400 text-sm" />
               </div>
-              <h3 className="text-red-300 font-bold">ADVERTENCIA</h3>
+              <h3 className="text-red-300 font-bold text-sm sm:text-base">ADVERTENCIA</h3>
             </div>
-            <p className="text-red-200 mb-3">
+            <p className="text-red-200 mb-3 text-sm">
               Eliminar al usuario <span className="font-bold text-white">"{userName}"</span> causará:
             </p>
-            <ul className="text-red-200 text-sm space-y-1 list-disc list-inside">
+            <ul className="text-red-200 text-xs sm:text-sm space-y-1 list-disc list-inside">
               <li>Eliminación PERMANENTE del usuario</li>
               {userHasMods ? (
                 <>
@@ -187,8 +191,8 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
             </ul>
           </div>
 
-          <div className="space-y-4">
-            <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-4 border border-gray-600/30">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-3 sm:p-4 border border-gray-600/30">
               <div className="flex items-start space-x-3">
                 <input
                   type="checkbox"
@@ -197,21 +201,21 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
                   onChange={(e) => setUnderstood(e.target.checked)}
                   className="mt-1 accent-red-500"
                 />
-                <label htmlFor="understand" className="text-gray-300 text-sm">
+                <label htmlFor="understand" className="text-gray-300 text-xs sm:text-sm">
                   Entiendo las consecuencias y acepto la responsabilidad de esta acción irreversible
                 </label>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-4 border border-gray-600/30">
-              <label className="block text-gray-300 text-sm font-medium mb-2">
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-3 sm:p-4 border border-gray-600/30">
+              <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-2">
                 Para confirmar, escribe exactamente: <span className="text-red-400 font-bold">ELIMINAR USUARIO</span>
               </label>
               <input
                 type="text"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
-                className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-300"
+                className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all duration-300 text-sm"
                 placeholder="Escribe: ELIMINAR USUARIO"
               />
             </div>
@@ -219,25 +223,26 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
         </div>
 
         {/* Footer mejorado */}
-        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5">
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-3 sm:p-5 flex-shrink-0">
           <div className="flex justify-end space-x-3">
             <button
               onClick={onCancel}
-              className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium"
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium text-sm"
             >
               Cancelar
             </button>
             <button
               onClick={handleConfirm}
               disabled={!isValid}
-              className={`px-5 py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 ${
+              className={`px-3 sm:px-5 py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 text-sm ${
                 isValid 
                   ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
                   : 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
               }`}
             >
               <FontAwesomeIcon icon={faTrash} />
-              <span>Eliminar Usuario</span>
+              <span className="hidden sm:inline">Eliminar Usuario</span>
+              <span className="sm:hidden">Eliminar</span>
             </button>
           </div>
         </div>
@@ -252,67 +257,68 @@ export const PermanentDeleteModal = ({ userName, onDeleteKeepMods, onDeleteWithM
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl max-w-lg w-full mx-auto border border-red-500/50">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg h-full max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] mx-auto flex flex-col overflow-hidden border border-red-500/50">
         {/* Header con gradiente mejorado */}
-        <div className="bg-gradient-to-r from-red-600/10 to-red-700/10 border-b border-gray-700/50">
-          <div className="flex items-center justify-between p-5">
+        <div className="bg-gradient-to-r from-red-600/10 to-red-700/10 border-b border-gray-700/50 flex-shrink-0">
+          <div className="flex items-center justify-between p-3 sm:p-5">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/30 rounded-lg">
                 <FontAwesomeIcon icon={faTrash} className="text-red-400" />
               </div>
-              <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 Eliminación Definitiva
               </h2>
             </div>
             <button 
               onClick={onCancel} 
-              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+              className="text-gray-400 hover:text-white transition-colors text-lg sm:text-xl hover:rotate-90 transition-transform duration-300"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
         </div>
         
-        <div className="p-5">
-          <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4 mb-6">
-            <p className="text-red-300 font-medium mb-2">
+        {/* Contenido con scroll personalizado */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 min-h-0">
+          <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4 mb-4 sm:mb-6">
+            <p className="text-red-300 font-medium mb-2 text-sm sm:text-base">
               El usuario <span className="font-bold text-white">"{userName}"</span> será eliminado definitivamente
             </p>
-            <p className="text-red-200 text-sm mb-3">
+            <p className="text-red-200 text-xs sm:text-sm mb-3">
               Elige cómo proceder:
             </p>
           </div>
           
-          <div className="space-y-4">
-            <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/30 border border-blue-500/50 rounded-xl p-4">
-              <h3 className="text-blue-300 font-bold mb-3 flex items-center">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/30 border border-blue-500/50 rounded-xl p-3 sm:p-4">
+              <h3 className="text-blue-300 font-bold mb-2 sm:mb-3 flex items-center text-sm sm:text-base">
                 <div className="p-1 bg-gradient-to-br from-blue-400/20 to-blue-500/30 rounded-lg mr-2">
                   <FontAwesomeIcon icon={faShieldAlt} className="text-blue-400 text-sm" />
                 </div>
                 Opción 1: Eliminar Solo Usuario
               </h3>
-              <p className="text-blue-200 text-sm mb-3">
+              <p className="text-blue-200 text-xs sm:text-sm mb-2 sm:mb-3">
                 Solo se eliminará el usuario, sus mods (si los tiene) permanecerán en la aplicación.
               </p>
-              <ul className="text-blue-200 text-sm space-y-1 list-disc list-inside">
+              <ul className="text-blue-200 text-xs space-y-1 list-disc list-inside">
                 <li>Usuario eliminado definitivamente</li>
                 <li>Los mods quedarán sin autor visible</li>
                 <li>Se mantienen valoraciones y comentarios</li>
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4">
-              <h3 className="text-red-300 font-bold mb-3 flex items-center">
+            <div className="bg-gradient-to-br from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-3 sm:p-4">
+              <h3 className="text-red-300 font-bold mb-2 sm:mb-3 flex items-center text-sm sm:text-base">
                 <div className="p-1 bg-gradient-to-br from-red-400/20 to-red-500/30 rounded-lg mr-2">
                   <FontAwesomeIcon icon={faDatabase} className="text-red-400 text-sm" />
                 </div>
                 Opción 2: Eliminar Usuario y Mods
               </h3>
-              <p className="text-red-200 text-sm mb-3">
+              <p className="text-red-200 text-xs sm:text-sm mb-2 sm:mb-3">
                 El usuario y TODOS sus mods (si los tiene) serán eliminados definitivamente.
               </p>
-              <ul className="text-red-200 text-sm space-y-1 list-disc list-inside">
+              <ul className="text-red-200 text-xs space-y-1 list-disc list-inside">
                 <li>Eliminación completa e irreversible</li>
                 <li>Todos los mods del usuario eliminados</li>
                 <li>Se perderán valoraciones y comentarios</li>
@@ -323,27 +329,29 @@ export const PermanentDeleteModal = ({ userName, onDeleteKeepMods, onDeleteWithM
         </div>
 
         {/* Footer mejorado */}
-        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5">
-          <div className="flex justify-end space-x-3">
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-3 sm:p-5 flex-shrink-0">
+          <div className="flex justify-end space-x-2 sm:space-x-3">
             <button
               onClick={onCancel}
-              className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium"
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium text-sm"
             >
               Cancelar
             </button>
             <button
               onClick={onDeleteKeepMods}
-              className="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 font-medium flex items-center space-x-2"
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 text-sm"
             >
               <FontAwesomeIcon icon={faShieldAlt} />
-              <span>Solo Usuario</span>
+              <span className="hidden sm:inline">Solo Usuario</span>
+              <span className="sm:hidden">Solo Usuario</span>
             </button>
             <button
               onClick={onDeleteWithMods}
-              className="px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-300 font-medium flex items-center space-x-2"
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 text-sm"
             >
               <FontAwesomeIcon icon={faDatabase} />
-              <span>Usuario y Mods</span>
+              <span className="hidden sm:inline">Usuario y Mods</span>
+              <span className="sm:hidden">Todo</span>
             </button>
           </div>
         </div>

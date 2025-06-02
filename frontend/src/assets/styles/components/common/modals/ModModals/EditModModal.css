@@ -443,3 +443,9 @@
     padding: 0.2rem 0.5rem;
   }
 }
+
+/* Mejorar el comportamiento del scroll en dispositivos táctiles */
+.custom-scrollbar {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}

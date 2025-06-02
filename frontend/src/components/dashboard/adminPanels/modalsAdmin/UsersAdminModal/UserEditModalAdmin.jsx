@@ -8,7 +8,9 @@ import {
   faEdit,
   faShieldAlt,
   faCrown,
-  faImage
+  faImage,
+  faSpinner,
+  faSave
 } from '@fortawesome/free-solid-svg-icons';
 
 const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
@@ -184,25 +186,25 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg mx-auto overflow-hidden border border-gray-700/50">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg h-full max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden border border-gray-700/50">
         {/* Header con gradiente mejorado */}
-        <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-gray-700/50">
-          <div className="flex justify-between items-center p-5">
+        <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-gray-700/50 flex-shrink-0">
+          <div className="flex justify-between items-center p-3 sm:p-5">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-purple-500/20 to-purple-600/30 rounded-lg">
                 <FontAwesomeIcon icon={faEdit} className="text-purple-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Editar Usuario
                 </h2>
-                <p className="text-sm text-gray-400 mt-1">Panel de administración - Edición completa</p>
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">Panel de administración - Edición completa</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+              className="text-gray-400 hover:text-white transition-colors text-lg sm:text-xl hover:rotate-90 transition-transform duration-300"
             >
               ✕
             </button>
@@ -210,8 +212,8 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
         </div>
 
         {/* Contenido con scroll personalizado */}
-        <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <div className="p-5">
+        <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+          <div className="p-3 sm:p-5">
             {loading && !formData.nome && (
               <div className="flex justify-center py-16">
                 <div className="relative">
@@ -229,7 +231,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
             )}
 
             {formData.nome && (
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form id="user-edit-form" onSubmit={handleSubmit} className="space-y-5">
                 {/* Foto de perfil */}
                 <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
                   <label className="block text-lg font-bold text-white mb-4 flex items-center">
@@ -408,41 +410,32 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
           </div>
         </div>
 
-        {/* Footer mejorado */}
-        {formData.nome && (
-          <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5">
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={loading || uploadingImage}
-                className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                onClick={handleSubmit}
-                disabled={loading || uploadingImage}
-                className="px-5 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-              >
-                {uploadingImage ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Subiendo imagen...</span>
-                  </>
-                ) : loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Guardando...</span>
-                  </>
-                ) : (
-                  <span>Guardar Cambios</span>
-                )}
-              </button>
-            </div>
+        {/* Footer con botones */}
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-3 sm:p-5 flex-shrink-0">
+          <div className="flex items-center justify-end space-x-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              form="user-edit-form"
+              disabled={loading}
+              className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
+            >
+              <FontAwesomeIcon 
+                icon={loading ? faSpinner : faSave} 
+                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+              />
+              <span className="hidden sm:inline">{loading ? 'Guardando...' : 'Guardar Cambios'}</span>
+              <span className="sm:hidden">{loading ? 'Guardando...' : 'Guardar'}</span>
+            </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

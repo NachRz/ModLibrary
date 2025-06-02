@@ -13,7 +13,8 @@ import {
   faUserPlus,
   faShieldAlt,
   faImage,
-  faCrown
+  faCrown,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 
 const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
@@ -219,25 +220,25 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg mx-auto overflow-hidden border border-gray-700/50">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-lg h-full max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden border border-gray-700/50">
         {/* Header con gradiente mejorado */}
-        <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-gray-700/50">
-          <div className="flex justify-between items-center p-5">
+        <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-gray-700/50 flex-shrink-0">
+          <div className="flex justify-between items-center p-3 sm:p-5">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-600/30 rounded-lg">
                 <FontAwesomeIcon icon={faUserPlus} className="text-green-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Crear Nuevo Usuario
                 </h2>
-                <p className="text-sm text-gray-400 mt-1">Panel de administración - Creación de usuario</p>
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">Panel de administración - Creación de usuario</p>
               </div>
             </div>
             <button
               onClick={handleClose}
-              className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300"
+              className="text-gray-400 hover:text-white transition-colors text-lg sm:text-xl hover:rotate-90 transition-transform duration-300"
             >
               ✕
             </button>
@@ -245,8 +246,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
         </div>
 
         {/* Contenido */}
-        <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <form onSubmit={handleSubmit} className="p-5 space-y-5" autoComplete="off">
+        <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+          <form id="create-user-form" onSubmit={handleSubmit} className="p-3 sm:p-5 space-y-4 sm:space-y-5" autoComplete="off">
             {/* Error general */}
             {error && (
               <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg">
@@ -504,38 +505,33 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
           </form>
         </div>
 
-        {/* Footer con botones */}
-        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5">
+        {/* Footer mejorado */}
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-3 sm:p-5 flex-shrink-0">
           <div className="flex justify-end space-x-3">
             <button
               type="button"
               onClick={handleClose}
-              className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50"
-              disabled={loading}
+              disabled={loading || uploadingImage}
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
               Cancelar
             </button>
             <button
-              onClick={handleSubmit}
+              type="submit"
+              form="create-user-form"
               disabled={loading || uploadingImage}
-              className="px-5 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Creando usuario...</span>
-                </>
-              ) : uploadingImage ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Subiendo imagen...</span>
-                </>
-              ) : (
-                <>
-                  <FontAwesomeIcon icon={faUserPlus} />
-                  <span>Crear Usuario</span>
-                </>
-              )}
+              <FontAwesomeIcon 
+                icon={loading ? faSpinner : faUserPlus} 
+                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+              />
+              <span className="hidden sm:inline">
+                {loading ? 'Creando...' : uploadingImage ? 'Subiendo...' : 'Crear Usuario'}
+              </span>
+              <span className="sm:hidden">
+                {loading ? 'Creando...' : uploadingImage ? 'Subiendo...' : 'Crear'}
+              </span>
             </button>
           </div>
         </div>

@@ -1576,19 +1576,19 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
 
   const modalContent = (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-4xl h-full max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden border border-gray-700/50">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl w-full max-w-4xl h-full max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden border border-gray-700/50">
         {/* Header con gradiente mejorado */}
         <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-b border-gray-700/50 flex-shrink-0">
-          <div className="flex items-center justify-between p-5">
+          <div className="flex items-center justify-between p-3 sm:p-5">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-purple-500/20 to-purple-600/30 rounded-lg">
                 <FontAwesomeIcon icon={faEdit} className="text-purple-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Editar Mod: {mod?.titulo || 'Sin título'}
                 </h3>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
                   ID: {mod?.id} | Administración avanzada
                 </p>
               </div>
@@ -1604,7 +1604,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
 
         {/* Tabs con mejor diseño */}
         <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-b border-gray-700/50 flex-shrink-0">
-          <div className="flex space-x-1 px-5 overflow-x-auto custom-scrollbar-horizontal">
+          <div className="flex space-x-1 px-3 sm:px-5 overflow-x-auto custom-scrollbar-horizontal">
             {[
               { id: 'general', label: 'General', icon: faEye, color: 'blue' },
               { id: 'etiquetas', label: 'Etiquetas', icon: faTag, color: 'green' },
@@ -1616,13 +1616,13 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-3 px-4 text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${
+                className={`py-2 sm:py-3 px-2 sm:px-4 text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${
                   activeTab === tab.id
                     ? `bg-gradient-to-r from-${tab.color}-600/20 to-${tab.color}-700/30 text-${tab.color}-300 border-b-2 border-${tab.color}-500`
                     : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
                 }`}
               >
-                <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+                <FontAwesomeIcon icon={tab.icon} className="mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">
                   {tab.id === 'general' ? 'Gen' : 
@@ -1638,7 +1638,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         </div>
 
         {/* Content - Área scrolleable */}
-        <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 custom-scrollbar min-h-0">
           {activeTab === 'general' && renderTabGeneral()}
           {activeTab === 'etiquetas' && renderTabEtiquetas()}
           {activeTab === 'imagenes' && renderTabImagenes()}
@@ -1648,11 +1648,11 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         </div>
 
         {/* Footer mejorado */}
-        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-5 flex-shrink-0">
+        <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border-t border-gray-700/50 p-3 sm:p-5 flex-shrink-0">
           <div className="flex items-center justify-end space-x-3">
             <button
               onClick={onClose}
-              className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50"
+              className="px-3 sm:px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
               disabled={loading}
             >
               Cancelar
@@ -1660,7 +1660,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             <button
               onClick={handleSave}
               disabled={loading}
-              className="flex items-center space-x-2 px-5 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50"
+              className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
               <FontAwesomeIcon 
                 icon={faSave} 
