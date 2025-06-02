@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import modService from '../../services/api/modService';
-import useSavedStatus from '../../hooks/useSavedStatus';
+import useUserModsStatus from '../../hooks/useUserModsStatus';
 import useRating from '../../hooks/useRating';
 import Breadcrumb from '../common/Breadcrumb/Breadcrumb';
 import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import { useNotification } from '../../context/NotificationContext';
 import '../../assets/styles/components/mods/ModDetails.css';
-import authService from '../../services/api/authService';
 
 const ModDetails = () => {
   const { id } = useParams();
@@ -21,9 +20,6 @@ const ModDetails = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [showSaveMsg, setShowSaveMsg] = useState(false);
   const [saveError, setSaveError] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [isOwner, setIsOwner] = useState(false);
   
   // Estados para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -32,6 +28,16 @@ const ModDetails = () => {
   // Estados para el carrusel de imágenes
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
+  // Hook unificado para usuario y mods guardados
+  const { 
+    isAuthenticated, 
+    currentUserId,
+    isOwner: checkIsOwner, 
+    isSaved, 
+    toggleSavedStatus, 
+    loading: userLoading 
+  } = useUserModsStatus();
+
   // Array dinámico de imágenes que incluye la imagen principal del mod
   const imagenesCarrusel = useMemo(() => {
     const imagenesPorDefecto = [
@@ -51,8 +57,9 @@ const ModDetails = () => {
     return imagenesPorDefecto;
   }, [mod?.imagen_principal]);
   
-  // Usar el hook personalizado para manejar el estado de guardado
-  const [isGuardado, toggleSavedStatus, isSaving, savedError] = useSavedStatus(id);
+  // Verificar si el mod está guardado y si es propietario
+  const isGuardado = isSaved(id);
+  const isOwner = checkIsOwner(mod);
 
   // Usar el hook personalizado para manejar las valoraciones
   const [
@@ -67,20 +74,6 @@ const ModDetails = () => {
 
   // Nuevo estado para saber la última acción
   const [lastSaveAction, setLastSaveAction] = useState(null); // 'guardado' | 'eliminado' | null
-
-  useEffect(() => {
-    // Verificar si el usuario está autenticado y obtener su información
-    const user = authService.getCurrentUser();
-    setIsAuthenticated(!!user);
-    setCurrentUser(user);
-  }, []);
-
-  // Verificar si el usuario actual es el propietario del mod
-  useEffect(() => {
-    if (currentUser && mod) {
-      setIsOwner(currentUser.id === mod.creador?.id);
-    }
-  }, [currentUser, mod]);
 
   useEffect(() => {
     const fetchModDetails = async () => {
@@ -118,10 +111,10 @@ const ModDetails = () => {
     try {
       if (isGuardado) {
         action = 'eliminado';
-        await toggleSavedStatus();
+        await toggleSavedStatus(id);
       } else {
         action = 'guardado';
-        await toggleSavedStatus();
+        await toggleSavedStatus(id);
       }
       setLastSaveAction(action);
       setShowSaveMsg(true);
@@ -413,7 +406,7 @@ const ModDetails = () => {
                 <button 
                   className={`mod-action-btn endorse ${isGuardado ? 'active' : ''}`}
                   onClick={handleGuardarClick}
-                  disabled={isSaving || !isAuthenticated}
+                  disabled={userLoading || !isAuthenticated}
                   title={isGuardado ? 'Guardado' : 'Guardar'}
                 >
                   <i className={isGuardado ? 'fas fa-bookmark' : 'far fa-bookmark'}></i>

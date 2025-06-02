@@ -20,7 +20,11 @@ class ModController extends Controller
     public function index(): JsonResponse
     {
         // Solo obtener mods que no han sido eliminados (soft delete)
-        $mods = Mod::with('creador:id,nome,correo,foto_perfil')
+        $mods = Mod::with([
+            'creador:id,nome,correo,foto_perfil',
+            'juego:id,titulo,imagen_fondo',
+            'etiquetas:id,nombre'
+        ])
             ->whereNull('deleted_at')
             ->get();
         
@@ -839,6 +843,14 @@ class ModController extends Controller
                 'status' => 'error',
                 'message' => 'Mod no encontrado'
             ], 404);
+        }
+
+        // Verificar si el usuario es el creador del mod
+        if ($mod->creador_id === $usuario->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No puedes guardar tu propio mod'
+            ], 400);
         }
 
         // Verificar si el mod ya está guardado

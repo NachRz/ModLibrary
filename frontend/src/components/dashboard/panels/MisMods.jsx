@@ -50,11 +50,12 @@ const MisMods = () => {
     titulo: mod.titulo,
     juego: mod.juego?.titulo || 'Juego desconocido',
     autor: mod.creador?.nome || 'Anónimo',
+    creador_id: mod.creador_id,
     descargas: mod.total_descargas || 0,
     valoracion: mod.val_media || 0,
     numValoraciones: mod.num_valoraciones || 0,
     categoria: mod.etiquetas?.[0]?.nombre || 'General',
-    imagen: mod.imagen || '/images/mod-placeholder.jpg',
+    imagen: mod.imagen_banner ? `/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
     descripcion: mod.descripcion || '',
     estado: mod.estado || 'publicado',
     url: mod.url,
@@ -191,60 +192,6 @@ const MisMods = () => {
     </div>
   );
 
-  // Crear acciones personalizadas para cada mod
-  const createModActions = (mod) => {
-    if (mod.is_deleted) {
-      // Acciones para mods eliminados
-      return (
-        <div className="flex items-center justify-center gap-2 flex-wrap">
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleRestoreMod(mod.id);
-            }}
-            className="flex items-center justify-center w-9 h-9 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-full transition-colors duration-200 flex-shrink-0"
-            title="Restaurar mod"
-          >
-            <FontAwesomeIcon icon={faUndo} className="w-4 h-4" />
-          </button>
-        </div>
-      );
-    } else {
-      // Acciones para mods activos
-      return (
-        <div className="flex items-center justify-center gap-2 flex-wrap">
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleEditMod(mod.id);
-            }}
-            className="flex items-center justify-center w-9 h-9 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full transition-colors duration-200 flex-shrink-0"
-            title="Editar mod"
-          >
-            <FontAwesomeIcon icon={faEdit} className="w-4 h-4" />
-          </button>
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleDeleteMod(mod);
-            }}
-            className="flex items-center justify-center w-9 h-9 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full transition-colors duration-200 flex-shrink-0"
-            title="Eliminar mod"
-            disabled={deleting && modToDelete?.id === mod.id}
-          >
-            <FontAwesomeIcon 
-              icon={faTrash} 
-              className={`w-4 h-4 ${deleting && modToDelete?.id === mod.id ? 'animate-spin' : ''}`} 
-            />
-          </button>
-        </div>
-      );
-    }
-  };
-
   const renderModGrid = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredMods.map(mod => (
@@ -253,14 +200,27 @@ const MisMods = () => {
             mod={mod} 
             isOwner={true} 
             showSaveButton={false}
-            actions={createModActions(mod)}
+            onEdit={!mod.is_deleted ? () => handleEditMod(mod.id) : undefined}
+            onDelete={!mod.is_deleted ? () => handleDeleteMod(mod) : undefined}
+            actions={mod.is_deleted ? (
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRestoreMod(mod.id);
+                }}
+                className="flex items-center justify-center w-9 h-9 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-full transition-colors duration-200 flex-shrink-0"
+                title="Restaurar mod"
+              >
+                <FontAwesomeIcon icon={faUndo} className="w-4 h-4" />
+              </button>
+            ) : undefined}
             isDeleted={mod.is_deleted}
           />
           {mod.is_deleted && (
-            <div className="mt-2 text-center">
-              <span className="text-red-400 text-sm">
-                🗑️ Mod eliminado - {new Date(mod.deleted_at).toLocaleDateString()}
-              </span>
+            <div className="text-center mt-2 text-sm text-red-400">
+              <i className="fas fa-exclamation-triangle mr-1"></i>
+              Mod eliminado
             </div>
           )}
         </div>

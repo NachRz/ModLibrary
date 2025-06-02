@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import PageContainer from '../layout/PageContainer';
 import ModCard from '../common/Cards/ModCard';
+import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import gameService from '../../services/api/gameService';
 import modService from '../../services/api/modService';
+import useUserModsStatus from '../../hooks/useUserModsStatus';
 import { useNotification } from '../../context/NotificationContext';
 import { useFavorite } from '../../hooks/useFavorites';
 import '../../assets/styles/components/juegos/gameDetails.css';
 
 const GameDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { showNotification } = useNotification();
   
   // Estados
@@ -21,8 +24,19 @@ const GameDetails = () => {
   const [filtroMods, setFiltroMods] = useState('todos');
   const [ordenMods, setOrdenMods] = useState('populares');
   
+  // Estados para el modal de eliminar
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [modToDelete, setModToDelete] = useState(null);
+  
   // Hook para manejar favoritos
   const [esFavorito, toggleFavorito, cargandoFavorito, errorFavorito, mensaje] = useFavorite(parseInt(id));
+  
+  // Hook para verificar propiedad de mods
+  const { 
+    isAuthenticated, 
+    getOwnershipMap, 
+    loading: userLoading 
+  } = useUserModsStatus();
 
   // Mostrar notificaciones cuando cambien los mensajes del hook de favoritos
   useEffect(() => {
@@ -36,6 +50,40 @@ const GameDetails = () => {
       showNotification(errorFavorito, 'error');
     }
   }, [errorFavorito, showNotification]);
+
+  // Cargar mods del juego
+  const cargarMods = useCallback(async () => {
+    if (!juego?.id) return;
+    
+    try {
+      setCargandoMods(true);
+      
+      const response = await modService.getModsByGame(juego.id);
+      if (response.status === 'success') {
+        setMods(response.data.map(mod => ({
+          id: mod.id,
+          titulo: mod.titulo,
+          imagen: mod.imagen_banner ? `/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
+          juego: { titulo: mod.juego?.titulo || 'Juego desconocido' },
+          categoria: mod.etiquetas?.[0]?.nombre || 'General',
+          etiquetas: mod.etiquetas || [],
+          autor: mod.creador?.nome || 'Anónimo',
+          creador_id: mod.creador_id,
+          descargas: mod.estadisticas?.total_descargas || mod.total_descargas || 0,
+          valoracion: mod.estadisticas?.valoracion_media || 0,
+          numValoraciones: mod.estadisticas?.total_valoraciones || 0,
+          descripcion: mod.descripcion || '',
+          estado: mod.estado || 'publicado'
+        })));
+      }
+    } catch (err) {
+      console.error('Error al cargar los mods:', err);
+      // No mostramos error si no hay mods, es normal
+      setMods([]);
+    } finally {
+      setCargandoMods(false);
+    }
+  }, [juego?.id]);
 
   // Cargar datos del juego
   useEffect(() => {
@@ -60,42 +108,10 @@ const GameDetails = () => {
     }
   }, [id, showNotification]);
 
-  // Cargar mods del juego
+  // useEffect para cargar mods cuando cambia el juego
   useEffect(() => {
-    const cargarMods = async () => {
-      try {
-        setCargandoMods(true);
-        
-        const response = await modService.getModsByGame(juego.id);
-        if (response.status === 'success') {
-          setMods(response.data.map(mod => ({
-            id: mod.id,
-            titulo: mod.titulo,
-            imagen: mod.imagen || '/images/mod-placeholder.jpg',
-            juego: { titulo: mod.juego?.titulo || 'Juego desconocido' },
-            categoria: mod.etiquetas?.[0]?.nombre || 'General',
-            etiquetas: mod.etiquetas || [],
-            autor: mod.creador?.nome || 'Anónimo',
-            descargas: mod.estadisticas?.total_descargas || mod.total_descargas || 0,
-            valoracion: mod.estadisticas?.valoracion_media || 0,
-            numValoraciones: mod.estadisticas?.total_valoraciones || 0,
-            descripcion: mod.descripcion || '',
-            estado: mod.estado || 'publicado'
-          })));
-        }
-      } catch (err) {
-        console.error('Error al cargar los mods:', err);
-        // No mostramos error si no hay mods, es normal
-        setMods([]);
-      } finally {
-        setCargandoMods(false);
-      }
-    };
-
-    if (juego?.id) {
-      cargarMods();
-    }
-  }, [juego]);
+    cargarMods();
+  }, [cargarMods]);
 
   // Filtrar y ordenar mods
   const modsFiltrados = mods
@@ -160,6 +176,43 @@ const GameDetails = () => {
 
     return stars;
   };
+
+  // Funciones para editar y eliminar mods
+  const handleEditMod = (mod) => {
+    navigate(`/dashboard/editar-mod/${mod.id}`);
+  };
+
+  const handleDeleteMod = (mod) => {
+    setModToDelete(mod);
+    setShowDeleteModal(true);
+  };
+
+  // Funciones para el modal de eliminar
+  const confirmDelete = async () => {
+    if (!modToDelete) return;
+    
+    try {
+      await modService.deleteMod(modToDelete.id);
+      showNotification('Mod eliminado correctamente', 'success');
+      // Recargar los mods después de eliminar
+      if (juego?.id) {
+        cargarMods();
+      }
+      setShowDeleteModal(false);
+      setModToDelete(null);
+    } catch (error) {
+      console.error('Error al eliminar el mod:', error);
+      showNotification('Error al eliminar el mod', 'error');
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setModToDelete(null);
+  };
+
+  // Obtener mapa de propiedad para todos los mods
+  const ownershipMap = getOwnershipMap(mods);
 
   if (cargandoJuego) {
     return (
@@ -381,9 +434,19 @@ const GameDetails = () => {
           </div>
         ) : modsFiltrados.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {modsFiltrados.map(mod => (
-              <ModCard key={mod.id} mod={mod} />
-            ))}
+            {modsFiltrados.map(mod => {
+              const isOwnerOfMod = ownershipMap[mod.id] || false;
+              return (
+                <ModCard 
+                  key={mod.id} 
+                  mod={mod}
+                  isOwner={isOwnerOfMod}
+                  showSaveButton={true}
+                  onEdit={isOwnerOfMod ? () => handleEditMod(mod) : undefined}
+                  onDelete={isOwnerOfMod ? () => handleDeleteMod(mod) : undefined}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-12">
@@ -428,6 +491,19 @@ const GameDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de eliminación */}
+      {showDeleteModal && (
+        <ModDeleteConfirmationModal
+          isOpen={showDeleteModal}
+          modTitle={modToDelete?.titulo || ''}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          message="¿Estás seguro de que quieres desactivar este mod? Podrá ser restaurado posteriormente."
+          confirmText="Desactivar"
+          isDangerous={false}
+        />
+      )}
     </div>
   );
 };

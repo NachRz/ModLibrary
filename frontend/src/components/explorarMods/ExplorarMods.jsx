@@ -1,13 +1,26 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import ModCard from '../common/Cards/ModCard';
 import ModList from '../common/list/ModList';
 import modService from '../../services/api/modService';
+import useUserModsStatus from '../../hooks/useUserModsStatus';
 import { useNotification } from '../../context/NotificationContext';
 import PageContainer from '../layout/PageContainer';
+import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import '../../assets/styles/components/explorarMods/ExplorarMods.css';
 
 const ExplorarMods = () => {
+  const navigate = useNavigate();
+  const { showNotification } = useNotification();
+  
+  // Hook unificado para optimizar verificaciones de usuario
+  const { 
+    isAuthenticated, 
+    getOwnershipMap, 
+    getSavedMap, 
+    loading: userLoading 
+  } = useUserModsStatus();
+
   // Constante para filtros por defecto (evitar duplicación)
   const FILTROS_DEFAULT = {
     juego: '',
@@ -48,14 +61,12 @@ const ExplorarMods = () => {
   const [filtros, setFiltros] = useState(FILTROS_DEFAULT);
   const [paginacion, setPaginacion] = useState({
     paginaActual: 1,
-    resultadosPorPagina: 20,
+    resultadosPorPagina: 20, // Mantener 20 como estaba originalmente
     totalPaginas: 1
   });
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [isUpdatingResults, setIsUpdatingResults] = useState(false);
-
-  const { showNotification } = useNotification();
 
   // Añadir estados para manejo de secciones colapsables
   const [secciones, setSecciones] = useState({
@@ -80,6 +91,10 @@ const ExplorarMods = () => {
   // Estados para controlar dropdowns de etiquetas
   const [showEtiquetasIncluirDropdown, setShowEtiquetasIncluirDropdown] = useState(false);
   const [showEtiquetasExcluirDropdown, setShowEtiquetasExcluirDropdown] = useState(false);
+
+  // Estados para el modal de eliminación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [modToDelete, setModToDelete] = useState(null);
 
   // Función helper para resetear estados de búsqueda
   const resetearEstadosBusqueda = useCallback(() => {
@@ -192,27 +207,28 @@ const ExplorarMods = () => {
     setCargando(true);
     setError(null);
     try {
-      const response = await modService.getModsWithDetails();
+      const response = await modService.getAllMods();
       if (response.status === 'success') {
+        // Simplificar el formateo de datos - usar solo lo esencial
         setMods(response.data.map(mod => ({
           id: mod.id,
           titulo: mod.titulo,
-          imagen: mod.imagen || '/images/mod-placeholder.jpg',
-          juego: { titulo: mod.juego?.titulo || 'Juego desconocido' },
+          imagen: mod.imagen_banner ? `/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
+          juego: mod.juego || { titulo: 'Juego desconocido' },
           categoria: mod.etiquetas?.[0]?.nombre || 'General',
           etiquetas: mod.etiquetas || [],
           autor: mod.creador?.nome || 'Anónimo',
-          descargas: mod.estadisticas?.total_descargas || mod.total_descargas || Math.floor(Math.random() * 1000),
-          valoracion: mod.estadisticas?.valoracion_media || mod.valoracion_media || 0,
-          numValoraciones: mod.estadisticas?.total_valoraciones || mod.total_valoraciones || 0,
+          creador_id: mod.creador_id,
+          descargas: mod.total_descargas || 0,
+          valoracion: mod.val_media || 0,
+          numValoraciones: mod.num_valoraciones || 0,
           descripcion: mod.descripcion || '',
-          fecha: mod.fecha_creacion,
+          fecha: mod.fecha_creacion || mod.created_at,
           estado: mod.estado || 'publicado',
           edad_recomendada: Number(mod.edad_recomendada || 0),
-          popularidad: mod.estadisticas?.popularidad || 'baja',
+          popularidad: mod.popularidad || 'baja',
           version: mod.version || '1.0'
         })));
-        console.log('Mods cargados:', response.data);
       } else {
         throw new Error(response.message || 'Error al cargar los mods');
       }
@@ -269,12 +285,141 @@ const ExplorarMods = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [resetearEstadosBusqueda]);
 
-  // Efecto para animar el contador de resultados
+  // Filtrar y ordenar los mods usando useMemo para evitar recálculos innecesarios
+  const modsFiltrados = useMemo(() => {
+    return mods
+      .filter(mod => {
+        // Filtro por búsqueda general
+        if (filtros.busqueda) {
+          const searchTerm = filtros.busqueda.toLowerCase();
+          return mod.titulo.toLowerCase().includes(searchTerm) ||
+                 mod.descripcion.toLowerCase().includes(searchTerm) ||
+                 mod.autor.toLowerCase().includes(searchTerm);
+        }
+        return true;
+      })
+      .filter(mod => !filtros.busquedaDescripcion || mod.descripcion.toLowerCase().includes(filtros.busquedaDescripcion.toLowerCase()))
+      .filter(mod => !filtros.busquedaAutor || mod.autor.toLowerCase().includes(filtros.busquedaAutor.toLowerCase()))
+      .filter(mod => !filtros.juego || mod.juego.titulo === filtros.juego)
+      .filter(mod => {
+        // Filtrar por etiquetas incluidas (cualquiera de las seleccionadas)
+        if (filtros.etiquetas.length === 0) return true;
+        return mod.etiquetas.some(tag => filtros.etiquetas.includes(tag.nombre));
+      })
+      .filter(mod => {
+        // Si no hay edades seleccionadas, mostrar todos los mods
+        if (filtros.edades_seleccionadas.length === 0) return true;
+
+        const edadMod = Number(mod.edad_recomendada);
+
+        // Si está seleccionado "Sin clasificar" (0) y el mod no tiene clasificación
+        if (filtros.edades_seleccionadas.includes('0') && edadMod === 0) {
+          return true;
+        }
+
+        // Si el mod no tiene clasificación y no está seleccionado "Sin clasificar"
+        if (edadMod === 0) {
+          return false;
+        }
+
+        // Mostrar solo los mods que coincidan exactamente con alguna de las edades seleccionadas
+        return filtros.edades_seleccionadas.includes(String(edadMod));
+      })
+      .filter(mod => !filtros.popularidad || mod.popularidad === filtros.popularidad)
+      .filter(mod => !filtros.version || mod.version === filtros.version)
+      .filter(mod => {
+        if (filtros.fechaDesde) {
+          const fechaDesde = new Date(filtros.fechaDesde);
+          const fechaMod = new Date(mod.fecha);
+          if (fechaMod < fechaDesde) return false;
+        }
+        if (filtros.fechaHasta) {
+          const fechaHasta = new Date(filtros.fechaHasta);
+          const fechaMod = new Date(mod.fecha);
+          if (fechaMod > fechaHasta) return false;
+        }
+        return true;
+      })
+      .filter(mod => {
+        // Filtrar por etiquetas excluidas
+        if (filtros.etiquetasExcluidas.length === 0) return true;
+        return !mod.etiquetas.some(tag => filtros.etiquetasExcluidas.includes(tag.nombre));
+      })
+      .filter(mod => {
+        // Filtrar por número de descargas
+        if (filtros.descargasMin && mod.descargas < parseInt(filtros.descargasMin)) return false;
+        if (filtros.descargasMax && mod.descargas > parseInt(filtros.descargasMax)) return false;
+        return true;
+      })
+      .filter(mod => {
+        // Filtrar por número de valoraciones
+        if (filtros.valoracionesMin && mod.numValoraciones < parseInt(filtros.valoracionesMin)) return false;
+        if (filtros.valoracionesMax && mod.numValoraciones > parseInt(filtros.valoracionesMax)) return false;
+        return true;
+      })
+      .filter(mod => {
+        // Filtrar por tamaño de archivo (simulado en MB)
+        const tamanoMod = mod.tamano || Math.floor(Math.random() * 500) + 1; // Simulamos tamaño si no existe
+        if (filtros.tamanoMin) {
+          const tamanoMinMB = parseInt(filtros.tamanoMin);
+          if (tamanoMod < tamanoMinMB) return false;
+        }
+        if (filtros.tamanoMax) {
+          const tamanoMaxMB = parseInt(filtros.tamanoMax);
+          if (tamanoMod > tamanoMaxMB) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const order = filtros.orden === 'desc' ? -1 : 1;
+        switch (filtros.ordenarPor) {
+          case 'recientes':
+            return order * (new Date(b.fecha) - new Date(a.fecha));
+          case 'descargas':
+            return order * (b.descargas - a.descargas);
+          case 'valoracion':
+            return order * (b.valoracion - a.valoracion);
+          case 'alfabetico':
+            return order * a.titulo.localeCompare(b.titulo);
+          case 'popularidad':
+            return order * (b.popularidad === 'alta' ? 3 : b.popularidad === 'media' ? 2 : 1) -
+              (a.popularidad === 'alta' ? 3 : a.popularidad === 'media' ? 2 : 1);
+          default:
+            return 0;
+        }
+      });
+  }, [mods, filtros]);
+
+  // Calcular paginación usando useMemo
+  const { modsEnPagina, totalPaginas } = useMemo(() => {
+    const indiceInicial = (paginacion.paginaActual - 1) * paginacion.resultadosPorPagina;
+    const indiceFinal = indiceInicial + paginacion.resultadosPorPagina;
+    return {
+      modsEnPagina: modsFiltrados.slice(indiceInicial, indiceFinal),
+      totalPaginas: Math.ceil(modsFiltrados.length / paginacion.resultadosPorPagina)
+    };
+  }, [modsFiltrados, paginacion.paginaActual, paginacion.resultadosPorPagina]);
+
+  // Efecto para animar el contador de resultados (optimizado)
   useEffect(() => {
+    const timer = setTimeout(() => {
     setIsUpdatingResults(true);
-    const timer = setTimeout(() => setIsUpdatingResults(false), 300);
+      const updateTimer = setTimeout(() => setIsUpdatingResults(false), 200);
+      return () => clearTimeout(updateTimer);
+    }, 100);
     return () => clearTimeout(timer);
-  }, [filtros]);
+  }, [modsFiltrados.length]); // Solo cuando cambie el número de resultados
+
+  // Actualizar paginación cuando cambien los resultados filtrados
+  useEffect(() => {
+    // Resetear a página 1 cuando cambien los filtros
+    if (paginacion.paginaActual > totalPaginas && totalPaginas > 0) {
+      setPaginacion(prev => ({
+        ...prev,
+        paginaActual: 1
+      }));
+    }
+  }, [totalPaginas, paginacion.paginaActual]);
 
   // Manejar cambios en los filtros
   const handleFiltroChange = (e) => {
@@ -415,13 +560,7 @@ const ExplorarMods = () => {
     }));
   };
 
-  // Función helper para filtrado por texto
-  const filtrarPorTexto = useCallback((texto, campo) => {
-    if (!texto) return true;
-    return campo.toLowerCase().includes(texto.toLowerCase());
-  }, []);
-
-  // Función helper para validar etiquetas disponibles
+  // Función helper para validar etiquetas disponibles usando useMemo para optimización
   const validarEtiquetaDisponible = useCallback((etiqueta, busqueda, esIncluir) => {
     // Filtrar por búsqueda solo si hay texto
     const coincideBusqueda = !busqueda || etiqueta.toLowerCase().includes(busqueda.toLowerCase());
@@ -439,129 +578,26 @@ const ExplorarMods = () => {
     }
   }, [filtros.etiquetas, filtros.etiquetasExcluidas]);
 
-  // Filtrar y ordenar los mods
-  const modsFiltrados = mods
-    .filter(mod => {
-      // Filtro por búsqueda general
-      if (filtros.busqueda) {
-        const searchTerm = filtros.busqueda;
-        return filtrarPorTexto(searchTerm, mod.titulo) ||
-               filtrarPorTexto(searchTerm, mod.descripcion) ||
-               filtrarPorTexto(searchTerm, mod.autor);
-      }
-      return true;
-    })
-    .filter(mod => filtrarPorTexto(filtros.busquedaDescripcion, mod.descripcion))
-    .filter(mod => filtrarPorTexto(filtros.busquedaAutor, mod.autor))
-    .filter(mod => filtros.juego ? mod.juego.titulo === filtros.juego : true)
-    .filter(mod => {
-      // Filtrar por etiquetas incluidas (cualquiera de las seleccionadas)
-      if (filtros.etiquetas.length === 0) return true;
-      return mod.etiquetas.some(tag => filtros.etiquetas.includes(tag.nombre));
-    })
-    .filter(mod => {
-      // Si no hay edades seleccionadas, mostrar todos los mods
-      if (filtros.edades_seleccionadas.length === 0) return true;
+  // Extraer datos únicos para los filtros usando useMemo para optimización
+  const { juegosUnicos, categoriasUnicas, etiquetasUnicas, edades_seleccionadasUnicas, popularidadUnica, versionesUnicas } = useMemo(() => {
+    if (!mods.length) return {
+      juegosUnicos: [],
+      categoriasUnicas: [],
+      etiquetasUnicas: [],
+      edades_seleccionadasUnicas: [],
+      popularidadUnica: [],
+      versionesUnicas: []
+    };
 
-      const edadMod = Number(mod.edad_recomendada);
-
-      // Si está seleccionado "Sin clasificar" (0) y el mod no tiene clasificación
-      if (filtros.edades_seleccionadas.includes('0') && edadMod === 0) {
-        return true;
-      }
-
-      // Si el mod no tiene clasificación y no está seleccionado "Sin clasificar"
-      if (edadMod === 0) {
-        return false;
-      }
-
-      // Mostrar solo los mods que coincidan exactamente con alguna de las edades seleccionadas
-      return filtros.edades_seleccionadas.includes(String(edadMod));
-    })
-    .filter(mod => filtros.popularidad ? mod.popularidad === filtros.popularidad : true)
-    .filter(mod => filtros.version ? mod.version === filtros.version : true)
-    .filter(mod => {
-      if (filtros.fechaDesde) {
-        const fechaDesde = new Date(filtros.fechaDesde);
-        const fechaMod = new Date(mod.fecha);
-        if (fechaMod < fechaDesde) return false;
-      }
-      if (filtros.fechaHasta) {
-        const fechaHasta = new Date(filtros.fechaHasta);
-        const fechaMod = new Date(mod.fecha);
-        if (fechaMod > fechaHasta) return false;
-      }
-      return true;
-    })
-    .filter(mod => {
-      // Filtrar por etiquetas excluidas
-      if (filtros.etiquetasExcluidas.length === 0) return true;
-      return !mod.etiquetas.some(tag => filtros.etiquetasExcluidas.includes(tag.nombre));
-    })
-    .filter(mod => {
-      // Filtrar por número de descargas
-      if (filtros.descargasMin && mod.descargas < parseInt(filtros.descargasMin)) return false;
-      if (filtros.descargasMax && mod.descargas > parseInt(filtros.descargasMax)) return false;
-      return true;
-    })
-    .filter(mod => {
-      // Filtrar por número de valoraciones
-      if (filtros.valoracionesMin && mod.numValoraciones < parseInt(filtros.valoracionesMin)) return false;
-      if (filtros.valoracionesMax && mod.numValoraciones > parseInt(filtros.valoracionesMax)) return false;
-      return true;
-    })
-    .filter(mod => {
-      // Filtrar por tamaño de archivo (simulado en MB)
-      const tamanoMod = mod.tamano || Math.floor(Math.random() * 500) + 1; // Simulamos tamaño si no existe
-      if (filtros.tamanoMin) {
-        const tamanoMinMB = parseInt(filtros.tamanoMin);
-        if (tamanoMod < tamanoMinMB) return false;
-      }
-      if (filtros.tamanoMax) {
-        const tamanoMaxMB = parseInt(filtros.tamanoMax);
-        if (tamanoMod > tamanoMaxMB) return false;
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      const order = filtros.orden === 'desc' ? -1 : 1;
-      switch (filtros.ordenarPor) {
-        case 'recientes':
-          return order * (new Date(b.fecha) - new Date(a.fecha));
-        case 'descargas':
-          return order * (b.descargas - a.descargas);
-        case 'valoracion':
-          return order * (b.valoracion - a.valoracion);
-        case 'alfabetico':
-          return order * a.titulo.localeCompare(b.titulo);
-        case 'popularidad':
-          return order * (b.popularidad === 'alta' ? 3 : b.popularidad === 'media' ? 2 : 1) -
-            (a.popularidad === 'alta' ? 3 : a.popularidad === 'media' ? 2 : 1);
-        default:
-          return 0;
-      }
-    });
-
-  // Calcular paginación
-  const indiceInicial = (paginacion.paginaActual - 1) * paginacion.resultadosPorPagina;
-  const indiceFinal = indiceInicial + paginacion.resultadosPorPagina;
-  const modsEnPagina = modsFiltrados.slice(indiceInicial, indiceFinal);
-  const totalPaginas = Math.ceil(modsFiltrados.length / paginacion.resultadosPorPagina);
-
-  useEffect(() => {
-    setPaginacion(prev => ({
-      ...prev,
-      totalPaginas: Math.ceil(modsFiltrados.length / prev.resultadosPorPagina)
-    }));
-  }, [modsFiltrados.length]);
-
-  // Extraer datos únicos para los filtros
-  const juegosUnicos = [...new Set(mods.map(mod => mod.juego.titulo))];
-  const categoriasUnicas = [...new Set(mods.map(mod => mod.categoria))];
-  const etiquetasUnicas = [...new Set(mods.flatMap(mod => mod.etiquetas.map(tag => tag.nombre)))];
-  const edades_seleccionadasUnicas = [...new Set(mods.map(mod => mod.edad_recomendada))];
-  const popularidadUnica = [...new Set(mods.map(mod => mod.popularidad))];
-  const versionesUnicas = [...new Set(mods.map(mod => mod.version))];
+    return {
+      juegosUnicos: [...new Set(mods.map(mod => mod.juego.titulo))],
+      categoriasUnicas: [...new Set(mods.map(mod => mod.categoria))],
+      etiquetasUnicas: [...new Set(mods.flatMap(mod => mod.etiquetas.map(tag => tag.nombre)))],
+      edades_seleccionadasUnicas: [...new Set(mods.map(mod => mod.edad_recomendada))],
+      popularidadUnica: [...new Set(mods.map(mod => mod.popularidad))],
+      versionesUnicas: [...new Set(mods.map(mod => mod.version))]
+    };
+  }, [mods]);
 
   // Función para alternar secciones
   const toggleSeccion = (seccion) => {
@@ -570,6 +606,53 @@ const ExplorarMods = () => {
       [seccion]: !prev[seccion]
     }));
   };
+
+  // Función para editar mod
+  const handleEditMod = useCallback((mod) => {
+    navigate(`/mods/editar/${mod.id}`);
+  }, [navigate]);
+
+  // Función para eliminar mod (soft delete)
+  const handleDeleteMod = useCallback(async (mod) => {
+    setModToDelete(mod);
+    setShowDeleteModal(true);
+  }, []);
+
+  // Función para confirmar la eliminación
+  const confirmDelete = useCallback(async () => {
+    if (!modToDelete) return;
+
+    try {
+      const response = await modService.softDeleteMod(modToDelete.id);
+      
+      if (response.status === 'success') {
+        // Remover el mod de la lista local
+        setMods(prevMods => prevMods.filter(m => m.id !== modToDelete.id));
+        showNotification(`Mod "${modToDelete.titulo}" eliminado correctamente`, 'success');
+      } else {
+        throw new Error(response.message || 'Error al eliminar el mod');
+      }
+    } catch (err) {
+      showNotification(err.message || 'Error al eliminar el mod', 'error');
+    } finally {
+      setShowDeleteModal(false);
+      setModToDelete(null);
+    }
+  }, [modToDelete, showNotification]);
+
+  // Función para cancelar la eliminación
+  const cancelDelete = useCallback(() => {
+    setShowDeleteModal(false);
+    setModToDelete(null);
+  }, []);
+
+  // Optimización: Calcular una sola vez qué mods son propios del usuario
+  const ownershipMap = useMemo(() => {
+    if (!isAuthenticated || userLoading || modsFiltrados.length === 0) {
+      return {};
+    }
+    return getOwnershipMap(modsFiltrados);
+  }, [isAuthenticated, userLoading, modsFiltrados, getOwnershipMap]);
 
   return (
     <PageContainer>
@@ -1479,21 +1562,32 @@ const ExplorarMods = () => {
                       {/* Vista compacta (usando ModCards) */}
                       {vistaActual === 'compacta' && (
                         <div className="mods-grid">
-                          {modsEnPagina.map((mod) => (
-                            <ModCard
-                              key={mod.id}
-                              mod={mod}
-                              showSaveButton={true}
-                            />
-                          ))}
+                          {modsEnPagina.map((mod) => {
+                            const isOwnerOfMod = ownershipMap[mod.id] || false;
+                            return (
+                              <ModCard
+                                key={mod.id}
+                                mod={mod}
+                                isOwner={isOwnerOfMod}
+                                showSaveButton={true}
+                                onEdit={isOwnerOfMod ? () => handleEditMod(mod) : undefined}
+                                onDelete={isOwnerOfMod ? () => handleDeleteMod(mod) : undefined}
+                              />
+                            );
+                          })}
                         </div>
                       )}
 
                       {/* Vista de lista */}
                       {vistaActual === 'lista' && (
                         <ModList
-                          mods={modsEnPagina}
+                          mods={modsEnPagina.map(mod => ({
+                            ...mod,
+                            isOwner: ownershipMap[mod.id] || false
+                          }))}
                           showSaveButton={true}
+                          onEdit={handleEditMod}
+                          onDelete={handleDeleteMod}
                         />
                       )}
 
@@ -1557,6 +1651,19 @@ const ExplorarMods = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && (
+        <ModDeleteConfirmationModal
+          isOpen={showDeleteModal}
+          modTitle={modToDelete?.titulo || ''}
+          message="¿Estás seguro de que quieres desactivar este mod? Podrá ser restaurado posteriormente."
+          confirmText="Desactivar"
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          isDangerous={false}
+        />
+      )}
     </PageContainer>
   );
 };

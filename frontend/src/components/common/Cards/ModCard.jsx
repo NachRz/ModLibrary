@@ -1,14 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import authService from '../../../services/api/authService';
-import useSavedStatus from '../../../hooks/useSavedStatus';
+import useUserModsStatus from '../../../hooks/useUserModsStatus';
 import { useNotification } from '../../../context/NotificationContext';
 import '../../../assets/styles/components/common/Cards/ModCard.css';
 
-const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSavedChange }) => {
-  const isAuthenticated = authService.isAuthenticated();
-  const [isGuardado, toggleSavedStatus, isSaving] = useSavedStatus(mod?.id);
+const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSavedChange, onEdit, onDelete }) => {
+  const { 
+    isAuthenticated, 
+    isOwner: checkIsOwner, 
+    isSaved, 
+    toggleSavedStatus, 
+    loading: userLoading 
+  } = useUserModsStatus();
   const { showNotification } = useNotification();
+
+  // Verificar si el usuario actual es el creador del mod
+  const isCreator = isOwner || checkIsOwner(mod);
+  const isModSaved = isSaved(mod?.id);
 
   // Función para mostrar estrellas según la valoración
   const renderStars = (valoracion) => {
@@ -75,7 +83,7 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
       return; // Si no está autenticado, no hacemos nada (podríamos redirigir al login)
     }
     
-    const prevStatus = isGuardado;
+    const prevStatus = isModSaved;
     try {
       await toggleSavedStatus();
       // Notificar el cambio al componente padre si es necesario
@@ -165,16 +173,48 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
               <span className="text-xs font-medium">{mod.descargas >= 1000 ? `${(mod.descargas / 1000).toFixed(1)}k` : mod.descargas}</span>
             </div>
             
-            {/* Botón de guardar (si está autenticado) */}
-            {isAuthenticated && showSaveButton && (
+            {/* Botón de guardar (si está autenticado y no es el creador) */}
+            {isAuthenticated && showSaveButton && !isCreator && (
               <button 
                 onClick={handleSaveToggle}
-                disabled={isSaving}
-                className={`mod-card-save-button ${isGuardado ? 'active' : ''}`}
-                title={isGuardado ? 'Guardado' : 'Guardar mod'}
+                disabled={userLoading}
+                className={`mod-card-save-button ${isModSaved ? 'active' : ''}`}
+                title={isModSaved ? 'Guardado' : 'Guardar mod'}
               >
-                <i className={`${isGuardado ? 'fas' : 'far'} fa-bookmark`}></i>
+                <i className={`${isModSaved ? 'fas' : 'far'} fa-bookmark`}></i>
               </button>
+            )}
+            
+            {/* Botones de editar y eliminar (solo para el creador) */}
+            {isCreator && (
+              <div className="flex items-center space-x-2">
+                {onEdit && (
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onEdit(mod);
+                    }}
+                    className="mod-card-edit-button"
+                    title="Editar mod"
+                  >
+                    <i className="fas fa-edit"></i>
+                  </button>
+                )}
+                {onDelete && (
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onDelete(mod);
+                    }}
+                    className="mod-card-delete-button"
+                    title="Eliminar mod"
+                  >
+                    <i className="fas fa-trash"></i>
+                  </button>
+                )}
+              </div>
             )}
             
             {/* Solo mostrar acciones personalizadas si existen */}

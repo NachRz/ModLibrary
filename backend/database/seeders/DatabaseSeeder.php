@@ -16,7 +16,6 @@ class DatabaseSeeder extends Seeder
             ModSeeder::class,
             ComentarioSeeder::class,
             ValoracionSeeder::class,
-            ModGuardadoSeeder::class,
         ]);
     }
 }

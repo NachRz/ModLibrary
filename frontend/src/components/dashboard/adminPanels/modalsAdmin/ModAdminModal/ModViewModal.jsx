@@ -85,9 +85,7 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
   const getStatusBadge = (estado) => {
     const styles = {
       publicado: 'bg-gradient-to-r from-green-600/20 to-emerald-600/20 text-green-300 border border-green-500/50',
-      borrador: 'bg-gradient-to-r from-orange-600/20 to-yellow-600/20 text-orange-300 border border-orange-500/50',
-      revision: 'bg-gradient-to-r from-blue-600/20 to-cyan-600/20 text-blue-300 border border-blue-500/50',
-      rechazado: 'bg-gradient-to-r from-red-600/20 to-pink-600/20 text-red-300 border border-red-500/50'
+      borrador: 'bg-gradient-to-r from-orange-600/20 to-yellow-600/20 text-orange-300 border border-orange-500/50'
     };
     
     return styles[estado] || styles.borrador;
@@ -110,12 +108,10 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
   const getStatusText = (estado) => {
     const statusMap = {
       publicado: 'Publicado',
-      borrador: 'Borrador',
-      revision: 'En Revisión',
-      rechazado: 'Rechazado'
+      borrador: 'Borrador'
     };
     
-    return statusMap[estado] || 'Desconocido';
+    return statusMap[estado] || 'Borrador';
   };
 
   if (!isOpen) return null;
@@ -140,7 +136,7 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
                     <FontAwesomeIcon icon={faGamepad} className="text-white text-2xl" />
                   )}
                 </div>
-                {modDetails?.es_destacado && (
+                {!!modDetails?.es_destacado && (
                   <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
                     <FontAwesomeIcon icon={faCrown} className="text-white text-xs" />
                   </div>

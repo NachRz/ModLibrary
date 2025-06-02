@@ -1,14 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import authService from '../../../services/api/authService';
-import useSavedStatus from '../../../hooks/useSavedStatus';
+import useUserModsStatus from '../../../hooks/useUserModsStatus';
 import { useNotification } from '../../../context/NotificationContext';
 import '../../../assets/styles/components/common/list/ModList.css';
 
-const ModListItem = ({ mod, showSaveButton = true, onSavedChange }) => {
-  const isAuthenticated = authService.isAuthenticated();
-  const [isGuardado, toggleSavedStatus, isSaving] = useSavedStatus(mod?.id);
+const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDelete }) => {
+  const { 
+    isAuthenticated, 
+    isSaved, 
+    toggleSavedStatus, 
+    loading: userLoading 
+  } = useUserModsStatus();
   const { showNotification } = useNotification();
+
+  // Usar la propiedad isOwner que se pasa desde el componente padre (optimizada)
+  const isCreator = mod.isOwner || false;
+  const isModSaved = isSaved(mod?.id);
 
   // Función para mostrar estrellas según la valoración
   const renderStars = (valoracion) => {
@@ -76,7 +83,7 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange }) => {
       return;
     }
     
-    const prevStatus = isGuardado;
+    const prevStatus = isModSaved;
     try {
       await toggleSavedStatus();
       if (onSavedChange && typeof onSavedChange === 'function') {
@@ -183,15 +190,49 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange }) => {
         </div>
 
         <div className="mod-list-actions">
-          {isAuthenticated && showSaveButton && (
+          {isAuthenticated && showSaveButton && !isCreator && (
             <button 
               onClick={handleSaveToggle}
-              disabled={isSaving}
-              className={`mod-list-save-button ${isGuardado ? 'active' : ''}`}
-              title={isGuardado ? 'Guardado' : 'Guardar mod'}
+              disabled={userLoading}
+              className={`mod-list-save-button ${isModSaved ? 'active' : ''}`}
+              title={isModSaved ? 'Guardado' : 'Guardar mod'}
             >
-              <i className={`${isGuardado ? 'fas' : 'far'} fa-bookmark`}></i>
+              <i className={`${isModSaved ? 'fas' : 'far'} fa-bookmark`}></i>
             </button>
+          )}
+
+          {/* Botones de editar y eliminar (solo para el creador) */}
+          {isCreator && (
+            <>
+              {onEdit && (
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onEdit(mod);
+                  }}
+                  className="bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-400 hover:text-green-300 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center backdrop-blur-sm"
+                  title="Editar mod"
+                >
+                  <i className="fas fa-edit mr-1"></i>
+                  Editar
+                </button>
+              )}
+              {onDelete && (
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDelete(mod);
+                  }}
+                  className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 hover:text-red-300 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center backdrop-blur-sm"
+                  title="Eliminar mod"
+                >
+                  <i className="fas fa-trash mr-1"></i>
+                  Eliminar
+                </button>
+              )}
+            </>
           )}
 
           <Link 
@@ -206,7 +247,7 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange }) => {
   );
 };
 
-const ModList = ({ mods, showSaveButton = true, onSavedChange }) => {
+const ModList = ({ mods, showSaveButton = true, onSavedChange, onEdit, onDelete }) => {
   if (!mods || mods.length === 0) {
     return (
       <div className="mod-list-empty">
@@ -227,6 +268,8 @@ const ModList = ({ mods, showSaveButton = true, onSavedChange }) => {
           mod={mod}
           showSaveButton={showSaveButton}
           onSavedChange={onSavedChange}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>

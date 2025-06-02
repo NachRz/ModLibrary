@@ -55,6 +55,55 @@
   color: #F18F75;
 }
 
+/* Botones de editar y eliminar para el creador */
+.mod-card-edit-button,
+.mod-card-delete-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.mod-card-edit-button {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.mod-card-edit-button:hover {
+  background: rgba(34, 197, 94, 0.3);
+  border-color: #4ade80;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+}
+
+.mod-card-delete-button {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.mod-card-delete-button:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #f87171;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.mod-card-edit-button i,
+.mod-card-delete-button i {
+  font-size: 0.875rem;
+  transition: transform 0.3s ease;
+}
+
 /* Media queries */
 @media (max-width: 768px) {
   .mod-card-save-button {
@@ -64,5 +113,16 @@
   
   .mod-card-save-button i {
     font-size: 1rem;
+  }
+
+  .mod-card-edit-button,
+  .mod-card-delete-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mod-card-edit-button i,
+  .mod-card-delete-button i {
+    font-size: 0.75rem;
   }
 } 

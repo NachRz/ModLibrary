@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import ModCard from '../../common/Cards/ModCard';
 import modService from '../../../services/api/modService';
+import { useNotification } from '../../../context/NotificationContext';
 
 const ModsGuardados = () => {
   const [sortOption, setSortOption] = useState('date');
   const [savedMods, setSavedMods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { showNotification } = useNotification();
 
   const fetchSavedMods = async () => {
     setLoading(true);
@@ -14,12 +16,33 @@ const ModsGuardados = () => {
     try {
       const response = await modService.getSavedMods();
       if (response.status === 'success') {
-        setSavedMods(response.data);
+        // Formatear los datos para que sean compatibles con ModCard
+        setSavedMods(response.data.map(mod => ({
+          id: mod.id,
+          titulo: mod.titulo,
+          imagen: mod.imagen_banner ? `/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
+          juego: mod.juego || { titulo: 'Juego no especificado' },
+          categoria: mod.etiquetas?.[0]?.nombre || 'Sin categoría',
+          etiquetas: mod.etiquetas || [],
+          autor: mod.creador?.nome || 'Anónimo',
+          creador_id: mod.creador_id,
+          descargas: mod.total_descargas || 0,
+          valoracion: mod.valoracion || 0,
+          numValoraciones: mod.numValoraciones || 0,
+          descripcion: mod.descripcion || '',
+          fecha: mod.fecha_creacion || mod.created_at,
+          estado: mod.estado || 'publicado',
+          edad_recomendada: Number(mod.edad_recomendada || 0),
+          popularidad: mod.popularidad || 'baja',
+          version: mod.version || '1.0',
+          fecha_guardado: mod.pivot?.fecha_guardado || mod.fecha_guardado
+        })));
       } else {
-        setError(response.message || 'Error al obtener los mods guardados');
+        throw new Error(response.message || 'Error al cargar los mods guardados');
       }
     } catch (err) {
       setError(err.message || 'Error al obtener los mods guardados');
+      showNotification('Error al cargar los mods guardados', 'error');
     } finally {
       setLoading(false);
     }
@@ -33,7 +56,7 @@ const ModsGuardados = () => {
   const sortedMods = [...savedMods].sort((a, b) => {
     switch (sortOption) {
       case 'date':
-        return new Date(b.pivot?.fecha_guardado || b.fecha_guardado) - new Date(a.pivot?.fecha_guardado || a.fecha_guardado);
+        return new Date(b.fecha_guardado || b.fecha) - new Date(a.fecha_guardado || a.fecha);
       case 'rating':
         return (b.valoracion || 0) - (a.valoracion || 0);
       case 'downloads':
@@ -45,7 +68,7 @@ const ModsGuardados = () => {
     }
   });
 
-  // Cuando un mod es desmarcado como guardado, lo eliminamos de la lista
+  // Cuando un mod es desmarcado como guardado, se actualiza automáticamente
   const handleModSavedChanged = (modId, isCurrentlySaved) => {
     if (!isCurrentlySaved) {
       setSavedMods(prevMods => prevMods.filter(mod => mod.id !== modId));
@@ -96,14 +119,7 @@ const ModsGuardados = () => {
           {sortedMods.map(mod => (
             <ModCard 
               key={mod.id} 
-              mod={{
-                ...mod,
-                autor: mod.creador?.nome || 'Anónimo',
-                descargas: mod.total_descargas || 0,
-                categoria: mod.etiquetas?.[0]?.nombre || 'Sin categoría',
-                valoracion: mod.valoracion || 0,
-                numValoraciones: mod.numValoraciones || 0
-              }}
+              mod={mod}
               showSaveButton={true}
               onSavedChange={(isCurrentlySaved) => handleModSavedChanged(mod.id, isCurrentlySaved)}
             />
