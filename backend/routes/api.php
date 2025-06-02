@@ -147,7 +147,7 @@ Route::prefix('mods')->group(function () {
 // Rutas de etiquetas
 Route::prefix('etiquetas')->group(function () {
     Route::get('/buscar-rawg', [EtiquetaController::class, 'buscarEnRawg']);
-    Route::post('/{id}/sincronizar', [EtiquetaController::class, 'sincronizarConRawg'])->middleware('auth:sanctum');
+    Route::post('/{id}/sincronizar', [EtiquetaController::class, 'sincronizarConRawg']);
 });
 
 // Rutas de géneros

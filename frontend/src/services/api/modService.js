@@ -93,14 +93,24 @@ const modService = {
   // Crear un nuevo mod
   createMod: async (formData) => {
     try {
-      // Crear un FormData object para enviar los datos
+      // Si ya es un FormData (viene de CrearMod.jsx con archivos), enviarlo directamente
+      if (formData instanceof FormData) {
+        const response = await apiClient.post('/mods', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        return response.data;
+      }
+      
+      // Si no es FormData, crear uno nuevo y procesar los datos (casos sin archivos)
       const data = new FormData();
       
       // Añadir cada campo al FormData, asegurando que juego_id sea un número
       Object.keys(formData).forEach(key => {
-        if (key === 'imagen') {
+        if (key === 'imagen' || key === 'imagen_banner') {
           if (formData[key]) {
-            data.append(key, formData[key]);
+            data.append('imagen_banner', formData[key]);
           }
         } else if (key === 'juego_id') {
           data.append(key, Number(formData[key]));

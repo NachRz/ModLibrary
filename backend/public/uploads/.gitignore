@@ -1,8 +1,0 @@
-# Ignorar todos los archivos subidos
-*
-
-# Pero mantener el archivo .gitignore
-!.gitignore
-
-# Mantener la estructura de directorios
-!*/ 

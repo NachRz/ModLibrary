@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('edad_recomendada');
             $table->foreignId('juego_id')->constrained('juegos')->onDelete('cascade');
             $table->string('version_actual');
-            $table->string('url');
+            $table->string('url')->nullable();
             $table->foreignId('creador_id')->constrained('usuarios')->onDelete('cascade');
             $table->text('descripcion');
             $table->integer('total_descargas')->default(0);

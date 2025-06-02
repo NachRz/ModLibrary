@@ -97,7 +97,7 @@ class ModController extends Controller
             'edad_recomendada' => $request->edad_recomendada,
             'juego_id' => $request->juego_id,
             'version_actual' => $request->version_actual,
-            'url' => $request->url,
+            'url' => $request->url ?: null,
             'creador_id' => $usuario->id,
             'estado' => $request->estado,
             'total_descargas' => 0,
