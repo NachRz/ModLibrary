@@ -85,7 +85,7 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
     
     const prevStatus = isModSaved;
     try {
-      await toggleSavedStatus();
+      await toggleSavedStatus(mod.id);
       // Notificar el cambio al componente padre si es necesario
       if (onSavedChange && typeof onSavedChange === 'function') {
         onSavedChange(!prevStatus);

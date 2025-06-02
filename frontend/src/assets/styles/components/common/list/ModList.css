@@ -95,11 +95,11 @@
 }
 
 .mod-list-save-button {
-  @apply w-full h-9 bg-custom-bg/50 hover:bg-custom-bg/70 text-custom-text hover:text-custom-primary transition-all duration-200 rounded-md border border-custom-detail/20 flex items-center justify-center;
+  @apply w-full h-9 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-all duration-200 rounded-md border border-red-500/20 flex items-center justify-center;
 }
 
 .mod-list-save-button.active {
-  @apply bg-custom-primary/20 text-custom-primary border-custom-primary/30;
+  @apply bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30 hover:text-red-300;
 }
 
 .mod-list-save-button:hover {

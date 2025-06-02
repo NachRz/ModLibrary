@@ -85,7 +85,7 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
     
     const prevStatus = isModSaved;
     try {
-      await toggleSavedStatus();
+      await toggleSavedStatus(mod.id);
       if (onSavedChange && typeof onSavedChange === 'function') {
         onSavedChange(!prevStatus);
       }
