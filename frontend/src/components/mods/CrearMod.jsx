@@ -132,30 +132,6 @@ const CrearMod = () => {
   const [loadingTags, setLoadingTags] = useState(false);
   const [errorTags, setErrorTags] = useState(null);
   
-  // Lista hardcoded de etiquetas disponibles
-  const availableTags = [
-    { value: 1, label: 'Action', juegos_count: 15420 },
-    { value: 2, label: 'Adventure', juegos_count: 12380 },
-    { value: 3, label: 'RPG', juegos_count: 8560 },
-    { value: 4, label: 'Shooter', juegos_count: 7890 },
-    { value: 5, label: 'Strategy', juegos_count: 5670 },
-    { value: 6, label: 'Simulation', juegos_count: 4320 },
-    { value: 7, label: 'Sports', juegos_count: 3890 },
-    { value: 8, label: 'Racing', juegos_count: 2980 },
-    { value: 9, label: 'Platformer', juegos_count: 2450 },
-    { value: 10, label: 'Fighting', juegos_count: 1890 },
-    { value: 11, label: 'Puzzle', juegos_count: 1560 },
-    { value: 12, label: 'Horror', juegos_count: 1230 },
-    { value: 13, label: 'Survival', juegos_count: 1890 },
-    { value: 14, label: 'Open World', juegos_count: 3450 },
-    { value: 15, label: 'Multiplayer', juegos_count: 8900 },
-    { value: 16, label: 'Co-op', juegos_count: 4560 },
-    { value: 17, label: 'PvP', juegos_count: 2340 },
-    { value: 18, label: 'Single Player', juegos_count: 12890 },
-    { value: 19, label: 'Indie', juegos_count: 7890 },
-    { value: 20, label: 'Casual', juegos_count: 3450 }
-  ];
-
   // Función para cargar opciones iniciales de juegos (mejorado desde EditModAdmin)
   useEffect(() => {
     const loadInitialGames = async () => {
@@ -203,26 +179,23 @@ const CrearMod = () => {
     }
   };
   
-  // Función para cargar opciones de etiquetas
+  // Función para cargar opciones de etiquetas usando AsyncSelect (igual que EditModAdmin)
   const loadTagOptions = async (inputValue) => {
     try {
-      setLoadingTags(true);
-      setErrorTags(null);
+      const response = await etiquetasService.searchTags(inputValue);
       
-      if (!inputValue) {
-        return availableTags;
+      if (response.etiquetas) {
+        return response.etiquetas.map(tag => ({
+          value: tag.id, // Este es el rawg_id cuando viene de RAWG
+          label: tag.name || tag.nombre,
+          juegos_count: tag.juegos_count || 0
+        }));
       }
       
-      const filteredTags = availableTags.filter(tag => 
-        tag.label.toLowerCase().includes(inputValue.toLowerCase())
-      );
-      
-      return filteredTags;
-      } catch (error) {
-      setErrorTags(error.message);
       return [];
-      } finally {
-      setLoadingTags(false);
+    } catch (error) {
+      console.error('Error al cargar etiquetas:', error);
+      return [];
     }
   };
   
@@ -294,13 +267,53 @@ const CrearMod = () => {
     }
   };
   
-  // Manejador para cambios en la selección de etiquetas
-  const handleTagChange = (selectedOptions) => {
+  // Manejador para cambios en la selección de etiquetas (mejorado como EditModAdmin)
+  const handleTagChange = async (selectedOptions) => {
     setSelectedTags(selectedOptions || []);
-    setFormData(prev => ({
-      ...prev,
-      etiquetas: selectedOptions ? selectedOptions.map(option => option.value) : []
-    }));
+    
+    // Sincronizar etiquetas con la base de datos local para obtener los IDs correctos
+    if (selectedOptions && selectedOptions.length > 0) {
+      try {
+        const syncedTags = await Promise.all(
+          selectedOptions.map(async (option) => {
+            try {
+              // Sincronizar la etiqueta para obtener el ID local
+              const syncedTag = await etiquetasService.syncTag(option.value);
+              return {
+                id: syncedTag.id, // ID local de la base de datos
+                nombre: syncedTag.nombre,
+                rawg_id: syncedTag.rawg_id
+              };
+            } catch (error) {
+              console.error(`Error al sincronizar etiqueta ${option.label}:`, error);
+              // En caso de error, usar el valor original como fallback
+              return {
+                id: option.value,
+                nombre: option.label,
+                rawg_id: option.value
+              };
+            }
+          })
+        );
+
+        setFormData(prev => ({
+          ...prev,
+          etiquetas: syncedTags.map(tag => tag.id) // Solo guardar los IDs para el formulario
+        }));
+      } catch (error) {
+        console.error('Error al sincronizar etiquetas:', error);
+        // En caso de error, usar los valores originales
+        setFormData(prev => ({
+          ...prev,
+          etiquetas: selectedOptions ? selectedOptions.map(option => option.value) : []
+        }));
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        etiquetas: []
+      }));
+    }
 
     if (selectedOptions?.length > 0 && errors.etiquetas) {
       setErrors(prev => ({ ...prev, etiquetas: '' }));
@@ -510,7 +523,7 @@ const CrearMod = () => {
           throw new Error('Debes iniciar sesión para crear un mod');
         }
         
-        const syncedTags = await etiquetasService.syncMultipleTags(formData.etiquetas);
+        // Las etiquetas ya están sincronizadas desde handleTagChange, no necesitamos syncMultipleTags
         
         // Preparar datos base del mod
         const modDataBase = {
@@ -522,7 +535,7 @@ const CrearMod = () => {
           url: formData.url,
           estado: formData.estado,
           juego_id: formData.juego_id,
-          etiquetas: syncedTags.map(tag => tag.id)
+          etiquetas: formData.etiquetas // Ya contiene los IDs locales sincronizados
         };
 
         // Crear FormData si hay archivos para subir
@@ -792,7 +805,7 @@ const CrearMod = () => {
                   <AsyncSelect
                     isMulti
                     cacheOptions
-              defaultOptions={availableTags}
+              defaultOptions={[]}
                     value={selectedTags}
                     onChange={handleTagChange}
                     loadOptions={loadTagOptions}
