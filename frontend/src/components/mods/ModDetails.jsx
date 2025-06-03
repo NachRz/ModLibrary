@@ -50,17 +50,21 @@ const ModDetails = () => {
       'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80'
     ];
 
-    // Si el mod tiene imagen principal, la incluimos al principio
-    if (mod?.imagen_principal) {
-      return [mod.imagen_principal, ...imagenesPorDefecto];
+    // Si el mod tiene imagen de banner, la incluimos al principio
+    if (mod?.imagen_banner) {
+      const bannerUrl = `http://localhost:8000/storage/${mod.imagen_banner}`;
+      return [bannerUrl, ...imagenesPorDefecto];
     }
     
     return imagenesPorDefecto;
-  }, [mod?.imagen_principal]);
+  }, [mod?.imagen_banner]);
   
   // Verificar si el mod está guardado y si es propietario
   const isGuardado = isSaved(id);
   const isOwner = checkIsOwner(mod);
+
+  // Construir URL de la imagen del banner
+  const bannerImageUrl = mod?.imagen_banner ? `http://localhost:8000/storage/${mod.imagen_banner}` : null;
 
   // Usar el hook personalizado para manejar las valoraciones
   const [
@@ -330,7 +334,15 @@ const ModDetails = () => {
       </div>
 
       {/* Banner Hero Section */}
-      <div className="mod-header-banner">
+      <div 
+        className="mod-header-banner"
+        style={{
+          backgroundImage: bannerImageUrl ? `url(${bannerImageUrl})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <div className="mod-header-content">
           <div className="mod-header-main">
             <h1 className="mod-title-main">{mod.titulo}</h1>

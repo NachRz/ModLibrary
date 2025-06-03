@@ -75,15 +75,37 @@ const Navbar = () => {
     };
     
     checkAuth();
+    
     // Escuchar cambios en localStorage para actualizar el estado
     window.addEventListener('storage', checkAuth);
-    return () => window.removeEventListener('storage', checkAuth);
+    
+    // Escuchar evento personalizado de actualización de usuario
+    const handleUserUpdate = (event) => {
+      const updatedUser = event.detail;
+      if (updatedUser) {
+        setUserData({
+          nome: updatedUser.nome || 'Usuario',
+          correo: updatedUser.correo || '',
+          rol: updatedUser.rol || 'usuario',
+          foto_perfil: updatedUser.foto_perfil || ''
+        });
+      }
+    };
+    
+    window.addEventListener('userUpdated', handleUserUpdate);
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('userUpdated', handleUserUpdate);
+    };
   }, []);
 
   // Actualizar URL de imagen de perfil con cache-busting
   useEffect(() => {
     if (userData.foto_perfil) {
-      const timestamp = Date.now();
+      // Usar timestamp del usuario si está disponible, sino generar uno nuevo
+      const user = authService.getCurrentUser();
+      const timestamp = user?.imageTimestamp || Date.now();
       setProfileImageUrl(`http://localhost:8000/storage/${userData.foto_perfil}?t=${timestamp}`);
     } else {
       setProfileImageUrl('');

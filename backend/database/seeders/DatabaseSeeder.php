@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
      */
     private function fixStorageLink(): void
     {
-        $this->command->info('🔧 Corrigiendo enlace simbólico de storage...');
+        $this->command->info('Corrigiendo enlace simbólico de storage...');
 
         $publicStoragePath = public_path('storage');
         $storageAppPublicPath = storage_path('app/public');
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
                 
                 // Hacer backup del contenido existente si hay archivos
                 if (File::exists($publicStoragePath) && count(File::allFiles($publicStoragePath)) > 0) {
-                    $this->command->warn('⚠️  Encontrados archivos en public/storage. Sincronizando con storage/app/public...');
+                    $this->command->warn('Encontrados archivos en public/storage. Sincronizando con storage/app/public...');
                     
                     // Copiar archivos de public/storage a storage/app/public si no existen
                     $this->syncFiles($publicStoragePath, $storageAppPublicPath);
@@ -49,20 +49,20 @@ class DatabaseSeeder extends Seeder
 
                 // Eliminar la carpeta public/storage
                 File::deleteDirectory($publicStoragePath);
-                $this->command->info('📂 Eliminada carpeta duplicada public/storage');
+                $this->command->info('Eliminada carpeta duplicada public/storage');
             }
 
             // Crear el enlace simbólico correcto
             if (!is_link($publicStoragePath)) {
                 Artisan::call('storage:link');
-                $this->command->info('🔗 Enlace simbólico creado correctamente');
-                $this->command->info('✅ Problema de almacenamiento corregido. Ahora los archivos solo se guardan en una ubicación.');
+                $this->command->info('Enlace simbólico creado correctamente');
+                $this->command->info('Problema de almacenamiento corregido. Ahora los archivos solo se guardan en una ubicación.');
             } else {
-                $this->command->info('✅ El enlace simbólico ya existe y está configurado correctamente');
+                $this->command->info('El enlace simbólico ya existe y está configurado correctamente');
             }
 
         } catch (\Exception $e) {
-            $this->command->error('❌ Error al corregir el enlace simbólico: ' . $e->getMessage());
+            $this->command->error('Error al corregir el enlace simbólico: ' . $e->getMessage());
             Log::error('Error al corregir enlace simbólico en seeder', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -92,7 +92,7 @@ class DatabaseSeeder extends Seeder
                     File::makeDirectory($destDir, 0755, true);
                 }
                 File::copy($file->getRealPath(), $destFile);
-                $this->command->info("📄 Sincronizado: {$relativePath}");
+                $this->command->info("Sincronizado: {$relativePath}");
             }
         }
     }

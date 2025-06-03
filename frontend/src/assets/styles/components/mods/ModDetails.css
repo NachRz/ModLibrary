@@ -16,7 +16,10 @@
 /* Banner Hero Section */
 .mod-header-banner {
   position: relative;
-  height: 300px;
+  width: 100%;
+  max-width: 1240px;
+  height: 372px;
+  margin: 0 auto;
   background: linear-gradient(135deg, #1E3A8A 0%, #3730A3 50%, #1E40AF 100%);
   background-image: 
     url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><rect width="1200" height="300" fill="%23172554"/><polygon points="0,300 300,250 600,280 900,200 1200,250 1200,300" fill="%23134E4A" opacity="0.6"/><polygon points="0,300 200,270 400,290 800,240 1200,280 1200,300" fill="%23065F46" opacity="0.4"/></svg>'),
@@ -1232,7 +1235,8 @@
   }
 
   .mod-header-banner {
-    height: 250px;
+    height: 310px;
+    max-width: 1024px;
   }
 
   .mod-title-main {
@@ -1247,7 +1251,8 @@
   }
 
   .mod-header-banner {
-    height: 200px;
+    height: 230px;
+    max-width: 768px;
   }
   
   .mod-title-main {

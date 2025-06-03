@@ -120,12 +120,15 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
 
   const modUrl = `/mods/${mod.id}`;
 
+  // Construir la URL completa de la imagen siguiendo el patrón del proyecto
+  const imageUrl = mod.imagen_banner ? `http://localhost:8000/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg';
+
   return (
     <div className="mod-list-item">
       {/* Imagen */}
       <div className="mod-list-image">
         <img 
-          src={mod.imagen} 
+          src={imageUrl} 
           alt={mod.titulo}
           className="w-full h-full object-cover"
           loading="lazy"

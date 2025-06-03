@@ -32,6 +32,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Función para actualizar el usuario actual
+  const updateUser = (updatedUserData) => {
+    if (user && updatedUserData.id === user.id) {
+      const updatedUser = { 
+        ...user, 
+        ...updatedUserData,
+        // Agregar timestamp para cache-busting si se actualiza la foto de perfil
+        imageTimestamp: updatedUserData.foto_perfil ? Date.now() : user.imageTimestamp
+      };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // Disparar evento personalizado para notificar a otros componentes
+      window.dispatchEvent(new CustomEvent('userUpdated', { 
+        detail: updatedUser 
+      }));
+    }
+  };
+
   // Inicializar el contexto
   useEffect(() => {
     const initializeAuth = async () => {
@@ -82,6 +101,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    updateUser,
     checkAdminStatus,
     isAuthenticated: authService.isAuthenticated
   };

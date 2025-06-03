@@ -9,6 +9,7 @@ import Pagination from '../../common/Pagination';
 import CreateUserAdminModal from './modalsAdmin/UsersAdminModal/CreateUserAdminModal';
 import UserProfileViewModal from './modalsAdmin/UsersAdminModal/UserProfileViewModal';
 import '../../../assets/styles/components/dashboard/adminPanel/adminTables.css';
+import { useAuth } from '../../../context/AuthContext';
 
 const UsuariosAdminContent = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -36,6 +37,7 @@ const UsuariosAdminContent = () => {
   const [userToDelete, setUserToDelete] = useState(null);
 
   const { showNotification } = useAdminUserDeleteNotifications();
+  const { updateUser: updateAuthUser } = useAuth();
 
   // Cargar usuarios desde la API
   useEffect(() => {
@@ -227,6 +229,9 @@ const UsuariosAdminContent = () => {
       setUsuarios(prev => prev.map(user => 
         user.id === updatedUser.id ? userWithTimestamp : user
       ));
+
+      // Si es el usuario actualmente logueado, actualizar el contexto y localStorage
+      updateAuthUser(userWithTimestamp);
       
       // Recargar los datos del usuario de forma asíncrona para asegurar sincronización
       setTimeout(async () => {

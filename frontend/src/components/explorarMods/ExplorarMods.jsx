@@ -213,7 +213,7 @@ const ExplorarMods = () => {
         setMods(response.data.map(mod => ({
           id: mod.id,
           titulo: mod.titulo,
-          imagen: mod.imagen_banner ? `/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
+          imagen_banner: mod.imagen_banner,
           juego: mod.juego || { titulo: 'Juego desconocido' },
           categoria: mod.etiquetas?.[0]?.nombre || 'General',
           etiquetas: mod.etiquetas || [],
