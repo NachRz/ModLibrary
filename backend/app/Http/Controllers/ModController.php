@@ -479,7 +479,7 @@ class ModController extends Controller
     }
 
     /**
-     * Eliminar mod definitivamente (force delete)
+     * Eliminar definitivamente un mod (solo admins)
      *
      * @param Request $request
      * @param int $id
@@ -501,38 +501,11 @@ class ModController extends Controller
                 ], 403);
             }
 
-            // Eliminar la imagen banner si existe
-            if ($mod->imagen_banner && Storage::exists('public/' . $mod->imagen_banner)) {
-                Storage::delete('public/' . $mod->imagen_banner);
-            }
-
-            // Eliminar imágenes adicionales si existen
-            if ($mod->imagenes_adicionales) {
-                $imagenesAdicionales = json_decode($mod->imagenes_adicionales, true);
-                if (is_array($imagenesAdicionales)) {
-                    foreach ($imagenesAdicionales as $imagenPath) {
-                        if (Storage::exists('public/' . $imagenPath)) {
-                            Storage::delete('public/' . $imagenPath);
-                        }
-                    }
-                }
-            }
-
-            // Eliminar relaciones
-            $mod->etiquetas()->detach();
-            $mod->usuariosGuardados()->detach();
-            
-            // Eliminar valoraciones y comentarios
-            $mod->valoraciones()->delete();
-            $mod->comentarios()->delete();
-            
-            // Eliminar versiones del mod y sus archivos
-            foreach ($mod->versiones as $version) {
-                if ($version->archivo && Storage::exists('public/' . $version->archivo)) {
-                    Storage::delete('public/' . $version->archivo);
-                }
-                $version->delete();
-            }
+            // ModObserver se encargará automáticamente de:
+            // - Eliminar imagen banner y imágenes adicionales
+            // - Eliminar relaciones many-to-many (etiquetas, usuariosGuardados)
+            // - Eliminar valoraciones y comentarios relacionados
+            // - Eliminar versiones del mod (VersionModObserver elimina archivos)
 
             // Eliminar el mod definitivamente
             $mod->forceDelete();

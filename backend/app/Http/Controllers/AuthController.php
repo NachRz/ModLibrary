@@ -390,17 +390,13 @@ class AuthController extends Controller
             $usuario->comentarios()->delete();
             $usuario->redesSociales()->delete();
 
-            // Eliminar imagen de perfil si existe
-            if ($usuario->foto_perfil && Storage::exists('public/' . $usuario->foto_perfil)) {
-                Storage::delete('public/' . $usuario->foto_perfil);
-            }
-
-            // Eliminar el usuario PERMANENTEMENTE (los mods quedan huérfanos pero visibles)
+            // La eliminación de archivos la maneja automáticamente UsuarioObserver
+            // Eliminar definitivamente
             $usuario->forceDelete();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Usuario eliminado correctamente (los mods se mantienen)'
+                'message' => 'Usuario eliminado definitivamente'
             ]);
         } catch (\Exception $e) {
             Log::error('Error al eliminar usuario', [
@@ -519,11 +515,7 @@ class AuthController extends Controller
             $usuario->comentarios()->delete();
             $usuario->redesSociales()->delete();
 
-            // Eliminar imagen de perfil si existe
-            if ($usuario->foto_perfil && Storage::exists('public/' . $usuario->foto_perfil)) {
-                Storage::delete('public/' . $usuario->foto_perfil);
-            }
-
+            // La eliminación de archivos la maneja automáticamente UsuarioObserver
             // Eliminar definitivamente
             $usuario->forceDelete();
 
@@ -549,46 +541,15 @@ class AuthController extends Controller
         try {
             $usuario = Usuario::onlyTrashed()->findOrFail($id);
 
-            // Eliminar todos los mods del usuario y sus relaciones
+            // Eliminar todos los mods del usuario (ModObserver manejará archivos automáticamente)
             $mods = $usuario->mods;
             
             foreach ($mods as $mod) {
-                // Eliminar imagen banner del mod si existe
-                if ($mod->imagen_banner && Storage::exists('public/' . $mod->imagen_banner)) {
-                    Storage::delete('public/' . $mod->imagen_banner);
-                }
-
-                // Eliminar imágenes adicionales si existen
-                if ($mod->imagenes_adicionales) {
-                    $imagenesAdicionales = json_decode($mod->imagenes_adicionales, true);
-                    if (is_array($imagenesAdicionales)) {
-                        foreach ($imagenesAdicionales as $imagenPath) {
-                            if (Storage::exists('public/' . $imagenPath)) {
-                                Storage::delete('public/' . $imagenPath);
-                            }
-                        }
-                    }
-                }
-
-                // Eliminar relaciones
-                $mod->etiquetas()->detach();
-                $mod->usuariosGuardados()->detach();
-                
-                // Eliminar valoraciones
-                $mod->valoraciones()->delete();
-                
-                // Eliminar comentarios
-                $mod->comentarios()->delete();
-                
-                // Eliminar versiones del mod y sus archivos
-                foreach ($mod->versiones as $version) {
-                    if ($version->archivo && Storage::exists('public/' . $version->archivo)) {
-                        Storage::delete('public/' . $version->archivo);
-                    }
-                    $version->delete();
-                }
-
-                // Eliminar el mod
+                // ModObserver se encargará automáticamente de:
+                // - Eliminar imagen banner y imágenes adicionales
+                // - Eliminar relaciones many-to-many
+                // - Eliminar valoraciones y comentarios
+                // - Eliminar versiones (VersionModObserver elimina archivos)
                 $mod->delete();
             }
 
@@ -599,11 +560,7 @@ class AuthController extends Controller
             $usuario->comentarios()->delete();
             $usuario->redesSociales()->delete();
 
-            // Eliminar imagen de perfil si existe
-            if ($usuario->foto_perfil && Storage::exists('public/' . $usuario->foto_perfil)) {
-                Storage::delete('public/' . $usuario->foto_perfil);
-            }
-
+            // UsuarioObserver se encargará automáticamente de eliminar foto_perfil y carpeta
             // Eliminar definitivamente
             $usuario->forceDelete();
 

@@ -286,10 +286,7 @@ class VersionModController extends Controller
         // Comprobar si esta es la versión actual del mod
         $esVersionActual = $mod->version_actual === $version->version;
         
-        // Eliminar el archivo si existe
-        if ($version->archivo && Storage::exists('public/' . $version->archivo)) {
-            Storage::delete('public/' . $version->archivo);
-        }
+        // VersionModObserver se encargará automáticamente de eliminar el archivo
         
         // Actualizar la versión actual del mod si es necesario
         if ($esVersionActual) {

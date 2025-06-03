@@ -14,15 +14,48 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Corregir automáticamente el problema del enlace simbólico PRIMERO
+        $this->fixStorageLink();
+
+        // Limpiar solo las carpetas específicas antes de ejecutar los seeders
+        $this->limpiarCarpetasEspecificas();
+
         $this->call([
             UsuarioSeeder::class,
             ModSeeder::class,
             ComentarioSeeder::class,
             ValoracionSeeder::class,
         ]);
+    }
 
-        // Corregir automáticamente el problema del enlace simbólico
-        $this->fixStorageLink();
+    /**
+     * Limpia únicamente las carpetas mods y users, manteniendo el resto
+     */
+    private function limpiarCarpetasEspecificas(): void
+    {
+        $this->command->info('Limpiando carpetas específicas (mods y users)...');
+
+        $storageAppPublicPath = storage_path('app/public');
+        
+        // Limpiar carpeta de mods
+        $modsPath = $storageAppPublicPath . '/mods';
+        if (File::exists($modsPath)) {
+            File::deleteDirectory($modsPath);
+            $this->command->info('Carpeta mods eliminada');
+        }
+
+        // Limpiar carpeta de users
+        $usersPath = $storageAppPublicPath . '/users';
+        if (File::exists($usersPath)) {
+            File::deleteDirectory($usersPath);
+            $this->command->info('Carpeta users eliminada');
+        }
+
+        // Recrear las carpetas
+        File::makeDirectory($modsPath, 0755, true);
+        File::makeDirectory($usersPath, 0755, true);
+        
+        $this->command->info('Carpetas mods y users recreadas');
     }
 
     /**
@@ -30,70 +63,19 @@ class DatabaseSeeder extends Seeder
      */
     private function fixStorageLink(): void
     {
-        $this->command->info('Corrigiendo enlace simbólico de storage...');
-
-        $publicStoragePath = public_path('storage');
-        $storageAppPublicPath = storage_path('app/public');
+        $this->command->info('Creando enlace simbólico de storage...');
 
         try {
-            // Si public/storage existe y NO es un enlace simbólico
-            if (File::exists($publicStoragePath) && !is_link($publicStoragePath)) {
-                
-                // Hacer backup del contenido existente si hay archivos
-                if (File::exists($publicStoragePath) && count(File::allFiles($publicStoragePath)) > 0) {
-                    $this->command->warn('Encontrados archivos en public/storage. Sincronizando con storage/app/public...');
-                    
-                    // Copiar archivos de public/storage a storage/app/public si no existen
-                    $this->syncFiles($publicStoragePath, $storageAppPublicPath);
-                }
-
-                // Eliminar la carpeta public/storage
-                File::deleteDirectory($publicStoragePath);
-                $this->command->info('Eliminada carpeta duplicada public/storage');
-            }
-
-            // Crear el enlace simbólico correcto
-            if (!is_link($publicStoragePath)) {
-                Artisan::call('storage:link');
-                $this->command->info('Enlace simbólico creado correctamente');
-                $this->command->info('Problema de almacenamiento corregido. Ahora los archivos solo se guardan en una ubicación.');
-            } else {
-                $this->command->info('El enlace simbólico ya existe y está configurado correctamente');
-            }
+            // Simplemente ejecutar el comando artisan storage:link
+            Artisan::call('storage:link');
+            $this->command->info('Enlace simbólico creado correctamente');
 
         } catch (\Exception $e) {
-            $this->command->error('Error al corregir el enlace simbólico: ' . $e->getMessage());
-            Log::error('Error al corregir enlace simbólico en seeder', [
+            $this->command->error('Error al crear el enlace simbólico: ' . $e->getMessage());
+            Log::error('Error al crear enlace simbólico en seeder', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-        }
-    }
-
-    /**
-     * Sincroniza archivos entre dos directorios
-     */
-    private function syncFiles(string $source, string $destination): void
-    {
-        if (!File::exists($destination)) {
-            File::makeDirectory($destination, 0755, true);
-        }
-
-        $files = File::allFiles($source);
-        
-        foreach ($files as $file) {
-            $relativePath = $file->getRelativePathname();
-            $destFile = $destination . DIRECTORY_SEPARATOR . $relativePath;
-            
-            // Solo copiar si el archivo no existe en el destino
-            if (!File::exists($destFile)) {
-                $destDir = dirname($destFile);
-                if (!File::exists($destDir)) {
-                    File::makeDirectory($destDir, 0755, true);
-                }
-                File::copy($file->getRealPath(), $destFile);
-                $this->command->info("Sincronizado: {$relativePath}");
-            }
         }
     }
 }

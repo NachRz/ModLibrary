@@ -11,44 +11,6 @@ use Illuminate\Support\Facades\File;
 class UsuarioSeeder extends Seeder
 {
     /**
-     * Limpiar todas las carpetas de usuarios existentes
-     */
-    private function limpiarCarpetasUsuarios()
-    {
-        $usersBasePath = storage_path('app/public/users');
-        
-        if (File::exists($usersBasePath)) {
-            // Obtener todas las carpetas de usuarios
-            $carpetasUsuarios = File::directories($usersBasePath);
-            $totalCarpetas = count($carpetasUsuarios);
-            
-            if ($totalCarpetas > 0) {
-                $this->command->info("Eliminando {$totalCarpetas} carpetas de usuarios existentes...");
-                
-                foreach ($carpetasUsuarios as $carpeta) {
-                    File::deleteDirectory($carpeta);
-                }
-                
-                $this->command->info("Limpieza completada - {$totalCarpetas} carpetas eliminadas");
-            } else {
-                $this->command->info("No hay carpetas de usuarios para eliminar");
-            }
-        } else {
-            $this->command->info("Directorio de usuarios no existe");
-        }
-        
-        // También crear el directorio de defaults si no existe
-        $defaultsPath = storage_path('app/public/defaults');
-        if (!File::exists($defaultsPath)) {
-            File::makeDirectory($defaultsPath, 0755, true);
-            $this->command->info("Creado directorio de archivos por defecto: {$defaultsPath}");
-            
-            // Crear subdirectorio de avatares
-            File::makeDirectory($defaultsPath . '/avatars', 0755, true);
-        }
-    }
-
-    /**
      * Crear carpeta de usuario y copiar avatar por defecto
      */
     private function crearCarpetaUsuario($usuarioId)
@@ -80,8 +42,15 @@ class UsuarioSeeder extends Seeder
     {
         $this->command->info('Iniciando UsuarioSeeder - Creación de usuarios y carpetas...');
         
-        // Limpiar carpetas de usuarios existentes antes de empezar
-        $this->limpiarCarpetasUsuarios();
+        // Asegurar que existe el directorio de defaults si no existe
+        $defaultsPath = storage_path('app/public/defaults');
+        if (!File::exists($defaultsPath)) {
+            File::makeDirectory($defaultsPath, 0755, true);
+            $this->command->info("Creado directorio de archivos por defecto: {$defaultsPath}");
+            
+            // Crear subdirectorio de avatares
+            File::makeDirectory($defaultsPath . '/avatars', 0755, true);
+        }
         
         // Usuario 1 - Admin existente
         if (!Usuario::where('correo', 'admin@gmail.com')->exists()) {

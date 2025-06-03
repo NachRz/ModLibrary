@@ -24,34 +24,6 @@ class ModSeeder extends Seeder
     }
 
     /**
-     * Limpiar todas las carpetas de mods existentes
-     */
-    private function limpiarCarpetasMods()
-    {
-        $modsBasePath = storage_path('app/public/mods');
-        
-        if (File::exists($modsBasePath)) {
-            // Obtener todas las carpetas de mods
-            $carpetasMods = File::directories($modsBasePath);
-            $totalCarpetas = count($carpetasMods);
-            
-            if ($totalCarpetas > 0) {
-                $this->command->info("Eliminando {$totalCarpetas} carpetas de mods existentes...");
-                
-                foreach ($carpetasMods as $carpeta) {
-                    File::deleteDirectory($carpeta);
-                }
-                
-                $this->command->info("Limpieza completada - {$totalCarpetas} carpetas eliminadas");
-            } else {
-                $this->command->info("No hay carpetas de mods para eliminar");
-            }
-        } else {
-            $this->command->info("Directorio de mods no existe");
-        }
-    }
-
-    /**
      * Crear carpetas para un mod específico y copiar archivos por defecto
      */
     private function crearCarpetasMod($modTitulo, $versionActual, $versionesAnteriores = [], $modId)
@@ -178,9 +150,6 @@ class ModSeeder extends Seeder
     public function run()
     {
         $this->command->info('Iniciando ModSeeder - Creación de mods y carpetas...');
-        
-        // Limpiar carpetas de mods existentes antes de empezar
-        $this->limpiarCarpetasMods();
         
         // Cargar datos del JSON
         $jsonPath = base_path('resources/assets/data/mods.json');
