@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class ModController extends Controller
 {
@@ -66,34 +67,15 @@ class ModController extends Controller
             ], 422);
         }
 
-        // Procesar y almacenar la imagen banner
-        $imagenBannerPath = null;
-        if ($request->hasFile('imagen_banner')) {
-            $imagenBanner = $request->file('imagen_banner');
-            $nombreArchivo = time() . '_' . $imagenBanner->getClientOriginalName();
-            $imagenBannerPath = $imagenBanner->storeAs('public/mods', $nombreArchivo);
-            $imagenBannerPath = str_replace('public/', '', $imagenBannerPath);
-        }
-
-        // Procesar imágenes adicionales
-        $imagenesAdicionales = [];
-        if ($request->hasFile('imagenes_adicionales')) {
-            foreach ($request->file('imagenes_adicionales') as $imagen) {
-                $nombreArchivo = time() . '_' . uniqid() . '_' . $imagen->getClientOriginalName();
-                $imagenPath = $imagen->storeAs('public/mods/adicionales', $nombreArchivo);
-                $imagenesAdicionales[] = str_replace('public/', '', $imagenPath);
-            }
-        }
-
         // Obtenemos el usuario autenticado
         $usuario = $request->user();
 
-        // Crear el mod
+        // Crear el mod primero (sin rutas de imágenes definitivas)
         $mod = Mod::create([
             'titulo' => $request->titulo,
             'descripcion' => $request->descripcion,
-            'imagen_banner' => $imagenBannerPath,
-            'imagenes_adicionales' => json_encode($imagenesAdicionales),
+            'imagen_banner' => 'temporal', // Se actualizará después
+            'imagenes_adicionales' => null, // Se actualizará después
             'edad_recomendada' => $request->edad_recomendada,
             'juego_id' => $request->juego_id,
             'version_actual' => $request->version_actual,
@@ -103,6 +85,22 @@ class ModController extends Controller
             'total_descargas' => 0,
             'num_valoraciones' => 0,
             'val_media' => 0
+        ]);
+
+        // Crear la carpeta del mod y procesar las imágenes
+        $resultadoProcesamiento = $this->crearCarpetaYProcesarImagenes(
+            $mod->titulo, 
+            $mod->id, 
+            $request->file('imagen_banner'),
+            $request->file('imagenes_adicionales')
+        );
+
+        // Actualizar el mod con las rutas correctas de las imágenes
+        $mod->update([
+            'imagen_banner' => $resultadoProcesamiento['ruta_banner'],
+            'imagenes_adicionales' => !empty($resultadoProcesamiento['rutas_adicionales']) 
+                ? json_encode($resultadoProcesamiento['rutas_adicionales']) 
+                : null
         ]);
 
         // Asociar etiquetas si se proporcionaron
@@ -122,6 +120,69 @@ class ModController extends Controller
             'message' => 'Mod creado exitosamente',
             'data' => $mod
         ], 201);
+    }
+
+    /**
+     * Crear la estructura de carpetas para un mod y procesar las imágenes
+     *
+     * @param string $modTitulo
+     * @param int $modId
+     * @param \Illuminate\Http\UploadedFile|null $imagenBanner
+     * @param array|null $imagenesAdicionales
+     * @return array
+     */
+    private function crearCarpetaYProcesarImagenes($modTitulo, $modId, $imagenBanner = null, $imagenesAdicionales = null)
+    {
+        // Convertir el título del mod en un nombre de carpeta válido
+        $modSlug = strtolower(str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $modTitulo));
+        $basePath = storage_path('app/public/mods/' . $modSlug);
+        
+        // Crear carpeta principal del mod si no existe
+        if (!File::exists($basePath)) {
+            File::makeDirectory($basePath, 0755, true);
+        }
+
+        // Crear subcarpetas estándar
+        $subcarpetas = ['banners', 'imagenes_adicionales', 'versions'];
+        foreach ($subcarpetas as $subcarpeta) {
+            $subcarpetaPath = $basePath . '/' . $subcarpeta;
+            if (!File::exists($subcarpetaPath)) {
+                File::makeDirectory($subcarpetaPath, 0755, true);
+            }
+        }
+
+        $resultado = [
+            'ruta_banner' => null,
+            'rutas_adicionales' => []
+        ];
+
+        // Procesar imagen banner
+        if ($imagenBanner) {
+            $nombreBanner = 'banner_' . $modId . '_' . time() . '.' . $imagenBanner->getClientOriginalExtension();
+            $rutaBanner = $basePath . '/banners/' . $nombreBanner;
+            
+            // Mover el archivo a la carpeta específica del mod
+            $imagenBanner->move($basePath . '/banners', $nombreBanner);
+            
+            // Guardar la ruta relativa para la base de datos
+            $resultado['ruta_banner'] = 'mods/' . $modSlug . '/banners/' . $nombreBanner;
+        }
+
+        // Procesar imágenes adicionales
+        if ($imagenesAdicionales && is_array($imagenesAdicionales)) {
+            foreach ($imagenesAdicionales as $index => $imagen) {
+                $nombreImagen = 'img_adicional_' . $modId . '_' . ($index + 1) . '_' . time() . '.' . $imagen->getClientOriginalExtension();
+                $rutaImagen = $basePath . '/imagenes_adicionales/' . $nombreImagen;
+                
+                // Mover el archivo a la carpeta específica del mod
+                $imagen->move($basePath . '/imagenes_adicionales', $nombreImagen);
+                
+                // Guardar la ruta relativa para la base de datos
+                $resultado['rutas_adicionales'][] = 'mods/' . $modSlug . '/imagenes_adicionales/' . $nombreImagen;
+            }
+        }
+
+        return $resultado;
     }
 
     /**
@@ -239,7 +300,7 @@ class ModController extends Controller
         $validator = Validator::make($request->all(), [
             'titulo' => 'sometimes|string|max:255',
             'descripcion' => 'sometimes|string',
-            'imagen_banner' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagen_banner' => 'sometimes|string|max:500',
             'imagenes_adicionales' => 'sometimes|array',
             'imagenes_adicionales.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'edad_recomendada' => 'sometimes|integer|min:0|max:18',
@@ -250,7 +311,8 @@ class ModController extends Controller
             'estado' => 'sometimes|in:borrador,publicado,revision,suspendido',
             'es_destacado' => 'sometimes|boolean',
             'permitir_comentarios' => 'sometimes|boolean',
-            'visible_en_busqueda' => 'sometimes|boolean'
+            'visible_en_busqueda' => 'sometimes|boolean',
+            'juego_id' => 'sometimes|integer|exists:juegos,id'
         ]);
 
         if ($validator->fails()) {
@@ -261,17 +323,23 @@ class ModController extends Controller
             ], 422);
         }
 
-        // Procesar y almacenar la nueva imagen banner si se proporciona
-        if ($request->hasFile('imagen_banner')) {
-            // Eliminar la imagen anterior si existe
-            if ($mod->imagen_banner && Storage::exists('public/' . $mod->imagen_banner)) {
-                Storage::delete('public/' . $mod->imagen_banner);
-            }
+        // Procesar imagen banner - ahora puede ser una URL de string (ya subida) o un archivo
+        if ($request->has('imagen_banner')) {
+            if ($request->hasFile('imagen_banner')) {
+                // Es un archivo - procesarlo como antes
+                // Eliminar la imagen anterior si existe
+                if ($mod->imagen_banner && Storage::exists('public/' . $mod->imagen_banner)) {
+                    Storage::delete('public/' . $mod->imagen_banner);
+                }
 
-            $imagenBanner = $request->file('imagen_banner');
-            $nombreArchivo = time() . '_' . $imagenBanner->getClientOriginalName();
-            $imagenBannerPath = $imagenBanner->storeAs('public/mods', $nombreArchivo);
-            $mod->imagen_banner = str_replace('public/', '', $imagenBannerPath);
+                $imagenBanner = $request->file('imagen_banner');
+                $nombreArchivo = time() . '_' . $imagenBanner->getClientOriginalName();
+                $imagenBannerPath = $imagenBanner->storeAs('public/mods', $nombreArchivo);
+                $mod->imagen_banner = str_replace('public/', '', $imagenBannerPath);
+            } else {
+                // Es una URL de string (ya subida por separado)
+                $mod->imagen_banner = $request->imagen_banner;
+            }
         }
 
         // Procesar imágenes adicionales
@@ -292,6 +360,7 @@ class ModController extends Controller
         if ($request->filled('version_actual')) $mod->version_actual = $request->version_actual;
         if ($request->filled('url')) $mod->url = $request->url;
         if ($request->filled('estado')) $mod->estado = $request->estado;
+        if ($request->filled('juego_id')) $mod->juego_id = $request->juego_id;
         
         // Actualizar campos booleanos
         if ($request->has('es_destacado')) $mod->es_destacado = $request->boolean('es_destacado');

@@ -16,7 +16,8 @@ import {
   faTag,
   faGamepad,
   faEdit,
-  faCog
+  faCog,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import { useNotification } from '../../../../../context/NotificationContext';
 import modService from '../../../../../services/api/modService';
@@ -149,6 +150,18 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const [initialGameOptions, setInitialGameOptions] = useState([]);
   const [isSyncingGame, setIsSyncingGame] = useState(false);
 
+  // Estados para manejo de imagen banner (copiado del modal de usuarios)
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [selectedBannerFile, setSelectedBannerFile] = useState(null);
+  const [bannerPreviewUrl, setBannerPreviewUrl] = useState('');
+  const [bannerImageTimestamp, setBannerImageTimestamp] = useState(Date.now());
+
+  // Estados para manejo de imágenes adicionales
+  const [uploadingAdditionalImages, setUploadingAdditionalImages] = useState(false);
+  const [selectedAdditionalFiles, setSelectedAdditionalFiles] = useState([]);
+  const [additionalPreviewUrls, setAdditionalPreviewUrls] = useState([]);
+  const [deletingImageIndex, setDeletingImageIndex] = useState(null);
+
   // Limpiar estado cuando se cierra el modal
   useEffect(() => {
     if (!isOpen) {
@@ -171,8 +184,38 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           imagenPreview: ''
         };
       });
+
+      // Limpiar estados de banner
+      setSelectedBannerFile(null);
+      setBannerPreviewUrl('');
+      setUploadingBanner(false);
+      setBannerImageTimestamp(Date.now());
+
+      // Limpiar estados de imágenes adicionales
+      setSelectedAdditionalFiles([]);
+      setAdditionalPreviewUrls([]);
+      setUploadingAdditionalImages(false);
+      setDeletingImageIndex(null);
     }
   }, [isOpen]);
+
+  // Efecto para actualizar preview de banner cuando cambie imagen_banner desde la carga de datos
+  useEffect(() => {
+    if (formData.imagen_banner && !selectedBannerFile) {
+      const timestamp = Date.now();
+      setBannerImageTimestamp(timestamp);
+      // Construir URL completa desde la ruta relativa
+      let imageUrl = formData.imagen_banner;
+      if (!imageUrl.startsWith('http')) {
+        imageUrl = `http://localhost:8000/storage/${imageUrl}`;
+      }
+      setBannerPreviewUrl(`${imageUrl}?t=${timestamp}`);
+      console.log('Preview URL establecida:', `${imageUrl}?t=${timestamp}`);
+    } else if (!formData.imagen_banner && !selectedBannerFile) {
+      setBannerPreviewUrl('');
+      console.log('Preview URL limpiada');
+    }
+  }, [formData.imagen_banner, selectedBannerFile]);
 
   // Cargar datos del mod cuando se abre el modal
   useEffect(() => {
@@ -198,6 +241,49 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       } catch (backendError) {
         console.warn('No se pudieron obtener datos del backend, usando datos del prop:', backendError);
       }
+
+      console.log('=== DEBUG IMAGEN BANNER ===');
+      console.log('modCompleto completo:', modCompleto);
+      console.log('modCompleto.imagen_banner:', modCompleto.imagen_banner);
+      console.log('modCompleto.imagen:', modCompleto.imagen);
+      console.log('============================');
+      
+      console.log('=== DEBUG IMÁGENES ADICIONALES ===');
+      console.log('modCompleto.imagenes_adicionales:', modCompleto.imagenes_adicionales);
+      console.log('Tipo:', typeof modCompleto.imagenes_adicionales);
+      console.log('Es array:', Array.isArray(modCompleto.imagenes_adicionales));
+      console.log('=====================================');
+
+      // Procesar imágenes adicionales correctamente
+      let imagenesAdicionalesProcesadas = [];
+      if (modCompleto.imagenes_adicionales) {
+        let imagenesRaw = modCompleto.imagenes_adicionales;
+        
+        // Si es string, parsearlo
+        if (typeof imagenesRaw === 'string') {
+          try {
+            imagenesRaw = JSON.parse(imagenesRaw);
+          } catch (e) {
+            console.error('Error parsing imagenes_adicionales:', e);
+            imagenesRaw = [];
+          }
+        }
+        
+        // Si es array, procesarlo
+        if (Array.isArray(imagenesRaw)) {
+          imagenesAdicionalesProcesadas = imagenesRaw.map(img => {
+            // Si ya es una URL completa, devolverla tal como está
+            if (typeof img === 'string' && img.startsWith('http')) {
+              return img;
+            }
+            // Si es una ruta relativa, construir la URL completa
+            const rutaLimpia = img.startsWith('storage/') ? img : `storage/${img}`;
+            return `http://localhost:8000/${rutaLimpia}`;
+          });
+        }
+      }
+
+      console.log('Imágenes adicionales procesadas:', imagenesAdicionalesProcesadas);
         
       // Cargar datos del mod (desde backend o prop)
       const modData = {
@@ -207,16 +293,9 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         edad_recomendada: modCompleto.edad_recomendada || 0,
         version: modCompleto.version || modCompleto.version_actual || '1.0',
         etiquetas: modCompleto.etiquetas || [],
-        imagen_banner: modCompleto.imagen_banner ? `${window.location.origin}/storage/${modCompleto.imagen_banner}` : 
-                      (modCompleto.imagen ? `${window.location.origin}/storage/${modCompleto.imagen}` : ''),
-        imagenes_adicionales: modCompleto.imagenes_adicionales ? 
-          (Array.isArray(modCompleto.imagenes_adicionales) ? 
-            modCompleto.imagenes_adicionales.map(img => `${window.location.origin}/storage/${img}`) :
-            (typeof modCompleto.imagenes_adicionales === 'string' ? 
-              JSON.parse(modCompleto.imagenes_adicionales).map(img => `${window.location.origin}/storage/${img}`) : 
-              []
-            )
-          ) : [],
+        // Guardar solo la ruta relativa, sin el dominio
+        imagen_banner: modCompleto.imagen_banner || modCompleto.imagen || '',
+        imagenes_adicionales: imagenesAdicionalesProcesadas,
         imagenFile: null,
         imagenPreview: '',
         imagenesAdicionalesFiles: [],
@@ -441,8 +520,8 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
     }));
   };
 
-  // Manejador para la carga de imagen
-  const handleImageUpload = (e) => {
+  // Manejador para la carga de imagen banner (mejorado copiando del modal de usuarios)
+  const handleBannerFileChange = (e) => {
     const file = e.target.files[0];
     
     if (file) {
@@ -452,30 +531,70 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         return;
       }
       
-      // Validar tamaño (máximo 2MB como en el backend)
-      if (file.size > 2 * 1024 * 1024) {
-        showNotification('La imagen es demasiado grande. Máximo 2MB', 'error');
+      // Validar tamaño (máximo 5MB como en el modal de usuarios)
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification('La imagen es demasiado grande. Máximo 5MB', 'error');
         return;
       }
 
-      // Crear vista previa
-      const previewUrl = URL.createObjectURL(file);
+      setSelectedBannerFile(file);
       
-      setFormData(prev => ({
-        ...prev,
-        imagenFile: file,
-        imagenPreview: previewUrl
-      }));
+      // Crear preview usando FileReader
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setBannerPreviewUrl(e.target.result);
+      };
+      reader.readAsDataURL(file);
+      
+      // Limpiar error previo
+      console.log('Banner file selected:', file.name);
     }
   };
 
-  // Función para limpiar la imagen seleccionada
-  const clearSelectedImage = () => {
+  // Función para subir imagen banner (copiado del modal de usuarios)
+  const uploadBannerImage = async () => {
+    if (!selectedBannerFile) return null;
+    
+    try {
+      setUploadingBanner(true);
+      const uploadFormData = new FormData();
+      uploadFormData.append('imagen_banner', selectedBannerFile);
+      uploadFormData.append('mod_id', mod.id);
+      
+      // Usar el servicio de mods para subir la imagen
+      const response = await modService.uploadBannerImage(uploadFormData);
+      
+      // Actualizar timestamp para forzar actualización de imagen
+      setBannerImageTimestamp(Date.now());
+      
+      return response.data.url || response.data.imagen_banner;
+    } catch (error) {
+      console.error('Error uploading banner:', error);
+      throw new Error('Error al subir la imagen banner: ' + (error.message || 'Error desconocido'));
+    } finally {
+      setUploadingBanner(false);
+    }
+  };
+
+  // Función para limpiar la imagen banner seleccionada (copiado del modal de usuarios)
+  const clearBannerImage = () => {
+    setSelectedBannerFile(null);
+    setBannerPreviewUrl('');
+    setBannerImageTimestamp(Date.now());
     setFormData(prev => ({
       ...prev,
-      imagenFile: null,
-      imagenPreview: ''
+      imagen_banner: ''
     }));
+  };
+
+  // Manejador para la carga de imagen (mantenido para compatibilidad)
+  const handleImageUpload = (e) => {
+    handleBannerFileChange(e);
+  };
+
+  // Función para limpiar la imagen seleccionada (mantenido para compatibilidad)
+  const clearSelectedImage = () => {
+    clearBannerImage();
   };
 
   // Manejador para la carga de imágenes adicionales
@@ -518,6 +637,142 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       
       showNotification(`${validFiles.length} imagen(es) agregada(s) exitosamente`, 'success');
     }
+  };
+
+  // Función para manejar selección de imágenes adicionales (mejorada con subida separada)
+  const handleAdditionalImagesFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    if (files.length === 0) return;
+    
+    // Validar cada archivo
+    const validFiles = [];
+    const errors = [];
+    
+    files.forEach((file, index) => {
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        errors.push(`Archivo ${index + 1}: No es una imagen válida`);
+        return;
+      }
+      
+      // Validar tamaño (máximo 5MB como el banner)
+      if (file.size > 5 * 1024 * 1024) {
+        errors.push(`Archivo ${index + 1}: Tamaño mayor a 5MB`);
+        return;
+      }
+      
+      validFiles.push(file);
+    });
+    
+    // Mostrar errores si los hay
+    if (errors.length > 0) {
+      showNotification(errors.join(', '), 'error');
+    }
+    
+    // Si hay archivos válidos, procesarlos
+    if (validFiles.length > 0) {
+      setSelectedAdditionalFiles(prev => [...prev, ...validFiles]);
+      
+      // Crear previews para los nuevos archivos
+      const newPreviews = validFiles.map(file => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+      });
+      
+      Promise.all(newPreviews).then(previews => {
+        setAdditionalPreviewUrls(prev => [...prev, ...previews]);
+      });
+      
+      showNotification(`${validFiles.length} imagen(es) agregada(s) para subir`, 'success');
+    }
+  };
+
+  // Función para subir imágenes adicionales
+  const uploadAdditionalImages = async () => {
+    if (!selectedAdditionalFiles || selectedAdditionalFiles.length === 0) return null;
+    
+    try {
+      setUploadingAdditionalImages(true);
+      const uploadFormData = new FormData();
+      
+      selectedAdditionalFiles.forEach((file, index) => {
+        uploadFormData.append('imagenes_adicionales[]', file);
+      });
+      uploadFormData.append('mod_id', mod.id);
+      
+      const response = await modService.uploadAdditionalImages(uploadFormData);
+      
+      console.log('Imágenes adicionales subidas:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Error uploading additional images:', error);
+      throw new Error('Error al subir las imágenes adicionales: ' + (error.message || 'Error desconocido'));
+    } finally {
+      setUploadingAdditionalImages(false);
+    }
+  };
+
+  // Función para eliminar imagen adicional seleccionada (antes de subir)
+  const removeSelectedAdditionalImage = (index) => {
+    setSelectedAdditionalFiles(prev => prev.filter((_, i) => i !== index));
+    setAdditionalPreviewUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Función para eliminar imagen adicional ya subida
+  const deleteExistingAdditionalImage = async (imagePath, index) => {
+    try {
+      setDeletingImageIndex(index);
+      
+      console.log('=== ELIMINAR IMAGEN ADICIONAL ===');
+      console.log('imagePath recibido:', imagePath);
+      console.log('index:', index);
+      console.log('formData.imagenes_adicionales:', formData.imagenes_adicionales);
+      
+      await modService.deleteAdditionalImage(mod.id, imagePath);
+      
+      // Actualizar el estado local - mejorar la lógica de filtrado
+      const nuevasImagenes = formData.imagenes_adicionales.filter(img => {
+        console.log('Comparando imagen:', img);
+        
+        // Obtener la ruta relativa de la imagen actual
+        let rutaRelativaImg = img;
+        if (img.includes('/storage/')) {
+          rutaRelativaImg = img.split('/storage/')[1];
+        } else if (img.includes('storage/')) {
+          rutaRelativaImg = img.split('storage/')[1];
+        }
+        
+        console.log('Ruta relativa de imagen:', rutaRelativaImg);
+        console.log('Ruta a eliminar:', imagePath);
+        console.log('¿Coincide?', rutaRelativaImg === imagePath);
+        
+        return rutaRelativaImg !== imagePath;
+      });
+      
+      console.log('Imágenes después del filtro:', nuevasImagenes);
+      
+      setFormData(prev => ({
+        ...prev,
+        imagenes_adicionales: nuevasImagenes
+      }));
+      
+      showNotification('Imagen eliminada correctamente', 'success');
+    } catch (error) {
+      console.error('Error deleting additional image:', error);
+      showNotification('Error al eliminar la imagen: ' + (error.message || 'Error desconocido'), 'error');
+    } finally {
+      setDeletingImageIndex(null);
+    }
+  };
+
+  // Función para limpiar todas las imágenes adicionales seleccionadas
+  const clearSelectedAdditionalImages = () => {
+    setSelectedAdditionalFiles([]);
+    setAdditionalPreviewUrls([]);
   };
 
   // Manejador para cambios en la selección de etiquetas con AsyncSelect
@@ -581,6 +836,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       console.log('ID del mod:', mod.id);
       console.log('Datos del formulario:', formData);
       console.log('Etiquetas seleccionadas:', selectedTags);
+      console.log('Banner file selected:', selectedBannerFile);
       
       // Validaciones básicas
       if (!formData.titulo.trim()) {
@@ -593,73 +849,70 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         return;
       }
 
-      // Preparar datos para enviar al backend
-      let updateData;
-      
-      // Si hay una imagen nueva (archivo) o imágenes adicionales, usar FormData
-      if (formData.imagenFile || formData.imagenesAdicionalesFiles.length > 0) {
-        console.log('Usando FormData - hay archivos nuevos');
-        updateData = new FormData();
-        
-        // Agregar todos los campos al FormData
-        updateData.append('titulo', formData.titulo);
-        updateData.append('descripcion', formData.descripcion);
-        updateData.append('estado', formData.estado);
-        updateData.append('edad_recomendada', parseInt(formData.edad_recomendada, 10));
-        updateData.append('version_actual', formData.version);
-        updateData.append('url', formData.url || '');
-        updateData.append('es_destacado', Boolean(formData.es_destacado));
-        updateData.append('permitir_comentarios', Boolean(formData.permitir_comentarios));
-        updateData.append('visible_en_busqueda', Boolean(formData.visible_en_busqueda));
-        
-        // Agregar juego_id si está seleccionado
-        if (formData.juego_id) {
-          updateData.append('juego_id', formData.juego_id);
+      // Subir imagen banner si hay un archivo seleccionado
+      let finalBannerUrl = formData.imagen_banner;
+      if (selectedBannerFile) {
+        try {
+          finalBannerUrl = await uploadBannerImage();
+          console.log('Banner uploaded successfully:', finalBannerUrl);
+        } catch (uploadError) {
+          console.error('Error uploading banner:', uploadError);
+          showNotification('Error al subir la imagen banner: ' + uploadError.message, 'error');
+          return;
         }
-        
-        // Agregar imagen banner como archivo si hay una nueva
-        if (formData.imagenFile) {
-          updateData.append('imagen_banner', formData.imagenFile);
-          console.log('Agregando imagen banner:', formData.imagenFile.name);
-        }
-        
-        // Agregar imágenes adicionales
-        formData.imagenesAdicionalesFiles.forEach((file, index) => {
-          updateData.append('imagenes_adicionales[]', file);
-          console.log(`Agregando imagen adicional ${index}:`, file.name);
-        });
-        
-        // Agregar etiquetas usando los IDs locales sincronizados
-        if (formData.etiquetas && formData.etiquetas.length > 0) {
-          formData.etiquetas.forEach(tag => {
-            updateData.append('etiquetas[]', tag.id);
-          });
-        }
-        
-        console.log('FormData preparado con archivos');
-      } else {
-        console.log('Usando JSON - sin archivos nuevos');
-        // Si no hay imágenes nuevas, enviar datos normales
-        updateData = {
-          titulo: formData.titulo,
-          descripcion: formData.descripcion,
-          estado: formData.estado,
-          edad_recomendada: parseInt(formData.edad_recomendada, 10),
-          version_actual: formData.version,
-          url: formData.url || '',
-          etiquetas: formData.etiquetas ? formData.etiquetas.map(tag => tag.id) : [],
-          es_destacado: Boolean(formData.es_destacado),
-          permitir_comentarios: Boolean(formData.permitir_comentarios),
-          visible_en_busqueda: Boolean(formData.visible_en_busqueda)
-        };
-        
-        // Agregar juego_id si está seleccionado
-        if (formData.juego_id) {
-          updateData.juego_id = formData.juego_id;
-        }
-        
-        console.log('Datos JSON a enviar:', updateData);
       }
+
+      // Subir imágenes adicionales si hay archivos seleccionados
+      if (selectedAdditionalFiles && selectedAdditionalFiles.length > 0) {
+        try {
+          const additionalImagesResult = await uploadAdditionalImages();
+          console.log('Additional images uploaded successfully:', additionalImagesResult);
+          
+          // Actualizar el estado local con las nuevas imágenes
+          if (additionalImagesResult && additionalImagesResult.todas_las_imagenes) {
+            setFormData(prev => ({
+              ...prev,
+              imagenes_adicionales: additionalImagesResult.todas_las_imagenes.map(img => `${window.location.origin}/storage/${img}`)
+            }));
+          }
+          
+          // Limpiar archivos seleccionados después de subirlos
+          clearSelectedAdditionalImages();
+          
+          showNotification(`${additionalImagesResult.total_imagenes_subidas} imagen(es) adicional(es) subida(s) correctamente`, 'success');
+        } catch (uploadError) {
+          console.error('Error uploading additional images:', uploadError);
+          showNotification('Error al subir las imágenes adicionales: ' + uploadError.message, 'error');
+          return;
+        }
+      }
+
+      // Preparar datos para enviar al backend (ahora sin imágenes ya que se subieron por separado)
+      console.log('Usando JSON - imágenes subidas por separado');
+      const updateData = {
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        estado: formData.estado,
+        edad_recomendada: parseInt(formData.edad_recomendada, 10),
+        version_actual: formData.version,
+        url: formData.url || '',
+        etiquetas: formData.etiquetas ? formData.etiquetas.map(tag => tag.id) : [],
+        es_destacado: Boolean(formData.es_destacado),
+        permitir_comentarios: Boolean(formData.permitir_comentarios),
+        visible_en_busqueda: Boolean(formData.visible_en_busqueda)
+      };
+      
+      // Agregar imagen banner URL si se subió o cambió
+      if (finalBannerUrl) {
+        updateData.imagen_banner = finalBannerUrl;
+      }
+      
+      // Agregar juego_id si está seleccionado
+      if (formData.juego_id) {
+        updateData.juego_id = formData.juego_id;
+      }
+      
+      console.log('Datos JSON a enviar:', updateData);
 
       console.log('Enviando petición al backend...');
       const response = await modService.updateMod(mod.id, updateData);
@@ -683,7 +936,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             creador: mod.creador?.nome || mod.creador?.nombre || 'Usuario', // Usar el nombre del creador
             juego: mod.juego?.titulo || mod.juego?.title || mod.juego?.nombre || 'Juego', // Usar el título del juego
             // Campos adicionales para que el modal funcione correctamente
-            imagen_banner: response.data.imagen_banner || formData.imagen_banner,
+            imagen_banner: finalBannerUrl || response.data?.imagen_banner || formData.imagen_banner,
             descripcion: formData.descripcion,
             edad_recomendada: formData.edad_recomendada,
             version_actual: formData.version || formData.version_actual,
@@ -1352,68 +1605,122 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       <div className="bg-gray-700 rounded-lg p-6">
         <h5 className="text-white font-medium mb-4">Imagen Banner Principal</h5>
         
-        {/* Imagen Banner Actual */}
+        {/* Imagen Banner Actual y Nueva */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Banner Actual:
+            Banner:
           </label>
-          {formData.imagen_banner ? (
-            <div className="relative inline-block">
-              <img
-                src={formData.imagen_banner}
-                alt="Banner actual del mod"
-                className="w-64 h-40 object-cover rounded-lg border border-gray-600"
-                onError={(e) => {
-                  console.error('Error al cargar imagen banner:', formData.imagen_banner);
-                  e.target.style.display = 'none';
-                  e.target.parentElement.style.display = 'none';
-                }}
-                onLoad={() => {
-                  console.log('Imagen banner cargada correctamente:', formData.imagen_banner);
-                }}
-              />
-              <div className="absolute top-2 right-2">
-                <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs">
-                  Actual
-                </span>
+          
+          {/* Mostrar imagen actual y/o nueva */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Banner actual (si existe y no hay archivo seleccionado) */}
+            {formData.imagen_banner && !selectedBannerFile && (
+              <div className="relative">
+                <label className="block text-xs text-gray-400 mb-2">Banner Actual:</label>
+                <div className="relative inline-block">
+                  <img
+                    src={bannerPreviewUrl || (() => {
+                      let imageUrl = formData.imagen_banner;
+                      if (!imageUrl.startsWith('http')) {
+                        imageUrl = `http://localhost:8000/storage/${imageUrl}`;
+                      }
+                      return `${imageUrl}?t=${bannerImageTimestamp}`;
+                    })()}
+                    alt="Banner actual del mod"
+                    className="w-full h-40 object-cover rounded-lg border border-gray-600"
+                    onError={(e) => {
+                      console.error('Error al cargar imagen banner:', e.target.src);
+                      console.error('formData.imagen_banner:', formData.imagen_banner);
+                      e.target.style.display = 'none';
+                      e.target.parentElement.querySelector('.no-image-fallback').style.display = 'flex';
+                    }}
+                    onLoad={(e) => {
+                      console.log('Imagen banner cargada correctamente:', e.target?.src || 'URL no disponible');
+                    }}
+                  />
+                  <div className="no-image-fallback w-full h-40 bg-gray-600 rounded-lg border border-gray-500 border-dashed items-center justify-center hidden">
+                    <div className="text-center">
+                      <FontAwesomeIcon icon={faImage} className="text-gray-400 text-2xl mb-2" />
+                      <p className="text-gray-400 text-sm">Error al cargar imagen</p>
+                    </div>
+                  </div>
+                  <div className="absolute top-2 right-2">
+                    <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs">
+                      Actual
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="w-64 h-40 bg-gray-600 rounded-lg border border-gray-500 border-dashed flex items-center justify-center">
-              <div className="text-center">
-                <FontAwesomeIcon icon={faImage} className="text-gray-400 text-2xl mb-2" />
-                <p className="text-gray-400 text-sm">Sin imagen banner</p>
+            )}
+            
+            {/* Vista previa de nuevo banner */}
+            {bannerPreviewUrl && selectedBannerFile && (
+              <div className="relative">
+                <label className="block text-xs text-gray-400 mb-2">Nuevo Banner:</label>
+                <div className="relative inline-block">
+                  <img
+                    src={bannerPreviewUrl}
+                    alt="Vista previa del nuevo banner"
+                    className="w-full h-40 object-cover rounded-lg border border-gray-600"
+                  />
+                  <div className="absolute top-2 right-2">
+                    <span className="bg-green-500 text-white px-2 py-1 rounded text-xs">
+                      Nuevo
+                    </span>
+                  </div>
+                  {uploadingBanner && (
+                    <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                      <div className="text-white text-sm flex items-center">
+                        <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-2" />
+                        Subiendo...
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+            
+            {/* Placeholder si no hay imagen */}
+            {!formData.imagen_banner && !selectedBannerFile && (
+              <div className="w-full h-40 bg-gray-600 rounded-lg border border-gray-500 border-dashed flex items-center justify-center">
+                <div className="text-center">
+                  <FontAwesomeIcon icon={faImage} className="text-gray-400 text-2xl mb-2" />
+                  <p className="text-gray-400 text-sm">Sin imagen banner</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         
-        {/* Selector de nuevo banner */}
+        {/* Controles de subida */}
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Subir Nuevo Banner
+              {formData.imagen_banner ? 'Cambiar Banner' : 'Subir Nuevo Banner'}
             </label>
             <div className="flex items-center space-x-3">
               <input
                 type="file"
                 id="banner-upload"
                 accept="image/*"
-                onChange={handleImageUpload}
+                onChange={handleBannerFileChange}
                 className="hidden"
+                disabled={uploadingBanner}
               />
               <label
                 htmlFor="banner-upload"
-                className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block"
+                className={`cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${
+                  uploadingBanner ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                <FontAwesomeIcon icon={faImage} className="mr-2" />
-                Seleccionar Banner
+                <FontAwesomeIcon icon={uploadingBanner ? faSpinner : faImage} className={`mr-2 ${uploadingBanner ? 'animate-spin' : ''}`} />
+                {uploadingBanner ? 'Subiendo...' : 'Seleccionar Banner'}
               </label>
               
-              {(formData.imagenPreview || formData.imagenFile) && (
+              {(selectedBannerFile || formData.imagen_banner) && !uploadingBanner && (
                 <button
                   type="button"
-                  onClick={clearSelectedImage}
+                  onClick={clearBannerImage}
                   className="text-red-400 hover:text-red-300 text-sm transition-colors"
                 >
                   <FontAwesomeIcon icon={faTimes} className="mr-1" />
@@ -1422,38 +1729,17 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               )}
             </div>
             
-            {formData.imagenFile && (
+            {selectedBannerFile && !uploadingBanner && (
               <p className="text-green-400 text-sm mt-2">
-                ✓ {formData.imagenFile.name}
+                ✓ {selectedBannerFile.name} ({(selectedBannerFile.size / (1024 * 1024)).toFixed(2)} MB)
               </p>
             )}
             
             <p className="text-xs text-gray-400 mt-2">
-              Imagen principal que aparecerá en listas y detalles. Formatos: JPG, PNG, GIF. Máximo: 2MB
+              Imagen principal que aparecerá en listas y detalles. Formatos: JPG, PNG, GIF. Máximo: 5MB
             </p>
           </div>
-          </div>
-          
-        {/* Vista previa de nuevo banner */}
-        {formData.imagenPreview && (
-          <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Vista Previa del Nuevo Banner:
-            </label>
-            <div className="relative inline-block">
-              <img
-                src={formData.imagenPreview}
-                alt="Vista previa"
-                className="w-64 h-40 object-cover rounded-lg border border-gray-600"
-              />
-              <div className="absolute top-2 right-2">
-                <span className="bg-green-500 text-white px-2 py-1 rounded text-xs">
-                  Nuevo
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
       
       {/* Imágenes Adicionales */}
@@ -1467,33 +1753,120 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               Imágenes Actuales ({formData.imagenes_adicionales.length}):
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {formData.imagenes_adicionales.map((imagen, index) => (
+              {formData.imagenes_adicionales.map((imagen, index) => {
+                console.log(`Renderizando imagen adicional ${index + 1}:`, imagen);
+                
+                // Obtener la ruta relativa para la eliminación
+                let rutaRelativa = imagen;
+                if (imagen.includes('/storage/')) {
+                  rutaRelativa = imagen.split('/storage/')[1];
+                } else if (imagen.includes('storage/')) {
+                  rutaRelativa = imagen.split('storage/')[1];
+                }
+                
+                console.log(`Ruta relativa calculada para imagen ${index + 1}:`, rutaRelativa);
+                
+                return (
+                  <div key={index} className="relative">
+                    <img
+                      src={imagen}
+                      alt={`Imagen adicional ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-lg border border-gray-600"
+                      onError={(e) => {
+                        console.error(`Error cargando imagen adicional ${index + 1}:`, imagen);
+                        e.target.style.display = 'none';
+                        const fallback = e.target.parentElement.querySelector('.no-image-fallback');
+                        if (fallback) {
+                          fallback.style.display = 'flex';
+                        }
+                      }}
+                      onLoad={(e) => {
+                        console.log(`Imagen adicional ${index + 1} cargada correctamente:`, imagen);
+                      }}
+                    />
+                    <div className="no-image-fallback w-full h-24 bg-gray-600 rounded-lg border border-gray-500 border-dashed items-center justify-center hidden">
+                      <div className="text-center">
+                        <FontAwesomeIcon icon={faImage} className="text-gray-400 text-lg mb-1" />
+                        <p className="text-gray-400 text-xs">Error al cargar</p>
+                      </div>
+                    </div>
+                    <div className="absolute top-1 right-1">
+                      <button
+                        type="button"
+                        onClick={() => deleteExistingAdditionalImage(rutaRelativa, index)}
+                        disabled={deletingImageIndex === index}
+                        className={`bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-xs transition-all ${
+                          deletingImageIndex === index ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                      >
+                        {deletingImageIndex === index ? (
+                          <FontAwesomeIcon icon={faSpinner} className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
+                        )}
+                      </button>
+                    </div>
+                    <div className="absolute top-1 left-1">
+                      <span className="bg-blue-500 text-white px-1 py-0.5 rounded text-xs">
+                        {index + 1}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Vista previa de nuevas imágenes seleccionadas */}
+        {selectedAdditionalFiles && selectedAdditionalFiles.length > 0 && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-3">
+              Nuevas Imágenes Seleccionadas ({selectedAdditionalFiles.length}):
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {additionalPreviewUrls.map((previewUrl, index) => (
                 <div key={index} className="relative">
                   <img
-                    src={imagen}
-                    alt={`Imagen adicional ${index + 1}`}
+                    src={previewUrl}
+                    alt={`Nueva imagen ${index + 1}`}
                     className="w-full h-24 object-cover rounded-lg border border-gray-600"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
                   />
                   <div className="absolute top-1 right-1">
                     <button
                       type="button"
-                      onClick={() => {
-                        const nuevasImagenes = formData.imagenes_adicionales.filter((_, i) => i !== index);
-                        setFormData(prev => ({
-                          ...prev,
-                          imagenes_adicionales: nuevasImagenes
-                        }));
-                      }}
+                      onClick={() => removeSelectedAdditionalImage(index)}
                       className="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-xs"
                     >
                       <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
                     </button>
                   </div>
+                  <div className="absolute top-1 left-1">
+                    <span className="bg-green-500 text-white px-1 py-0.5 rounded text-xs">
+                      Nuevo
+                    </span>
+                  </div>
+                  {selectedAdditionalFiles[index] && (
+                    <div className="absolute bottom-1 left-1 right-1">
+                      <div className="bg-black/70 text-white text-xs p-1 rounded truncate">
+                        {selectedAdditionalFiles[index].name}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
+            </div>
+            
+            {/* Botones de control para nuevas imágenes */}
+            <div className="flex items-center space-x-3 mt-3">
+              <button
+                type="button"
+                onClick={clearSelectedAdditionalImages}
+                className="text-red-400 hover:text-red-300 text-sm transition-colors"
+              >
+                <FontAwesomeIcon icon={faTimes} className="mr-1" />
+                Limpiar Selección
+              </button>
             </div>
           </div>
         )}
@@ -1508,63 +1881,26 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             <p className="text-gray-300 mb-2">Arrastra múltiples imágenes aquí o haz clic para seleccionar</p>
             <input
               type="file"
-              id="imagenes-adicionales-upload"
+              id="imagenes-adicionales-upload-new"
               accept="image/*"
               multiple
-              onChange={handleAdditionalImagesUpload}
+              onChange={handleAdditionalImagesFileChange}
               className="hidden"
+              disabled={uploadingAdditionalImages}
             />
             <label
-              htmlFor="imagenes-adicionales-upload"
-              className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block"
+              htmlFor="imagenes-adicionales-upload-new"
+              className={`cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${
+                uploadingAdditionalImages ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               <FontAwesomeIcon icon={faImage} className="mr-2" />
               Seleccionar Imágenes
             </label>
             <p className="text-xs text-gray-400 mt-2">
-              Capturas de pantalla, galería de imágenes. Formatos: JPG, PNG, GIF. Máximo: 2MB cada una
+              Capturas de pantalla, galería de imágenes. Formatos: JPG, PNG, GIF. Máximo: 5MB cada una
             </p>
           </div>
-          
-          {/* Previsualización de nuevas imágenes */}
-          {formData.imagenesAdicionalesFiles && formData.imagenesAdicionalesFiles.length > 0 && (
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-300 mb-3">
-                Nuevas Imágenes a Subir ({formData.imagenesAdicionalesFiles.length}):
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {formData.imagenesAdicionalesFiles.map((file, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={`Nueva imagen ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg border border-gray-600"
-                    />
-                    <div className="absolute top-1 right-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const nuevosArchivos = formData.imagenesAdicionalesFiles.filter((_, i) => i !== index);
-                          setFormData(prev => ({
-                            ...prev,
-                            imagenesAdicionalesFiles: nuevosArchivos
-                          }));
-                        }}
-                        className="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-xs"
-                      >
-                        <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
-                      </button>
-        </div>
-                    <div className="absolute top-1 left-1">
-                      <span className="bg-green-500 text-white px-1 py-0.5 rounded text-xs">
-                        Nueva
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
       
@@ -1579,9 +1915,38 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           <li>• <strong>Imágenes Adicionales:</strong> Galería de capturas de pantalla y contenido visual extra</li>
           <li>• Se recomienda usar una relación de aspecto 16:10 para el banner (ej: 1600x1000px)</li>
           <li>• Formatos soportados: JPG, PNG, GIF</li>
-          <li>• Tamaño máximo: 2MB por imagen</li>
+          <li>• Tamaño máximo: 5MB por imagen (igual que fotos de perfil)</li>
           <li>• Las imágenes se optimizarán automáticamente para diferentes dispositivos</li>
+          <li>• El banner se sube por separado para mejor rendimiento</li>
         </ul>
+      </div>
+
+      {/* Información sobre imágenes mejorada */}
+      <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <FontAwesomeIcon icon={faImage} className="text-blue-400" />
+          <h5 className="text-blue-400 font-medium">Sistema de Gestión de Imágenes</h5>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <h6 className="text-blue-300 font-medium mb-2">Características:</h6>
+            <ul className="text-blue-200 text-sm space-y-1">
+              <li>• <strong>Banner:</strong> Subida independiente con preview en tiempo real</li>
+              <li>• <strong>Adicionales:</strong> Subida múltiple con vista previa inmediata</li>
+              <li>• <strong>Eliminación:</strong> Individual con confirmación visual</li>
+              <li>• <strong>Organización:</strong> Estructura de carpetas por mod</li>
+            </ul>
+          </div>
+          <div>
+            <h6 className="text-blue-300 font-medium mb-2">Especificaciones:</h6>
+            <ul className="text-blue-200 text-sm space-y-1">
+              <li>• <strong>Formatos:</strong> JPG, PNG, GIF</li>
+              <li>• <strong>Tamaño máximo:</strong> 5MB por imagen</li>
+              <li>• <strong>Banner recomendado:</strong> 1600x1000px (16:10)</li>
+              <li>• <strong>Límite adicionales:</strong> 10 imágenes máximo</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

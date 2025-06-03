@@ -39,25 +39,42 @@ const ModDetails = () => {
     loading: userLoading 
   } = useUserModsStatus();
 
-  // Array dinámico de imágenes que incluye la imagen principal del mod
+  // Array dinámico de imágenes que incluye la imagen banner y las imágenes adicionales del mod
   const imagenesCarrusel = useMemo(() => {
-    const imagenesPorDefecto = [
-      'https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80',
-      'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2126&q=80',
-      'https://images.unsplash.com/photo-1585504198199-20277593b94f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2079&q=80',
-      'https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80'
-    ];
-
-    // Si el mod tiene imagen de banner, la incluimos al principio
+    const imagenes = [];
+    
+    // Agregar la imagen del banner si existe
     if (mod?.imagen_banner) {
       const bannerUrl = `http://localhost:8000/storage/${mod.imagen_banner}`;
-      return [bannerUrl, ...imagenesPorDefecto];
+      imagenes.push(bannerUrl);
     }
     
-    return imagenesPorDefecto;
-  }, [mod?.imagen_banner]);
+    // Agregar las imágenes adicionales si existen
+    if (mod?.imagenes_adicionales) {
+      try {
+        // Las imágenes adicionales pueden venir como string JSON o como array
+        const imagenesAdicionales = typeof mod.imagenes_adicionales === 'string' 
+          ? JSON.parse(mod.imagenes_adicionales) 
+          : mod.imagenes_adicionales;
+          
+        if (Array.isArray(imagenesAdicionales)) {
+          imagenesAdicionales.forEach(imagen => {
+            const imageUrl = `http://localhost:8000/storage/${imagen}`;
+            imagenes.push(imageUrl);
+          });
+        }
+      } catch (error) {
+        console.error('Error al procesar imágenes adicionales:', error);
+      }
+    }
+    
+    // Si no hay imágenes, agregar una imagen placeholder
+    if (imagenes.length === 0) {
+      imagenes.push('/images/mod-placeholder.jpg');
+    }
+    
+    return imagenes;
+  }, [mod?.imagen_banner, mod?.imagenes_adicionales]);
   
   // Verificar si el mod está guardado y si es propietario
   const isGuardado = isSaved(id);
@@ -254,10 +271,12 @@ const ModDetails = () => {
     navigate(`/mods/editar/${mod.id}`);
   };
 
-  // Calcular las imágenes visibles (siempre 5)
+  // Calcular las imágenes visibles (mostrar todas las disponibles, máximo 5)
   const getVisibleImages = () => {
     const visibleImages = [];
-    for (let i = 0; i < 5; i++) {
+    const maxVisibleImages = Math.min(5, imagenesCarrusel.length);
+    
+    for (let i = 0; i < maxVisibleImages; i++) {
       const index = currentImageIndex + i;
       if (index < imagenesCarrusel.length) {
         visibleImages.push({
@@ -270,8 +289,9 @@ const ModDetails = () => {
   };
 
   // Verificar si se puede navegar
+  const maxVisibleAtOnce = Math.min(5, imagenesCarrusel.length);
   const canGoPrev = currentImageIndex > 0;
-  const canGoNext = currentImageIndex < imagenesCarrusel.length - 5;
+  const canGoNext = currentImageIndex < imagenesCarrusel.length - maxVisibleAtOnce;
 
   // Funciones de navegación no infinitas
   const handlePrev = () => {
@@ -514,19 +534,21 @@ const ModDetails = () => {
           </div>
         </div>
 
-        {/* Galería y detalles del mod - Solo mostrar si hay 5 o más imágenes */}
-        {imagenesCarrusel.length >= 5 && (
+        {/* Galería y detalles del mod - Mostrar si hay al menos 1 imagen */}
+        {imagenesCarrusel.length >= 1 && (
           <div className="mod-gallery-section">
             <div className="mod-gallery-carousel">
               <div className="carousel-container">
-                {/* Botón anterior */}
-                <button 
-                  className="carousel-nav-btn prev" 
-                  onClick={handlePrev}
-                  disabled={!canGoPrev}
-                >
-                  <i className="fas fa-chevron-left"></i>
-                </button>
+                {/* Botón anterior - solo mostrar si se puede navegar hacia atrás */}
+                {canGoPrev && (
+                  <button 
+                    className="carousel-nav-btn prev" 
+                    onClick={handlePrev}
+                    disabled={!canGoPrev}
+                  >
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                )}
 
                 {/* Galería horizontal */}
                 <div className="gallery-horizontal">
@@ -537,10 +559,11 @@ const ModDetails = () => {
                         className={`gallery-image-item`}
                       >
                         <img src={image.src} alt={`Imagen ${index + 1}`} />
-                        {/* Solo mostrar el contador en la imagen del centro (índice 2) */}
-                        {index === 2 && (
+                        {/* Mostrar el contador en la imagen del centro o en la primera si hay pocas imágenes */}
+                        {((imagenesCarrusel.length > 1 && index === Math.floor(getVisibleImages().length / 2)) || 
+                          (imagenesCarrusel.length === 1 && index === 0)) && (
                           <div className="image-counter-overlay">
-                            {imagenesCarrusel.length} imágenes
+                            {imagenesCarrusel.length} {imagenesCarrusel.length === 1 ? 'imagen' : 'imágenes'}
                           </div>
                         )}
                       </div>
@@ -548,14 +571,16 @@ const ModDetails = () => {
                   </div>
                 </div>
 
-                {/* Botón siguiente */}
-                <button 
-                  className="carousel-nav-btn next" 
-                  onClick={handleNext}
-                  disabled={!canGoNext}
-                >
-                  <i className="fas fa-chevron-right"></i>
-                </button>
+                {/* Botón siguiente - solo mostrar si se puede navegar hacia adelante */}
+                {canGoNext && (
+                  <button 
+                    className="carousel-nav-btn next" 
+                    onClick={handleNext}
+                    disabled={!canGoNext}
+                  >
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                )}
               </div>
             </div>
           </div>

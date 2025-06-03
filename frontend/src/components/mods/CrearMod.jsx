@@ -132,6 +132,28 @@ const CrearMod = () => {
   const [loadingTags, setLoadingTags] = useState(false);
   const [errorTags, setErrorTags] = useState(null);
   
+  // Estados para manejo de imágenes adicionales (como en EditModAdmin)
+  const [selectedAdditionalFiles, setSelectedAdditionalFiles] = useState([]);
+  const [additionalPreviewUrls, setAdditionalPreviewUrls] = useState([]);
+  const [uploadingAdditionalImages, setUploadingAdditionalImages] = useState(false);
+  
+  // Efecto de limpieza para evitar memory leaks con las URLs de preview
+  useEffect(() => {
+    return () => {
+      // Limpiar URLs de preview al desmontar el componente
+      additionalPreviewUrls.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+      
+      // Limpiar URL de imagen principal si existe
+      if (formData.imagenPreview && formData.imagenPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(formData.imagenPreview);
+      }
+    };
+  }, [additionalPreviewUrls, formData.imagenPreview]);
+  
   // Función para cargar opciones iniciales de juegos (mejorado desde EditModAdmin)
   useEffect(() => {
     const loadInitialGames = async () => {
@@ -386,46 +408,106 @@ const CrearMod = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // Manejador para la carga de imágenes adicionales
+  // Función mejorada para manejo de imágenes adicionales (como en EditModAdmin)
   const handleAdditionalImagesUpload = (e) => {
     const files = Array.from(e.target.files);
     
     if (files.length === 0) return;
     
+    console.log('=== SUBIR IMÁGENES ADICIONALES CREARMOD ===');
+    console.log('Archivos seleccionados:', files.length);
+    
+    // Validar cada archivo
     const validFiles = [];
     const errors = [];
     
     files.forEach((file, index) => {
+      console.log(`Procesando archivo ${index + 1}:`, file.name, file.type, file.size);
+      
+      // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
         errors.push(`Archivo ${index + 1}: No es una imagen válida`);
         return;
       }
       
-      if (file.size > 2 * 1024 * 1024) {
-        errors.push(`Archivo ${index + 1}: Tamaño mayor a 2MB`);
+      // Validar tamaño (máximo 5MB como en EditModAdmin)
+      if (file.size > 5 * 1024 * 1024) {
+        errors.push(`Archivo ${index + 1}: Tamaño mayor a 5MB`);
         return;
       }
       
       validFiles.push(file);
     });
     
+    console.log('Archivos válidos:', validFiles.length);
+    console.log('Errores encontrados:', errors);
+    
+    // Mostrar errores si los hay
     if (errors.length > 0) {
       setSubmitError(errors.join(', '));
     }
     
+    // Si hay archivos válidos, procesarlos
     if (validFiles.length > 0) {
+      // Agregar a los archivos seleccionados
+      setSelectedAdditionalFiles(prev => [...prev, ...validFiles]);
+      
+      // También agregar al formData para compatibilidad con la lógica existente
       setFormData(prev => ({
         ...prev,
         imagenesAdicionalesFiles: [...prev.imagenesAdicionalesFiles, ...validFiles]
       }));
+      
+      // Crear previews para los nuevos archivos
+      const newPreviews = validFiles.map(file => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+      });
+      
+      Promise.all(newPreviews).then(previews => {
+        console.log('Previews creados:', previews.length);
+        setAdditionalPreviewUrls(prev => [...prev, ...previews]);
+      });
+      
+      // Limpiar errores si fue exitoso
+      if (submitError) {
+        setSubmitError(null);
+      }
+      
+      console.log(`${validFiles.length} imagen(es) adicional(es) agregada(s) exitosamente`);
     }
   };
 
-  // Función para eliminar imagen adicional
+  // Función mejorada para eliminar imagen adicional
   const removeAdditionalImage = (index) => {
+    console.log(`Eliminando imagen adicional en índice: ${index}`);
+    
+    // Eliminar del estado de archivos seleccionados
+    setSelectedAdditionalFiles(prev => prev.filter((_, i) => i !== index));
+    
+    // Eliminar de las URLs de preview
+    setAdditionalPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    
+    // Mantener compatibilidad con la lógica existente
     setFormData(prev => ({
       ...prev,
       imagenesAdicionalesFiles: prev.imagenesAdicionalesFiles.filter((_, i) => i !== index)
+    }));
+    
+    console.log(`Imagen adicional ${index + 1} eliminada correctamente`);
+  };
+
+  // Función para limpiar todas las imágenes adicionales seleccionadas
+  const clearSelectedAdditionalImages = () => {
+    console.log('Limpiando todas las imágenes adicionales seleccionadas');
+    setSelectedAdditionalFiles([]);
+    setAdditionalPreviewUrls([]);
+    setFormData(prev => ({
+      ...prev,
+      imagenesAdicionalesFiles: []
     }));
   };
 
@@ -960,73 +1042,130 @@ const CrearMod = () => {
         <div className="bg-gray-700 rounded-lg p-6">
           <h5 className="text-white font-medium mb-4">Imágenes Adicionales (Opcional)</h5>
           
+          {/* Mostrar imágenes seleccionadas si las hay */}
+          {selectedAdditionalFiles && selectedAdditionalFiles.length > 0 && (
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-300 mb-3">
+                Imágenes Seleccionadas ({selectedAdditionalFiles.length}):
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {additionalPreviewUrls.map((previewUrl, index) => {
+                  console.log(`Renderizando preview imagen adicional ${index + 1}:`, previewUrl);
+                  
+                  return (
+                    <div key={index} className="relative">
+                      <img
+                        src={previewUrl}
+                        alt={`Nueva imagen ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border border-gray-600"
+                        onError={(e) => {
+                          console.error(`Error cargando preview imagen ${index + 1}:`, previewUrl);
+                          e.target.style.display = 'none';
+                          const fallback = e.target.parentElement.querySelector('.no-image-fallback');
+                          if (fallback) {
+                            fallback.style.display = 'flex';
+                          }
+                        }}
+                        onLoad={(e) => {
+                          console.log(`Preview imagen ${index + 1} cargada correctamente`);
+                        }}
+                      />
+                      <div className="no-image-fallback w-full h-24 bg-gray-600 rounded-lg border border-gray-500 border-dashed items-center justify-center hidden">
+                        <div className="text-center">
+                          <FontAwesomeIcon icon={faImage} className="text-gray-400 text-lg mb-1" />
+                          <p className="text-gray-400 text-xs">Error al cargar</p>
+                        </div>
+                      </div>
+                      <div className="absolute top-1 right-1">
+                        <button
+                          type="button"
+                          onClick={() => removeAdditionalImage(index)}
+                          className="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-xs transition-all"
+                        >
+                          <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <div className="absolute top-1 left-1">
+                        <span className="bg-green-500 text-white px-1 py-0.5 rounded text-xs">
+                          {index + 1}
+                        </span>
+                      </div>
+                      {selectedAdditionalFiles[index] && (
+                        <div className="absolute bottom-1 left-1 right-1">
+                          <div className="bg-black/70 text-white text-xs p-1 rounded truncate">
+                            {selectedAdditionalFiles[index].name}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Botón para limpiar selección */}
+              <div className="flex items-center justify-end mt-3">
+                <button
+                  type="button"
+                  onClick={clearSelectedAdditionalImages}
+                  className="text-red-400 hover:text-red-300 text-sm transition-colors"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="mr-1" />
+                  Limpiar Todas las Imágenes
+                </button>
+              </div>
+            </div>
+          )}
+          
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Agregar más imágenes
+                Agregar Imágenes Adicionales
               </label>
               <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
                 <FontAwesomeIcon icon={faImage} className="text-4xl text-gray-400 mb-3" />
                 <p className="text-gray-300 mb-2">Arrastra múltiples imágenes aquí o haz clic para seleccionar</p>
-                      <input
+                <input
                   type="file"
                   id="imagenes-adicionales-upload"
                   accept="image/*"
                   multiple
                   onChange={handleAdditionalImagesUpload}
                   className="hidden"
+                  disabled={uploadingAdditionalImages}
                 />
                 <label
                   htmlFor="imagenes-adicionales-upload"
-                  className="cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block"
+                  className={`cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${
+                    uploadingAdditionalImages ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
                   <FontAwesomeIcon icon={faImage} className="mr-2" />
                   Seleccionar Imágenes
                 </label>
                 <p className="text-xs text-gray-400 mt-2">
-                  Capturas de pantalla, galería de imágenes. Formatos: JPG, PNG, GIF. Máximo: 2MB cada una
+                  Capturas de pantalla, galería de imágenes. Formatos: JPG, PNG, GIF. Máximo: 5MB cada una
                 </p>
               </div>
             </div>
             
-            {/* Previsualización de imágenes adicionales */}
-            {formData.imagenesAdicionalesFiles.length > 0 && (
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-300 mb-3">
-                  Imágenes Adicionales ({formData.imagenesAdicionalesFiles.length}):
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {formData.imagenesAdicionalesFiles.map((file, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Imagen adicional ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border border-gray-600"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeAdditionalImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-xs"
-                      >
-                        <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Eliminar la sección antigua de previsualización ya que ahora se muestra arriba */}
           </div>
         </div>
 
         {/* Información sobre imágenes */}
         <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4 mt-6">
-          <h5 className="text-blue-400 font-medium mb-2">Información sobre Imágenes</h5>
+          <div className="flex items-center space-x-2 mb-2">
+            <FontAwesomeIcon icon={faImage} className="text-blue-400" />
+            <h5 className="text-blue-400 font-medium">Información sobre Imágenes</h5>
+          </div>
           <ul className="text-blue-300 text-sm space-y-1">
-            <li>• <strong>Imagen Principal:</strong> Imagen principal que aparece en listas y páginas de detalle</li>
-            <li>• <strong>Imágenes Adicionales:</strong> Galería de capturas de pantalla y contenido visual extra</li>
-            <li>• Se recomienda usar una relación de aspecto 16:9 para la imagen principal (ej: 1920x1080px)</li>
+            <li>• <strong>Imagen Principal:</strong> Imagen principal que aparece en listas y páginas de detalle (Obligatoria)</li>
+            <li>• <strong>Imágenes Adicionales:</strong> Galería de capturas de pantalla y contenido visual extra (Opcional)</li>
+            <li>• Se recomienda usar una relación de aspecto 16:10 para la imagen principal (ej: 1600x1000px)</li>
             <li>• Formatos soportados: JPG, PNG, GIF</li>
-            <li>• Tamaño máximo: 2MB por imagen</li>
+            <li>• Tamaño máximo: 2MB imagen principal, 5MB imágenes adicionales</li>
+            <li>• Las imágenes se optimizarán automáticamente para diferentes dispositivos</li>
+            <li>• Puedes agregar hasta 10 imágenes adicionales</li>
           </ul>
         </div>
       </div>

@@ -104,7 +104,7 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
   const modUrl = `/mods/${mod.id}`;
 
   // Construir la URL completa de la imagen siguiendo el patrón del proyecto
-  const imageUrl = mod.imagen_banner ? `http://localhost:8000/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg';
+  const imageUrl = mod.imagen || (mod.imagen_banner ? `http://localhost:8000/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg');
 
   return (
     <div className="bg-custom-card rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-custom-detail/10">

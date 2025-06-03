@@ -63,7 +63,7 @@ const GameDetails = () => {
         setMods(response.data.map(mod => ({
           id: mod.id,
           titulo: mod.titulo,
-          imagen: mod.imagen_banner ? `/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
+          imagen: mod.imagen_banner ? `http://localhost:8000/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
           juego: { titulo: mod.juego?.titulo || 'Juego desconocido' },
           categoria: mod.etiquetas?.[0]?.nombre || 'General',
           etiquetas: mod.etiquetas || [],

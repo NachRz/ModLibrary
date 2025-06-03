@@ -26,6 +26,13 @@ Route::middleware('auth:sanctum')->get('/user/is-admin', [AuthController::class,
 // Ruta para subir imágenes de perfil (disponible para usuarios autenticados)
 Route::middleware('auth:sanctum')->post('/upload/profile-image', [AuthController::class, 'uploadProfileImage']);
 
+// Ruta para subir imagen banner de mods (disponible para usuarios autenticados)
+Route::middleware('auth:sanctum')->post('/upload/mod-banner', [AuthController::class, 'uploadModBanner']);
+
+// Rutas para subir y eliminar imágenes adicionales de mods (disponible para usuarios autenticados)
+Route::middleware('auth:sanctum')->post('/upload/mod-additional-images', [AuthController::class, 'uploadModAdditionalImages']);
+Route::middleware('auth:sanctum')->delete('/upload/mod-additional-image', [AuthController::class, 'deleteModAdditionalImage']);
+
 // Rutas de administración (requieren middleware admin)
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     // Gestión de usuarios

@@ -338,6 +338,49 @@ const modService = {
       throw new Error('Error al eliminar mod definitivamente');
     }
   },
+
+  // Subir imagen banner del mod (copiado del uploadProfileImage del adminService)
+  uploadBannerImage: async (formData) => {
+    try {
+      const response = await apiClient.post('/upload/mod-banner', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al subir la imagen banner' };
+    }
+  },
+
+  // Subir imágenes adicionales del mod
+  uploadAdditionalImages: async (formData) => {
+    try {
+      const response = await apiClient.post('/upload/mod-additional-images', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al subir las imágenes adicionales' };
+    }
+  },
+
+  // Eliminar imagen adicional específica del mod
+  deleteAdditionalImage: async (modId, imagenRuta) => {
+    try {
+      const response = await apiClient.delete('/upload/mod-additional-image', {
+        data: {
+          mod_id: modId,
+          imagen_ruta: imagenRuta
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al eliminar la imagen adicional' };
+    }
+  },
 };
 
 export default modService; 

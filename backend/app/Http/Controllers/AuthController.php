@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -723,6 +725,253 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al obtener estadísticas del usuario'
+            ], 500);
+        }
+    }
+
+    // Subir imagen banner para mod (copiado del uploadProfileImage)
+    public function uploadModBanner(Request $request)
+    {
+        try {
+            $request->validate([
+                'imagen_banner' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB máximo
+                'mod_id' => 'required|integer|exists:mods,id'
+            ]);
+
+            $image = $request->file('imagen_banner');
+            $modId = $request->input('mod_id');
+            
+            // Verificar que el usuario tenga permisos para subir imagen del mod
+            $mod = \App\Models\Mod::findOrFail($modId);
+            $currentUser = $request->user();
+            
+            // Solo el creador del mod o un admin pueden subir la imagen banner
+            if ($mod->creador_id !== $currentUser->id && $currentUser->rol !== 'admin') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No tienes permisos para subir imagen de este mod'
+                ], 403);
+            }
+            
+            // Sanitizar el nombre del mod para usarlo como nombre de carpeta
+            $nombreModSanitizado = preg_replace('/[^a-zA-Z0-9_\-\s]/', '', $mod->titulo);
+            $nombreModSanitizado = preg_replace('/\s+/', '_', trim($nombreModSanitizado));
+            $nombreModSanitizado = strtolower($nombreModSanitizado);
+            
+            // Crear estructura de carpetas: mods/{nombre_mod}/banners/
+            $modFolder = "mods/{$nombreModSanitizado}/banners";
+            $uploadPath = storage_path("app/public/{$modFolder}");
+            
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            // Eliminar imagen banner anterior si existe
+            if ($mod->imagen_banner && Storage::exists('public/' . $mod->imagen_banner)) {
+                Storage::delete('public/' . $mod->imagen_banner);
+            }
+            
+            // Generar nombre de archivo: banner_timestamp.extension
+            $extension = $image->getClientOriginalExtension();
+            $nombreArchivo = 'banner_' . time() . '.' . $extension;
+            
+            // Mover archivo a la carpeta correcta
+            $image->move($uploadPath, $nombreArchivo);
+            
+            // Ruta relativa para guardar en la base de datos
+            $relativeImagePath = "{$modFolder}/{$nombreArchivo}";
+            
+            // Actualizar la imagen banner del mod en la base de datos
+            $mod->update(['imagen_banner' => $relativeImagePath]);
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Imagen banner subida correctamente',
+                'data' => [
+                    'url' => $relativeImagePath,
+                    'filename' => $nombreArchivo,
+                    'imagen_banner' => $relativeImagePath
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al subir imagen banner del mod', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'mod_id' => $request->input('mod_id')
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al subir la imagen banner: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Subir imágenes adicionales para mod
+    public function uploadModAdditionalImages(Request $request)
+    {
+        try {
+            $request->validate([
+                'imagenes_adicionales' => 'required|array|min:1|max:10', // Máximo 10 imágenes
+                'imagenes_adicionales.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB máximo cada una
+                'mod_id' => 'required|integer|exists:mods,id'
+            ]);
+
+            $images = $request->file('imagenes_adicionales');
+            $modId = $request->input('mod_id');
+            
+            // Verificar que el usuario tenga permisos para subir imágenes del mod
+            $mod = \App\Models\Mod::findOrFail($modId);
+            $currentUser = $request->user();
+            
+            // Solo el creador del mod o un admin pueden subir imágenes adicionales
+            if ($mod->creador_id !== $currentUser->id && $currentUser->rol !== 'admin') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No tienes permisos para subir imágenes de este mod'
+                ], 403);
+            }
+            
+            // Sanitizar el nombre del mod para usarlo como nombre de carpeta
+            $nombreModSanitizado = preg_replace('/[^a-zA-Z0-9_\-\s]/', '', $mod->titulo);
+            $nombreModSanitizado = preg_replace('/\s+/', '_', trim($nombreModSanitizado));
+            $nombreModSanitizado = strtolower($nombreModSanitizado);
+            
+            // Crear estructura de carpetas: mods/{nombre_mod}/imagenes_adicionales/
+            $modFolder = "mods/{$nombreModSanitizado}/imagenes_adicionales";
+            $uploadPath = storage_path("app/public/{$modFolder}");
+            
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
+            // Procesar cada imagen
+            $uploadedImages = [];
+            $timestamp = time();
+            
+            foreach ($images as $index => $image) {
+                // Generar nombre de archivo único: adicional_{timestamp}_{index}.extension
+                $extension = $image->getClientOriginalExtension();
+                $nombreArchivo = "adicional_{$timestamp}_{$index}.{$extension}";
+                
+                // Mover archivo a la carpeta correcta
+                $image->move($uploadPath, $nombreArchivo);
+                
+                // Ruta relativa para guardar en la base de datos
+                $relativeImagePath = "{$modFolder}/{$nombreArchivo}";
+                $uploadedImages[] = $relativeImagePath;
+            }
+            
+            // Obtener imágenes adicionales existentes
+            $imagenesExistentes = [];
+            if ($mod->imagenes_adicionales) {
+                if (is_string($mod->imagenes_adicionales)) {
+                    $imagenesExistentes = json_decode($mod->imagenes_adicionales, true) ?: [];
+                } elseif (is_array($mod->imagenes_adicionales)) {
+                    $imagenesExistentes = $mod->imagenes_adicionales;
+                }
+            }
+            
+            // Combinar imágenes existentes con las nuevas
+            $todasLasImagenes = array_merge($imagenesExistentes, $uploadedImages);
+            
+            // Actualizar las imágenes adicionales del mod en la base de datos
+            $mod->update(['imagenes_adicionales' => json_encode($todasLasImagenes)]);
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Imágenes adicionales subidas correctamente',
+                'data' => [
+                    'imagenes_subidas' => $uploadedImages,
+                    'total_imagenes_subidas' => count($uploadedImages),
+                    'todas_las_imagenes' => $todasLasImagenes,
+                    'total_imagenes' => count($todasLasImagenes)
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al subir imágenes adicionales del mod', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'mod_id' => $request->input('mod_id')
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al subir las imágenes adicionales: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Eliminar imagen adicional específica del mod
+    public function deleteModAdditionalImage(Request $request)
+    {
+        try {
+            $request->validate([
+                'mod_id' => 'required|integer|exists:mods,id',
+                'imagen_ruta' => 'required|string'
+            ]);
+
+            $modId = $request->input('mod_id');
+            $imagenRuta = $request->input('imagen_ruta');
+            
+            // Verificar que el usuario tenga permisos
+            $mod = \App\Models\Mod::findOrFail($modId);
+            $currentUser = $request->user();
+            
+            if ($mod->creador_id !== $currentUser->id && $currentUser->rol !== 'admin') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No tienes permisos para eliminar imágenes de este mod'
+                ], 403);
+            }
+            
+            // Obtener imágenes adicionales existentes
+            $imagenesExistentes = [];
+            if ($mod->imagenes_adicionales) {
+                if (is_string($mod->imagenes_adicionales)) {
+                    $imagenesExistentes = json_decode($mod->imagenes_adicionales, true) ?: [];
+                } elseif (is_array($mod->imagenes_adicionales)) {
+                    $imagenesExistentes = $mod->imagenes_adicionales;
+                }
+            }
+            
+            // Buscar y eliminar la imagen de la lista
+            $nuevasImagenes = array_filter($imagenesExistentes, function($imagen) use ($imagenRuta) {
+                return $imagen !== $imagenRuta;
+            });
+            
+            // Verificar que la imagen existía en la lista
+            if (count($nuevasImagenes) === count($imagenesExistentes)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'La imagen especificada no existe en este mod'
+                ], 404);
+            }
+            
+            // Eliminar archivo físico del almacenamiento
+            if (Storage::exists('public/' . $imagenRuta)) {
+                Storage::delete('public/' . $imagenRuta);
+            }
+            
+            // Actualizar la base de datos
+            $mod->update(['imagenes_adicionales' => json_encode(array_values($nuevasImagenes))]);
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Imagen eliminada correctamente',
+                'data' => [
+                    'imagenes_restantes' => array_values($nuevasImagenes),
+                    'total_imagenes' => count($nuevasImagenes)
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar imagen adicional del mod', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'mod_id' => $request->input('mod_id'),
+                'imagen_ruta' => $request->input('imagen_ruta')
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al eliminar la imagen: ' . $e->getMessage()
             ], 500);
         }
     }

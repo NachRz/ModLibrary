@@ -20,7 +20,7 @@ const ModsGuardados = () => {
         setSavedMods(response.data.map(mod => ({
           id: mod.id,
           titulo: mod.titulo,
-          imagen: mod.imagen_banner ? `/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
+          imagen: mod.imagen_banner ? `http://localhost:8000/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
           juego: mod.juego || { titulo: 'Juego no especificado' },
           categoria: mod.etiquetas?.[0]?.nombre || 'Sin categoría',
           etiquetas: mod.etiquetas || [],

@@ -44,23 +44,23 @@ const MisMods = () => {
     fetchMyMods();
   }, []);
 
-  // Función para formatear los datos del mod
+  // Función auxiliar para formatear los datos del mod
   const formatModData = (mod) => ({
     id: mod.id,
     titulo: mod.titulo,
-    juego: mod.juego?.titulo || 'Juego desconocido',
+    imagen: mod.imagen_banner ? `http://localhost:8000/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
+    juego: mod.juego || { titulo: 'Juego no especificado' },
+    categoria: mod.etiquetas?.[0]?.nombre || 'Sin categoría',
+    etiquetas: mod.etiquetas || [],
     autor: mod.creador?.nome || 'Anónimo',
     creador_id: mod.creador_id,
     descargas: mod.total_descargas || 0,
-    valoracion: mod.val_media || 0,
-    numValoraciones: mod.num_valoraciones || 0,
-    categoria: mod.etiquetas?.[0]?.nombre || 'General',
-    imagen: mod.imagen_banner ? `/storage/${mod.imagen_banner}` : '/images/mod-placeholder.jpg',
+    valoracion: mod.valoracion || 0,
+    numValoraciones: mod.numValoraciones || 0,
     descripcion: mod.descripcion || '',
+    fecha: mod.fecha_creacion || mod.created_at,
     estado: mod.estado || 'publicado',
-    url: mod.url,
-    is_deleted: mod.is_deleted || false,
-    deleted_at: mod.deleted_at
+    is_deleted: mod.is_deleted || false
   });
 
   // Manejar la eliminación del mod (soft delete)
