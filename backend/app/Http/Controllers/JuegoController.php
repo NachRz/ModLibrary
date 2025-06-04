@@ -55,10 +55,16 @@ class JuegoController extends Controller
 
     public function index()
     {
-        $juegos = Juego::with('generos')->select([
-            'id', 'titulo', 'imagen_fondo', 'mods_totales',
-            'rating', 'fecha_lanzamiento'
-        ])->get();
+        $juegos = Juego::with('generos')
+            ->select([
+                'id', 'titulo', 'imagen_fondo', 'mods_totales',
+                'rating', 'fecha_lanzamiento'
+            ])
+            ->whereHas('mods', function ($query) {
+                $query->where('estado', 'publicado')
+                      ->whereNull('deleted_at');
+            })
+            ->get();
         
         return response()->json([
             'status' => 'success',

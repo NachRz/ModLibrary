@@ -62,15 +62,37 @@ let gamesCache = {
   isFetching: false
 };
 
-// Tiempo de expiración de la caché en milisegundos (5 minutos)
-const CACHE_EXPIRATION = 5 * 60 * 1000;
+// Tiempo de expiración de la caché en milisegundos (5 segundos para desarrollo)
+const CACHE_EXPIRATION = 5 * 1000;
 
 const gameService = {
-  // Obtener todos los juegos
-  getAllGames: async () => {
+  // Limpiar toda la caché
+  clearCache: () => {
+    gamesCache = {
+      allGames: [],
+      gameDetails: {},
+      lastFetched: null,
+      isFetching: false
+    };
+  },
+
+  // Invalidar caché de todos los juegos
+  invalidateAllGamesCache: () => {
+    gamesCache.allGames = [];
+    gamesCache.lastFetched = null;
+  },
+
+  // Obtener todos los juegos (versión con opción de forzar actualización)
+  getAllGames: async (forceRefresh = false) => {
     try {
-      // Verificar si hay datos en caché y si son válidos
+      // Si se fuerza la actualización, invalidar caché
+      if (forceRefresh) {
+        gameService.invalidateAllGamesCache();
+      }
+
+      // Verificar si hay datos en caché y si son válidos (solo si no se fuerza refresh)
       if (
+        !forceRefresh &&
         gamesCache.allGames.length > 0 &&
         gamesCache.lastFetched &&
         Date.now() - gamesCache.lastFetched < CACHE_EXPIRATION
@@ -78,7 +100,14 @@ const gameService = {
         return gamesCache.allGames;
       }
 
-      const response = await apiClient.get('/juegos');
+      // Agregar headers para evitar caché del navegador
+      const response = await apiClient.get('/juegos', {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
       
       if (response.data.status === 'success') {
         gamesCache.allGames = response.data.data;
@@ -250,16 +279,6 @@ const gameService = {
       console.error('Error en syncGame:', error);
       throw error.response?.data || { message: 'Error al sincronizar el juego' };
     }
-  },
-
-  // Limpiar caché
-  clearCache: () => {
-    gamesCache = {
-      allGames: [],
-      gameDetails: {},
-      lastFetched: null,
-      isFetching: false
-    };
   },
 
   // Buscar juegos en RAWG directamente

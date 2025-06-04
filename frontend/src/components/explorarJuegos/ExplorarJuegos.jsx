@@ -43,12 +43,12 @@ const ExplorarJuegos = () => {
   }, []);
 
   // Cargar juegos desde la base de datos
-  const cargarJuegos = useCallback(async () => {
+  const cargarJuegos = useCallback(async (forceRefresh = false) => {
     try {
       setCargando(true);
       setError(null);
       
-      const response = await gameService.getAllGames();
+      const response = await gameService.getAllGames(forceRefresh);
       setJuegos(response.map(game => ({
         id: game.id,
         titulo: game.titulo,
@@ -69,10 +69,39 @@ const ExplorarJuegos = () => {
     }
   }, []);
 
+  // Función para refrescar datos
+  const handleRefresh = () => {
+    cargarJuegos(true);
+  };
+
   useEffect(() => {
     cargarGeneros();
-    cargarJuegos();
+    cargarJuegos(true); // Siempre hacer refresh inicial
   }, [cargarGeneros, cargarJuegos]);
+
+  // Auto-actualizar cuando el usuario vuelve a la pestaña
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Solo actualizar si han pasado más de 10 segundos desde la última carga
+        const now = Date.now();
+        const lastFetch = localStorage.getItem('explorarJuegos_lastFetch');
+        if (!lastFetch || now - parseInt(lastFetch) > 10000) {
+          cargarJuegos(true);
+          localStorage.setItem('explorarJuegos_lastFetch', now.toString());
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Establecer marca de tiempo inicial
+    localStorage.setItem('explorarJuegos_lastFetch', Date.now().toString());
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [cargarJuegos]);
 
   // Efecto para animar el contador de resultados
   useEffect(() => {
@@ -405,7 +434,7 @@ const ExplorarJuegos = () => {
                   </p>
                   <button
                     className="mt-4 px-6 py-2.5 bg-custom-primary hover:bg-custom-primary-hover text-white font-medium rounded-md transition-colors"
-                    onClick={cargarJuegos}
+                    onClick={handleRefresh}
                   >
                     Reintentar
                   </button>

@@ -105,6 +105,9 @@ class GeneroController extends Controller
         $perPage = $request->get('per_page', 20);
 
         $juegos = $genero->juegos()
+            ->whereHas('mods', function($query) {
+                $query->where('estado', 'publicado')->whereNull('deleted_at');
+            })
             ->with(['mods' => function($query) {
                 $query->where('estado', 'publicado')->whereNull('deleted_at');
             }])
@@ -135,6 +138,11 @@ class GeneroController extends Controller
                 $q->whereIn('generos.id', $generosIds);
             });
         }
+
+        // Solo incluir juegos que tengan al menos un mod publicado
+        $query->whereHas('mods', function($q) {
+            $q->where('estado', 'publicado')->whereNull('deleted_at');
+        });
 
         // Incluir relaciones
         $query->with(['generos', 'mods' => function($q) {

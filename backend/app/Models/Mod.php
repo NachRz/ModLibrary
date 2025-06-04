@@ -41,28 +41,55 @@ class Mod extends Model
 
         // Al crear un nuevo mod
         static::created(function ($mod) {
-            if ($mod->juego) {
+            if ($mod->juego && $mod->estado === 'publicado') {
                 $mod->juego->incrementarModsTotales();
             }
         });
 
-        // Al eliminar un mod
+        // Al eliminar un mod (soft delete)
         static::deleted(function ($mod) {
-            if ($mod->juego) {
+            if ($mod->juego && $mod->estado === 'publicado') {
                 $mod->juego->decrementarModsTotales();
             }
         });
 
-        // Al actualizar un mod (por si cambia el juego)
+        // Al restaurar un mod desde soft delete
+        static::restored(function ($mod) {
+            if ($mod->juego && $mod->estado === 'publicado') {
+                $mod->juego->incrementarModsTotales();
+            }
+        });
+
+        // Al actualizar un mod
         static::updated(function ($mod) {
+            // Si cambió el juego
             if ($mod->isDirty('juego_id')) {
-                // Decrementar el contador del juego anterior
-                if ($mod->getOriginal('juego_id')) {
+                // Decrementar el contador del juego anterior si el mod estaba publicado
+                if ($mod->getOriginal('juego_id') && $mod->getOriginal('estado') === 'publicado') {
                     Juego::find($mod->getOriginal('juego_id'))?->decrementarModsTotales();
                 }
-                // Incrementar el contador del nuevo juego
-                if ($mod->juego_id) {
+                // Incrementar el contador del nuevo juego si el mod está publicado
+                if ($mod->juego_id && $mod->estado === 'publicado') {
                     Juego::find($mod->juego_id)?->incrementarModsTotales();
+                }
+            }
+            
+            // Si cambió el estado
+            if ($mod->isDirty('estado')) {
+                $estadoAnterior = $mod->getOriginal('estado');
+                $estadoActual = $mod->estado;
+                
+                // Si pasó de publicado a borrador
+                if ($estadoAnterior === 'publicado' && $estadoActual === 'borrador') {
+                    if ($mod->juego) {
+                        $mod->juego->decrementarModsTotales();
+                    }
+                }
+                // Si pasó de borrador a publicado
+                elseif ($estadoAnterior === 'borrador' && $estadoActual === 'publicado') {
+                    if ($mod->juego) {
+                        $mod->juego->incrementarModsTotales();
+                    }
                 }
             }
         });

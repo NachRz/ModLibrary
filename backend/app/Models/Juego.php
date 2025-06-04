@@ -81,7 +81,10 @@ class Juego extends Model
      */
     public function recalcularModsTotales(): void
     {
-        $this->mods_totales = $this->mods()->count();
+        $this->mods_totales = $this->mods()
+            ->where('estado', 'publicado')
+            ->whereNull('deleted_at')
+            ->count();
         $this->save();
     }
 
