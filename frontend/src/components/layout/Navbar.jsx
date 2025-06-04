@@ -377,79 +377,182 @@ const Navbar = () => {
       </div>
 
       {/* Menú móvil */}
-      <div className={`md:hidden transition-all duration-300 overflow-hidden ${isMobileMenuOpen ? 'max-h-screen' : 'max-h-0'}`}>
-        <div className="px-2 pt-2 pb-3 space-y-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                isActive(link.path)
-                  ? 'text-custom-text bg-custom-primary/15 border-l-4 border-custom-secondary'
-                  : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/5'
-              }`}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {link.name}
-            </Link>
-          ))}
-          
-          {/* Mi Panel con desplegable - versión móvil */}
-          {isLoggedIn && (
-            <>
-              <button
-                className={`flex justify-between items-center w-full px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                  location.pathname.startsWith('/dashboard')
-                    ? 'text-custom-text bg-custom-primary/15 border-l-4 border-custom-secondary'
-                    : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/5'
-                }`}
-                onClick={() => {
-                  togglePanelMenu();
-                  // Redireccionar al dashboard si no estamos ya allí
-                  if (!location.pathname.startsWith('/dashboard')) {
-                    window.location.href = '/dashboard';
-                  }
-                }}
-                aria-expanded={isPanelMenuOpen}
-              >
-                <span>Mi Panel</span>
-                <svg 
-                  className={`h-5 w-5 transition-transform duration-200 ${isPanelMenuOpen ? 'transform rotate-180' : ''}`} 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              <div className={`transition-all duration-200 overflow-hidden pl-4 ${isPanelMenuOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
-                {panelOptions.map(option => (
-                  <Link
-                    key={option.path}
-                    to={option.path}
-                    className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive(option.path)
-                        ? 'text-custom-text bg-custom-primary/10'
-                        : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/5'
-                    }`}
+      <div className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className="bg-gradient-to-b from-custom-card to-custom-card/95 backdrop-blur-sm border-t border-custom-detail/10">
+          <div className="px-4 pt-4 pb-6 space-y-2">
+            {/* Sección de perfil en móvil - solo si está logueado */}
+            {isLoggedIn && (
+              <div className="bg-custom-primary/5 rounded-xl p-4 mb-4 border border-custom-detail/10">
+                <div className="flex items-center mb-3">
+                  <div className="relative">
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-custom-primary to-custom-secondary flex items-center justify-center text-custom-text shadow-lg overflow-hidden ring-2 ring-custom-primary/20">
+                      {userData.foto_perfil && profileImageUrl ? (
+                        <img 
+                          src={profileImageUrl}
+                          alt={`Foto de perfil de ${userData.nome}`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-white font-bold text-base">
+                          {userData.nome.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-custom-card"></div>
+                  </div>
+                  <div className="flex-1 ml-3">
+                    <p className="text-base font-semibold text-custom-text leading-tight">{userData.nome}</p>
+                    <p className="text-xs text-custom-detail truncate mt-0.5">{userData.correo}</p>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-custom-secondary/20 text-custom-secondary capitalize mt-1">
+                      {userData.rol}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Opciones del perfil en móvil */}
+                <div className="grid grid-cols-3 gap-2">
+                  <Link 
+                    to="/dashboard" 
+                    className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {option.name}
+                    <svg className="h-5 w-5 mb-1 text-custom-primary group-hover:text-custom-secondary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                    <span className="text-xs font-medium text-custom-text">Panel</span>
                   </Link>
-                ))}
+                  <Link 
+                    to="/perfil" 
+                    className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <svg className="h-5 w-5 mb-1 text-custom-primary group-hover:text-custom-secondary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span className="text-xs font-medium text-custom-text">Perfil</span>
+                  </Link>
+                  <Link 
+                    to="/ajustes" 
+                    className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <svg className="h-5 w-5 mb-1 text-custom-primary group-hover:text-custom-secondary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="text-xs font-medium text-custom-text">Ajustes</span>
+                  </Link>
+                </div>
               </div>
-            </>
-          )}
-          
-          {isLoggedIn && (
-            <button 
-              onClick={handleLogout}
-              className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-custom-error hover:bg-custom-error/10 transition-colors"
-            >
-              Desconectar
-            </button>
-          )}
+            )}
+
+            {/* Enlaces de navegación principales */}
+            <div className="space-y-1">
+              <div className="text-xs font-semibold text-custom-detail uppercase tracking-wider px-3 py-2">
+                Navegación
+              </div>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
+                    isActive(link.path)
+                      ? 'text-custom-text bg-gradient-to-r from-custom-primary/20 to-custom-secondary/10 border-l-4 border-custom-secondary shadow-sm'
+                      : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/8 hover:translate-x-1'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span className="flex-1">{link.name}</span>
+                  <svg className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ))}
+            </div>
+            
+            {/* Mi Panel con desplegable - versión móvil */}
+            {isLoggedIn && (
+              <div className="space-y-1">
+                <div className="text-xs font-semibold text-custom-detail uppercase tracking-wider px-3 py-2 mt-4">
+                  Panel Personal
+                </div>
+                <button
+                  className={`flex justify-between items-center w-full px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
+                    location.pathname.startsWith('/dashboard')
+                      ? 'text-custom-text bg-gradient-to-r from-custom-primary/20 to-custom-secondary/10 border-l-4 border-custom-secondary shadow-sm'
+                      : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/8'
+                  }`}
+                  onClick={() => {
+                    togglePanelMenu();
+                    // Redireccionar al dashboard si no estamos ya allí
+                    if (!location.pathname.startsWith('/dashboard')) {
+                      window.location.href = '/dashboard';
+                    }
+                  }}
+                  aria-expanded={isPanelMenuOpen}
+                >
+                  <span>Mi Panel</span>
+                  <svg 
+                    className={`h-5 w-5 transition-all duration-300 ${isPanelMenuOpen ? 'transform rotate-180 text-custom-secondary' : 'text-custom-detail'}`} 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isPanelMenuOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <div className="pl-6 space-y-1">
+                    {panelOptions.map(option => (
+                      <Link
+                        key={option.path}
+                        to={option.path}
+                        className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          isActive(option.path)
+                            ? 'text-custom-secondary bg-custom-secondary/10 font-semibold'
+                            : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/5 hover:translate-x-1'
+                        }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <div className="h-1.5 w-1.5 rounded-full bg-current mr-3 opacity-60"></div>
+                        {option.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Botón de desconectar separado al final */}
+            {isLoggedIn && (
+              <div className="border-t border-custom-detail/10 pt-4 mt-6">
+                <button 
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center px-4 py-3 rounded-xl text-base font-medium text-custom-error bg-custom-error/5 hover:bg-custom-error/10 transition-all duration-200 border border-custom-error/20 hover:border-custom-error/30"
+                >
+                  <svg className="h-5 w-5 mr-3 text-custom-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Desconectar
+                </button>
+              </div>
+            )}
+
+            {/* Si no está logueado, mostrar botón de login */}
+            {!isLoggedIn && (
+              <div className="border-t border-custom-detail/10 pt-4 mt-6">
+                <Link 
+                  to="/login" 
+                  className="block px-4 py-3 rounded-xl text-base font-medium text-white bg-gradient-to-r from-custom-primary to-custom-secondary hover:from-custom-primary-hover hover:to-custom-secondary/90 transition-all duration-200 text-center shadow-lg transform hover:scale-[1.02]"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Iniciar Sesión
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </nav>
