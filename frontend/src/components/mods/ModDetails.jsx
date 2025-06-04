@@ -348,11 +348,6 @@ const ModDetails = () => {
 
   return (
     <div className="mod-details-container">
-      {/* Sección de navegación */}
-      <div className="mod-navigation">
-        <Breadcrumb items={breadcrumbItems} />
-      </div>
-
       {/* Banner Hero Section */}
       <div 
         className="mod-header-banner"
@@ -364,8 +359,109 @@ const ModDetails = () => {
         }}
       >
         <div className="mod-header-content">
-          <div className="mod-header-main">
-            <h1 className="mod-title-main">{mod.titulo}</h1>
+          
+          {/* Breadcrumb dentro del banner */}
+          <div className="mod-navigation-banner">
+            <Breadcrumb items={breadcrumbItems} />
+          </div>
+          
+          {/* Título y estadísticas juntos en la parte inferior */}
+          <div className="mod-stats-actions overlay">
+            
+            <div className="mod-stats-and-actions">
+              <div className="mod-stats-section">
+                <h1 className="mod-title-main">{mod.titulo}</h1>
+                <div className="mod-stats-group">
+                  <div className="mod-stat-box">
+                    <div className="stat-icon"><i className="fas fa-thumbs-up"></i></div>
+                    <div className="stat-content">
+                      <div className="stat-label">Valoraciones</div>
+                      <div className="stat-value">{mod.estadisticas?.total_valoraciones || 0}</div>
+                    </div>
+                  </div>
+                
+                  <div className="mod-stat-box">
+                    <div className="stat-icon"><i className="fas fa-download"></i></div>
+                    <div className="stat-content">
+                      <div className="stat-label">Descargas</div>
+                      <div className="stat-value">{mod.estadisticas?.total_descargas || 0}</div>
+                    </div>
+                  </div>
+                
+                  <div className="mod-stat-box">
+                    <div className="stat-icon"><i className="fas fa-eye"></i></div>
+                    <div className="stat-content">
+                      <div className="stat-label">Visitas</div>
+                      <div className="stat-value">Próximamente</div>
+                    </div>
+                  </div>
+                  
+                  <div className="mod-stat-box">
+                    <div className="stat-icon"><i className="fas fa-code-branch"></i></div>
+                    <div className="stat-content">
+                      <div className="stat-label">Versión</div>
+                      <div className="stat-value">v{ultimaVersion ? ultimaVersion.version : mod.version}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mod-actions-group">
+                {/* Botones que solo aparecen si NO es el propietario */}
+                {!isOwner && (
+                  <>
+                    <button className="mod-action-btn track" title="Seguir">
+                      <i className="fas fa-bell"></i>
+                      <span>Seguir</span>
+                    </button>
+                    
+                    <button 
+                      className={`mod-action-btn endorse ${isGuardado ? 'active' : ''}`}
+                      onClick={handleGuardarClick}
+                      disabled={userLoading || !isAuthenticated}
+                      title={isGuardado ? 'Guardado' : 'Guardar'}
+                    >
+                      <i className={isGuardado ? 'fas fa-bookmark' : 'far fa-bookmark'}></i>
+                      <span>{isGuardado ? 'Guardado' : 'Guardar'}</span>
+                    </button>
+                    
+                    <button className="mod-action-btn vote" title="Votar">
+                      <i className="fas fa-thumbs-up"></i>
+                      <span>Votar</span>
+                    </button>
+                  </>
+                )}
+                
+                {/* Botones para el propietario del mod */}
+                {isOwner && (
+                  <>
+                    <button 
+                      className="mod-action-btn edit"
+                      onClick={handleEditMod}
+                      title="Editar mod"
+                    >
+                      <i className="fas fa-edit"></i>
+                      <span>Editar</span>
+                    </button>
+                    
+                    <button 
+                      className="mod-action-btn delete"
+                      onClick={handleDeleteMod}
+                      disabled={deleting}
+                      title={deleting ? 'Eliminando...' : 'Eliminar mod'}
+                    >
+                      <i className={`fas ${deleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
+                      <span>{deleting ? 'Eliminando...' : 'Eliminar'}</span>
+                    </button>
+                  </>
+                )}
+                
+                <button className="mod-action-btn download-main" title="Descargar">
+                  <i className="fas fa-download"></i>
+                  <span>Descargar</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -401,118 +497,10 @@ const ModDetails = () => {
           </div>
         )}
         
-        {/* Estadísticas y botones de acción */}
-        <div className="mod-stats-actions">
-          <div className="mod-stats-group">
-            <div className="mod-stat-box">
-              <div className="stat-icon"><i className="fas fa-thumbs-up"></i></div>
-              <div className="stat-content">
-                <div className="stat-label">Valoraciones</div>
-                <div className="stat-value">{mod.estadisticas?.total_valoraciones || 0}</div>
-              </div>
-            </div>
-          
-            <div className="mod-stat-box">
-              <div className="stat-icon"><i className="fas fa-download"></i></div>
-              <div className="stat-content">
-                <div className="stat-label">Descargas</div>
-                <div className="stat-value">{mod.estadisticas?.total_descargas || 0}</div>
-              </div>
-            </div>
-          
-            <div className="mod-stat-box">
-              <div className="stat-icon"><i className="fas fa-eye"></i></div>
-              <div className="stat-content">
-                <div className="stat-label">Visitas</div>
-                <div className="stat-value">Próximamente</div>
-              </div>
-            </div>
-            
-            <div className="mod-stat-box">
-              <div className="stat-icon"><i className="fas fa-code-branch"></i></div>
-              <div className="stat-content">
-                <div className="stat-label">Versión</div>
-                <div className="stat-value">v{ultimaVersion ? ultimaVersion.version : mod.version}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mod-actions-group">
-            {/* Botones que solo aparecen si NO es el propietario */}
-            {!isOwner && (
-              <>
-                <button className="mod-action-btn track" title="Seguir">
-                  <i className="fas fa-bell"></i>
-                  <span>Seguir</span>
-                </button>
-                
-                <button 
-                  className={`mod-action-btn endorse ${isGuardado ? 'active' : ''}`}
-                  onClick={handleGuardarClick}
-                  disabled={userLoading || !isAuthenticated}
-                  title={isGuardado ? 'Guardado' : 'Guardar'}
-                >
-                  <i className={isGuardado ? 'fas fa-bookmark' : 'far fa-bookmark'}></i>
-                  <span>{isGuardado ? 'Guardado' : 'Guardar'}</span>
-                </button>
-                
-                <button className="mod-action-btn vote" title="Votar">
-                  <i className="fas fa-thumbs-up"></i>
-                  <span>Votar</span>
-                </button>
-              </>
-            )}
-            
-            {/* Botones para el propietario del mod */}
-            {isOwner && (
-              <>
-                <button 
-                  className="mod-action-btn edit"
-                  onClick={handleEditMod}
-                  title="Editar mod"
-                >
-                  <i className="fas fa-edit"></i>
-                  <span>Editar</span>
-                </button>
-                
-                <button 
-                  className="mod-action-btn delete"
-                  onClick={handleDeleteMod}
-                  disabled={deleting}
-                  title={deleting ? 'Eliminando...' : 'Eliminar mod'}
-                >
-                  <i className={`fas ${deleting ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
-                  <span>{deleting ? 'Eliminando...' : 'Eliminar'}</span>
-                </button>
-              </>
-            )}
-            
-            <button className="mod-action-btn download-main" title="Descargar">
-              <i className="fas fa-download"></i>
-              <span>Descargar</span>
-            </button>
-          </div>
-        </div>
-
         {/* Información del mod */}
         <div className="mod-info-section">
           <div className="mod-info-left">
-            <div className="mod-dates">
-              <div className="mod-date-box">
-                <div className="date-label">Última actualización</div>
-                <div className="date-value">
-                  {mod.fecha_actualizacion ? new Date(mod.fecha_actualizacion).toLocaleDateString() : 'No disponible'}
-                </div>
-              </div>
-              
-              <div className="mod-date-box">
-                <div className="date-label">Subido originalmente</div>
-                <div className="date-value">
-                  {mod.fecha_creacion ? new Date(mod.fecha_creacion).toLocaleDateString() : 'No disponible'}
-                </div>
-              </div>
-            </div>
-            
+            {/* Creador - Ahora va primero */}
             <div className="mod-creator-box">
               <div className="creator-header">Creado por</div>
               <div className="creator-content">
@@ -529,6 +517,41 @@ const ModDetails = () => {
                   </div>
                 )}
                 <span className="creator-name">{mod.creador?.nome || 'Anónimo'}</span>
+              </div>
+            </div>
+
+            {/* Campo "De juego" - Nuevo campo añadido */}
+            <div className="mod-game-box">
+              <div className="game-header">De juego</div>
+              <div className="game-content">
+                {mod.juego?.imagen_fondo ? (
+                  <img 
+                    src={mod.juego?.imagen_fondo}
+                    alt={mod.juego?.titulo || 'Juego'} 
+                    className="game-image"
+                  />
+                ) : (
+                  <div className="game-image-fallback">
+                    <i className="fas fa-gamepad"></i>
+                  </div>
+                )}
+                <span className="game-name">{mod.juego?.titulo || 'Juego desconocido'}</span>
+              </div>
+            </div>
+            
+            <div className="mod-dates">
+              <div className="mod-date-box">
+                <div className="date-label">Última actualización</div>
+                <div className="date-value">
+                  {mod.fecha_actualizacion ? new Date(mod.fecha_actualizacion).toLocaleDateString() : 'No disponible'}
+                </div>
+              </div>
+              
+              <div className="mod-date-box">
+                <div className="date-label">Subido originalmente</div>
+                <div className="date-value">
+                  {mod.fecha_creacion ? new Date(mod.fecha_creacion).toLocaleDateString() : 'No disponible'}
+                </div>
               </div>
             </div>
           </div>
@@ -598,7 +621,6 @@ const ModDetails = () => {
               )) : 
               <span className="no-tags">Sin etiquetas</span>
             }
-            <button className="add-tag-btn">+ Añadir etiqueta</button>
           </div>
         </div>
       
@@ -614,16 +636,7 @@ const ModDetails = () => {
             Imágenes <span className="tab-count">0</span>
           </button>
           <button className="tab-btn">
-            Videos <span className="tab-count">0</span>
-          </button>
-          <button className="tab-btn">
-            Artículos <span className="tab-count">0</span>
-          </button>
-          <button className="tab-btn">
             Comentarios <span className="tab-count">0</span>
-          </button>
-          <button className="tab-btn">
-            Estadísticas
           </button>
         </div>
         
