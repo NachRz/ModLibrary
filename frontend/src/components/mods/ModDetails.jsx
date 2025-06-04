@@ -4,6 +4,7 @@ import modService from '../../services/api/modService';
 import useUserModsStatus from '../../hooks/useUserModsStatus';
 import useRating from '../../hooks/useRating';
 import Breadcrumb from '../common/Breadcrumb/Breadcrumb';
+import ImageCarousel from '../common/ImageCarousel/ImageCarousel';
 import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import { useNotification } from '../../context/NotificationContext';
 import '../../assets/styles/components/mods/ModDetails.css';
@@ -25,9 +26,6 @@ const ModDetails = () => {
   // Estados para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  
-  // Estados para el carrusel de imágenes
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Hook unificado para usuario y mods guardados
   const { 
@@ -66,11 +64,6 @@ const ModDetails = () => {
       } catch (error) {
         console.error('Error al procesar imágenes adicionales:', error);
       }
-    }
-    
-    // Si no hay imágenes, agregar una imagen placeholder
-    if (imagenes.length === 0) {
-      imagenes.push('/images/mod-placeholder.jpg');
     }
     
     return imagenes;
@@ -269,41 +262,6 @@ const ModDetails = () => {
   // Editar mod
   const handleEditMod = () => {
     navigate(`/mods/editar/${mod.id}`);
-  };
-
-  // Calcular las imágenes visibles (mostrar todas las disponibles, máximo 5)
-  const getVisibleImages = () => {
-    const visibleImages = [];
-    const maxVisibleImages = Math.min(5, imagenesCarrusel.length);
-    
-    for (let i = 0; i < maxVisibleImages; i++) {
-      const index = currentImageIndex + i;
-      if (index < imagenesCarrusel.length) {
-        visibleImages.push({
-          src: imagenesCarrusel[index],
-          originalIndex: index
-        });
-      }
-    }
-    return visibleImages;
-  };
-
-  // Verificar si se puede navegar
-  const maxVisibleAtOnce = Math.min(5, imagenesCarrusel.length);
-  const canGoPrev = currentImageIndex > 0;
-  const canGoNext = currentImageIndex < imagenesCarrusel.length - maxVisibleAtOnce;
-
-  // Funciones de navegación no infinitas
-  const handlePrev = () => {
-    if (canGoPrev) {
-      setCurrentImageIndex(prev => prev - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (canGoNext) {
-      setCurrentImageIndex(prev => prev + 1);
-    }
   };
 
   if (loading) {
@@ -560,52 +518,10 @@ const ModDetails = () => {
         {/* Galería y detalles del mod - Mostrar si hay al menos 1 imagen */}
         {imagenesCarrusel.length >= 1 && (
           <div className="mod-gallery-section">
-            <div className="mod-gallery-carousel">
-              <div className="carousel-container">
-                {/* Botón anterior - solo mostrar si se puede navegar hacia atrás */}
-                {canGoPrev && (
-                  <button 
-                    className="carousel-nav-btn prev" 
-                    onClick={handlePrev}
-                    disabled={!canGoPrev}
-                  >
-                    <i className="fas fa-chevron-left"></i>
-                  </button>
-                )}
-
-                {/* Galería horizontal */}
-                <div className="gallery-horizontal">
-                  <div className="gallery-images-container">
-                    {getVisibleImages().map((image, index) => (
-                      <div 
-                        key={index}
-                        className={`gallery-image-item`}
-                      >
-                        <img src={image.src} alt={`Imagen ${index + 1}`} />
-                        {/* Mostrar el contador en la imagen del centro o en la primera si hay pocas imágenes */}
-                        {((imagenesCarrusel.length > 1 && index === Math.floor(getVisibleImages().length / 2)) || 
-                          (imagenesCarrusel.length === 1 && index === 0)) && (
-                          <div className="image-counter-overlay">
-                            {imagenesCarrusel.length} {imagenesCarrusel.length === 1 ? 'imagen' : 'imágenes'}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Botón siguiente - solo mostrar si se puede navegar hacia adelante */}
-                {canGoNext && (
-                  <button 
-                    className="carousel-nav-btn next" 
-                    onClick={handleNext}
-                    disabled={!canGoNext}
-                  >
-                    <i className="fas fa-chevron-right"></i>
-                  </button>
-                )}
-              </div>
-            </div>
+            <ImageCarousel 
+              images={imagenesCarrusel}
+              className="mod-image-carousel"
+            />
           </div>
         )}
         
