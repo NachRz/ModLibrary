@@ -156,6 +156,10 @@ Route::prefix('mods')->group(function () {
         
         // Obtener mods eliminados del usuario autenticado
         Route::get('/mis-mods/eliminados', [ModController::class, 'getMyDeletedMods']);
+        
+        // Rutas de soft delete y restore para usuarios normales (sus propios mods)
+        Route::delete('/{id}/soft', [ModController::class, 'softDelete']);
+        Route::post('/{id}/restore', [ModController::class, 'restore']);
     });
 });
 

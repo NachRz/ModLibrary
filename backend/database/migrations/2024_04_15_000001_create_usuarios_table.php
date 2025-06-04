@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('rol');
             $table->string('nombre');
             $table->string('apelidos');
+            $table->text('sobre_mi')->nullable();
             $table->string('foto_perfil')->nullable();
             $table->string('correo')->unique();
             $table->timestamps();

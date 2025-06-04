@@ -21,6 +21,7 @@ class Usuario extends Authenticatable
         'rol',
         'nombre',
         'apelidos',
+        'sobre_mi',
         'foto_perfil',
         'correo'
     ];

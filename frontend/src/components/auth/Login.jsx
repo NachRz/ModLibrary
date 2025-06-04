@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import GradientButton from '../common/buttons/GradientButton';
-import authService from '../../services/api/authService';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -11,6 +11,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,8 +33,8 @@ const Login = () => {
     }
     
     try {
-      // Llamada real a la API para autenticar al usuario
-      await authService.login(credentials);
+      // Usar el login del contexto de autenticación
+      await login(credentials);
       
       // Redirección al dashboard si el inicio de sesión es exitoso
       navigate('/dashboard');

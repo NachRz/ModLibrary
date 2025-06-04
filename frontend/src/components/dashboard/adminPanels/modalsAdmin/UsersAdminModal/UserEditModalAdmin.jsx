@@ -19,6 +19,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
     correo: '',
     nombre: '',
     apelidos: '',
+    sobre_mi: '',
     rol: 'usuario',
     foto_perfil: ''
   });
@@ -58,6 +59,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
         correo: userData.correo || '',
         nombre: userData.nombre || '',
         apelidos: userData.apelidos || '',
+        sobre_mi: userData.sobre_mi || '',
         rol: userData.rol || 'usuario',
         foto_perfil: userData.foto_perfil || ''
       });
@@ -161,6 +163,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
         nome: formData.nome,
         nombre: formData.nombre,
         apelidos: formData.apelidos,
+        sobre_mi: formData.sobre_mi,
         foto_perfil: finalImageUrl || null
       };
 
@@ -394,6 +397,19 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                       onChange={handleChange}
                       className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
                       placeholder="Apellidos del usuario"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Sobre Mi
+                    </label>
+                    <textarea
+                      name="sobre_mi"
+                      value={formData.sobre_mi}
+                      onChange={handleChange}
+                      className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                      placeholder="Sobre mi del usuario"
                     />
                   </div>
                 </div>

@@ -1132,7 +1132,8 @@ class ModController extends Controller
                 ->where('creador_id', $usuario->id)
                 ->with([
                     'creador:id,nome,correo,foto_perfil',
-                    'juego:id,titulo',
+                    'valoraciones',
+                    'juego:id,titulo,imagen_fondo',
                     'etiquetas:id,nombre'
                 ])
                 ->orderBy('deleted_at', 'desc')
@@ -1141,6 +1142,12 @@ class ModController extends Controller
             return response()->json([
                 'status' => 'success',
                 'data' => $mods->map(function ($mod) {
+                    $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
+                    $totalValoraciones = $mod->valoraciones->count();
+                    
+                    // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
+                    unset($mod->valoraciones);
+                    
                     return [
                         'id' => $mod->id,
                         'titulo' => $mod->titulo,
@@ -1151,9 +1158,15 @@ class ModController extends Controller
                         'estado' => $mod->estado,
                         'total_descargas' => $mod->total_descargas,
                         'val_media' => $mod->val_media,
+                        'num_valoraciones' => $mod->num_valoraciones,
                         'fecha_creacion' => $mod->created_at->format('Y-m-d'),
                         'fecha_eliminacion' => $mod->deleted_at->format('Y-m-d H:i:s'),
-                        'is_deleted' => true
+                        'is_deleted' => true,
+                        'estadisticas' => [
+                            'valoracion_media' => round($valoracionMedia, 1),
+                            'total_valoraciones' => $totalValoraciones,
+                            'total_descargas' => $mod->total_descargas
+                        ]
                     ];
                 })
             ]);

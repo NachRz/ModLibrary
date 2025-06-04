@@ -290,7 +290,7 @@ const modService = {
   // Eliminar mod con soft delete
   softDeleteMod: async (modId) => {
     try {
-      const response = await apiClient.delete(`/admin/mods/${modId}/soft`);
+      const response = await apiClient.delete(`/mods/${modId}/soft`);
       return response.data;
     } catch (error) {
       const backendError = error.response?.data;
@@ -314,7 +314,7 @@ const modService = {
   // Restaurar mod eliminado
   restoreMod: async (modId) => {
     try {
-      const response = await apiClient.post(`/admin/mods/${modId}/restore`);
+      const response = await apiClient.post(`/mods/${modId}/restore`);
       return response.data;
     } catch (error) {
       const backendError = error.response?.data;

@@ -57,9 +57,8 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       
       const currentUser = authService.getCurrentUser();
-      setUser(currentUser);
-      
       if (currentUser) {
+        setUser(currentUser);
         await checkAdminStatus();
       }
       
@@ -69,12 +68,18 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Función para hacer login
+  // Función para hacer login - MEJORADA
   const login = async (credentials) => {
     try {
       const response = await authService.login(credentials);
+      
+      // Actualizar inmediatamente el estado del usuario
       setUser(response.user);
-      await checkAdminStatus();
+      setLoading(false);
+      
+      // Verificar estado de admin en segundo plano
+      checkAdminStatus();
+      
       return response;
     } catch (error) {
       throw error;

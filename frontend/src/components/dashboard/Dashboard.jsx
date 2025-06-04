@@ -36,7 +36,7 @@ const Dashboard = ({ defaultTab = 0 }) => {
   // Configuración de pestañas para modo normal
   const normalTabConfig = [
     {
-      label: 'General',
+      label: 'Perfil',
       content: <General />
     },
     {

@@ -222,6 +222,23 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                 </div>
               </div>
 
+              {/* Sección Sobre Mi */}
+              <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-5 border border-gray-600/30">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                  <div className="p-2 bg-gradient-to-br from-indigo-500/20 to-indigo-600/30 rounded-lg mr-2">
+                    <FontAwesomeIcon icon={faUser} className="text-indigo-400" />
+                  </div>
+                  Sobre Mi
+                </h3>
+                <div className="bg-gray-700/30 rounded-lg border border-gray-600/20 p-4">
+                  <div className="text-white text-sm leading-relaxed whitespace-pre-wrap">
+                    {userDetails?.sobre_mi || (
+                      <span className="text-gray-400 italic">No hay nada aquí todavía</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {/* Estadísticas de mods mejoradas */}
               {userStats && (
                 <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-xl p-6 border border-gray-600/30">

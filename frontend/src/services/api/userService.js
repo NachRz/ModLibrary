@@ -43,6 +43,16 @@ const userService = {
     } catch (error) {
       throw error.response?.data || { message: 'Error al obtener estadísticas' };
     }
+  },
+
+  // Obtener juegos favoritos del usuario
+  getFavoriteGames: async () => {
+    try {
+      const response = await apiClient.get('/juegos/favoritos');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener juegos favoritos' };
+    }
   }
 };
 

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ModCard from '../../common/Cards/ModCard';
 import modService from '../../../services/api/modService';
 import { useNotification } from '../../../context/NotificationContext';
 
 const ModsGuardados = () => {
+  const navigate = useNavigate();
   const [sortOption, setSortOption] = useState('date');
   const [savedMods, setSavedMods] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,7 +112,10 @@ const ModsGuardados = () => {
           </svg>
           <h4 className="mt-2 text-lg font-medium text-custom-text">No tienes mods guardados</h4>
           <p className="mt-1 text-custom-detail">Cuando guardes mods, aparecerán aquí para facilitar su acceso.</p>
-          <button className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-custom-primary hover:bg-custom-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-primary transition-colors duration-300">
+          <button 
+            onClick={() => navigate('/mods')}
+            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-custom-primary hover:bg-custom-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-primary transition-colors duration-300"
+          >
             Explorar mods
           </button>
         </div>

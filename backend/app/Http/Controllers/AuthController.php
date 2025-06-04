@@ -189,7 +189,7 @@ class AuthController extends Controller
     public function getAllUsers(Request $request)
     {
         try {
-            $usuarios = Usuario::select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'foto_perfil', 'created_at')
+            $usuarios = Usuario::select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'sobre_mi', 'foto_perfil', 'created_at')
                 ->withCount('mods')
                 ->orderBy('nome', 'asc')
                 ->get();
@@ -236,6 +236,7 @@ class AuthController extends Controller
                     'rol' => $usuario->rol,
                     'nombre' => $usuario->nombre,
                     'apelidos' => $usuario->apelidos,
+                    'sobre_mi' => $usuario->sobre_mi,
                     'fecha_registro' => $usuario->created_at->format('Y-m-d H:i:s'),
                     'foto_perfil' => $usuario->foto_perfil
                 ]
@@ -256,6 +257,7 @@ class AuthController extends Controller
                 'nome' => 'sometimes|string|max:255|unique:usuarios,nome,' . $id,
                 'nombre' => 'sometimes|string|max:255',
                 'apelidos' => 'sometimes|string|max:255',
+                'sobre_mi' => 'sometimes|nullable|string|max:1000',
                 'foto_perfil' => 'sometimes|nullable|string'
             ]);
 
@@ -288,6 +290,9 @@ class AuthController extends Controller
             }
             if ($request->has('apelidos')) {
                 $usuario->apelidos = $request->apelidos;
+            }
+            if ($request->has('sobre_mi')) {
+                $usuario->sobre_mi = $request->sobre_mi;
             }
             if ($request->has('foto_perfil')) {
                 $usuario->foto_perfil = $request->foto_perfil;
@@ -449,7 +454,7 @@ class AuthController extends Controller
     {
         try {
             $usuarios = Usuario::onlyTrashed()
-                ->select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'foto_perfil', 'created_at', 'deleted_at')
+                ->select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'sobre_mi', 'foto_perfil', 'created_at', 'deleted_at')
                 ->withCount('mods')
                 ->orderBy('deleted_at', 'desc')
                 ->get();
@@ -1055,6 +1060,7 @@ class AuthController extends Controller
                     'correo' => $user->correo,
                     'nombre' => $user->nombre,
                     'apelidos' => $user->apelidos,
+                    'sobre_mi' => $user->sobre_mi,
                     'rol' => $user->rol,
                     'foto_perfil' => $user->foto_perfil,
                     'created_at' => $user->created_at,
@@ -1081,12 +1087,14 @@ class AuthController extends Controller
             
             $request->validate([
                 'nombre' => 'nullable|string|max:255',
-                'apelidos' => 'nullable|string|max:255'
+                'apelidos' => 'nullable|string|max:255',
+                'sobre_mi' => 'nullable|string|max:1000'
             ]);
 
             $user->update([
                 'nombre' => $request->nombre,
-                'apelidos' => $request->apelidos
+                'apelidos' => $request->apelidos,
+                'sobre_mi' => $request->sobre_mi
             ]);
 
             Log::info('Perfil actualizado', [
@@ -1102,6 +1110,7 @@ class AuthController extends Controller
                     'correo' => $user->correo,
                     'nombre' => $user->nombre,
                     'apelidos' => $user->apelidos,
+                    'sobre_mi' => $user->sobre_mi,
                     'rol' => $user->rol,
                     'foto_perfil' => $user->foto_perfil,
                     'created_at' => $user->created_at,

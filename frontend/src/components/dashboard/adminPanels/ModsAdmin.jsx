@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEye, faEdit, faTrash, faUndo, faTrashAlt, faPlus } from '@fortawesome/free-solid-svg-icons';
 import modService from '../../../services/api/modService';
 import ModDeleteConfirmationModal from './modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
+import ModRestoreConfirmationModal from './modalsAdmin/ModAdminModal/ModRestoreConfirmationModal';
 import EditModAdmin from './modalsAdmin/ModAdminModal/EditModAdmin';
 import ModViewModal from './modalsAdmin/ModAdminModal/ModViewModal';
 import { useNotification } from '../../../context/NotificationContext';
@@ -39,6 +40,11 @@ const ModsAdmin = () => {
 
   // Estados para eliminación permanente
   const [showPermanentDeleteModal, setShowPermanentDeleteModal] = useState(false);
+
+  // Estados para el modal de restauración
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [modToRestore, setModToRestore] = useState(null);
+  const [restoring, setRestoring] = useState(false);
 
   // Cargar datos iniciales
   useEffect(() => {
@@ -247,37 +253,52 @@ const ModsAdmin = () => {
   };
 
   // Restaurar mod eliminado
-  const handleRestoreMod = async (modId) => {
+  const handleRestoreMod = (mod) => {
+    setModToRestore(mod);
+    setShowRestoreModal(true);
+  };
+
+  // Confirmar restauración
+  const confirmRestore = async () => {
+    if (!modToRestore) return;
+    
     try {
-      const response = await modService.restoreMod(modId);
+      setRestoring(true);
+      const response = await modService.restoreMod(modToRestore.id);
       
       if (response.status === 'success') {
-        // Encontrar el mod restaurado y añadirlo a la lista de activos
-        const restoredMod = deletedMods.find(mod => mod.id === modId);
-        if (restoredMod) {
-          // Formatear el mod restaurado para la lista de activos
-          const formattedMod = {
-            id: restoredMod.id,
-            nombre: restoredMod.titulo,
-            creador: restoredMod.creador?.nome || 'Usuario eliminado',
-            juego: restoredMod.juego?.titulo || 'Juego no especificado',
-            estado: restoredMod.estado || 'borrador',
-            descargas: restoredMod.total_descargas || 0,
-            valoracion: restoredMod.val_media || 0,
-            fecha_creacion: restoredMod.fecha_creacion || 'N/A',
-            titulo: restoredMod.titulo
-          };
-          setMods(prevMods => [...prevMods, formattedMod]);
-        }
+        // Formatear el mod restaurado para la lista de activos
+        const formattedMod = {
+          id: modToRestore.id,
+          nombre: modToRestore.titulo,
+          creador: modToRestore.creador?.nome || 'Usuario eliminado',
+          juego: modToRestore.juego?.titulo || 'Juego no especificado',
+          estado: modToRestore.estado || 'borrador',
+          descargas: modToRestore.total_descargas || 0,
+          valoracion: modToRestore.val_media || 0,
+          fecha_creacion: modToRestore.fecha_creacion || 'N/A',
+          titulo: modToRestore.titulo
+        };
+        setMods(prevMods => [...prevMods, formattedMod]);
         
-        setDeletedMods(prev => prev.filter(mod => mod.id !== modId));
-        showNotification('Mod restaurado correctamente', 'success');
+        setDeletedMods(prev => prev.filter(mod => mod.id !== modToRestore.id));
+        showNotification(`Mod "${modToRestore.titulo}" restaurado correctamente`, 'success');
       } else {
         throw new Error(response.message || 'Error al restaurar el mod');
       }
     } catch (err) {
       showNotification(err.message || 'Error al restaurar mod', 'error');
+    } finally {
+      setRestoring(false);
+      setShowRestoreModal(false);
+      setModToRestore(null);
     }
+  };
+
+  // Cancelar restauración
+  const cancelRestore = () => {
+    setShowRestoreModal(false);
+    setModToRestore(null);
   };
 
   // Eliminar mod permanentemente
@@ -637,7 +658,7 @@ const ModsAdmin = () => {
                         <td className="actions-column">
                           <div className="action-buttons-container">
                             <button 
-                              onClick={() => handleRestoreMod(mod.id)}
+                              onClick={() => handleRestoreMod(mod)}
                               className="action-btn-text restore"
                               title="Restaurar mod"
                             >
@@ -712,6 +733,16 @@ const ModsAdmin = () => {
         isOpen={showViewModal}
         onClose={handleViewClose}
         onEdit={handleEditFromView}
+      />
+
+      {/* Modal de confirmación para restauración */}
+      <ModRestoreConfirmationModal
+        modTitle={modToRestore?.titulo || ''}
+        onConfirm={confirmRestore}
+        onCancel={cancelRestore}
+        isOpen={showRestoreModal}
+        isLoading={restoring}
+        message="¿Estás seguro de que quieres restaurar este mod?"
       />
     </>
   );

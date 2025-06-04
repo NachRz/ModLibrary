@@ -1,28 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import UserProfileEditModal from '../modals/UserProfileEditModal';
 import userService from '../../../services/api/userService';
+import modService from '../../../services/api/modService';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGamepad, faPlus, faBookmark, faStar } from '@fortawesome/free-solid-svg-icons';
 
 // Componente para mostrar las tarjetas de estadísticas
-const StatCard = ({ title, value, icon, change, color }) => (
-  <div className={`bg-gradient-to-br ${color} rounded-xl shadow-lg p-5 text-white transform hover:scale-[1.02] transition-all duration-300`}>
-    <div className="flex justify-between">
-      <div>
-        <p className="text-white/80 text-sm font-medium">{title}</p>
-        <p className="text-3xl font-bold mt-1">{value}</p>
+const StatCard = ({ title, value, icon, change, color }) => {
+  const cardContent = (
+    <div className={`bg-gradient-to-br ${color} rounded-xl shadow-lg p-5 text-white transform hover:scale-[1.02] transition-all duration-300`}>
+      <div className="flex justify-between">
+        <div>
+          <p className="text-white/80 text-sm font-medium">{title}</p>
+          <p className="text-3xl font-bold mt-1">{value}</p>
+        </div>
+        <div className="p-3 bg-white/20 rounded-lg">
+          {icon}
+        </div>
       </div>
-      <div className="p-3 bg-white/20 rounded-lg">
-        {icon}
-      </div>
+      {change && (
+        <div className="mt-3">
+          <span className="text-white/80 text-xs font-medium">{change}</span>
+        </div>
+      )}
     </div>
-    {change && (
-      <div className="mt-3">
-        <span className="text-white/80 text-xs font-medium">{change}</span>
-      </div>
-    )}
-  </div>
-);
+  );
+
+  return cardContent;
+};
 
 // Componente para mostrar actividades recientes
 const ActivityItem = ({ activity }) => (
@@ -84,46 +91,107 @@ const NotificationItem = ({ notification }) => (
 );
 
 const General = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, loading: authLoading } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [userStats, setUserStats] = useState({
     modsCreated: 0,
-    modsInstalled: 0,
-    favorites: 0,
+    misJuegos: 0,
+    modsGuardados: 0,
     rating: 0
   });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Cargar estadísticas del usuario
   useEffect(() => {
     const loadUserStats = async () => {
-      if (user) {
+      // Solo cargar estadísticas si el usuario está disponible y no estamos en carga de autenticación
+      if (user && !authLoading) {
         try {
           setLoading(true);
-          const stats = await userService.getUserStats();
-          setUserStats(stats.data || {
-            modsCreated: 0,
-            modsInstalled: 0,
-            favorites: 0,
-            rating: 0
+          
+          // Cargar estadísticas del usuario, juegos favoritos y mods guardados en paralelo
+          const [statsResponse, gamesResponse, savedModsResponse] = await Promise.all([
+            userService.getUserStats(),
+            userService.getFavoriteGames(),
+            modService.getSavedMods()
+          ]);
+          
+          const stats = statsResponse.data || {};
+          const favoriteGames = gamesResponse.data || [];
+          const savedMods = savedModsResponse.data || [];
+          
+          setUserStats({
+            modsCreated: stats.modsCreated || 0,
+            misJuegos: favoriteGames.length || 0,
+            modsGuardados: savedMods.length || 0,
+            rating: stats.rating || 0
           });
         } catch (error) {
           console.error('Error al cargar estadísticas:', error);
           // Usar valores por defecto si hay error
           setUserStats({
             modsCreated: 0,
-            modsInstalled: 0,
-            favorites: 0,
+            misJuegos: 0,
+            modsGuardados: 0,
             rating: 0
           });
         } finally {
           setLoading(false);
         }
+      } else if (!authLoading && !user) {
+        // Si no hay usuario y no estamos cargando la autenticación, establecer valores por defecto
+        setUserStats({
+          modsCreated: 0,
+          misJuegos: 0,
+          modsGuardados: 0,
+          rating: 0
+        });
+        setLoading(false);
       }
     };
 
     loadUserStats();
-  }, [user]);
+  }, [user, authLoading]);
+
+  // Función para formatear fecha de registro
+  const formatearFechaRegistro = (fechaString) => {
+    if (!fechaString) return 'No disponible';
+    
+    try {
+      let fecha;
+      
+      // Manejar diferentes formatos de fecha
+      if (typeof fechaString === 'string') {
+        // Si es una fecha ISO (YYYY-MM-DD HH:MM:SS o YYYY-MM-DDTHH:MM:SS)
+        if (fechaString.includes('T') || fechaString.includes(' ')) {
+          fecha = new Date(fechaString);
+        } else {
+          // Si es solo una fecha (YYYY-MM-DD)
+          fecha = new Date(fechaString + 'T00:00:00');
+        }
+      } else {
+        // Si es un timestamp u otro formato
+        fecha = new Date(fechaString);
+      }
+      
+      // Verificar si la fecha es válida
+      if (isNaN(fecha.getTime())) {
+        return 'No disponible';
+      }
+      
+      // Formatear en español
+      return fecha.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+    } catch (error) {
+      console.error('Error al formatear fecha:', error);
+      return 'No disponible';
+    }
+  };
 
   // Datos del usuario con valores por defecto
   const userData = {
@@ -133,13 +201,10 @@ const General = () => {
     correo: user?.correo || '',
     nombre: user?.nombre || '',
     apelidos: user?.apelidos || '',
+    sobre_mi: user?.sobre_mi || '',
     rol: user?.rol || 'usuario',
     foto_perfil: user?.foto_perfil || null,
-    fechaRegistro: user?.created_at ? new Date(user.created_at).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }) : 'No disponible',
+    fechaRegistro: formatearFechaRegistro(user?.created_at || user?.updated_at),
     ultimaActividad: 'Ahora',
     ...userStats
   };
@@ -149,37 +214,29 @@ const General = () => {
     {
       title: 'Mods Creados',
       value: loading ? '...' : userStats.modsCreated,
-      icon: <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>,
-      change: '↗ 5% más que el mes pasado',
+      icon: <FontAwesomeIcon icon={faPlus} className="h-7 w-7 text-white" />,
+      change: userStats.modsCreated > 0 ? `${userStats.modsCreated} mod${userStats.modsCreated !== 1 ? 's' : ''} creado${userStats.modsCreated !== 1 ? 's' : ''}` : 'Comienza creando tu primer mod',
       color: 'from-custom-primary/80 to-custom-primary'
     },
     {
-      title: 'Mods Instalados',
-      value: loading ? '...' : userStats.modsInstalled,
-      icon: <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>,
-      change: '↗ 12% más que el mes pasado',
+      title: 'Mis Juegos',
+      value: loading ? '...' : userStats.misJuegos,
+      icon: <FontAwesomeIcon icon={faGamepad} className="h-7 w-7 text-white" />,
+      change: userStats.misJuegos > 0 ? `${userStats.misJuegos} juego${userStats.misJuegos !== 1 ? 's' : ''} favorito${userStats.misJuegos !== 1 ? 's' : ''}` : 'Explora y agrega juegos a favoritos',
       color: 'from-custom-secondary/80 to-custom-secondary'
     },
     {
-      title: 'Favoritos',
-      value: loading ? '...' : userStats.favorites,
-      icon: <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>,
-      change: '↗ 3% más que el mes pasado',
+      title: 'Mods Guardados',
+      value: loading ? '...' : userStats.modsGuardados,
+      icon: <FontAwesomeIcon icon={faBookmark} className="h-7 w-7 text-white" />,
+      change: userStats.modsGuardados > 0 ? `${userStats.modsGuardados} mod${userStats.modsGuardados !== 1 ? 's' : ''} guardado${userStats.modsGuardados !== 1 ? 's' : ''}` : 'Guarda mods interesantes para más tarde',
       color: 'from-custom-tertiary/80 to-custom-tertiary'
     },
     {
       title: 'Valoración Media',
-      value: loading ? '...' : (userStats.rating || 0).toFixed(1),
-      icon: <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>,
-      change: '↑ 0.2 puntos desde el último mes',
+      value: loading ? '...' : (userStats.rating > 0 ? userStats.rating.toFixed(1) : '0.0'),
+      icon: <FontAwesomeIcon icon={faStar} className="h-7 w-7 text-white" />,
+      change: userStats.rating > 0 ? `${userStats.rating.toFixed(1)}/5.0 estrellas` : 'Sin valoraciones aún',
       color: 'from-purple-500/80 to-purple-600'
     }
   ];
@@ -190,11 +247,28 @@ const General = () => {
     console.log('Perfil actualizado:', updatedUser);
   };
 
-  // Si no hay usuario, mostrar mensaje de carga
-  if (!user) {
+  // Si estamos cargando la autenticación, mostrar mensaje de carga
+  if (authLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-custom-primary/20 border-t-custom-primary"></div>
+      </div>
+    );
+  }
+
+  // Si no hay usuario después de la carga de autenticación, mostrar mensaje de error
+  if (!authLoading && !user) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">No se pudo cargar la información del usuario</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-custom-primary text-white rounded-lg hover:bg-custom-primary/80 transition-colors"
+          >
+            Recargar página
+          </button>
+        </div>
       </div>
     );
   }
@@ -274,6 +348,40 @@ const General = () => {
             color={stat.color}
           />
         ))}
+      </div>
+
+      {/* Botón de Crear Mod */}
+      <div className="bg-custom-card rounded-xl shadow-lg p-4 border border-custom-detail/10 hover:shadow-xl transition-all duration-300">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-white">¿Tienes una idea para un mod?</h3>
+            <p className="text-custom-detail text-sm mt-1">Comparte tu creatividad con la comunidad</p>
+          </div>
+          <button
+            onClick={() => navigate('/mods/crear')}
+            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-custom-primary to-custom-primary/80 hover:from-custom-primary-hover hover:to-custom-primary text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+          >
+            <FontAwesomeIcon icon={faPlus} className="mr-2 h-4 w-4" />
+            Crear Mod
+          </button>
+        </div>
+      </div>
+
+      {/* Sección Sobre Mi */}
+      <div className="bg-custom-card rounded-xl shadow-lg p-6 border border-custom-detail/10 hover:shadow-xl transition-all duration-300">
+        <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+          <svg className="h-5 w-5 mr-3 text-custom-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          Sobre Mi
+        </h4>
+        <div className="bg-custom-bg/30 rounded-lg p-4 border border-custom-detail/20">
+          <div className="text-white text-sm leading-relaxed whitespace-pre-wrap">
+            {userData.sobre_mi || (
+              <span className="text-custom-detail italic">No hay nada aquí todavía</span>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Sección Sobre mí */}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ModCard from '../../common/Cards/ModCard';
 import modService from '../../../services/api/modService';
 import ModDeleteConfirmationModal from '../adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
+import ModRestoreConfirmationModal from '../adminPanels/modalsAdmin/ModAdminModal/ModRestoreConfirmationModal';
 import { useNotification } from '../../../context/NotificationContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faUndo } from '@fortawesome/free-solid-svg-icons';
@@ -20,19 +21,51 @@ const MisMods = () => {
   const [modToDelete, setModToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   
+  // Estados para el modal de restauración
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [modToRestore, setModToRestore] = useState(null);
+  const [restoring, setRestoring] = useState(false);
+  
   useEffect(() => {
     const fetchMyMods = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        const response = await modService.getMyMods();
+        // Obtener tanto mods activos como eliminados
+        const [activeModsResponse, deletedModsResponse] = await Promise.allSettled([
+          modService.getMyMods(),
+          modService.getMyDeletedMods()
+        ]);
         
-        if (response.status === 'success') {
-          setMyMods(response.data.map(formatModData));
-        } else {
-          setError('No se pudieron cargar los mods');
+        let allMods = [];
+        
+        // Procesar mods activos
+        if (activeModsResponse.status === 'fulfilled' && activeModsResponse.value.status === 'success') {
+          const activeMods = activeModsResponse.value.data.map(mod => ({
+            ...formatModData(mod),
+            is_deleted: false
+          }));
+          allMods = [...allMods, ...activeMods];
         }
+        
+        // Procesar mods eliminados
+        if (deletedModsResponse.status === 'fulfilled' && deletedModsResponse.value.status === 'success') {
+          const deletedMods = deletedModsResponse.value.data.map(mod => ({
+            ...formatModData(mod),
+            is_deleted: true,
+            deleted_at: mod.fecha_eliminacion || mod.deleted_at
+          }));
+          allMods = [...allMods, ...deletedMods];
+        }
+        
+        setMyMods(allMods);
+        
+        // Si no hay mods en absoluto, mostrar mensaje
+        if (allMods.length === 0) {
+          setError('No tienes mods creados aún');
+        }
+        
       } catch (err) {
         console.error('Error al cargar los mods:', err);
         setError(err.message || 'Error al cargar los mods');
@@ -54,9 +87,9 @@ const MisMods = () => {
     etiquetas: mod.etiquetas || [],
     autor: mod.creador?.nome || 'Anónimo',
     creador_id: mod.creador_id,
-    descargas: mod.total_descargas || 0,
-    valoracion: mod.valoracion || 0,
-    numValoraciones: mod.numValoraciones || 0,
+    descargas: mod.estadisticas?.total_descargas || mod.total_descargas || 0,
+    valoracion: mod.estadisticas?.valoracion_media || mod.val_media || 0,
+    numValoraciones: mod.estadisticas?.total_valoraciones || mod.num_valoraciones || 0,
     descripcion: mod.descripcion || '',
     fecha: mod.fecha_creacion || mod.created_at,
     estado: mod.estado || 'publicado',
@@ -100,26 +133,45 @@ const MisMods = () => {
   };
 
   // Restaurar mod eliminado
-  const handleRestoreMod = async (modId) => {
+  const handleRestoreMod = (mod) => {
+    setModToRestore(mod);
+    setShowRestoreModal(true);
+  };
+
+  // Confirmar restauración
+  const confirmRestore = async () => {
+    if (!modToRestore) return;
+    
     try {
-      const response = await modService.restoreMod(modId);
+      setRestoring(true);
+      const response = await modService.restoreMod(modToRestore.id);
       
       if (response.status === 'success') {
         // Marcar el mod como activo
         setMyMods(prevMods => 
           prevMods.map(mod => 
-            mod.id === modId 
+            mod.id === modToRestore.id 
               ? { ...mod, is_deleted: false, deleted_at: null }
               : mod
           )
         );
-        showNotification('Mod restaurado correctamente', 'success');
+        showNotification(`Mod "${modToRestore.titulo}" restaurado correctamente`, 'success');
       } else {
         throw new Error(response.message || 'Error al restaurar el mod');
       }
     } catch (err) {
       showNotification(err.message || 'Error al restaurar mod', 'error');
+    } finally {
+      setRestoring(false);
+      setShowRestoreModal(false);
+      setModToRestore(null);
     }
+  };
+
+  // Cancelar restauración
+  const cancelRestore = () => {
+    setShowRestoreModal(false);
+    setModToRestore(null);
   };
 
   // Cancelar eliminación
@@ -207,7 +259,7 @@ const MisMods = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  handleRestoreMod(mod.id);
+                  handleRestoreMod(mod);
                 }}
                 className="flex items-center justify-center w-9 h-9 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-full transition-colors duration-200 flex-shrink-0"
                 title="Restaurar mod"
@@ -289,6 +341,16 @@ const MisMods = () => {
         onCancel={cancelDelete}
         isOpen={showDeleteModal}
         message="¿Estás seguro de que quieres desactivar este mod? Podrá ser restaurado posteriormente."
+      />
+
+      {/* Modal de confirmación para restaurar mod */}
+      <ModRestoreConfirmationModal
+        modTitle={modToRestore?.titulo || ''}
+        onConfirm={confirmRestore}
+        onCancel={cancelRestore}
+        isOpen={showRestoreModal}
+        isLoading={restoring}
+        message="¿Estás seguro de que quieres restaurar este mod?"
       />
     </>
   );
