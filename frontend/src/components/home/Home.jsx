@@ -102,7 +102,7 @@ const Home = () => {
                   {isLoggedIn ? 'Mi Panel' : 'Iniciar sesión'}
                 </button>
                 <button
-                  onClick={() => navigate('/explorar')}
+                  onClick={() => navigate('/mods')}
                   className="flex items-center justify-center px-8 py-3 border border-custom-tertiary text-base font-medium rounded-custom text-custom-text bg-transparent hover:bg-custom-tertiary/10 shadow-custom-lg hover:shadow-custom transition-all duration-300 transform hover:scale-105"
                 >
                   Explorar mods
