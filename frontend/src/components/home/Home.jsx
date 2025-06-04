@@ -47,16 +47,6 @@ const Home = () => {
       color: "bg-custom-accent"
     },
     {
-      title: "Compatibilidad",
-      description: "Verifica la compatibilidad de tus mods con diferentes versiones de juegos y otros mods instalados.",
-      icon: (
-        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
-      color: "bg-custom-primary"
-    },
-    {
       title: "Comunidad",
       description: "Comparte tus mods con otros usuarios, recibe valoraciones y descubre nuevas creaciones populares.",
       icon: (
@@ -140,17 +130,17 @@ const Home = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 place-items-center">
           {features.map((feature, index) => (
             <div 
               key={index} 
-              className="bg-custom-card/60 backdrop-blur-sm rounded-2xl p-8 border border-custom-detail/10 shadow-custom hover:shadow-custom-lg transition-all duration-500 hover:transform hover:-translate-y-2 group"
+              className="bg-custom-card/60 backdrop-blur-sm rounded-2xl p-8 border border-custom-detail/10 shadow-custom hover:shadow-custom-lg transition-all duration-500 hover:transform hover:-translate-y-2 group w-full max-w-sm min-h-[320px] flex flex-col"
             >
               <div className={`flex items-center justify-center h-14 w-14 rounded-xl ${feature.color} text-custom-text mb-6 group-hover:scale-110 transition-transform duration-300`}>
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold text-custom-text mb-3 group-hover:text-custom-secondary transition-colors duration-300">{feature.title}</h3>
-              <p className="text-custom-detail/80">
+              <p className="text-custom-detail/80 flex-grow">
                 {feature.description}
               </p>
             </div>
