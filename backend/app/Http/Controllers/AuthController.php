@@ -1040,4 +1040,147 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    // Obtener perfil del usuario actual
+    public function getCurrentProfile(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'id' => $user->id,
+                    'nome' => $user->nome,
+                    'correo' => $user->correo,
+                    'nombre' => $user->nombre,
+                    'apelidos' => $user->apelidos,
+                    'rol' => $user->rol,
+                    'foto_perfil' => $user->foto_perfil,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener perfil del usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $request->user()->id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al obtener el perfil'
+            ], 500);
+        }
+    }
+
+    // Actualizar perfil del usuario actual
+    public function updateProfile(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            $request->validate([
+                'nombre' => 'nullable|string|max:255',
+                'apelidos' => 'nullable|string|max:255'
+            ]);
+
+            $user->update([
+                'nombre' => $request->nombre,
+                'apelidos' => $request->apelidos
+            ]);
+
+            Log::info('Perfil actualizado', [
+                'user_id' => $user->id
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Perfil actualizado correctamente',
+                'data' => [
+                    'id' => $user->id,
+                    'nome' => $user->nome,
+                    'correo' => $user->correo,
+                    'nombre' => $user->nombre,
+                    'apelidos' => $user->apelidos,
+                    'rol' => $user->rol,
+                    'foto_perfil' => $user->foto_perfil,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar perfil del usuario', [
+                'error' => $e->getMessage(),
+                'user_id' => $request->user()->id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al actualizar el perfil'
+            ], 500);
+        }
+    }
+
+    // Obtener estadísticas del usuario actual
+    public function getCurrentUserStats(Request $request)
+    {
+        try {
+            $user = $request->user();
+            
+            // Reutilizar la lógica existente del método getUserStats
+            $usuario = Usuario::with(['mods.valoraciones', 'mods.versiones'])->findOrFail($user->id);
+            
+            // Calcular estadísticas de mods
+            $totalMods = $usuario->mods->count();
+            $modsPublicados = $usuario->mods->where('estado', 'publicado')->count();
+            $modsBorradores = $usuario->mods->where('estado', 'borrador')->count();
+            
+            // Calcular descargas totales
+            $totalDescargas = 0;
+            foreach ($usuario->mods as $mod) {
+                foreach ($mod->versiones as $version) {
+                    $totalDescargas += $version->descargas;
+                }
+            }
+            
+            // Calcular valoración promedio
+            $totalValoraciones = 0;
+            $sumaValoraciones = 0;
+            foreach ($usuario->mods as $mod) {
+                foreach ($mod->valoraciones as $valoracion) {
+                    $totalValoraciones++;
+                    $sumaValoraciones += $valoracion->puntuacion;
+                }
+            }
+            $valoracionPromedio = $totalValoraciones > 0 ? round($sumaValoraciones / $totalValoraciones, 2) : 0;
+            
+            // Calcular mods guardados por otros usuarios
+            $totalGuardados = 0;
+            foreach ($usuario->mods as $mod) {
+                $totalGuardados += $mod->usuariosGuardados()->count();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'modsCreated' => $totalMods,
+                    'modsInstalled' => 0, // Placeholder - implementar si es necesario
+                    'favorites' => $totalGuardados,
+                    'rating' => $valoracionPromedio,
+                    'total_descargas' => $totalDescargas,
+                    'mods_publicados' => $modsPublicados,
+                    'mods_borradores' => $modsBorradores,
+                    'total_valoraciones' => $totalValoraciones
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener estadísticas del usuario actual', [
+                'error' => $e->getMessage(),
+                'user_id' => $request->user()->id
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al obtener estadísticas'
+            ], 500);
+        }
+    }
 } 

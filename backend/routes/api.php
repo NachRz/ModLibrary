@@ -20,10 +20,18 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('auth:sanctum');
 
+// Rutas de perfil de usuario
+Route::middleware('auth:sanctum')->prefix('user')->group(function () {
+    Route::get('/profile', [AuthController::class, 'getCurrentProfile']);
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/profile/image', [AuthController::class, 'uploadProfileImage']);
+    Route::get('/stats', [AuthController::class, 'getCurrentUserStats']);
+});
+
 // Ruta para verificar si el usuario es admin
 Route::middleware('auth:sanctum')->get('/user/is-admin', [AuthController::class, 'isAdmin']);
 
-// Ruta para subir imágenes de perfil (disponible para usuarios autenticados)
+// Ruta para subir imágenes de perfil (disponible para usuarios autenticados) - DEPRECADA, usar /user/profile/image
 Route::middleware('auth:sanctum')->post('/upload/profile-image', [AuthController::class, 'uploadProfileImage']);
 
 // Ruta para subir imagen banner de mods (disponible para usuarios autenticados)
