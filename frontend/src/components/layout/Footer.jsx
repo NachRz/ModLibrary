@@ -35,7 +35,7 @@ const Footer = () => {
             </a>
           </li>
           <li>
-            <a href="/contact" className="text-sm text-custom-detail hover:text-custom-primary transition-all duration-300 hover:translate-x-1 flex items-center group">
+            <a href="/contacto" className="text-sm text-custom-detail hover:text-custom-primary transition-all duration-300 hover:translate-x-1 flex items-center group">
               <span className="w-1.5 h-1.5 bg-custom-detail rounded-full mr-3 group-hover:bg-custom-primary transition-colors duration-300"></span>
               Contacto
             </a>
@@ -184,11 +184,11 @@ const Footer = () => {
             </a>
           </li>
           <li>
-            <a href="/contact" className="text-sm text-custom-detail hover:text-custom-primary transition-all duration-300 hover:translate-x-1 flex items-center group">
+            <a href="/contacto" className="text-sm text-custom-detail hover:text-custom-primary transition-all duration-300 hover:translate-x-1 flex items-center group">
               <span className="w-1.5 h-1.5 bg-custom-detail rounded-full mr-3 group-hover:bg-custom-primary transition-colors duration-300"></span>
               Contacto rápido
             </a>
-              </li>
+          </li>
         </ul>
       </div>
     </>
