@@ -249,7 +249,7 @@ const ExplorarMods = () => {
     if (filtros.juego !== busquedaJuegos) {
       setBusquedaJuegos(filtros.juego || '');
     }
-  }, [filtros.juego, busquedaJuegos]);
+  }, [filtros.juego]); // Removido busquedaJuegos de las dependencias para evitar bucle
 
   // Función para remover filtro de juego específicamente
   const removeJuegoFilter = useCallback(() => {
