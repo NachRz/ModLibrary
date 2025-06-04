@@ -73,7 +73,6 @@ const ExplorarMods = () => {
     juego: true,
     etiquetas: true,
     parametrosBusqueda: true,
-    idiomas: true,
     opcionesContenido: true,
     tamanoArchivo: true,
     descargas: true,
@@ -331,10 +330,21 @@ const ExplorarMods = () => {
         if (filtros.fechaDesde) {
           const fechaDesde = new Date(filtros.fechaDesde);
           const fechaMod = new Date(mod.fecha);
-          if (fechaMod < fechaDesde) return false;
+          
+          // Si es filtro de últimas 24 horas, comparar con precisión de horas
+          if (filtros.periodoTiempo === '24h') {
+            const ahora = new Date();
+            const hace24Horas = new Date(ahora.getTime() - 24 * 60 * 60 * 1000);
+            if (fechaMod < hace24Horas) return false;
+          } else {
+            // Para otros períodos, comparar solo fechas
+            if (fechaMod < fechaDesde) return false;
+          }
         }
         if (filtros.fechaHasta) {
           const fechaHasta = new Date(filtros.fechaHasta);
+          // Establecer la hora final del día para fechaHasta
+          fechaHasta.setHours(23, 59, 59, 999);
           const fechaMod = new Date(mod.fecha);
           if (fechaMod > fechaHasta) return false;
         }
@@ -458,13 +468,23 @@ const ExplorarMods = () => {
 
   // Función para aplicar filtros de búsqueda avanzada
   const handleBusquedaAvanzadaSubmit = () => {
-    // La búsqueda ya se aplica automáticamente por los efectos de los filtros
-    // Podríamos agregar aquí alguna lógica adicional si fuera necesario
-    console.log('Filtros de búsqueda aplicados:', {
-      busqueda: filtros.busqueda,
-      busquedaDescripcion: filtros.busquedaDescripcion,
-      busquedaAutor: filtros.busquedaAutor
-    });
+    // Mostrar notificación de filtros aplicados
+    const filtrosActivos = [];
+    if (filtros.busqueda) filtrosActivos.push(`Título: "${filtros.busqueda}"`);
+    if (filtros.busquedaDescripcion) filtrosActivos.push(`Descripción: "${filtros.busquedaDescripcion}"`);
+    if (filtros.busquedaAutor) filtrosActivos.push(`Autor: "${filtros.busquedaAutor}"`);
+    
+    if (filtrosActivos.length > 0) {
+      showNotification(`Filtros de búsqueda aplicados: ${filtrosActivos.join(', ')}`, 'success');
+    } else {
+      showNotification('No hay parámetros de búsqueda específicos activos', 'info');
+    }
+    
+    // Resetear a la primera página cuando se aplican nuevos filtros
+    setPaginacion(prev => ({
+      ...prev,
+      paginaActual: 1
+    }));
   };
 
   // Función para manejar etiquetas incluidas
@@ -515,19 +535,19 @@ const ExplorarMods = () => {
 
     switch (periodo) {
       case '24h':
-        fechaDesde = new Date(hoy.setHours(hoy.getHours() - 24));
+        fechaDesde = new Date(hoy.getTime() - 24 * 60 * 60 * 1000);
         break;
       case '7d':
-        fechaDesde = new Date(hoy.setDate(hoy.getDate() - 7));
+        fechaDesde = new Date(hoy.getTime() - 7 * 24 * 60 * 60 * 1000);
         break;
       case '14d':
-        fechaDesde = new Date(hoy.setDate(hoy.getDate() - 14));
+        fechaDesde = new Date(hoy.getTime() - 14 * 24 * 60 * 60 * 1000);
         break;
       case '28d':
-        fechaDesde = new Date(hoy.setDate(hoy.getDate() - 28));
+        fechaDesde = new Date(hoy.getTime() - 28 * 24 * 60 * 60 * 1000);
         break;
       case '1y':
-        fechaDesde = new Date(hoy.setFullYear(hoy.getFullYear() - 1));
+        fechaDesde = new Date(hoy.getTime() - 365 * 24 * 60 * 60 * 1000);
         break;
       default:
         fechaDesde = '';
@@ -535,7 +555,7 @@ const ExplorarMods = () => {
 
     return {
       fechaDesde: fechaDesde ? fechaDesde.toISOString().split('T')[0] : '',
-      fechaHasta: periodo === 'todo' ? '' : new Date().toISOString().split('T')[0]
+      fechaHasta: periodo === 'todo' ? '' : hoy.toISOString().split('T')[0]
     };
   };
 
@@ -943,55 +963,6 @@ const ExplorarMods = () => {
                         >
                           Aplicar
                         </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Sección SOPORTE DE IDIOMAS */}
-                  <div className="filter-section mb-2 border border-custom-detail/10 rounded-md">
-                    <button
-                      className="filter-section-header w-full p-2 flex justify-between items-center bg-custom-bg/50 text-custom-text"
-                      onClick={() => toggleSeccion('idiomas')}
-                    >
-                      <span className="text-xs font-bold uppercase">Soporte de idiomas</span>
-                      <div className="flex items-center">
-                        <span className="proximamente-badge mr-2">Próximamente</span>
-                        <svg className={`h-4 w-4 transition-transform ${secciones.idiomas ? 'transform rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </button>
-
-                    {secciones.idiomas && (
-                      <div className="filter-section-content p-2">
-                        <label className="custom-checkbox block mb-2">
-                          <input type="checkbox" disabled />
-                          <span className="checkmark"></span>
-                          <span className="text-sm text-custom-text">Ocultar traducciones</span>
-                        </label>
-
-                        <div className="space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
-                          <label className="custom-checkbox block">
-                            <input type="checkbox" disabled />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">Español <span className="text-custom-detail text-xs">(978)</span></span>
-                          </label>
-                          <label className="custom-checkbox block">
-                            <input type="checkbox" disabled />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">Inglés <span className="text-custom-detail text-xs">(22.889)</span></span>
-                          </label>
-                          <label className="custom-checkbox block">
-                            <input type="checkbox" disabled />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">Francés <span className="text-custom-detail text-xs">(793)</span></span>
-                          </label>
-                          <label className="custom-checkbox block">
-                            <input type="checkbox" disabled />
-                            <span className="checkmark"></span>
-                            <span className="text-sm text-custom-text">Alemán <span className="text-custom-detail text-xs">(918)</span></span>
-                          </label>
-                        </div>
                       </div>
                     )}
                   </div>
@@ -1417,7 +1388,57 @@ const ExplorarMods = () => {
                     </div>
                   )}
 
-                  {filtros.fechaDesde && (
+                  {filtros.fechaDesde && filtros.periodoTiempo === '24h' && (
+                    <div className="filtro-tag bg-blue-500/20 text-blue-400 border-blue-400/30">
+                      <span className="tipo">📅 Últimas 24 horas</span>
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, fechaDesde: '', fechaHasta: '', periodoTiempo: 'todo' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.fechaDesde && filtros.periodoTiempo === '7d' && (
+                    <div className="filtro-tag bg-green-500/20 text-green-400 border-green-400/30">
+                      <span className="tipo">📅 Últimos 7 días</span>
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, fechaDesde: '', fechaHasta: '', periodoTiempo: 'todo' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.fechaDesde && filtros.periodoTiempo === '14d' && (
+                    <div className="filtro-tag bg-yellow-500/20 text-yellow-400 border-yellow-400/30">
+                      <span className="tipo">📅 Últimos 14 días</span>
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, fechaDesde: '', fechaHasta: '', periodoTiempo: 'todo' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.fechaDesde && filtros.periodoTiempo === '28d' && (
+                    <div className="filtro-tag bg-purple-500/20 text-purple-400 border-purple-400/30">
+                      <span className="tipo">📅 Últimos 28 días</span>
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, fechaDesde: '', fechaHasta: '', periodoTiempo: 'todo' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.fechaDesde && filtros.periodoTiempo === '1y' && (
+                    <div className="filtro-tag bg-orange-500/20 text-orange-400 border-orange-400/30">
+                      <span className="tipo">📅 Último año</span>
+                      <span
+                        className="remove"
+                        onClick={() => setFiltros(prev => ({ ...prev, fechaDesde: '', fechaHasta: '', periodoTiempo: 'todo' }))}
+                      >×</span>
+                    </div>
+                  )}
+
+                  {filtros.fechaDesde && !['24h', '7d', '14d', '28d', '1y'].includes(filtros.periodoTiempo) && (
                     <div className="filtro-tag">
                       <span className="tipo">Desde:</span> {new Date(filtros.fechaDesde).toLocaleDateString()}
                       <span
@@ -1427,7 +1448,7 @@ const ExplorarMods = () => {
                     </div>
                   )}
 
-                  {filtros.fechaHasta && (
+                  {filtros.fechaHasta && !['24h', '7d', '14d', '28d', '1y'].includes(filtros.periodoTiempo) && (
                     <div className="filtro-tag">
                       <span className="tipo">Hasta:</span> {new Date(filtros.fechaHasta).toLocaleDateString()}
                       <span
