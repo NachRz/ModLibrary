@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Tabs from '../common/Tabs';
-import General from './panels/General';
 import MisMods from './panels/MisMods';
 import JuegosFavoritos from './panels/JuegosFavoritos';
 import ModsGuardados from './panels/ModsGuardados';
@@ -17,28 +16,22 @@ const Dashboard = ({ defaultTab = 0 }) => {
   const [currentTab, setCurrentTab] = useState(defaultTab);
   const [adminModeActive, setAdminModeActive] = useState(false);
   
-  // Mapeo de rutas a índices de pestañas
+  // Mapeo de rutas a índices de pestañas (sin General)
   const pathToTabIndex = {
-    '/dashboard': 0,
-    '/dashboard/mis-mods': 1,
-    '/dashboard/juegos-favoritos': 2,
-    '/dashboard/guardados': 3
+    '/dashboard/mis-mods': 0,
+    '/dashboard/juegos-favoritos': 1,
+    '/dashboard/guardados': 2
   };
 
-  // Mapeo de índices de pestañas a rutas
+  // Mapeo de índices de pestañas a rutas (sin General)
   const tabIndexToPath = {
-    0: '/dashboard',
-    1: '/dashboard/mis-mods',
-    2: '/dashboard/juegos-favoritos',
-    3: '/dashboard/guardados'
+    0: '/dashboard/mis-mods',
+    1: '/dashboard/juegos-favoritos',
+    2: '/dashboard/guardados'
   };
 
-  // Configuración de pestañas para modo normal
+  // Configuración de pestañas para modo normal (sin General)
   const normalTabConfig = [
-    {
-      label: 'Perfil',
-      content: <General />
-    },
     {
       label: 'Mis Mods',
       content: <MisMods />

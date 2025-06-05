@@ -2,17 +2,20 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
 import ProtectedRoute from '../../middlewares/authMiddleware';
+import Perfil from '../../components/perfil/Perfil';
 
 const userRoutes = [
   <Route 
     path="/perfil" 
     element={
       <ProtectedRoute>
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold">Mi Perfil</h1>
-        </div>
+        <Perfil />
       </ProtectedRoute>
     } 
+  />,
+  <Route 
+    path="/usuarios/:userId/perfil" 
+    element={<Perfil />} 
   />,
   <Route 
     path="/mis-mods" 

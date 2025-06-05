@@ -14,9 +14,9 @@ const GuestRoute = ({ children }) => {
     );
   }
 
-  // Si ya está autenticado, redirigir al dashboard
+  // Si ya está autenticado, redirigir al perfil
   if (user) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/perfil" replace />;
   }
 
   return children;

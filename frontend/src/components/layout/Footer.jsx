@@ -109,9 +109,9 @@ const Footer = () => {
         </div>
         <ul className="space-y-3">
           <li>
-            <a href="/profile" className="text-sm text-custom-detail hover:text-custom-primary transition-all duration-300 hover:translate-x-1 flex items-center group">
-              <span className="w-1.5 h-1.5 bg-custom-detail rounded-full mr-3 group-hover:bg-custom-primary transition-colors duration-300"></span>
-              Mi perfil
+            <a href="/perfil" className="text-sm text-custom-detail hover:text-custom-primary transition-all duration-300 hover:translate-x-1 flex items-center group">
+              <span className="w-1.5 h-1.5 bg-custom-detail rounded-full mr-2 group-hover:animate-pulse"></span>
+              Perfil
             </a>
           </li>
           <li>
@@ -135,12 +135,6 @@ const Footer = () => {
           <h3 className="text-lg font-semibold text-custom-text">Mi Biblioteca</h3>
         </div>
         <ul className="space-y-3">
-          <li>
-            <a href="/dashboard" className="text-sm text-custom-detail hover:text-custom-primary transition-all duration-300 hover:translate-x-1 flex items-center group">
-              <span className="w-1.5 h-1.5 bg-custom-detail rounded-full mr-3 group-hover:bg-custom-primary transition-colors duration-300"></span>
-              Dashboard
-            </a>
-          </li>
           <li>
             <a href="/dashboard/juegos-favoritos" className="text-sm text-custom-detail hover:text-custom-primary transition-all duration-300 hover:translate-x-1 flex items-center group">
               <span className="w-1.5 h-1.5 bg-custom-detail rounded-full mr-3 group-hover:bg-custom-primary transition-colors duration-300"></span>

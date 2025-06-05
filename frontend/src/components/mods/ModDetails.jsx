@@ -663,7 +663,12 @@ const ModDetails = () => {
             {/* Creador - Ahora va primero */}
             <div className="mod-creator-box">
               <div className="creator-header">Creado por</div>
-              <div className="creator-content">
+              <div 
+                className="creator-content clickable"
+                onClick={() => navigate(`/usuarios/${mod.creador?.id}/perfil`)}
+                style={{ cursor: 'pointer' }}
+                title={`Ver perfil de ${mod.creador?.nome || 'Usuario'}`}
+              >
                 {mod.creador?.foto_perfil && creatorImageUrl ? (
                   <img 
                     src={creatorImageUrl} 

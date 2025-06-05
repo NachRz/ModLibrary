@@ -52,11 +52,11 @@ const Register = () => {
       // Llamada real a la API para registrar al usuario
       await authService.register(userData);
       
-      setSuccess('Cuenta creada correctamente. Redirigiendo al dashboard...');
+      setSuccess('Cuenta creada correctamente. Redirigiendo al perfil...');
       
-      // Redirección a dashboard después de 2 segundos
+      // Redirección a perfil después de 2 segundos
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate('/perfil');
       }, 2000);
     } catch (error) {
       console.error('Error al registrar:', error);

@@ -22,7 +22,7 @@ const NavLinkWithDropdown = ({ title, isActive, children }) => {
   return (
     <div className="relative h-full flex items-center group">
       <Link
-        to="/dashboard"
+        to="/dashboard/mis-mods"
         className={`inline-flex items-center h-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${
           isActive
             ? 'text-custom-text bg-custom-primary/15 border-b-2 border-custom-secondary'
@@ -125,7 +125,6 @@ const Navbar = () => {
 
   // Opciones del panel
   const panelOptions = [
-    { name: 'General', path: '/dashboard' },
     { name: 'Mis Mods', path: '/dashboard/mis-mods' },
     { name: 'Juegos Favoritos', path: '/dashboard/juegos-favoritos' },
     { name: 'Mods Guardados', path: '/dashboard/guardados' },
@@ -201,7 +200,7 @@ const Navbar = () => {
               {isLoggedIn && (
                 <NavLinkWithDropdown
                   title="Mi Panel"
-                  isActive={location.pathname.startsWith('/dashboard')}
+                  isActive={location.pathname === '/perfil' || location.pathname.startsWith('/dashboard')}
                 >
                   {panelOptions.map(option => (
                     <Link 
@@ -315,7 +314,7 @@ const Navbar = () => {
                       <p className="text-sm font-medium text-custom-text">{userData.nome}</p>
                       <p className="text-xs text-custom-detail truncate">{userData.correo}</p>
                     </div>
-                    <Link to="/dashboard" className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors flex items-center">
+                    <Link to="/perfil" className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors flex items-center">
                       <svg className="h-4 w-4 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
@@ -404,7 +403,7 @@ const Navbar = () => {
                 {/* Opciones del perfil en móvil */}
                 <div className="grid grid-cols-2 gap-2">
                   <Link 
-                    to="/dashboard" 
+                    to="/perfil" 
                     className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -459,15 +458,15 @@ const Navbar = () => {
                 </div>
                 <button
                   className={`flex justify-between items-center w-full px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
-                    location.pathname.startsWith('/dashboard')
+                    location.pathname === '/perfil' || location.pathname.startsWith('/dashboard')
                       ? 'text-custom-text bg-gradient-to-r from-custom-primary/20 to-custom-secondary/10 border-l-4 border-custom-secondary shadow-sm'
                       : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/8'
                   }`}
                   onClick={() => {
                     togglePanelMenu();
-                    // Redireccionar al dashboard si no estamos ya allí
-                    if (!location.pathname.startsWith('/dashboard')) {
-                      window.location.href = '/dashboard';
+                    // Redireccionar a la primera página del dashboard
+                    if (location.pathname !== '/perfil' && !location.pathname.startsWith('/dashboard')) {
+                      window.location.href = '/dashboard/mis-mods';
                     }
                   }}
                   aria-expanded={isPanelMenuOpen}

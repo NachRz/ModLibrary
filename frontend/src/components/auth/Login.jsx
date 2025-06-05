@@ -14,8 +14,8 @@ const Login = () => {
   const location = useLocation();
   const { login } = useAuth();
 
-  // Obtener la ruta de origen o usar dashboard como default
-  const from = location.state?.from?.pathname || '/dashboard';
+  // Obtener la ruta de origen o usar perfil como default
+  const from = location.state?.from?.pathname || '/perfil';
 
   const handleChange = (e) => {
     const { name, value } = e.target;

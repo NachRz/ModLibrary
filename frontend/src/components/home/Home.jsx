@@ -19,7 +19,7 @@ const Home = () => {
 
   const handleLogin = () => {
     if (isLoggedIn) {
-      navigate('/dashboard');
+      navigate('/perfil');
     } else {
       navigate('/login');
     }

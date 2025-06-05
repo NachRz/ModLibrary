@@ -7,20 +7,11 @@ import ProtectedRoute from '../../middlewares/authMiddleware';
 const dashboardRoutes = (
   [
     <Route 
-      key="dashboard-main" 
-      path="/dashboard" 
-      element={
-        <ProtectedRoute>
-          <Dashboard defaultTab={0} />
-        </ProtectedRoute>
-      } 
-    />,
-    <Route 
       key="dashboard-mis-mods" 
       path="/dashboard/mis-mods" 
       element={
         <ProtectedRoute>
-          <Dashboard defaultTab={1} />
+          <Dashboard defaultTab={0} />
         </ProtectedRoute>
       } 
     />,
@@ -29,7 +20,7 @@ const dashboardRoutes = (
       path="/dashboard/juegos-favoritos" 
       element={
         <ProtectedRoute>
-          <Dashboard defaultTab={2} />
+          <Dashboard defaultTab={1} />
         </ProtectedRoute>
       } 
     />,
@@ -38,7 +29,7 @@ const dashboardRoutes = (
       path="/dashboard/guardados" 
       element={
         <ProtectedRoute>
-          <Dashboard defaultTab={3} />
+          <Dashboard defaultTab={2} />
         </ProtectedRoute>
       } 
     />,
