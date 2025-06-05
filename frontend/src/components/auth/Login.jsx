@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import GradientButton from '../common/buttons/GradientButton';
 import { useAuth } from '../../context/AuthContext';
 
@@ -11,7 +11,11 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  // Obtener la ruta de origen o usar dashboard como default
+  const from = location.state?.from?.pathname || '/dashboard';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,8 +40,8 @@ const Login = () => {
       // Usar el login del contexto de autenticación
       await login(credentials);
       
-      // Redirección al dashboard si el inicio de sesión es exitoso
-      navigate('/dashboard');
+      // Redirección a la página de origen o dashboard
+      navigate(from, { replace: true });
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
       setError(error.message || 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.');
