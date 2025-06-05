@@ -156,6 +156,78 @@ const SearchModal = ({ isOpen, onClose }) => {
     }
   };
 
+  // Función para buscar todo (mods, juegos y usuarios)
+  const searchAll = async (query) => {
+    if (!query || query.trim().length < 2) {
+      setSearchResults([]);
+      setGameResults([]);
+      setUserResults([]);
+      setHasSearched(false);
+      return;
+    }
+
+    setLoadingSearch(true);
+    setErrorSearch(null);
+    setHasSearched(true);
+
+    try {
+      // Buscar en paralelo
+      const [modsResponse, gamesResponse, usersResponse] = await Promise.allSettled([
+        modService.searchModsByName(query.trim()),
+        gameService.searchGames(query.trim()).catch(async () => {
+          // Fallback para juegos
+          const allGames = await gameService.getAllGames();
+          return allGames.filter(game => {
+            const title = game.titulo || game.title || game.name || '';
+            return title.toLowerCase().includes(query.trim().toLowerCase());
+          });
+        }),
+        userService.searchUsers(query.trim())
+      ]);
+
+      // Procesar resultados de mods
+      if (modsResponse.status === 'fulfilled' && modsResponse.value?.status === 'success') {
+        const formattedMods = modsResponse.value.data.map(mod => ({
+          ...mod,
+          autor: mod.creador?.nome || 'Autor desconocido',
+          juego: mod.juego || { titulo: 'Juego no especificado' }
+        }));
+        setSearchResults(formattedMods);
+      } else {
+        setSearchResults([]);
+      }
+
+      // Procesar resultados de juegos
+      if (gamesResponse.status === 'fulfilled' && Array.isArray(gamesResponse.value)) {
+        const formattedGames = gamesResponse.value.map(game => ({
+          ...game,
+          titulo: game.titulo || game.title || game.name,
+          imagen_fondo: game.imagen_fondo || game.background_image || game.image,
+          mods_totales: game.mods_totales || game.total_mods || game.totalMods || 0
+        }));
+        setGameResults(formattedGames);
+      } else {
+        setGameResults([]);
+      }
+
+      // Procesar resultados de usuarios
+      if (usersResponse.status === 'fulfilled' && usersResponse.value?.status === 'success') {
+        setUserResults(usersResponse.value.data);
+      } else {
+        setUserResults([]);
+      }
+
+    } catch (error) {
+      console.error('Error searching all:', error);
+      setErrorSearch(error.message || 'Error al realizar la búsqueda');
+      setSearchResults([]);
+      setGameResults([]);
+      setUserResults([]);
+    } finally {
+      setLoadingSearch(false);
+    }
+  };
+
   // Función para cargar juegos favoritos desde la API
   const fetchFavoriteGames = async () => {
     setLoadingFavorites(true);
@@ -192,8 +264,6 @@ const SearchModal = ({ isOpen, onClose }) => {
     }
   };
 
-
-
   // Cargar juegos favoritos desde la API
   useEffect(() => {
     if (isOpen) {
@@ -203,7 +273,13 @@ const SearchModal = ({ isOpen, onClose }) => {
 
   // Buscar mods, juegos o usuarios cuando se escribe en el campo (con debounce)
   useEffect(() => {
-    if (searchType === 'mods' && searchQuery.trim()) {
+    if (searchType === 'todos' && searchQuery.trim()) {
+      const timer = setTimeout(() => {
+        searchAll(searchQuery);
+      }, 300); // Debounce de 300ms
+
+      return () => clearTimeout(timer);
+    } else if (searchType === 'mods' && searchQuery.trim()) {
       const timer = setTimeout(() => {
         searchMods(searchQuery);
       }, 300); // Debounce de 300ms
@@ -221,6 +297,11 @@ const SearchModal = ({ isOpen, onClose }) => {
       }, 300); // Debounce de 300ms
 
       return () => clearTimeout(timer);
+    } else if (searchType === 'todos') {
+      setSearchResults([]);
+      setGameResults([]);
+      setUserResults([]);
+      setHasSearched(false);
     } else if (searchType === 'mods') {
       setSearchResults([]);
       setHasSearched(false);
@@ -266,7 +347,12 @@ const SearchModal = ({ isOpen, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      performSearch(searchQuery.trim());
+      // Siempre redirigir a la página de búsqueda general
+      const encodedQuery = encodeURIComponent(searchQuery.trim());
+      addToRecentSearches(searchQuery.trim());
+      navigate(`/search?q=${encodedQuery}`);
+      onClose();
+      setSearchQuery('');
     }
   };
 
@@ -281,36 +367,6 @@ const SearchModal = ({ isOpen, onClose }) => {
 
     setRecentSearches(updatedRecentSearches);
     localStorage.setItem('recentSearches', JSON.stringify(updatedRecentSearches));
-  };
-
-  // Realizar búsqueda
-  const performSearch = (query) => {
-    const encodedQuery = encodeURIComponent(query);
-    let searchPath = '';
-
-    switch (searchType) {
-      case 'todos':
-        searchPath = `/search?q=${encodedQuery}`;
-        break;
-      case 'mods':
-        searchPath = `/mods?search=${encodedQuery}`;
-        break;
-      case 'juegos':
-        searchPath = `/juegos?search=${encodedQuery}`;
-        break;
-      case 'usuarios':
-        searchPath = `/usuarios?search=${encodedQuery}`;
-        break;
-      default:
-        searchPath = `/search?q=${encodedQuery}`;
-    }
-
-    // Añadir a búsquedas recientes
-    addToRecentSearches(query);
-
-    navigate(searchPath);
-    onClose();
-    setSearchQuery('');
   };
 
   // Eliminar búsqueda reciente
@@ -328,11 +384,12 @@ const SearchModal = ({ isOpen, onClose }) => {
 
   // Manejar búsqueda reciente
   const handleRecentSearch = (query) => {
-    setSearchQuery(query);
-    performSearch(query);
+    const encodedQuery = encodeURIComponent(query);
+    addToRecentSearches(query);
+    navigate(`/search?q=${encodedQuery}`);
+    onClose();
+    setSearchQuery('');
   };
-
-
 
   // Manejar clic en juego favorito
   const handleFavoriteGameClick = (game) => {
@@ -416,8 +473,151 @@ const SearchModal = ({ isOpen, onClose }) => {
 
         {/* Body del modal */}
         <div className="nexus-modal-body">
-          {/* Mostrar resultados de búsqueda de mods si está buscando mods */}
-          {searchType === 'mods' && (hasSearched || searchQuery.trim()) ? (
+          {/* Mostrar resultados de búsqueda divididos por categorías cuando el tipo es 'todos' */}
+          {searchType === 'todos' && (hasSearched || searchQuery.trim()) ? (
+            <div className="search-results-section">
+              <div className="nexus-section-header">
+                <h3 className="nexus-section-title">
+                  {searchQuery.trim() ? `Resultados para "${searchQuery}"` : 'Resultados de búsqueda'}
+                </h3>
+              </div>
+              
+              {loadingSearch ? (
+                <div className="loading-state">
+                  <div className="spinner"></div>
+                  <p className="loading-text">Buscando...</p>
+                </div>
+              ) : errorSearch ? (
+                <div className="error-state">
+                  <p className="error-text">Error al realizar la búsqueda</p>
+                  <p className="error-subtext">{errorSearch}</p>
+                </div>
+              ) : (
+                <div className="search-all-results">
+                  {/* Sección de Mods */}
+                  {searchResults.length > 0 && (
+                    <div className="search-category-section">
+                      <h4 className="category-title">Mods ({searchResults.length})</h4>
+                      <div className="mods-grid">
+                        {searchResults.slice(0, 3).map((mod) => (
+                          <div key={mod.id} className="mod-card-wrapper">
+                            <ModCardCompact 
+                              mod={mod}
+                              onClick={() => {
+                                navigate(`/mods/${mod.id}`);
+                                onClose();
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      {searchResults.length > 3 && (
+                        <button 
+                          className="view-all-button"
+                          onClick={() => {
+                            navigate(`/mods?search=${encodeURIComponent(searchQuery)}`);
+                            onClose();
+                          }}
+                        >
+                          Ver todos los mods ({searchResults.length})
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Sección de Juegos */}
+                  {gameResults.length > 0 && (
+                    <div className="search-category-section">
+                      <h4 className="category-title">Juegos ({gameResults.length})</h4>
+                      <div className="games-grid-compact">
+                        {gameResults.slice(0, 4).map((game) => (
+                          <div key={game.id} className="game-card-wrapper">
+                            <GameCard 
+                              game={game}
+                              showStats={true}
+                              showFavoriteButton={false}
+                              onClick={() => {
+                                navigate(`/juegos/${game.id}`);
+                                onClose();
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      {gameResults.length > 4 && (
+                        <button 
+                          className="view-all-button"
+                          onClick={() => {
+                            navigate(`/juegos?search=${encodeURIComponent(searchQuery)}`);
+                            onClose();
+                          }}
+                        >
+                          Ver todos los juegos ({gameResults.length})
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Sección de Usuarios */}
+                  {userResults.length > 0 && (
+                    <div className="search-category-section">
+                      <h4 className="category-title">Usuarios ({userResults.length})</h4>
+                      <div className="users-grid-compact">
+                        {userResults.slice(0, 4).map((user) => (
+                          <div key={user.id} className="user-card-wrapper">
+                            <UserCard 
+                              user={user}
+                              onClick={() => {
+                                navigate(`/usuarios/${user.id}/perfil`);
+                                onClose();
+                              }}
+                              showLink={false}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      {userResults.length > 4 && (
+                        <button 
+                          className="view-all-button"
+                          onClick={() => {
+                            navigate(`/usuarios?search=${encodeURIComponent(searchQuery)}`);
+                            onClose();
+                          }}
+                        >
+                          Ver todos los usuarios ({userResults.length})
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Mensaje cuando no hay resultados */}
+                  {hasSearched && searchResults.length === 0 && gameResults.length === 0 && userResults.length === 0 && (
+                    <div className="empty-state">
+                      <p className="empty-text">No se encontraron resultados</p>
+                      <p className="empty-subtext">Intenta con otros términos de búsqueda</p>
+                    </div>
+                  )}
+
+                  {/* Botón para ver todos los resultados en página completa */}
+                  {hasSearched && (searchResults.length > 0 || gameResults.length > 0 || userResults.length > 0) && (
+                    <div className="search-category-section">
+                      <button 
+                        className="view-all-button view-all-results-button"
+                        onClick={() => {
+                          const encodedQuery = encodeURIComponent(searchQuery);
+                          addToRecentSearches(searchQuery);
+                          navigate(`/search?q=${encodedQuery}`);
+                          onClose();
+                        }}
+                      >
+                        Ver todos los resultados en página completa
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : searchType === 'mods' && (hasSearched || searchQuery.trim()) ? (
             <div className="search-results-section">
               <div className="nexus-section-header">
                 <h3 className="nexus-section-title">

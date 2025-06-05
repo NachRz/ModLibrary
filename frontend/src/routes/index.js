@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'; // Archivo principal de rutas
 
 import Home from '../components/home/Home';
 import Contacto from '../components/contacto/Contacto';
+import SearchResults from '../components/common/SearchResults';
 import authRoutes from './auth/authRoutes';
 import dashboardRoutes from './dashboard/dashboardRoutes';
 import modRoutes from './mods/modRoutes';
@@ -28,6 +29,9 @@ const AppRoutes = () => {
 
             {/* Rutas de usuario */}
             {userRoutes}
+
+            {/* Ruta de búsqueda */}
+            <Route path="/search" element={<SearchResults />} />
 
             {/* Ruta de contacto */}
             <Route path="/contacto" element={<Contacto />} />

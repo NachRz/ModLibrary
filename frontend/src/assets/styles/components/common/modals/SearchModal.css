@@ -169,6 +169,84 @@
   width: 100%;
 }
 
+/* Contenedor de resultados de búsqueda completa */
+.search-all-results {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Sección de cada categoría */
+.search-category-section {
+  background-color: #334155;
+  border-radius: 6px;
+  padding: 16px;
+  border: 1px solid #475569;
+}
+
+/* Título de categoría */
+.category-title {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #475569;
+}
+
+/* Botón para ver todos */
+.view-all-button {
+  width: 100%;
+  background-color: #3B82F6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 12px;
+}
+
+.view-all-button:hover {
+  background-color: #2563EB;
+}
+
+/* Botón especial para ver todos los resultados */
+.view-all-results-button {
+  background-color: #10B981;
+  font-weight: 600;
+  padding: 10px 16px;
+  margin-top: 0;
+}
+
+.view-all-results-button:hover {
+  background-color: #059669;
+}
+
+/* Grid compacto para juegos en búsqueda global */
+.games-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* Grid compacto para usuarios en búsqueda global */
+.users-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+/* Ajustar el grid de mods en las categorías */
+.search-category-section .mods-grid {
+  margin-bottom: 8px;
+  max-height: 300px;
+}
+
 /* Grid de mods compactos */
 .mods-grid {
   display: flex;
@@ -531,8 +609,6 @@
   transform: rotate(180deg);
 }
 
-
-
 /* Footer del modal */
 .nexus-modal-footer {
   background-color: #334155;
@@ -646,6 +722,21 @@
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 14px;
   }
+
+  /* Estilos para búsqueda dividida en tablet */
+  .search-category-section {
+    padding: 14px;
+  }
+
+  .games-grid-compact {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .users-grid-compact {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -694,6 +785,36 @@
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
   }
+
+  /* Estilos para búsqueda dividida en móvil */
+  .search-all-results {
+    gap: 16px;
+  }
+
+  .search-category-section {
+    padding: 12px;
+  }
+
+  .category-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .games-grid-compact {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .users-grid-compact {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+
+  .view-all-button {
+    padding: 6px 12px;
+    font-size: 13px;
+    margin-top: 10px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -739,6 +860,41 @@
   .users-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 10px;
+  }
+
+  /* Estilos para búsqueda dividida en pantallas muy pequeñas */
+  .search-all-results {
+    gap: 12px;
+  }
+
+  .search-category-section {
+    padding: 10px;
+  }
+
+  .category-title {
+    font-size: 13px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+
+  .games-grid-compact {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 6px;
+  }
+
+  .users-grid-compact {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .view-all-button {
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  .search-category-section .mods-grid {
+    max-height: 200px;
   }
 }
 

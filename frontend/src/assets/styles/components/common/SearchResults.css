@@ -1,0 +1,369 @@
+/* Página de Resultados de Búsqueda */
+
+.search-results-page {
+  min-height: 100vh;
+  background-color: #0F172A;
+  color: #FFFFFF;
+}
+
+/* Header de búsqueda */
+.search-header {
+  background-color: #1E293B;
+  border-bottom: 1px solid #334155;
+  padding: 24px 0;
+  margin-bottom: 32px;
+}
+
+.search-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 16px 0;
+  text-align: left;
+}
+
+/* Información de resultados */
+.results-info {
+  margin-top: 0;
+}
+
+.results-count {
+  color: #94A3B8;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Contenedor de pestañas */
+.tabs-container {
+  margin-bottom: 24px;
+  border-bottom: 1px solid #334155;
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 0;
+}
+
+.tab {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 12px 20px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab:hover {
+  color: #FFFFFF;
+  background-color: #334155;
+}
+
+.tab.active {
+  color: #3B82F6;
+  border-bottom-color: #3B82F6;
+  background-color: #1E293B;
+}
+
+/* Contenido de búsqueda */
+.search-content {
+  min-height: 400px;
+}
+
+/* Contenedor de resultados */
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Contenedor para mostrar todas las categorías */
+.all-results-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Contenedor para mostrar una sola categoría */
+.single-category-results {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Sección de resultados */
+.results-section {
+  background-color: #1E293B;
+  border-radius: 8px;
+  padding: 24px;
+  border: 1px solid #334155;
+}
+
+.section-title {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #334155;
+}
+
+/* Grids de resultados */
+.mods-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* Wrappers de cards */
+.mod-card-wrapper,
+.game-card-wrapper,
+.user-card-wrapper {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Estados */
+.loading-state,
+.error-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  text-align: center;
+  background-color: #1E293B;
+  border-radius: 8px;
+  border: 1px solid #334155;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #334155;
+  border-top: 3px solid #3B82F6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text,
+.empty-text,
+.error-text {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+.empty-subtext,
+.error-subtext {
+  color: #94A3B8;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.retry-button {
+  background-color: #3B82F6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.retry-button:hover {
+  background-color: #2563EB;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .search-title {
+    font-size: 24px;
+  }
+
+  .results-section {
+    padding: 20px;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .mods-grid {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-header {
+    padding: 20px 0;
+    margin-bottom: 24px;
+  }
+
+  .search-title {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+
+
+  .tabs {
+    gap: 0;
+    padding: 0 4px;
+  }
+
+  .tab {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .results-container {
+    gap: 24px;
+  }
+
+  .results-section {
+    padding: 16px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
+
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .mods-grid {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-header {
+    padding: 16px 0;
+    margin-bottom: 20px;
+  }
+
+  .search-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+
+
+  .tabs {
+    padding: 0;
+    margin: 0 -16px;
+  }
+
+  .tab {
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+
+  .results-section {
+    padding: 12px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .mods-grid {
+    gap: 10px;
+  }
+
+  .loading-state,
+  .error-state,
+  .empty-state {
+    padding: 48px 24px;
+  }
+}
+
+/* Animaciones */
+.search-results-page {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estados de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+  .tab.active {
+    border-bottom-color: #ffffff;
+  }
+} 
