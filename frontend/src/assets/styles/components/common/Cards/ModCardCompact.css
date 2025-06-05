@@ -1,0 +1,230 @@
+/* Estilos para el nuevo ModCardCompact */
+
+.mod-card-compact-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.mod-card-compact-new {
+  display: flex;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  height: 70px;
+}
+
+.mod-card-compact-new:hover {
+  background: rgba(51, 65, 85, 0.9);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Imagen del mod */
+.mod-card-compact-image {
+  position: relative;
+  width: 100px;
+  height: 70px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.mod-card-compact-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.mod-card-compact-new:hover .mod-card-compact-image img {
+  transform: scale(1.05);
+}
+
+.mod-card-compact-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(30, 41, 59, 0.3) 100%);
+  pointer-events: none;
+}
+
+/* Contenido principal */
+.mod-card-compact-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  padding: 0 16px;
+  min-width: 0;
+}
+
+/* Información del mod */
+.mod-card-compact-info {
+  flex: 1;
+  min-width: 0;
+  margin-right: 12px;
+}
+
+.mod-card-compact-title {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mod-card-compact-author {
+  color: rgba(148, 163, 184, 0.8);
+  font-size: 12px;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Estadísticas */
+.mod-card-compact-stats {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.mod-card-compact-downloads {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(148, 163, 184, 0.9);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.download-icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+/* Estados de hover específicos */
+.mod-card-compact-new:hover .mod-card-compact-title {
+  color: rgba(255, 255, 255, 1);
+}
+
+.mod-card-compact-new:hover .mod-card-compact-author {
+  color: rgba(148, 163, 184, 1);
+}
+
+.mod-card-compact-new:hover .mod-card-compact-downloads {
+  color: rgba(148, 163, 184, 1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .mod-card-compact-new {
+    height: 65px;
+  }
+  
+  .mod-card-compact-image {
+    width: 85px;
+    height: 65px;
+  }
+  
+  .mod-card-compact-content {
+    padding: 0 12px;
+  }
+  
+  .mod-card-compact-title {
+    font-size: 13px;
+  }
+  
+  .mod-card-compact-author {
+    font-size: 11px;
+  }
+  
+  .mod-card-compact-downloads {
+    font-size: 11px;
+  }
+  
+  .download-icon {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mod-card-compact-new {
+    height: 60px;
+  }
+  
+  .mod-card-compact-image {
+    width: 75px;
+    height: 60px;
+  }
+  
+  .mod-card-compact-content {
+    padding: 0 10px;
+  }
+  
+  .mod-card-compact-stats {
+    gap: 8px;
+  }
+  
+  .mod-card-compact-title {
+    font-size: 12px;
+  }
+  
+  .mod-card-compact-author {
+    font-size: 10px;
+  }
+}
+
+/* Animaciones de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mod-card-compact-new {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+  .mod-card-compact-new {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .mod-card-compact-new:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Reducir movimiento si está configurado */
+@media (prefers-reduced-motion: reduce) {
+  .mod-card-compact-new,
+  .mod-card-compact-image img {
+    transition: none;
+  }
+  
+  .mod-card-compact-new:hover {
+    transform: none;
+  }
+  
+  .mod-card-compact-new:hover .mod-card-compact-image img {
+    transform: none;
+  }
+} 

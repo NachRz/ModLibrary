@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useNotification } from '../../../context/NotificationContext';
 import { useFavorite } from '../../../hooks/useFavorites';
 
-const GameCard = ({ game, showStats = true, showFavoriteButton = false, onFavoriteChange }) => {
+const GameCard = ({ game, showStats = true, showFavoriteButton = false, onFavoriteChange, onClick }) => {
   const { showNotification } = useNotification();
   
   // Hook para manejar favoritos (solo si showFavoriteButton es true)
@@ -26,10 +26,22 @@ const GameCard = ({ game, showStats = true, showFavoriteButton = false, onFavori
     }
   };
 
+  // Manejar el clic en la tarjeta
+  const handleCardClick = (e) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick(game);
+    }
+  };
+
   return (
     <div className="relative group">
       {/* Card Container */}
-      <div className="bg-custom-card rounded-lg shadow-xl overflow-hidden transition-all duration-300 group-hover:shadow-2xl">
+      <div 
+        className="bg-custom-card rounded-lg shadow-xl overflow-hidden transition-all duration-300 group-hover:shadow-2xl"
+        onClick={handleCardClick}
+        style={{ cursor: onClick ? 'pointer' : 'default' }}
+      >
         {/* Imagen del juego con overlay */}
         <div className="relative aspect-[2/3]">
           <img 
@@ -101,12 +113,14 @@ const GameCard = ({ game, showStats = true, showFavoriteButton = false, onFavori
         </div>
       </div>
 
-      {/* Enlace que cubre toda la tarjeta */}
-      <Link 
-        to={`/juegos/${game.id}`} 
-        className="absolute inset-0 z-0"
-        aria-label={`Ver detalles de ${game.titulo || game.title || game.name}`}
-      />
+      {/* Enlace que cubre toda la tarjeta - solo si no hay onClick */}
+      {!onClick && (
+        <Link 
+          to={`/juegos/${game.id}`} 
+          className="absolute inset-0 z-0"
+          aria-label={`Ver detalles de ${game.titulo || game.title || game.name}`}
+        />
+      )}
     </div>
   );
 };

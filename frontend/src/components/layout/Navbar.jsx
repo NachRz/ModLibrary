@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import authService from '../../services/api/authService'; // Importar el servicio de autenticación
+import SearchModal from '../common/Modals/SearchModal'; // Importar el modal de búsqueda
 import '../../assets/styles/components/layout/navbar.css'; // Ruta actualizada al CSS
 
 // Componente NavLink reutilizable
@@ -48,10 +49,8 @@ const Navbar = () => {
   const [userData, setUserData] = useState({ nome: '', correo: '', rol: '', foto_perfil: '' });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPanelMenuOpen, setIsPanelMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState('');
-  const searchInputRef = useRef(null);
   const location = useLocation();
 
   // Verificar autenticación
@@ -144,38 +143,14 @@ const Navbar = () => {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const togglePanelMenu = () => setIsPanelMenuOpen(!isPanelMenuOpen);
 
-  // Función para manejar el envío del formulario de búsqueda
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    const query = searchInputRef.current.value.trim();
-    if (query) {
-      console.log('Searching for:', query);
-      // Aquí puedes añadir la lógica de búsqueda o redirección
-    }
+  // Función para abrir el modal de búsqueda
+  const handleOpenSearchModal = () => {
+    setIsSearchModalOpen(true);
   };
 
-  // Manejadores para los eventos del campo de búsqueda
-  const handleSearchMouseEnter = () => {
-    setIsSearchOpen(true);
-  };
-
-  const handleSearchMouseLeave = () => {
-    // Solo cerrar si no está enfocado
-    if (!isSearchFocused) {
-      setIsSearchOpen(false);
-    }
-  };
-
-  const handleSearchFocus = () => {
-    setIsSearchFocused(true);
-  };
-
-  const handleSearchBlur = () => {
-    setIsSearchFocused(false);
-    // Cerrar si el ratón no está sobre el campo
-    if (!isSearchOpen) {
-      setIsSearchOpen(false);
-    }
+  // Función para cerrar el modal de búsqueda
+  const handleCloseSearchModal = () => {
+    setIsSearchModalOpen(false);
   };
 
   return (
@@ -218,34 +193,16 @@ const Navbar = () => {
 
           {/* Lado derecho de la navbar */}
           <div className="flex items-center">
-            {/* Barra de búsqueda desplegable */}
-            <div 
-              className="search-container relative mr-2"
-              onMouseEnter={handleSearchMouseEnter}
-              onMouseLeave={handleSearchMouseLeave}
+            {/* Botón de búsqueda */}
+            <button 
+              onClick={handleOpenSearchModal}
+              className="text-custom-detail p-2 rounded-md hover:text-custom-text hover:bg-custom-primary/5 transition-colors mr-2" 
+              aria-label="Buscar"
             >
-              <form onSubmit={handleSearchSubmit} className="flex items-center">
-                <div className={`search-wrapper ${isSearchOpen || isSearchFocused ? 'search-wrapper-open' : ''}`}>
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Buscar..."
-                    className="search-input bg-custom-card text-custom-text placeholder-custom-detail/50 focus:outline-none"
-                    onFocus={handleSearchFocus}
-                    onBlur={handleSearchBlur}
-                  />
-                  <button 
-                    type="submit"
-                    className="search-button text-custom-detail hover:text-custom-text transition-colors" 
-                    aria-label="Buscar"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </button>
-                </div>
-              </form>
-            </div>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
 
             {/* Icono de favoritos */}
             <button 
@@ -534,6 +491,12 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de búsqueda */}
+      <SearchModal 
+        isOpen={isSearchModalOpen} 
+        onClose={handleCloseSearchModal} 
+      />
     </nav>
   );
 };

@@ -38,6 +38,61 @@ class ModController extends Controller
     }
 
     /**
+     * Buscar mods por nombre
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $nombre = $request->input('nombre', '');
+        
+        if (empty($nombre) || strlen($nombre) < 2) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'El término de búsqueda debe tener al menos 2 caracteres'
+            ], 400);
+        }
+
+        // Buscar mods por título que contenga el término de búsqueda
+        $mods = Mod::with([
+            'creador:id,nome,correo,foto_perfil',
+            'juego:id,titulo,imagen_fondo',
+            'etiquetas:id,nombre',
+            'valoraciones'
+        ])
+            ->where('titulo', 'LIKE', "%{$nombre}%")
+            ->where('estado', 'publicado') // Solo mods publicados
+            ->whereNull('deleted_at') // Solo mods no eliminados
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Calcular estadísticas para cada mod
+        $mods = $mods->map(function ($mod) {
+            $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
+            $totalValoraciones = $mod->valoraciones->count();
+            
+            // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
+            unset($mod->valoraciones);
+            
+            // Agregar las estadísticas calculadas
+            $mod->estadisticas = [
+                'valoracion_media' => round($valoracionMedia, 1),
+                'total_valoraciones' => $totalValoraciones,
+                'total_descargas' => $mod->total_descargas
+            ];
+            
+            return $mod;
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $mods,
+            'total' => $mods->count()
+        ]);
+    }
+
+    /**
      * Almacenar un nuevo mod en la base de datos
      *
      * @param Request $request

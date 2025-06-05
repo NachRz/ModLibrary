@@ -1625,7 +1625,7 @@ const ExplorarMods = () => {
                     <>
                       {/* Vista compacta (usando ModCards) */}
                       {vistaActual === 'compacta' && (
-                        <div className="mods-grid">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                           {modsEnPagina.map((mod) => {
                             const isOwnerOfMod = ownershipMap[mod.id] || false;
                             return (

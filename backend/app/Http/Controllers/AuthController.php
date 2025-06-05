@@ -186,6 +186,75 @@ class AuthController extends Controller
     }
 
     // Métodos de administración de usuarios
+    public function searchUsers(Request $request)
+    {
+        try {
+            $query = $request->get('q', '');
+            
+            if (empty(trim($query))) {
+                return response()->json([
+                    'status' => 'success',
+                    'data' => []
+                ]);
+            }
+            
+            $usuarios = Usuario::select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'sobre_mi', 'foto_perfil', 'created_at')
+                ->where(function($q) use ($query) {
+                    $q->where('nome', 'like', '%' . $query . '%')
+                      ->orWhere('nombre', 'like', '%' . $query . '%')
+                      ->orWhere('apelidos', 'like', '%' . $query . '%')
+                      ->orWhere('correo', 'like', '%' . $query . '%');
+                })
+                ->withCount('mods')
+                ->orderBy('nome', 'asc')
+                ->limit(20) // Limitar resultados para mejorar rendimiento
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $usuarios->map(function ($usuario) {
+                    // Construir URL completa para la imagen de perfil
+                    $profileImageUrl = null;
+                    if ($usuario->foto_perfil) {
+                        if (str_starts_with($usuario->foto_perfil, 'http')) {
+                            // URL completa
+                            $profileImageUrl = $usuario->foto_perfil;
+                        } else {
+                            // Ruta relativa, construir URL completa
+                            $profileImageUrl = url('storage/' . $usuario->foto_perfil);
+                        }
+                    }
+                    
+                    return [
+                        'id' => $usuario->id,
+                        'username' => $usuario->nome,
+                        'nome_usuario' => $usuario->nome,
+                        'name' => $usuario->nombre,
+                        'nombre' => $usuario->nombre,
+                        'apelidos' => $usuario->apelidos,
+                        'avatar' => $profileImageUrl,
+                        'foto_perfil' => $profileImageUrl,
+                        'profile_image' => $profileImageUrl,
+                        'correo' => $usuario->correo,
+                        'rol' => $usuario->rol,
+                        'sobre_mi' => $usuario->sobre_mi,
+                        'total_mods' => $usuario->mods_count,
+                        'created_at' => $usuario->created_at
+                    ];
+                })
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al buscar usuarios', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al buscar usuarios'
+            ], 500);
+        }
+    }
+
     public function getAllUsers(Request $request)
     {
         try {
@@ -197,6 +266,18 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'success',
                 'data' => $usuarios->map(function ($usuario) {
+                    // Construir URL completa para la imagen de perfil
+                    $profileImageUrl = null;
+                    if ($usuario->foto_perfil) {
+                        if (str_starts_with($usuario->foto_perfil, 'http')) {
+                            // URL completa
+                            $profileImageUrl = $usuario->foto_perfil;
+                        } else {
+                            // Ruta relativa, construir URL completa
+                            $profileImageUrl = url('storage/' . $usuario->foto_perfil);
+                        }
+                    }
+                    
                     return [
                         'id' => $usuario->id,
                         'nome' => $usuario->nome,
@@ -206,7 +287,7 @@ class AuthController extends Controller
                         'estado' => 'activo', // Por defecto, puedes añadir este campo a la BD si lo necesitas
                         'fecha_registro' => $usuario->created_at->format('Y-m-d'),
                         'tiene_mods' => $usuario->mods_count > 0,
-                        'foto_perfil' => $usuario->foto_perfil
+                        'foto_perfil' => $profileImageUrl
                     ];
                 })
             ]);
@@ -227,6 +308,18 @@ class AuthController extends Controller
         try {
             $usuario = Usuario::findOrFail($id);
             
+            // Construir URL completa para la imagen de perfil
+            $profileImageUrl = null;
+            if ($usuario->foto_perfil) {
+                if (str_starts_with($usuario->foto_perfil, 'http')) {
+                    // URL completa
+                    $profileImageUrl = $usuario->foto_perfil;
+                } else {
+                    // Ruta relativa, construir URL completa
+                    $profileImageUrl = url('storage/' . $usuario->foto_perfil);
+                }
+            }
+            
             return response()->json([
                 'status' => 'success',
                 'data' => [
@@ -238,7 +331,7 @@ class AuthController extends Controller
                     'apelidos' => $usuario->apelidos,
                     'sobre_mi' => $usuario->sobre_mi,
                     'fecha_registro' => $usuario->created_at->format('Y-m-d H:i:s'),
-                    'foto_perfil' => $usuario->foto_perfil
+                    'foto_perfil' => $profileImageUrl
                 ]
             ]);
         } catch (\Exception $e) {

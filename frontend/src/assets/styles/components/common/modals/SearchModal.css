@@ -1,0 +1,794 @@
+/* Estilos del Modal de Búsqueda - Réplica exacta de Nexus Mods */
+
+/* Overlay principal */
+.nexus-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Backdrop */
+.nexus-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+/* Contenedor principal del modal */
+.nexus-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  height: 85vh;
+  max-height: 800px;
+  min-height: 600px;
+  background-color: #1E293B;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header del modal */
+.nexus-modal-header {
+  background-color: #334155;
+  border-bottom: 1px solid #475569;
+  padding: 20px 24px;
+  flex-shrink: 0;
+}
+
+/* Contenedor del campo de búsqueda */
+.nexus-search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Formulario de búsqueda */
+.nexus-search-form {
+  width: 100%;
+}
+
+/* Wrapper del input de búsqueda */
+.nexus-search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  padding: 0;
+  transition: border-color 0.2s ease;
+}
+
+.nexus-search-input-wrapper:focus-within {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 1px #3B82F6;
+}
+
+/* Icono de búsqueda */
+.nexus-search-icon {
+  width: 16px;
+  height: 16px;
+  color: #94A3B8;
+  margin-left: 12px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Campo de búsqueda principal */
+.nexus-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-size: 14px;
+  padding: 10px 12px 10px 0;
+  font-family: inherit;
+}
+
+.nexus-search-input::placeholder {
+  color: #94A3B8;
+}
+
+/* Botón cerrar */
+.nexus-close-button {
+  background-color: #3B82F6;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 6px 12px;
+  margin-right: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nexus-close-button:hover {
+  background-color: #2563EB;
+}
+
+/* Contenedor del select */
+.nexus-select-container {
+  width: 100%;
+}
+
+/* Select de categorías */
+.nexus-category-select {
+  width: 150px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #334155;
+  border-radius: 0;
+  color: #FFFFFF;
+  font-size: 14px;
+  padding: 10px 16px 10px 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nexus-category-select:focus {
+  border-color: #3B82F6;
+}
+
+.nexus-category-select option {
+  background-color: #1E293B;
+  color: #FFFFFF;
+}
+
+/* Body del modal */
+.nexus-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background-color: #1E293B;
+}
+
+/* Grid del contenido */
+.nexus-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 100%;
+}
+
+/* Sección de resultados de búsqueda */
+.search-results-section {
+  width: 100%;
+}
+
+/* Grid de mods compactos */
+.mods-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0 4px;
+}
+
+/* Wrapper del mod card compacto */
+.mod-card-wrapper {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Grid de juegos */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0 4px;
+}
+
+/* Wrapper del game card */
+.game-card-wrapper {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Grid de usuarios */
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0 4px;
+}
+
+/* Wrapper del user card */
+.user-card-wrapper {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Hacer los GameCards más pequeños en el modal de búsqueda */
+.search-results-section .game-card-wrapper > div {
+  transform: scale(0.85);
+  transform-origin: center;
+}
+
+/* Secciones */
+.nexus-recent-section,
+.nexus-games-section {
+  min-width: 0;
+}
+
+/* Header de secciones */
+.nexus-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* Títulos de secciones */
+.nexus-section-title {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Botón limpiar */
+.nexus-clear-button {
+  background: none;
+  border: none;
+  color: #3B82F6;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nexus-clear-button:hover {
+  color: #2563EB;
+  text-decoration: underline;
+}
+
+/* Lista de búsquedas recientes */
+.nexus-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Item de búsqueda reciente */
+.nexus-recent-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  gap: 8px;
+  position: relative;
+}
+
+.nexus-recent-item:hover {
+  background-color: #334155;
+}
+
+/* Icono de búsqueda pequeño */
+.nexus-search-icon-small {
+  width: 14px;
+  height: 14px;
+  color: #94A3B8;
+  flex-shrink: 0;
+}
+
+/* Texto de búsqueda reciente */
+.nexus-recent-text {
+  flex: 1;
+  font-size: 14px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Botón remover */
+.nexus-remove-button {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 2px;
+  opacity: 0;
+  transition: all 0.2s ease;
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nexus-remove-button svg {
+  width: 12px;
+  height: 12px;
+}
+
+.nexus-recent-item:hover .nexus-remove-button {
+  opacity: 1;
+}
+
+.nexus-remove-button:hover {
+  background-color: #EF4444;
+  color: white;
+}
+
+/* Lista de juegos */
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Item de juego */
+.game-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: 1px solid transparent;
+  color: #FFFFFF;
+  text-align: left;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 12px;
+}
+
+.game-item:hover {
+  background-color: #334155;
+  border-color: #475569;
+  transform: translateY(-1px);
+}
+
+/* Imagen del juego */
+.game-image {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  border: 1px solid #475569;
+  background-color: #374151;
+  transition: transform 0.2s ease;
+}
+
+.game-item:hover .game-image {
+  transform: scale(1.05);
+}
+
+/* Placeholder para imagen del juego */
+.game-image-placeholder {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  flex-shrink: 0;
+  border: 1px solid #475569;
+  background-color: #374151;
+  transition: transform 0.2s ease;
+  font-size: 24px;
+}
+
+.game-item:hover .game-image-placeholder {
+  transform: scale(1.05);
+}
+
+/* Nombre del juego */
+.game-name {
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Estados vacíos */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.empty-text {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.empty-subtext {
+  color: #94A3B8;
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Estados de carga */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #334155;
+  border-top: 2px solid #3B82F6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+.loading-text {
+  color: #94A3B8;
+  font-size: 14px;
+  margin: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estados de error */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.error-text {
+  color: #EF4444;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.error-subtext {
+  color: #94A3B8;
+  font-size: 12px;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+}
+
+.nexus-retry-button {
+  background-color: #3B82F6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.nexus-retry-button:hover {
+  background-color: #2563EB;
+}
+
+/* Botón de refresh */
+.nexus-refresh-button {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nexus-refresh-button:hover {
+  color: #3B82F6;
+  background-color: #334155;
+  transform: rotate(180deg);
+}
+
+
+
+/* Footer del modal */
+.nexus-modal-footer {
+  background-color: #334155;
+  border-top: 1px solid #475569;
+  padding: 16px 24px;
+  flex-shrink: 0;
+}
+
+/* Contenido del footer */
+.nexus-footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #94A3B8;
+}
+
+/* Atajos de teclado */
+.nexus-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Atajo individual */
+.nexus-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Teclas del teclado */
+.nexus-key {
+  background-color: #475569;
+  border: 1px solid #6B7280;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: inherit;
+  color: #FFFFFF;
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Enlace de preferencias */
+.nexus-preferences-link {
+  background: none;
+  border: none;
+  color: #3B82F6;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nexus-preferences-link:hover {
+  color: #2563EB;
+  text-decoration: underline;
+}
+
+/* Scrollbar personalizada */
+.nexus-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nexus-modal-body::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 3px;
+}
+
+.nexus-modal-body::-webkit-scrollbar-thumb {
+  background-color: #6B7280;
+  border-radius: 3px;
+}
+
+.nexus-modal-body::-webkit-scrollbar-thumb:hover {
+  background-color: #9CA3AF;
+}
+
+.nexus-modal-body {
+  scrollbar-width: thin;
+  scrollbar-color: #6B7280 #374151;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .nexus-content-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .nexus-modal-content {
+    max-width: 95vw;
+    height: 80vh;
+    max-height: 700px;
+    min-height: 500px;
+  }
+
+  .mods-grid {
+    gap: 10px;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nexus-modal-overlay {
+    padding: 16px;
+  }
+  
+  .nexus-modal-content {
+    height: 90vh;
+    max-height: 600px;
+    min-height: 450px;
+  }
+  
+  .nexus-modal-header {
+    padding: 16px 20px;
+  }
+  
+  .nexus-modal-body {
+    padding: 20px;
+  }
+  
+  .nexus-modal-footer {
+    padding: 12px 20px;
+  }
+  
+  .nexus-footer-content {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .nexus-shortcuts {
+    gap: 12px;
+  }
+
+  .mods-grid {
+    gap: 8px;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nexus-modal-overlay {
+    padding: 12px;
+  }
+  
+  .nexus-modal-content {
+    height: 95vh;
+    max-height: 500px;
+    min-height: 400px;
+  }
+  
+  .nexus-modal-header {
+    padding: 12px 16px;
+  }
+  
+  .nexus-modal-body {
+    padding: 16px;
+  }
+  
+  .nexus-search-container {
+    gap: 12px;
+  }
+  
+  .nexus-search-input {
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+  
+  .nexus-category-select {
+    width: 100%;
+  }
+
+  .mods-grid {
+    gap: 8px;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .users-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+}
+
+/* Animaciones */
+.nexus-modal-overlay {
+  animation: nexus-fade-in 0.2s ease-out;
+}
+
+.nexus-modal-content {
+  animation: nexus-slide-in 0.2s ease-out;
+}
+
+@keyframes nexus-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes nexus-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Estados de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .nexus-modal-overlay,
+  .nexus-modal-content,
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+  .nexus-modal-content {
+    border: 2px solid #ffffff;
+  }
+  
+  .nexus-search-input-wrapper:focus-within {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+}

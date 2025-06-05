@@ -89,6 +89,16 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener el mod' };
     }
   },
+
+  // Buscar mods por nombre
+  searchModsByName: async (searchQuery) => {
+    try {
+      const response = await apiClient.get(`/mods/buscar?nombre=${encodeURIComponent(searchQuery)}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al buscar mods' };
+    }
+  },
   
   // Crear un nuevo mod
   createMod: async (formData) => {

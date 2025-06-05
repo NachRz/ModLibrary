@@ -65,6 +65,12 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::delete('/mods/{id}/force', [ModController::class, 'forceDelete']);
 });
 
+// Rutas de usuarios
+Route::prefix('usuarios')->group(function () {
+    // Ruta pública para buscar usuarios
+    Route::get('/buscar', [AuthController::class, 'searchUsers']);
+});
+
 // Rutas de juegos
 Route::prefix('juegos')->group(function () {
     // Rutas de favoritos (requieren autenticación) - DEBEN IR ANTES de las rutas con parámetros
@@ -93,6 +99,9 @@ Route::prefix('juegos')->group(function () {
 Route::prefix('mods')->group(function () {
     // Obtener todos los mods con información de creador
     Route::get('/', [ModController::class, 'index']);
+    
+    // Buscar mods por nombre
+    Route::get('/buscar', [ModController::class, 'search']);
     
     // Obtener mods con detalles completos del creador y estadísticas
     Route::get('/con-detalles', [ModController::class, 'getModsWithCreatorDetails']);

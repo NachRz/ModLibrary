@@ -53,6 +53,16 @@ const userService = {
     } catch (error) {
       throw error.response?.data || { message: 'Error al obtener juegos favoritos' };
     }
+  },
+
+  // Buscar usuarios por nombre
+  searchUsers: async (query) => {
+    try {
+      const response = await apiClient.get(`/usuarios/buscar?q=${encodeURIComponent(query)}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al buscar usuarios' };
+    }
   }
 };
 

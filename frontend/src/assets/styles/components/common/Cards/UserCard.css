@@ -1,0 +1,177 @@
+/* UserCard - Estilo similar a la imagen proporcionada */
+.user-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.user-card {
+  background: linear-gradient(145deg, #374151, #2D3748);
+  border-radius: 12px;
+  padding: 20px 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #4A5568;
+  min-height: 120px;
+  position: relative;
+  overflow: hidden;
+}
+
+.user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: #6B7280;
+  background: linear-gradient(145deg, #4A5568, #374151);
+}
+
+.user-card:active {
+  transform: translateY(0);
+}
+
+/* Avatar del usuario */
+.user-card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+  border: 2px solid #6B7280;
+  background-color: #4A5568;
+  flex-shrink: 0;
+}
+
+.user-card-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.user-card:hover .user-card-avatar img {
+  transform: scale(1.05);
+}
+
+/* Avatar fallback con iniciales */
+.user-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.user-card:hover .user-avatar-fallback {
+  transform: scale(1.05);
+}
+
+/* Contenido del usuario */
+.user-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Nombre del usuario */
+.user-card-name {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Estados de foco para accesibilidad */
+.user-card-link:focus {
+  outline: none;
+}
+
+.user-card-link:focus .user-card {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .user-card {
+    padding: 16px 12px 12px 12px;
+    min-height: 100px;
+  }
+  
+  .user-card-avatar {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+  }
+  
+  .user-avatar-fallback {
+    font-size: 14px;
+  }
+  
+  .user-card-name {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-card {
+    padding: 14px 10px 10px 10px;
+    min-height: 90px;
+  }
+  
+  .user-card-avatar {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 8px;
+  }
+  
+  .user-avatar-fallback {
+    font-size: 12px;
+  }
+  
+  .user-card-name {
+    font-size: 12px;
+  }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+  .user-card {
+    border: 2px solid #FFFFFF;
+    background: #000000;
+  }
+  
+  .user-card:hover {
+    border-color: #FFFFFF;
+    background: #1F2937;
+  }
+}
+
+/* Modo sin animaciones */
+@media (prefers-reduced-motion: reduce) {
+  .user-card,
+  .user-card-avatar img {
+    transition: none;
+  }
+  
+  .user-card:hover {
+    transform: none;
+  }
+} 
