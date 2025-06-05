@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import modService from '../../services/api/modService';
+import comentarioService from '../../services/api/comentarioService';
 import useUserModsStatus from '../../hooks/useUserModsStatus';
 import useRating from '../../hooks/useRating';
 import Breadcrumb from '../common/Breadcrumb/Breadcrumb';
@@ -8,6 +9,7 @@ import ImageCarousel from '../common/ImageCarousel/ImageCarousel';
 import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import EditModAdmin from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/EditModAdmin';
 import ShareModal from '../common/ShareModal/ShareModal';
+import ComentariosMod from './ComentariosMod';
 import { useNotification } from '../../context/NotificationContext';
 import '../../assets/styles/components/mods/ModDetails.css';
 
@@ -38,6 +40,12 @@ const ModDetails = () => {
   
   // Estado para el modal de compartir
   const [showShareModal, setShowShareModal] = useState(false);
+  
+  // Estado para comentarios
+  const [comentariosStats, setComentariosStats] = useState({
+    total_comentarios: 0,
+    permite_comentarios: true
+  });
   
   // Referencia al ImageCarousel para control externo
   const imageCarouselRef = useRef(null);
@@ -173,6 +181,24 @@ const ModDetails = () => {
 
     fetchDescargaUsuario();
   }, [isAuthenticated, mod?.id, userLoading]);
+
+  // Cargar estadísticas de comentarios
+  useEffect(() => {
+    const fetchComentariosStats = async () => {
+      if (mod?.id) {
+        try {
+          const response = await comentarioService.getEstadisticas(mod.id);
+          if (response.status === 'success') {
+            setComentariosStats(response.data);
+          }
+        } catch (error) {
+          console.error('Error al obtener estadísticas de comentarios:', error);
+        }
+      }
+    };
+
+    fetchComentariosStats();
+  }, [mod?.id]);
 
   // Función para manejar el clic en el botón de guardar
   const handleGuardarClick = async () => {
@@ -445,6 +471,14 @@ const ModDetails = () => {
   const handleCloseShareModal = () => {
     setShowShareModal(false);
   };
+
+  // Función para actualizar estadísticas de comentarios
+  const actualizarComentariosStats = useCallback((nuevoTotal) => {
+    setComentariosStats(prev => ({
+      ...prev,
+      total_comentarios: nuevoTotal
+    }));
+  }, []);
 
   if (loading) {
     return (
@@ -780,7 +814,7 @@ const ModDetails = () => {
             className={`tab-btn ${activeTab === 'comentarios' ? 'active' : ''}`}
             onClick={() => handleTabChange('comentarios')}
           >
-            Comentarios <span className="tab-count">0</span>
+            Comentarios <span className="tab-count">{comentariosStats.total_comentarios}</span>
           </button>
           {/* Tab Detalles - Solo visible para el propietario */}
           {isOwner && (
@@ -901,10 +935,12 @@ const ModDetails = () => {
 
         {activeTab === 'comentarios' && (
           <div className="mod-tab-content active">
-            <div className="mod-comments">
-              <h2>Comentarios</h2>
-              <p>Sistema de comentarios próximamente...</p>
-            </div>
+            <ComentariosMod 
+              modId={id}
+              isAuthenticated={isAuthenticated}
+              permitirComentarios={comentariosStats.permite_comentarios}
+              onStatsUpdate={actualizarComentariosStats}
+            />
           </div>
         )}
 
@@ -963,7 +999,7 @@ const ModDetails = () => {
                     <i className="fas fa-comments"></i>
                   </div>
                   <div className="stat-content">
-                    <div className="stat-value">0</div>
+                    <div className="stat-value">{comentariosStats.total_comentarios}</div>
                     <div className="stat-label">Comentarios</div>
                   </div>
                 </div>

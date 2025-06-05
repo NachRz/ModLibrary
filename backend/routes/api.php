@@ -8,6 +8,8 @@ use App\Http\Controllers\ModController;
 use App\Http\Controllers\VersionModController;
 use App\Http\Controllers\EtiquetaController;
 use App\Http\Controllers\GeneroController;
+use App\Http\Controllers\ComentarioController;
+use App\Http\Controllers\AdminController;
 
 // Ruta de prueba
 Route::get('/test', function() {
@@ -63,6 +65,13 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::delete('/mods/{id}/soft', [ModController::class, 'softDelete']);
     Route::post('/mods/{id}/restore', [ModController::class, 'restore']);
     Route::delete('/mods/{id}/force', [ModController::class, 'forceDelete']);
+    
+    // Gestión de comentarios (solo administradores)
+    Route::get('/comentarios', [AdminController::class, 'getComentarios']);
+    Route::get('/comentarios/stats', [AdminController::class, 'getComentariosStats']);
+    Route::get('/comentarios/{id}', [AdminController::class, 'getComentario']);
+    Route::put('/comentarios/{id}', [AdminController::class, 'updateComentario']);
+    Route::delete('/comentarios/{id}', [AdminController::class, 'deleteComentario']);
 });
 
 // Rutas de usuarios
@@ -152,6 +161,27 @@ Route::prefix('mods')->group(function () {
             
             // Eliminar una versión
             Route::delete('/{versionId}', [VersionModController::class, 'destroy']);
+        });
+    });
+    
+    // Rutas para comentarios de mods
+    Route::prefix('/{modId}/comentarios')->group(function () {
+        // Obtener comentarios de un mod (público)
+        Route::get('/', [ComentarioController::class, 'index']);
+        
+        // Obtener estadísticas de comentarios (público)
+        Route::get('/stats', [ComentarioController::class, 'stats']);
+        
+        // Rutas que requieren autenticación
+        Route::middleware('auth:sanctum')->group(function () {
+            // Crear un comentario
+            Route::post('/', [ComentarioController::class, 'store']);
+            
+            // Actualizar un comentario
+            Route::put('/{comentarioId}', [ComentarioController::class, 'update']);
+            
+            // Eliminar un comentario
+            Route::delete('/{comentarioId}', [ComentarioController::class, 'destroy']);
         });
     });
     

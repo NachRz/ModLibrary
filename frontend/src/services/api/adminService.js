@@ -184,6 +184,79 @@ const adminService = {
     } catch (error) {
       throw error.response?.data || { message: 'Error al obtener estadísticas del usuario' };
     }
+  },
+
+  // === GESTIÓN DE COMENTARIOS ===
+
+  // Obtener todos los comentarios (con filtros y paginación)
+  getComentarios: async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (params.page) queryParams.append('page', params.page);
+      if (params.per_page) queryParams.append('per_page', params.per_page);
+      if (params.search) queryParams.append('search', params.search);
+      if (params.mod_filter) queryParams.append('mod_filter', params.mod_filter);
+      if (params.user_filter) queryParams.append('user_filter', params.user_filter);
+      if (params.sort_by) queryParams.append('sort_by', params.sort_by);
+      if (params.sort_order) queryParams.append('sort_order', params.sort_order);
+
+      const response = await apiClient.get(`/admin/comentarios?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener comentarios' };
+    }
+  },
+
+  // Obtener detalles de un comentario específico
+  getComentario: async (comentarioId) => {
+    try {
+      const response = await apiClient.get(`/admin/comentarios/${comentarioId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener el comentario' };
+    }
+  },
+
+  // Actualizar comentario
+  updateComentario: async (comentarioId, data) => {
+    try {
+      const response = await apiClient.put(`/admin/comentarios/${comentarioId}`, data);
+      return response.data;
+    } catch (error) {
+      // Capturar más información del error
+      const errorData = {
+        status: error.response?.status,
+        message: error.response?.data?.message || 'Error al actualizar el comentario',
+        response: error.response
+      };
+      
+      throw errorData;
+    }
+  },
+
+  // Eliminar comentario
+  deleteComentario: async (comentarioId) => {
+    try {
+      const response = await apiClient.delete(`/admin/comentarios/${comentarioId}`);
+      return response.data;
+    } catch (error) {
+      const backendError = error.response?.data;
+      if (backendError && backendError.message) {
+        throw new Error(backendError.message);
+      }
+      throw new Error('Error al eliminar comentario');
+    }
+  },
+
+  // Obtener estadísticas de comentarios
+  getComentariosStats: async () => {
+    try {
+      const response = await apiClient.get('/admin/comentarios/stats');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener estadísticas de comentarios' };
+    }
   }
 };
 

@@ -92,6 +92,11 @@
   width: auto;
 }
 
+.admin-table .col-content { 
+  min-width: 200px; 
+  width: auto;
+}
+
 /* Columna de acciones - Siempre compacta */
 .admin-table .actions-column {
   min-width: 100px;

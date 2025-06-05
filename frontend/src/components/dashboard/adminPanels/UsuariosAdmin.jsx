@@ -238,12 +238,13 @@ const UsuariosAdminContent = () => {
         try {
           await loadUsers();
         } catch (error) {
-          console.error('Error al recargar usuarios:', error);
+          console.error('Error al recargar usuarios después de actualización:', error);
         }
       }, 100);
       
+      showNotification('Usuario actualizado correctamente', 'success');
     } catch (error) {
-      console.error('Error al manejar actualización de usuario:', error);
+      showNotification(error.message || 'Error al actualizar usuario', 'error');
     }
   };
 
@@ -320,8 +321,20 @@ const UsuariosAdminContent = () => {
   };
 
   const handleUserCreated = (newUser) => {
-    setUsuarios(prev => [newUser, ...prev]);
-    showNotification(`Usuario "${newUser.nome}" creado correctamente`, 'success');
+    // Agregar timestamp al nuevo usuario
+    const userWithTimestamp = {
+      ...newUser,
+      imageTimestamp: Date.now()
+    };
+    
+    // Agregar el nuevo usuario a la lista
+    setUsuarios(prev => [userWithTimestamp, ...prev]);
+    
+    // Cerrar el modal de creación
+    setIsCreateModalOpen(false);
+    
+    // Mostrar notificación
+    showNotification('Usuario creado correctamente', 'success');
   };
 
   const handleViewProfile = (user) => {
@@ -336,36 +349,46 @@ const UsuariosAdminContent = () => {
     setIsModalOpen(true);
   };
 
-  // Componente para mostrar avatar del usuario
-  const UserAvatar = ({ user }) => {
-    const [imageUrl, setImageUrl] = useState('');
-
-    useEffect(() => {
-      if (user.foto_perfil) {
-        // Usar timestamp personalizado si existe, sino generar uno nuevo
-        const timestamp = user.imageTimestamp || Date.now();
-        setImageUrl(`http://localhost:8000/storage/${user.foto_perfil}?t=${timestamp}`);
-      } else {
-        setImageUrl('');
+  // Función para renderizar avatar de usuario directamente
+  const renderUserAvatar = (usuario) => {
+    const getImageUrl = () => {
+      if (usuario.foto_perfil) {
+        // Usar el timestamp del usuario si existe, o generar uno nuevo
+        const timestamp = usuario.imageTimestamp || Date.now();
+        // Asegurarse de que la URL sea absoluta
+        if (usuario.foto_perfil.startsWith('http')) {
+          return `${usuario.foto_perfil}?t=${timestamp}`;
+        }
+        return `http://localhost:8000/storage/${usuario.foto_perfil}?t=${timestamp}`;
       }
-    }, [user.foto_perfil, user.id, user.imageTimestamp]);
+      return null;
+    };
+
+    const imageUrl = getImageUrl();
 
     return (
       <div className="flex items-center">
         <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3 overflow-hidden">
-          {user.foto_perfil && imageUrl ? (
+          {imageUrl ? (
             <img 
               src={imageUrl}
-              alt={`Avatar de ${user.nome}`}
+              alt={`Avatar de ${usuario.nome}`}
               className="w-8 h-8 rounded-full object-cover"
+              onError={(e) => {
+                // Si la imagen falla, mostrar la inicial
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
             />
-          ) : (
-            <span className="text-white font-bold text-sm">
-              {user.nome.charAt(0).toUpperCase()}
-            </span>
-          )}
+          ) : null}
+          <span 
+            className="text-white font-bold text-sm"
+            style={{ display: imageUrl ? 'none' : 'flex' }}
+          >
+            {usuario.nome.charAt(0).toUpperCase()}
+          </span>
         </div>
-        <span className="text-white font-medium">{user.nome}</span>
+        <span className="text-white font-medium">{usuario.nome}</span>
       </div>
     );
   };
@@ -527,7 +550,7 @@ const UsuariosAdminContent = () => {
                 paginatedUsuarios.map((usuario) => (
                   <tr key={usuario.id}>
                     <td className="col-user">
-                      <UserAvatar user={usuario} />
+                      {renderUserAvatar(usuario)}
                     </td>
                     <td className="col-email text-cell hidden sm:table-cell">{usuario.correo}</td>
                     <td className="col-name text-cell hidden md:table-cell">
@@ -590,7 +613,7 @@ const UsuariosAdminContent = () => {
                 paginatedDeletedUsers.map((usuario) => (
                   <tr key={usuario.id}>
                     <td className="col-user">
-                      <UserAvatar user={usuario} />
+                      {renderUserAvatar(usuario)}
                     </td>
                     <td className="col-email text-cell hidden sm:table-cell">{usuario.correo}</td>
                     <td className="col-name text-cell hidden md:table-cell">

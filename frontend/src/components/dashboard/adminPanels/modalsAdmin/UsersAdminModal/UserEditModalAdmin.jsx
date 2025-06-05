@@ -42,8 +42,16 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
     if (formData.foto_perfil && !selectedFile) {
       const timestamp = Date.now();
       setImageTimestamp(timestamp);
-      setPreviewUrl(`http://localhost:8000/storage/${formData.foto_perfil}?t=${timestamp}`);
-    } else if (!formData.foto_perfil) {
+      // Verificar si la URL ya es absoluta
+      if (formData.foto_perfil.startsWith('http')) {
+        setPreviewUrl(`${formData.foto_perfil}?t=${timestamp}`);
+      } else {
+        // Remover barras iniciales si existen para evitar doble barra
+        const cleanPath = formData.foto_perfil.replace(/^\/+/, '');
+        setPreviewUrl(`http://localhost:8000/storage/${cleanPath}?t=${timestamp}`);
+      }
+      console.log('Updated preview URL:', formData.foto_perfil, 'Final URL:', formData.foto_perfil.startsWith('http') ? `${formData.foto_perfil}?t=${timestamp}` : `http://localhost:8000/storage/${formData.foto_perfil.replace(/^\/+/, '')}?t=${timestamp}`);
+    } else if (!formData.foto_perfil && !selectedFile) {
       setPreviewUrl('');
     }
   }, [formData.foto_perfil, selectedFile]);
@@ -54,19 +62,40 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
       const response = await adminService.getUserDetails(user.id);
       const userData = response.data;
       
+      // Agregar timestamp a los datos del usuario
+      const userDataWithTimestamp = {
+        ...userData,
+        imageTimestamp: Date.now()
+      };
+      
       setFormData({
-        nome: userData.nome || '',
-        correo: userData.correo || '',
-        nombre: userData.nombre || '',
-        apelidos: userData.apelidos || '',
-        sobre_mi: userData.sobre_mi || '',
-        rol: userData.rol || 'usuario',
-        foto_perfil: userData.foto_perfil || ''
+        nome: userDataWithTimestamp.nome || '',
+        correo: userDataWithTimestamp.correo || '',
+        nombre: userDataWithTimestamp.nombre || '',
+        apelidos: userDataWithTimestamp.apelidos || '',
+        sobre_mi: userDataWithTimestamp.sobre_mi || '',
+        rol: userDataWithTimestamp.rol || 'usuario',
+        foto_perfil: userDataWithTimestamp.foto_perfil || ''
       });
       
       // Limpiar estados de archivo al cargar nuevos datos
       setSelectedFile(null);
-      setImageTimestamp(Date.now());
+      setImageTimestamp(userDataWithTimestamp.imageTimestamp);
+      
+      // Actualizar preview URL con el nuevo timestamp
+      if (userDataWithTimestamp.foto_perfil) {
+        if (userDataWithTimestamp.foto_perfil.startsWith('http')) {
+          setPreviewUrl(`${userDataWithTimestamp.foto_perfil}?t=${userDataWithTimestamp.imageTimestamp}`);
+        } else {
+          // Remover barras iniciales si existen para evitar doble barra
+          const cleanPath = userDataWithTimestamp.foto_perfil.replace(/^\/+/, '');
+          setPreviewUrl(`http://localhost:8000/storage/${cleanPath}?t=${userDataWithTimestamp.imageTimestamp}`);
+        }
+        console.log('Loaded user image:', userDataWithTimestamp.foto_perfil, 'Preview URL:', userDataWithTimestamp.foto_perfil.startsWith('http') ? `${userDataWithTimestamp.foto_perfil}?t=${userDataWithTimestamp.imageTimestamp}` : `http://localhost:8000/storage/${userDataWithTimestamp.foto_perfil.replace(/^\/+/, '')}?t=${userDataWithTimestamp.imageTimestamp}`);
+      } else {
+        setPreviewUrl('');
+        console.log('No profile image found for user');
+      }
     } catch (error) {
       setError('Error al cargar detalles del usuario');
       console.error('Error:', error);
@@ -134,7 +163,17 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
       const response = await adminService.uploadProfileImage(uploadFormData);
       
       // Actualizar timestamp para forzar actualización de imagen
-      setImageTimestamp(Date.now());
+      const newTimestamp = Date.now();
+      setImageTimestamp(newTimestamp);
+      
+      // Actualizar el preview URL con el nuevo timestamp
+      if (response.data.url) {
+        if (response.data.url.startsWith('http')) {
+          setPreviewUrl(`${response.data.url}?t=${newTimestamp}`);
+        } else {
+          setPreviewUrl(`http://localhost:8000/storage/${response.data.url}?t=${newTimestamp}`);
+        }
+      }
       
       return response.data.url;
     } catch (error) {
@@ -151,6 +190,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
 
     try {
       let finalImageUrl = formData.foto_perfil;
+      const newTimestamp = Date.now();
       
       // Si hay un archivo seleccionado, subirlo primero
       if (selectedFile) {
@@ -175,7 +215,8 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
         ...formData,
         foto_perfil: finalImageUrl,
         nombre_completo: `${formData.nombre} ${formData.apelidos}`.trim(),
-        updated_at: new Date().toISOString() // Agregar timestamp de actualización
+        imageTimestamp: newTimestamp,
+        updated_at: new Date().toISOString()
       };
       
       onSave(updatedUser);
@@ -197,7 +238,8 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
   const clearImage = () => {
     setSelectedFile(null);
     setPreviewUrl('');
-    setImageTimestamp(Date.now());
+    const newTimestamp = Date.now();
+    setImageTimestamp(newTimestamp);
     setFormData(prev => ({
       ...prev,
       foto_perfil: ''
@@ -266,17 +308,24 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {(previewUrl || formData.foto_perfil) ? (
+                        {previewUrl ? (
                           <img 
-                            src={selectedFile ? previewUrl : `http://localhost:8000/storage/${formData.foto_perfil}?t=${imageTimestamp}`}
+                            src={previewUrl}
                             alt="Preview" 
                             className="w-16 h-16 rounded-full object-cover"
+                            onError={(e) => {
+                              console.error('Error loading image:', previewUrl);
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
                           />
-                        ) : (
-                          <span className="text-white font-bold text-xl">
-                            {formData.nome.charAt(0).toUpperCase()}
-                          </span>
-                        )}
+                        ) : null}
+                        <span 
+                          className="text-white font-bold text-xl"
+                          style={{ display: previewUrl ? 'none' : 'flex' }}
+                        >
+                          {formData.nome.charAt(0).toUpperCase()}
+                        </span>
                       </div>
                       {formData.rol === 'admin' && (
                         <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">

@@ -8,6 +8,7 @@ import PageContainer from '../layout/PageContainer';
 import AdminToggle from './AdminToggle';
 import UsuariosAdmin from './adminPanels/UsuariosAdmin';
 import ModsAdmin from './adminPanels/ModsAdmin';
+import ComentariosAdmin from './adminPanels/ComentariosAdmin';
 
 const Dashboard = ({ defaultTab = 0 }) => {
   // Obtener la ubicación actual y navegación
@@ -55,6 +56,10 @@ const Dashboard = ({ defaultTab = 0 }) => {
     {
       label: 'Mods',
       content: <ModsAdmin />
+    },
+    {
+      label: 'Comentarios',
+      content: <ComentariosAdmin />
     }
   ];
 

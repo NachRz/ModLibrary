@@ -30,12 +30,17 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
   useEffect(() => {
     // Actualizar URL de imagen con cache-busting cuando cambie foto_perfil
     if (userDetails?.foto_perfil) {
-      const timestamp = new Date().getTime();
-      setImageUrl(`http://localhost:8000/storage/${userDetails.foto_perfil}?t=${timestamp}`);
+      const timestamp = userDetails.imageTimestamp || Date.now();
+      // Verificar si la URL ya es absoluta
+      if (userDetails.foto_perfil.startsWith('http')) {
+        setImageUrl(`${userDetails.foto_perfil}?t=${timestamp}`);
+      } else {
+        setImageUrl(`http://localhost:8000/storage/${userDetails.foto_perfil}?t=${timestamp}`);
+      }
     } else {
       setImageUrl('');
     }
-  }, [userDetails?.foto_perfil]);
+  }, [userDetails?.foto_perfil, userDetails?.imageTimestamp]);
 
   const loadUserDetails = async () => {
     try {
@@ -48,7 +53,13 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
         adminService.getUserStats(user.id)
       ]);
       
-      setUserDetails(detailsResponse.data);
+      // Agregar timestamp a los detalles del usuario
+      const userDetailsWithTimestamp = {
+        ...detailsResponse.data,
+        imageTimestamp: Date.now()
+      };
+      
+      setUserDetails(userDetailsWithTimestamp);
       setUserStats(statsResponse.data);
     } catch (error) {
       setError('Error al cargar el perfil del usuario');
@@ -103,17 +114,23 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden">
-                  {userDetails?.foto_perfil ? (
+                  {imageUrl ? (
                     <img 
                       src={imageUrl}
                       alt={`Avatar de ${userDetails?.nome || user?.nome}`}
                       className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
                     />
-                  ) : (
-                    <span className="text-white font-bold text-xl">
-                      {(userDetails?.nome || user?.nome || '').charAt(0).toUpperCase()}
-                    </span>
-                  )}
+                  ) : null}
+                  <span 
+                    className="text-white font-bold text-xl"
+                    style={{ display: imageUrl ? 'none' : 'flex' }}
+                  >
+                    {(userDetails?.nome || user?.nome || '').charAt(0).toUpperCase()}
+                  </span>
                 </div>
                 {userDetails?.rol === 'admin' && (
                   <div className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
