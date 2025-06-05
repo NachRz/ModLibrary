@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import PageContainer from '../layout/PageContainer';
 import ModCard from '../common/Cards/ModCard';
 import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
+import EditModAdmin from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/EditModAdmin';
 import Breadcrumb from '../common/Breadcrumb/Breadcrumb';
 import gameService from '../../services/api/gameService';
 import modService from '../../services/api/modService';
@@ -29,6 +30,10 @@ const GameDetails = () => {
   // Estados para el modal de eliminar
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modToDelete, setModToDelete] = useState(null);
+
+  // Estados para el modal de edición
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [modToEdit, setModToEdit] = useState(null);
   
   // Hook para manejar favoritos
   const [esFavorito, toggleFavorito, cargandoFavorito, errorFavorito, mensaje] = useFavorite(parseInt(id));
@@ -215,7 +220,43 @@ const GameDetails = () => {
 
   // Funciones para editar y eliminar mods
   const handleEditMod = (mod) => {
-    navigate(`/dashboard/editar-mod/${mod.id}`);
+    setModToEdit(mod);
+    setShowEditModal(true);
+  };
+
+  // Función para cerrar el modal de edición
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setModToEdit(null);
+  };
+
+  // Función para guardar cambios desde el modal de edición
+  const handleSaveModFromModal = (updatedMod) => {
+    console.log('Mod actualizado desde modal:', updatedMod);
+    
+    // Actualizar el mod en la lista local
+    setMods(prevMods => 
+      prevMods.map(mod => 
+        mod.id === updatedMod.id ? {
+          ...mod, // Mantener los campos existentes
+          ...updatedMod, // Sobrescribir con los campos actualizados
+          // Asegurar que los campos necesarios estén presentes
+          titulo: updatedMod.titulo || updatedMod.nombre || mod.titulo,
+          imagen: updatedMod.imagen_banner ? `http://localhost:8000/storage/${updatedMod.imagen_banner}` : mod.imagen,
+          etiquetas: updatedMod.etiquetas || mod.etiquetas,
+          estado: updatedMod.estado || mod.estado,
+          descripcion: updatedMod.descripcion || mod.descripcion,
+          fecha_actualizacion: new Date().toISOString()
+        } : mod
+      )
+    );
+    
+    // Cerrar el modal
+    setShowEditModal(false);
+    setModToEdit(null);
+    
+    // Mostrar notificación de éxito
+    showNotification(`Mod "${updatedMod.titulo || updatedMod.nombre}" actualizado exitosamente`, 'success');
   };
 
   const handleDeleteMod = (mod) => {
@@ -572,6 +613,16 @@ const GameDetails = () => {
           message="¿Estás seguro de que quieres desactivar este mod? Podrá ser restaurado posteriormente."
           confirmText="Desactivar"
           isDangerous={false}
+        />
+      )}
+
+      {/* Modal de edición */}
+      {showEditModal && modToEdit && (
+        <EditModAdmin
+          mod={modToEdit}
+          isOpen={showEditModal}
+          onClose={handleCloseEditModal}
+          onSave={handleSaveModFromModal}
         />
       )}
     </div>

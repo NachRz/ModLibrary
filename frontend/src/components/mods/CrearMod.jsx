@@ -119,9 +119,7 @@ const CrearMod = () => {
     version_actual: '1.0.0',
     url: '',
     etiquetas: [],
-    estado: 'borrador',
-    // Estados para archivos
-    archivoFile: null
+    estado: 'borrador'
   });
   
   // Estado para los errores de validación
@@ -369,46 +367,133 @@ const CrearMod = () => {
     }
   };
 
-  // Manejador para la carga de archivo principal
-  const handleMainFileUpload = (e) => {
-    const file = e.target.files[0];
-    
-    if (file) {
-      // Validar tamaño (máximo 100MB)
-      if (file.size > 100 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, archivo: 'El archivo es demasiado grande. Máximo 100MB' }));
-        return;
-      }
-
-      setFormData(prev => ({
-        ...prev,
-        archivoFile: file
-      }));
-      
-      if (errors.archivo) {
-        setErrors(prev => ({ ...prev, archivo: '' }));
-      }
-    }
-  };
-
-  // Función para limpiar el archivo principal
-  const clearSelectedFile = () => {
+  // Función para limpiar la imagen principal
+  const clearSelectedImage = () => {
     setFormData(prev => ({
       ...prev,
-      archivoFile: null
+      imagen: null,
+      imagenPreview: ''
     }));
   };
 
-  // Función para formatear tamaño de archivo
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  // Validación del formulario
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.titulo.trim()) {
+      newErrors.titulo = 'El título es obligatorio';
+    }
+    
+    if (!formData.descripcion.trim()) {
+      newErrors.descripcion = 'La descripción es obligatoria';
+    }
+    
+    if (!formData.juego_id) {
+      newErrors.juego_id = 'Debes seleccionar un juego';
+    }
+    
+    if (!formData.version_actual.trim()) {
+      newErrors.version_actual = 'La versión del mod es obligatoria';
+    }
+    
+    if (formData.etiquetas.length === 0) {
+      newErrors.etiquetas = 'Debes seleccionar al menos una etiqueta';
+    }
+    
+    if (!formData.imagen) {
+      newErrors.imagen = 'Debes subir una imagen';
+    }
+    
+    if (!formData.url.trim()) {
+      newErrors.url = 'Debes proporcionar una URL de descarga';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
+  
+  // Manejador para enviar el formulario
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (validateForm()) {
+      try {
+        setSubmitting(true);
+        setSubmitError(null);
+        
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!user.id) {
+          throw new Error('Debes iniciar sesión para crear un mod');
+        }
+        
+        // Preparar datos base del mod
+        const modDataBase = {
+          titulo: formData.titulo,
+          descripcion: formData.descripcion,
+          edad_recomendada: parseInt(formData.edad_recomendada, 10),
+          creador_id: user.id,
+          version_actual: formData.version_actual,
+          url: formData.url,
+          estado: formData.estado,
+          juego_id: formData.juego_id,
+          etiquetas: formData.etiquetas // Ya contiene los IDs locales sincronizados
+        };
 
-  // Función mejorada para manejo de imágenes adicionales (como en EditModAdmin)
+        // Crear FormData si hay archivos para subir (solo imágenes)
+        let dataToSubmit;
+        
+        if (formData.imagen || formData.imagenesAdicionalesFiles.length > 0) {
+          // Usar FormData para archivos
+          dataToSubmit = new FormData();
+          
+          // Agregar datos básicos
+          Object.keys(modDataBase).forEach(key => {
+            if (key === 'etiquetas') {
+              modDataBase[key].forEach(tagId => {
+                dataToSubmit.append('etiquetas[]', tagId);
+              });
+            } else {
+              dataToSubmit.append(key, modDataBase[key]);
+            }
+          });
+          
+          // Agregar imagen principal
+          if (formData.imagen) {
+            dataToSubmit.append('imagen_banner', formData.imagen);
+          }
+          
+          // Agregar imágenes adicionales
+          formData.imagenesAdicionalesFiles.forEach((file, index) => {
+            dataToSubmit.append('imagenes_adicionales[]', file);
+          });
+          
+        } else {
+          // Solo datos JSON si no hay archivos
+          dataToSubmit = modDataBase;
+        }
+        
+        console.log('Enviando datos del mod al backend...');
+        const response = await modService.createMod(dataToSubmit);
+        
+        if (response.status === 'success') {
+          setSubmitSuccess(true);
+          setTimeout(() => {
+            navigate('/dashboard/mis-mods');
+          }, 1500);
+        } else {
+          throw new Error(response.message || 'Error al crear el mod');
+        }
+        
+      } catch (error) {
+        setSubmitError(error.message || 'Ha ocurrido un error al crear el mod');
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  };
+  
+  // Función mejorada para manejo de imágenes adicionales (mejorada)
   const handleAdditionalImagesUpload = (e) => {
     const files = Array.from(e.target.files);
     
@@ -511,196 +596,6 @@ const CrearMod = () => {
     }));
   };
 
-  // Función para limpiar la imagen principal
-  const clearSelectedImage = () => {
-    setFormData(prev => ({
-      ...prev,
-      imagen: null,
-      imagenPreview: ''
-    }));
-  };
-
-  // Función para limpiar nombres de archivos y carpetas
-  const cleanNameForFolder = (name) => {
-    return name
-      .replace(/[^a-zA-Z0-9\s\-_]/g, '') // Remover caracteres especiales
-      .replace(/\s+/g, '_') // Reemplazar espacios con guiones bajos
-      .toLowerCase();
-  };
-
-  // Función para generar vista previa de estructura de archivos
-  const getFileStructurePreview = () => {
-    if (!formData.titulo || !formData.version_actual) return null;
-    
-    const cleanModName = cleanNameForFolder(formData.titulo);
-    const cleanVersion = cleanNameForFolder(formData.version_actual);
-    
-    let fileName = 'archivo-del-mod';
-    if (formData.archivoFile) {
-      const originalName = formData.archivoFile.name;
-      const fileExtension = originalName.substring(originalName.lastIndexOf('.'));
-      fileName = `${cleanModName}-${cleanVersion}${fileExtension}`;
-    } else {
-      fileName = `${cleanModName}-${cleanVersion}.jar`;
-    }
-    
-    return {
-      modFolder: cleanModName,
-      versionFolder: cleanVersion,
-      fileName: fileName,
-      fullPath: `${cleanModName}/${cleanVersion}/${fileName}`
-    };
-  };
-  
-  // Validación del formulario
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.titulo.trim()) {
-      newErrors.titulo = 'El título es obligatorio';
-    }
-    
-    if (!formData.descripcion.trim()) {
-      newErrors.descripcion = 'La descripción es obligatoria';
-    }
-    
-    if (!formData.juego_id) {
-      newErrors.juego_id = 'Debes seleccionar un juego';
-    }
-    
-    if (!formData.version_actual.trim()) {
-      newErrors.version_actual = 'La versión del mod es obligatoria';
-    }
-    
-    if (formData.etiquetas.length === 0) {
-      newErrors.etiquetas = 'Debes seleccionar al menos una etiqueta';
-    }
-    
-    if (!formData.imagen) {
-      newErrors.imagen = 'Debes subir una imagen';
-    }
-    
-    // Validar que haya al menos un archivo o una URL de descarga
-    if (!formData.archivoFile && !formData.url.trim()) {
-      newErrors.archivo = 'Debes subir un archivo o proporcionar una URL de descarga';
-      newErrors.url = 'Debes subir un archivo o proporcionar una URL de descarga';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-  
-  // Manejador para enviar el formulario
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
-      try {
-        setSubmitting(true);
-        setSubmitError(null);
-        
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        if (!user.id) {
-          throw new Error('Debes iniciar sesión para crear un mod');
-        }
-        
-        // Las etiquetas ya están sincronizadas desde handleTagChange, no necesitamos syncMultipleTags
-        
-        // Preparar datos base del mod
-        const modDataBase = {
-          titulo: formData.titulo,
-          descripcion: formData.descripcion,
-          edad_recomendada: parseInt(formData.edad_recomendada, 10),
-          creador_id: user.id,
-          version_actual: formData.version_actual,
-          url: formData.url,
-          estado: formData.estado,
-          juego_id: formData.juego_id,
-          etiquetas: formData.etiquetas // Ya contiene los IDs locales sincronizados
-        };
-
-        // Crear FormData si hay archivos para subir
-        let dataToSubmit;
-        
-        if (formData.imagen || formData.imagenesAdicionalesFiles.length > 0 || formData.archivoFile) {
-          // Usar FormData para archivos
-          dataToSubmit = new FormData();
-          
-          // Agregar datos básicos
-          Object.keys(modDataBase).forEach(key => {
-            if (key === 'etiquetas') {
-              modDataBase[key].forEach(tagId => {
-                dataToSubmit.append('etiquetas[]', tagId);
-              });
-            } else {
-              dataToSubmit.append(key, modDataBase[key]);
-            }
-          });
-          
-          // Agregar imagen principal
-          if (formData.imagen) {
-            dataToSubmit.append('imagen_banner', formData.imagen);
-          }
-          
-          // Agregar imágenes adicionales
-          formData.imagenesAdicionalesFiles.forEach((file, index) => {
-            dataToSubmit.append('imagenes_adicionales[]', file);
-          });
-          
-          // Agregar archivo del mod con información de estructura
-          if (formData.archivoFile) {
-            // Limpiar el nombre del mod para usarlo como carpeta (remover caracteres especiales)
-            const cleanModName = cleanNameForFolder(formData.titulo);
-            
-            // Limpiar la versión para usarla como subcarpeta
-            const cleanVersion = cleanNameForFolder(formData.version_actual);
-            
-            // Obtener la extensión original del archivo
-            const originalName = formData.archivoFile.name;
-            const fileExtension = originalName.substring(originalName.lastIndexOf('.'));
-            
-            // Crear el nombre final del archivo: nombremod-version.extension
-            const finalFileName = `${cleanModName}-${cleanVersion}${fileExtension}`;
-            
-            // Agregar el archivo con metadatos de estructura
-            dataToSubmit.append('archivo_principal', formData.archivoFile);
-            dataToSubmit.append('mod_folder_name', cleanModName);
-            dataToSubmit.append('version_folder_name', cleanVersion);
-            dataToSubmit.append('final_file_name', finalFileName);
-            
-            console.log('Estructura de carpetas:');
-            console.log(`- Carpeta mod: ${cleanModName}`);
-            console.log(`- Carpeta versión: ${cleanVersion}`);
-            console.log(`- Nombre archivo: ${finalFileName}`);
-            console.log(`- Ruta completa: ${cleanModName}/${cleanVersion}/${finalFileName}`);
-          }
-          
-        } else {
-          // Solo datos JSON si no hay archivos
-          dataToSubmit = modDataBase;
-        }
-        
-        console.log('Enviando datos del mod al backend...');
-        const response = await modService.createMod(dataToSubmit);
-        
-        if (response.status === 'success') {
-          setSubmitSuccess(true);
-          setTimeout(() => {
-            navigate('/dashboard/mis-mods');
-          }, 1500);
-        } else {
-          throw new Error(response.message || 'Error al crear el mod');
-        }
-        
-      } catch (error) {
-        setSubmitError(error.message || 'Ha ocurrido un error al crear el mod');
-      } finally {
-        setSubmitting(false);
-      }
-    }
-  };
-  
   // Renderizar contenido de la pestaña Básico
   const renderTabBasico = () => (
     <div className="space-y-6">
@@ -851,18 +746,39 @@ const CrearMod = () => {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Versión del mod *
               </label>
-                  <input
-                    type="text"
-                    name="version_actual"
-                    value={formData.version_actual}
-                    onChange={handleChange}
+              <input
+                type="text"
+                name="version_actual"
+                value={formData.version_actual}
+                onChange={handleChange}
                 className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
                   errors.version_actual ? 'border-red-500' : 'border-gray-600'
                 }`}
-                    disabled={submitting}
+                disabled={submitting}
                 placeholder="Ej: 1.0.0"
-                  />
+              />
               {errors.version_actual && <span className="text-red-400 text-sm mt-1 block">{errors.version_actual}</span>}
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                URL de descarga *
+              </label>
+              <input
+                type="url"
+                name="url"
+                value={formData.url}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                  errors.url ? 'border-red-500' : 'border-gray-600'
+                }`}
+                disabled={submitting}
+                placeholder="https://ejemplo.com/mi-mod.zip"
+              />
+              {errors.url && <span className="text-red-400 text-sm mt-1 block">{errors.url}</span>}
+              <small className="text-gray-400 text-sm mt-1 block">
+                Enlace directo donde los usuarios pueden descargar tu mod
+              </small>
             </div>
           </div>
         </div>
@@ -1172,170 +1088,6 @@ const CrearMod = () => {
     </div>
   );
 
-  // Renderizar contenido de la pestaña Archivos
-  const renderTabArchivos = () => (
-    <div className="space-y-6">
-      <div>
-        <h4 className="text-lg font-medium text-white mb-4 flex items-center">
-          <FontAwesomeIcon icon={faFile} className="mr-2" />
-          Archivos del Mod
-        </h4>
-        
-        {/* Mensaje de requisito */}
-        <div className="bg-purple-500 bg-opacity-20 border border-purple-500 rounded-lg p-4 mb-6">
-          <div className="flex items-center space-x-2 mb-2">
-            <FontAwesomeIcon icon={faFile} className="text-purple-400" />
-            <h5 className="text-purple-400 font-medium">Requisito de Descarga</h5>
-          </div>
-          <p className="text-purple-300 text-sm">
-            Debes proporcionar <strong>al menos una</strong> de las siguientes opciones para que los usuarios puedan descargar tu mod:
-          </p>
-          <ul className="text-purple-300 text-sm mt-2 space-y-1 ml-4">
-            <li>• Subir el archivo del mod directamente</li>
-            <li>• Proporcionar un enlace de descarga externo</li>
-          </ul>
-        </div>
-        
-        {/* Archivo principal */}
-        <div className="bg-gray-700 rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h5 className="text-white font-medium">Opción 1: Subir Archivo Directamente</h5>
-            {formData.archivoFile && (
-              <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
-                ✓ Archivo seleccionado
-              </span>
-            )}
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Subir archivo del mod
-              </label>
-              <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors file-upload-area">
-                <FontAwesomeIcon icon={faFile} className="text-4xl text-gray-400 mb-3" />
-                <p className="text-gray-300 mb-2">Arrastra el archivo del mod aquí o haz clic para seleccionar</p>
-                <input
-                  type="file"
-                  id="archivo-principal-upload"
-                  onChange={handleMainFileUpload}
-                  className="hidden"
-                />
-                <label
-                  htmlFor="archivo-principal-upload"
-                  className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block"
-                >
-                  <FontAwesomeIcon icon={faFile} className="mr-2" />
-                  Seleccionar Archivo
-                </label>
-                <p className="text-xs text-gray-400 mt-2">
-                  Archivo .jar, .zip, .rar, .7z o el formato específico de tu mod. Máximo: 100MB
-                </p>
-              </div>
-              
-              {formData.archivoFile && (
-                <div className="mt-4 bg-gray-600 rounded-lg p-4 file-item">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <FontAwesomeIcon icon={faFile} className="text-blue-400" />
-                      <div>
-                        <p className="text-white font-medium">{formData.archivoFile.name}</p>
-                        <p className="text-gray-300 text-sm">{formatFileSize(formData.archivoFile.size)}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={clearSelectedFile}
-                      className="text-red-400 hover:text-red-300 transition-colors"
-                    >
-                      <FontAwesomeIcon icon={faTimes} className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              {errors.archivo && <span className="text-red-400 text-sm mt-1 block">{errors.archivo}</span>}
-            </div>
-          </div>
-        </div>
-
-        {/* URL de descarga alternativa */}
-        <div className="bg-gray-700 rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h5 className="text-white font-medium">Opción 2: Enlace de Descarga Externo</h5>
-            {formData.url && (
-              <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
-                ✓ URL proporcionada
-              </span>
-            )}
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Enlace de descarga externo
-              </label>
-              <input
-                type="url"
-                name="url"
-                value={formData.url}
-                        onChange={handleChange}
-                className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        disabled={submitting}
-                placeholder="https://ejemplo.com/mi-mod.zip"
-              />
-              <p className="text-xs text-gray-400 mt-2">
-                Si prefieres alojar tu mod en otro lugar (GitHub, MediaFire, etc.), puedes proporcionar el enlace aquí
-              </p>
-                  </div>
-            
-            {formData.url && (
-              <div className="mt-3 p-3 bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg url-indicator">
-                <p className="text-blue-300 text-sm">
-                  <FontAwesomeIcon icon={faFile} className="mr-2" />
-                  Los usuarios serán redirigidos a: <span className="font-mono break-all">{formData.url}</span>
-                </p>
-                </div>
-            )}
-            
-            {errors.url && <span className="text-red-400 text-sm mt-1 block">{errors.url}</span>}
-              </div>
-            </div>
-            
-        {/* Estado actual */}
-        {(formData.archivoFile || formData.url) && (
-          <div className="bg-green-500 bg-opacity-20 border border-green-500 rounded-lg p-4 mb-6">
-            <div className="flex items-center space-x-2">
-              <FontAwesomeIcon icon={faFile} className="text-green-400" />
-              <h5 className="text-green-400 font-medium">Requisito Cumplido</h5>
-            </div>
-            <p className="text-green-300 text-sm mt-1">
-              {formData.archivoFile && formData.url 
-                ? 'Has proporcionado tanto un archivo como un enlace. Los usuarios podrán elegir cómo descargar tu mod.'
-                : formData.archivoFile 
-                ? 'Archivo subido correctamente. Los usuarios podrán descargar tu mod directamente.'
-                : 'Enlace de descarga proporcionado. Los usuarios serán redirigidos al enlace externo.'
-              }
-            </p>
-          </div>
-        )}
-
-        {/* Información sobre archivos */}
-        <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
-          <h5 className="text-blue-400 font-medium mb-2">Información sobre Archivos</h5>
-          <ul className="text-blue-300 text-sm space-y-1">
-            <li>• <strong>Archivo Directo:</strong> Subir el archivo aquí permite descarga inmediata desde nuestra plataforma</li>
-            <li>• <strong>Enlace Externo:</strong> Redirige a usuarios a tu enlace de descarga preferido</li>
-            <li>• <strong>Ambas opciones:</strong> Puedes proporcionar ambas para dar más opciones a los usuarios</li>
-            <li>• Formatos recomendados: .jar, .zip, .rar, .7z, .txt, .pdf, .md</li>
-            <li>• Tamaño máximo: 100MB para el archivo principal</li>
-            <li>• Los archivos se almacenan de forma segura y se escanean automáticamente</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-
   // Renderizado del mensaje de éxito
   const renderSuccessMessage = () => (
     <div className="success-message">
@@ -1385,12 +1137,11 @@ const CrearMod = () => {
                 {[
                   { id: 'basico', label: 'Información Básica', icon: faGamepad },
                   { id: 'etiquetas', label: 'Etiquetas', icon: faTag },
-                  { id: 'imagenes', label: 'Imágenes', icon: faImage },
-                  { id: 'archivos', label: 'Archivos', icon: faFile }
+                  { id: 'imagenes', label: 'Imágenes', icon: faImage }
                 ].map(tab => (
                   <button
                     key={tab.id}
-                type="button" 
+                    type="button" 
                     onClick={() => setActiveTab(tab.id)}
                     className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.id
@@ -1410,7 +1161,6 @@ const CrearMod = () => {
               {activeTab === 'basico' && renderTabBasico()}
               {activeTab === 'etiquetas' && renderTabEtiquetas()}
               {activeTab === 'imagenes' && renderTabImagenes()}
-              {activeTab === 'archivos' && renderTabArchivos()}
             </div>
 
             {/* Acciones del formulario */}

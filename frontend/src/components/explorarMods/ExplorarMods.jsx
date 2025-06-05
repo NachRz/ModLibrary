@@ -7,6 +7,7 @@ import useUserModsStatus from '../../hooks/useUserModsStatus';
 import { useNotification } from '../../context/NotificationContext';
 import PageContainer from '../layout/PageContainer';
 import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
+import EditModAdmin from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/EditModAdmin';
 import '../../assets/styles/components/explorarMods/ExplorarMods.css';
 
 const ExplorarMods = () => {
@@ -94,6 +95,10 @@ const ExplorarMods = () => {
   // Estados para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modToDelete, setModToDelete] = useState(null);
+
+  // Estados para el modal de edición
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [modToEdit, setModToEdit] = useState(null);
 
   // Función helper para resetear estados de búsqueda
   const resetearEstadosBusqueda = useCallback(() => {
@@ -629,8 +634,46 @@ const ExplorarMods = () => {
 
   // Función para editar mod
   const handleEditMod = useCallback((mod) => {
-    navigate(`/mods/editar/${mod.id}`);
-  }, [navigate]);
+    setModToEdit(mod);
+    setShowEditModal(true);
+  }, []);
+
+  // Función para cerrar el modal de edición
+  const handleCloseEditModal = useCallback(() => {
+    setShowEditModal(false);
+    setModToEdit(null);
+  }, []);
+
+  // Función para guardar cambios desde el modal de edición
+  const handleSaveModFromModal = useCallback((updatedMod) => {
+    console.log('Mod actualizado desde modal:', updatedMod);
+    
+    // Actualizar el mod en la lista local
+    setMods(prevMods => 
+      prevMods.map(mod => 
+        mod.id === updatedMod.id ? {
+          ...mod, // Mantener los campos existentes
+          ...updatedMod, // Sobrescribir con los campos actualizados
+          // Asegurar que los campos necesarios estén presentes
+          titulo: updatedMod.titulo || updatedMod.nombre || mod.titulo,
+          nombre: updatedMod.titulo || updatedMod.nombre || mod.nombre,
+          imagen_banner: updatedMod.imagen_banner || mod.imagen_banner,
+          imagenes_adicionales: updatedMod.imagenes_adicionales || mod.imagenes_adicionales,
+          etiquetas: updatedMod.etiquetas || mod.etiquetas,
+          version: updatedMod.version || updatedMod.version_actual || mod.version || mod.version_actual,
+          estado: updatedMod.estado || mod.estado,
+          fecha_actualizacion: new Date().toISOString()
+        } : mod
+      )
+    );
+    
+    // Cerrar el modal
+    setShowEditModal(false);
+    setModToEdit(null);
+    
+    // Mostrar notificación de éxito
+    showNotification(`Mod "${updatedMod.titulo || updatedMod.nombre}" actualizado exitosamente`, 'success');
+  }, [showNotification]);
 
   // Función para eliminar mod (soft delete)
   const handleDeleteMod = useCallback(async (mod) => {
@@ -1683,6 +1726,16 @@ const ExplorarMods = () => {
           onConfirm={confirmDelete}
           onCancel={cancelDelete}
           isDangerous={false}
+        />
+      )}
+
+      {/* Modal de edición */}
+      {showEditModal && modToEdit && (
+        <EditModAdmin
+          mod={modToEdit}
+          isOpen={showEditModal}
+          onClose={handleCloseEditModal}
+          onSave={handleSaveModFromModal}
         />
       )}
     </PageContainer>

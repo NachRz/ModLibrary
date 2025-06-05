@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import '../../../assets/styles/components/common/ImageCarousel/ImageCarousel.css';
 
-const ImageCarousel = ({ images = [], className = '' }) => {
+const ImageCarousel = forwardRef(({ images = [], className = '', externalLightboxControl = false }, ref) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
 
   // Si no hay imágenes, mostrar placeholder
   const imagenesCarrusel = images.length > 0 ? images : ['/images/mod-placeholder.jpg'];
+
+  // Exponer métodos para control externo
+  useImperativeHandle(ref, () => ({
+    openLightbox: (imageIndex = 0) => {
+      setLightboxImageIndex(imageIndex);
+      setIsLightboxOpen(true);
+    },
+    closeLightbox: () => {
+      setIsLightboxOpen(false);
+    }
+  }));
 
   // Calcular las imágenes visibles (mostrar máximo 5 a la vez)
   const getVisibleImages = () => {
@@ -231,6 +242,6 @@ const ImageCarousel = ({ images = [], className = '' }) => {
       )}
     </>
   );
-};
+});
 
 export default ImageCarousel; 

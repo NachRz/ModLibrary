@@ -20,6 +20,7 @@ import {
   faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import { useNotification } from '../../../../../context/NotificationContext';
+import { useAuth } from '../../../../../context/AuthContext';
 import modService from '../../../../../services/api/modService';
 import gameService from '../../../../../services/api/gameService';
 import etiquetasService from '../../../../../services/api/etiquetasService';
@@ -100,6 +101,7 @@ const CustomMultiValue = ({ children, removeProps, data }) => (
 
 const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const { showNotification } = useNotification();
+  const { isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
   
@@ -198,6 +200,13 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       setDeletingImageIndex(null);
     }
   }, [isOpen]);
+
+  // Cambiar pestaña si el usuario no es administrador y está en "avanzado"
+  useEffect(() => {
+    if (!isAdmin && activeTab === 'avanzado') {
+      setActiveTab('general');
+    }
+  }, [isAdmin, activeTab]);
 
   // Efecto para actualizar preview de banner cuando cambie imagen_banner desde la carga de datos
   useEffect(() => {
@@ -1028,6 +1037,23 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    URL de descarga
+                  </label>
+                  <input
+                    type="url"
+                    name="url"
+                    value={formData.url}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border border-gray-600/50 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-300"
+                    placeholder="https://ejemplo.com/mi-mod.zip"
+                  />
+                  <small className="text-gray-400 text-sm mt-1 block">
+                    Enlace directo donde los usuarios pueden descargar el mod
+                  </small>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
                     <FontAwesomeIcon icon={faGamepad} className="mr-2 text-green-400" />
                     Juego asociado *
@@ -1284,126 +1310,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           <li>• Evita usar demasiadas etiquetas (5-10 es ideal)</li>
           <li>• Puedes crear nuevas etiquetas si no encuentras las que necesitas</li>
         </ul>
-      </div>
-    </div>
-  );
-
-  const renderTabArchivos = () => (
-    <div className="space-y-6">
-      <h4 className="text-lg font-medium text-white mb-4 flex items-center">
-        <FontAwesomeIcon icon={faFile} className="mr-2" />
-        Gestión de Archivos
-      </h4>
-      
-      {/* Archivo Principal */}
-      <div className="bg-gray-700 rounded-lg p-6">
-        <h5 className="text-white font-medium mb-4">Archivo Principal del Mod</h5>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Información del archivo actual */}
-          <div>
-            <h6 className="text-gray-300 font-medium mb-3">Archivo Actual</h6>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="flex items-center space-x-3 mb-3">
-                <FontAwesomeIcon icon={faFile} className="text-blue-400 text-xl" />
-                <div>
-                  <p className="text-white font-medium">
-            {formData.archivo_principal || 'No especificado'}
-          </p>
-                  <p className="text-gray-400 text-sm">Archivo principal</p>
-                </div>
-          </div>
-          
-              {formData.url && (
-                <div className="mt-3">
-                  <label className="block text-xs text-gray-400 mb-1">URL de descarga:</label>
-                  <p className="text-gray-300 text-sm break-all">{formData.url}</p>
-                </div>
-              )}
-              
-              {formData.tamaño_archivo && (
-                <div className="mt-2">
-                  <label className="block text-xs text-gray-400 mb-1">Tamaño:</label>
-                  <p className="text-gray-300 text-sm">
-                    {(formData.tamaño_archivo / (1024 * 1024)).toFixed(2)} MB
-            </p>
-          </div>
-              )}
-        </div>
-          </div>
-          
-          {/* Gestión de nuevos archivos */}
-          <div>
-            <h6 className="text-gray-300 font-medium mb-3">Actualizar Archivo</h6>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Subir Nuevo Archivo
-                </label>
-                <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
-                  <FontAwesomeIcon icon={faFile} className="text-4xl text-gray-400 mb-3" />
-                  <p className="text-gray-300 mb-2">Arrastra tu archivo aquí o haz clic para seleccionar</p>
-                  <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                    Seleccionar Archivo
-                  </button>
-                  <p className="text-xs text-gray-400 mt-2">
-                    Formatos soportados: ZIP, RAR, 7Z, JAR. Máximo 50MB
-                  </p>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  O actualizar URL de descarga:
-                </label>
-                <input
-                  type="url"
-                  name="url"
-                  value={formData.url}
-                  onChange={handleInputChange}
-                  className="w-full bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
-                  placeholder="https://ejemplo.com/mi-mod.zip"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Información y restricciones */}
-      <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
-        <div className="flex items-center space-x-2 mb-2">
-          <FontAwesomeIcon icon={faFile} className="text-blue-400" />
-          <h5 className="text-blue-400 font-medium">Información sobre Archivos</h5>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div>
-            <h6 className="text-blue-300 font-medium mb-2">Formatos Soportados:</h6>
-            <ul className="text-blue-200 text-sm space-y-1">
-              <li>• <strong>Archivos:</strong> ZIP, RAR, 7Z, JAR</li>
-              <li>• <strong>Documentación:</strong> PDF, TXT, MD</li>
-              <li>• <strong>Código:</strong> JS, JSON, XML, YML</li>
-            </ul>
-          </div>
-          <div>
-            <h6 className="text-blue-300 font-medium mb-2">Límites de Tamaño:</h6>
-            <ul className="text-blue-200 text-sm space-y-1">
-              <li>• <strong>Archivo principal:</strong> Máximo 50MB</li>
-              <li>• <strong>Documentación:</strong> Máximo 5MB</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Nota informativa */}
-      <div className="bg-purple-500 bg-opacity-20 border border-purple-500 rounded-lg p-4">
-        <div className="flex items-center space-x-2 mb-2">
-          <FontAwesomeIcon icon={faFile} className="text-purple-400" />
-          <h5 className="text-purple-400 font-medium">Gestión de Archivos</h5>
-        </div>
-        <p className="text-purple-300 text-sm">
-          Gestiona el archivo principal de tu mod. Puedes subir un archivo directamente o proporcionar una URL de descarga externa.
-        </p>
       </div>
     </div>
   );
@@ -1988,9 +1894,8 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               { id: 'general', label: 'General', icon: faEye, color: 'blue' },
               { id: 'etiquetas', label: 'Etiquetas', icon: faTag, color: 'green' },
               { id: 'imagenes', label: 'Imágenes', icon: faImage, color: 'purple' },
-              { id: 'archivos', label: 'Archivos', icon: faFile, color: 'orange' },
               { id: 'estadisticas', label: 'Estadísticas', icon: faStar, color: 'yellow' },
-              { id: 'avanzado', label: 'Avanzado', icon: faCog, color: 'red' }
+              ...(isAdmin ? [{ id: 'avanzado', label: 'Avanzado', icon: faCog, color: 'red' }] : [])
             ].map(tab => (
               <button
                 key={tab.id}
@@ -2007,7 +1912,6 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                   {tab.id === 'general' ? 'Gen' : 
                    tab.id === 'etiquetas' ? 'Tags' :
                    tab.id === 'imagenes' ? 'Img' :
-                   tab.id === 'archivos' ? 'Arc' :
                    tab.id === 'estadisticas' ? 'Est' :
                    tab.id === 'avanzado' ? 'Avz' : tab.label.slice(0, 3)}
                 </span>
@@ -2021,9 +1925,8 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           {activeTab === 'general' && renderTabGeneral()}
           {activeTab === 'etiquetas' && renderTabEtiquetas()}
           {activeTab === 'imagenes' && renderTabImagenes()}
-          {activeTab === 'archivos' && renderTabArchivos()}
           {activeTab === 'estadisticas' && renderTabEstadisticas()}
-          {activeTab === 'avanzado' && renderTabAvanzado()}
+          {activeTab === 'avanzado' && isAdmin && renderTabAvanzado()}
         </div>
 
         {/* Footer mejorado */}

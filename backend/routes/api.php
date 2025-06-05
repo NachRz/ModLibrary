@@ -108,6 +108,12 @@ Route::prefix('mods')->group(function () {
         Route::get('/{id}/valoracion', [ModController::class, 'getUserValoracion']);
         Route::post('/{id}/valoracion', [ModController::class, 'valorarMod']);
         Route::delete('/{id}/valoracion', [ModController::class, 'eliminarValoracion']);
+        
+        // Rutas para información de descargas del usuario (requieren autenticación)
+        Route::get('/{id}/descarga-usuario', [ModController::class, 'getDescargaUsuario']);
+        
+        // Incrementar contador de descargas (requiere autenticación para guardar en base de datos)
+        Route::post('/{id}/incrementar-descarga', [ModController::class, 'incrementarDescarga']);
     });
 
     // Estas rutas deben ir después de las anteriores

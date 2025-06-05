@@ -4,6 +4,7 @@ import ModCard from '../../common/Cards/ModCard';
 import modService from '../../../services/api/modService';
 import ModDeleteConfirmationModal from '../adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import ModRestoreConfirmationModal from '../adminPanels/modalsAdmin/ModAdminModal/ModRestoreConfirmationModal';
+import EditModAdmin from '../adminPanels/modalsAdmin/ModAdminModal/EditModAdmin';
 import { useNotification } from '../../../context/NotificationContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faUndo } from '@fortawesome/free-solid-svg-icons';
@@ -25,7 +26,11 @@ const MisMods = () => {
   const [showRestoreModal, setShowRestoreModal] = useState(false);
   const [modToRestore, setModToRestore] = useState(null);
   const [restoring, setRestoring] = useState(false);
-  
+
+  // Estados para el modal de edición
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [modToEdit, setModToEdit] = useState(null);
+
   useEffect(() => {
     const fetchMyMods = async () => {
       try {
@@ -181,8 +186,54 @@ const MisMods = () => {
   };
 
   // Editar mod
-  const handleEditMod = (modId) => {
-    navigate(`/mods/editar/${modId}`);
+  const handleEditMod = (modIdOrMod) => {
+    // Si se pasa un objeto mod, usarlo directamente; si es un ID, buscar el mod
+    let mod;
+    if (typeof modIdOrMod === 'object') {
+      mod = modIdOrMod;
+    } else {
+      mod = myMods.find(m => m.id === modIdOrMod);
+    }
+    
+    if (mod) {
+      setModToEdit(mod);
+      setShowEditModal(true);
+    }
+  };
+
+  // Función para cerrar el modal de edición
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setModToEdit(null);
+  };
+
+  // Función para guardar cambios desde el modal de edición
+  const handleSaveModFromModal = (updatedMod) => {
+    console.log('Mod actualizado desde modal:', updatedMod);
+    
+    // Actualizar el mod en la lista local
+    setMyMods(prevMods => 
+      prevMods.map(mod => 
+        mod.id === updatedMod.id ? {
+          ...mod, // Mantener los campos existentes
+          ...updatedMod, // Sobrescribir con los campos actualizados
+          // Asegurar que los campos necesarios estén presentes
+          titulo: updatedMod.titulo || updatedMod.nombre || mod.titulo,
+          imagen: updatedMod.imagen_banner ? `http://localhost:8000/storage/${updatedMod.imagen_banner}` : mod.imagen,
+          etiquetas: updatedMod.etiquetas || mod.etiquetas,
+          estado: updatedMod.estado || mod.estado,
+          descripcion: updatedMod.descripcion || mod.descripcion,
+          fecha_actualizacion: new Date().toISOString()
+        } : mod
+      )
+    );
+    
+    // Cerrar el modal
+    setShowEditModal(false);
+    setModToEdit(null);
+    
+    // Mostrar notificación de éxito
+    showNotification(`Mod "${updatedMod.titulo || updatedMod.nombre}" actualizado exitosamente`, 'success');
   };
   
   // Filtrado mejorado para incluir mods eliminados
@@ -252,7 +303,7 @@ const MisMods = () => {
             mod={mod} 
             isOwner={true} 
             showSaveButton={false}
-            onEdit={!mod.is_deleted ? () => handleEditMod(mod.id) : undefined}
+            onEdit={!mod.is_deleted ? () => handleEditMod(mod) : undefined}
             onDelete={!mod.is_deleted ? () => handleDeleteMod(mod) : undefined}
             actions={mod.is_deleted ? (
               <button 
@@ -352,6 +403,16 @@ const MisMods = () => {
         isLoading={restoring}
         message="¿Estás seguro de que quieres restaurar este mod?"
       />
+
+      {/* Modal de edición */}
+      {showEditModal && modToEdit && (
+        <EditModAdmin
+          mod={modToEdit}
+          isOpen={showEditModal}
+          onClose={handleCloseEditModal}
+          onSave={handleSaveModFromModal}
+        />
+      )}
     </>
   );
 };

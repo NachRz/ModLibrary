@@ -155,4 +155,9 @@ class Mod extends Model
     {
         return $this->belongsToMany(Usuario::class, 'mods_guardados', 'mod_id', 'usuario_id');
     }
+
+    public function descargas(): HasMany
+    {
+        return $this->hasMany(DescargaUsuario::class, 'mod_id');
+    }
 } 

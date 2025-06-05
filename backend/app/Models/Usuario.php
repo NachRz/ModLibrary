@@ -68,4 +68,9 @@ class Usuario extends Authenticatable
             ->withTimestamps()
             ->withPivot('fecha_agregado');
     }
+
+    public function descargas(): HasMany
+    {
+        return $this->hasMany(DescargaUsuario::class, 'usuario_id');
+    }
 } 

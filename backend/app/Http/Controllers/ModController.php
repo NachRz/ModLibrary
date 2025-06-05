@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Mod;
 use App\Models\Usuario;
 use App\Models\Etiqueta;
+use App\Models\DescargaUsuario;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 class ModController extends Controller
 {
@@ -246,6 +248,11 @@ class ModController extends Controller
         $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
         $totalValoraciones = $mod->valoraciones->count();
         $totalDescargas = $mod->total_descargas;
+        
+        // Contar cuántas veces este mod ha sido guardado como favorito
+        $totalFavoritos = DB::table('mods_guardados')
+            ->where('mod_id', $id)
+            ->count();
 
         // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
         unset($mod->valoraciones);
@@ -254,11 +261,16 @@ class ModController extends Controller
         $mod->estadisticas = [
             'valoracion_media' => round($valoracionMedia, 1),
             'total_valoraciones' => $totalValoraciones,
-            'total_descargas' => $totalDescargas
+            'total_descargas' => $totalDescargas,
+            'total_favoritos' => $totalFavoritos
         ];
 
         // Añadir información de si está eliminado
         $mod->is_deleted = $mod->deleted_at !== null;
+
+        // Agregar fechas en el formato esperado por el frontend
+        $mod->fecha_creacion = $mod->created_at ? $mod->created_at->format('Y-m-d H:i:s') : null;
+        $mod->fecha_actualizacion = $mod->updated_at ? $mod->updated_at->format('Y-m-d H:i:s') : null;
 
         return response()->json([
             'status' => 'success',
@@ -1174,6 +1186,120 @@ class ModController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al obtener mods eliminados'
+            ], 500);
+        }
+    }
+
+    /**
+     * Incrementar el contador de descargas de un mod
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function incrementarDescarga(Request $request, int $id): JsonResponse
+    {
+        try {
+            $mod = Mod::find($id);
+            
+            if (!$mod) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Mod no encontrado'
+                ], 404);
+            }
+
+            // Obtener el usuario autenticado (ahora siempre debería existir)
+            $usuario = $request->user();
+            
+            if (!$usuario) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Usuario no autenticado'
+                ], 401);
+            }
+
+            // Incrementar el contador de descargas
+            $mod->increment('total_descargas');
+            
+            // Registrar la descarga del usuario
+            DescargaUsuario::create([
+                'usuario_id' => $usuario->id,
+                'mod_id' => $id,
+                'fecha_descarga' => now()
+            ]);
+            
+            $ultimaDescarga = now()->format('Y-m-d H:i:s');
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Descarga registrada correctamente',
+                'data' => [
+                    'total_descargas' => $mod->total_descargas,
+                    'ultima_descarga_usuario' => $ultimaDescarga
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al registrar la descarga: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener información de descargas del usuario para un mod específico
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function getDescargaUsuario(Request $request, int $id): JsonResponse
+    {
+        try {
+            $usuario = $request->user();
+            
+            if (!$usuario) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Usuario no autenticado'
+                ], 401);
+            }
+
+            $mod = Mod::find($id);
+            
+            if (!$mod) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Mod no encontrado'
+                ], 404);
+            }
+
+            // Obtener la última descarga del usuario para este mod
+            $ultimaDescarga = DescargaUsuario::where('usuario_id', $usuario->id)
+                ->where('mod_id', $id)
+                ->orderBy('fecha_descarga', 'desc')
+                ->first();
+
+            // Contar el total de descargas del usuario para este mod
+            $totalDescargasUsuario = DescargaUsuario::where('usuario_id', $usuario->id)
+                ->where('mod_id', $id)
+                ->count();
+            
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'ha_descargado' => $ultimaDescarga !== null,
+                    'ultima_descarga' => $ultimaDescarga ? $ultimaDescarga->fecha_descarga->format('Y-m-d H:i:s') : null,
+                    'total_descargas_usuario' => $totalDescargasUsuario
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al obtener información de descargas'
             ], 500);
         }
     }

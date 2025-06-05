@@ -275,6 +275,26 @@ const modService = {
     }
   },
 
+  // Incrementar contador de descargas
+  incrementDownload: async (modId) => {
+    try {
+      const response = await apiClient.post(`/mods/${modId}/incrementar-descarga`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al registrar la descarga' };
+    }
+  },
+
+  // Obtener información de descargas del usuario
+  getDescargaUsuario: async (modId) => {
+    try {
+      const response = await apiClient.get(`/mods/${modId}/descarga-usuario`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener información de descargas' };
+    }
+  },
+
   // Obtener lista de juegos
   getJuegos: async () => {
     try {

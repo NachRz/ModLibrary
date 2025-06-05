@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import modService from '../../services/api/modService';
 import useUserModsStatus from '../../hooks/useUserModsStatus';
@@ -6,6 +6,8 @@ import useRating from '../../hooks/useRating';
 import Breadcrumb from '../common/Breadcrumb/Breadcrumb';
 import ImageCarousel from '../common/ImageCarousel/ImageCarousel';
 import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
+import EditModAdmin from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/EditModAdmin';
+import ShareModal from '../common/ShareModal/ShareModal';
 import { useNotification } from '../../context/NotificationContext';
 import '../../assets/styles/components/mods/ModDetails.css';
 
@@ -26,6 +28,19 @@ const ModDetails = () => {
   // Estados para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  
+  // Estados para el modal de edición
+  const [showEditModal, setShowEditModal] = useState(false);
+  
+  // Estados para información de descargas del usuario
+  const [descargaUsuario, setDescargaUsuario] = useState(null);
+  const [loadingDescarga, setLoadingDescarga] = useState(false);
+  
+  // Estado para el modal de compartir
+  const [showShareModal, setShowShareModal] = useState(false);
+  
+  // Referencia al ImageCarousel para control externo
+  const imageCarouselRef = useRef(null);
   
   // Hook unificado para usuario y mods guardados
   const { 
@@ -73,8 +88,14 @@ const ModDetails = () => {
   const isGuardado = isSaved(id);
   const isOwner = checkIsOwner(mod);
 
-  // Construir URL de la imagen del banner
-  const bannerImageUrl = mod?.imagen_banner ? `http://localhost:8000/storage/${mod.imagen_banner}` : null;
+  // Construir URL de la imagen del banner con cache-busting
+  const bannerImageUrl = useMemo(() => {
+    if (mod?.imagen_banner) {
+      const timestamp = Date.now();
+      return `http://localhost:8000/storage/${mod.imagen_banner}?t=${timestamp}`;
+    }
+    return null;
+  }, [mod?.imagen_banner]);
 
   // Usar el hook personalizado para manejar las valoraciones
   const [
@@ -129,6 +150,30 @@ const ModDetails = () => {
     }
   }, [mod?.creador?.foto_perfil]);
 
+  // Obtener información de descargas del usuario
+  useEffect(() => {
+    const fetchDescargaUsuario = async () => {
+      if (isAuthenticated && mod?.id && !userLoading) {
+        try {
+          setLoadingDescarga(true);
+          const response = await modService.getDescargaUsuario(mod.id);
+          if (response.status === 'success') {
+            setDescargaUsuario(response.data);
+          }
+        } catch (error) {
+          console.error('Error al obtener información de descargas:', error);
+          setDescargaUsuario(null);
+        } finally {
+          setLoadingDescarga(false);
+        }
+      } else {
+        setDescargaUsuario(null);
+      }
+    };
+
+    fetchDescargaUsuario();
+  }, [isAuthenticated, mod?.id, userLoading]);
+
   // Función para manejar el clic en el botón de guardar
   const handleGuardarClick = async () => {
     setSaveError(null);
@@ -141,6 +186,10 @@ const ModDetails = () => {
         action = 'guardado';
         await toggleSavedStatus(id);
       }
+      
+      // Refrescar las estadísticas del mod después de cambiar el estado de guardado
+      await refreshModStats();
+      
       setLastSaveAction(action);
       setShowSaveMsg(true);
       setTimeout(() => {
@@ -261,7 +310,140 @@ const ModDetails = () => {
 
   // Editar mod
   const handleEditMod = () => {
-    navigate(`/mods/editar/${mod.id}`);
+    setShowEditModal(true);
+  };
+
+  // Manejar el cierre del modal de edición
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+  };
+
+  // Manejar el guardado desde el modal de edición
+  const handleSaveModFromModal = (updatedMod) => {
+    console.log('Mod actualizado desde modal:', updatedMod);
+    
+    // Actualizar el mod con los nuevos datos, preservando campos importantes
+    setMod(prevMod => {
+      const newMod = {
+        ...prevMod,
+        ...updatedMod,
+        // Mantener campos que no se editan en el modal pero son necesarios para la visualización
+        creador: prevMod.creador,
+        juego: updatedMod.juego || prevMod.juego, // Usar el juego actualizado si existe
+        estadisticas: prevMod.estadisticas,
+        total_descargas: prevMod.total_descargas,
+        fecha_creacion: prevMod.fecha_creacion,
+        fecha_actualizacion: new Date().toISOString(), // Actualizar la fecha de modificación
+        
+        // Manejar campos específicos que pueden venir con nombres diferentes
+        titulo: updatedMod.titulo || updatedMod.nombre || prevMod.titulo,
+        nombre: updatedMod.titulo || updatedMod.nombre || prevMod.nombre,
+        imagen_banner: updatedMod.imagen_banner || prevMod.imagen_banner,
+        imagenes_adicionales: updatedMod.imagenes_adicionales || prevMod.imagenes_adicionales,
+        etiquetas: updatedMod.etiquetas || prevMod.etiquetas,
+        version: updatedMod.version || updatedMod.version_actual || prevMod.version || prevMod.version_actual
+      };
+      
+      console.log('Mod actualizado en estado local:', newMod);
+      return newMod;
+    });
+    
+    // Cerrar el modal
+    setShowEditModal(false);
+    
+    // Mostrar notificación de éxito
+    showNotification(`Mod "${updatedMod.titulo || updatedMod.nombre}" actualizado exitosamente`, 'success');
+    
+    // Refrescar los datos del mod desde el servidor para asegurar sincronización
+    setTimeout(() => {
+      refreshModDetails();
+    }, 1500);
+  };
+
+  // Función para refrescar los detalles del mod desde el servidor
+  const refreshModDetails = async () => {
+    try {
+      const response = await modService.getModById(id);
+      if (response.status === 'success') {
+        setMod(response.data);
+        
+        // Actualizar URL de la imagen del creador con cache-busting si es necesario
+        if (response.data?.creador?.foto_perfil) {
+          const timestamp = Date.now();
+          setCreatorImageUrl(`http://localhost:8000/storage/${response.data.creador.foto_perfil}?t=${timestamp}`);
+        }
+        
+        console.log('Detalles del mod refrescados desde el servidor');
+      }
+    } catch (err) {
+      console.error('Error al refrescar los detalles del mod:', err);
+      // No mostrar error al usuario ya que es una actualización en segundo plano
+    }
+  };
+
+  // Función para cambiar tab
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+  };
+
+  // Función para manejar la descarga del mod
+  const handleDownload = async () => {
+    if (mod.url) {
+      try {
+        console.log('Iniciando descarga para mod:', mod.id);
+        
+        // Incrementar contador de descargas
+        const response = await modService.incrementDownload(mod.id);
+        console.log('Respuesta del incremento de descarga:', response);
+        
+        // Actualizar el contador de descargas localmente
+        setMod(prevMod => ({
+          ...prevMod,
+          total_descargas: (prevMod.total_descargas || 0) + 1,
+          estadisticas: {
+            ...prevMod.estadisticas,
+            total_descargas: (prevMod.estadisticas?.total_descargas || 0) + 1
+          }
+        }));
+
+        // Si el usuario está autenticado, actualizar información de descarga
+        if (isAuthenticated) {
+          try {
+            console.log('Usuario autenticado, obteniendo información de descarga...');
+            const descargaResponse = await modService.getDescargaUsuario(mod.id);
+            console.log('Respuesta de descarga usuario:', descargaResponse);
+            
+            if (descargaResponse.status === 'success') {
+              setDescargaUsuario(descargaResponse.data);
+            }
+          } catch (descargaError) {
+            console.error('Error al obtener info de descarga:', descargaError);
+          }
+        }
+        
+        // Abrir enlace en nueva pestaña
+        window.open(mod.url, '_blank', 'noopener,noreferrer');
+        
+        // Mostrar notificación de éxito
+        showNotification('Descarga registrada exitosamente', 'success');
+      } catch (error) {
+        console.error('Error al registrar la descarga:', error);
+        // Aún permitir la descarga aunque falle el registro
+        window.open(mod.url, '_blank', 'noopener,noreferrer');
+        showNotification('Descarga iniciada (no se pudo registrar)', 'warning');
+      }
+    } else {
+      showNotification('El enlace de descarga no está disponible', 'error');
+    }
+  };
+
+  // Función para manejar el modal de compartir
+  const handleShareClick = () => {
+    setShowShareModal(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
   };
 
   if (loading) {
@@ -331,10 +513,16 @@ const ModDetails = () => {
                 <h1 className="mod-title-main">{mod.titulo}</h1>
                 <div className="mod-stats-group">
                   <div className="mod-stat-box">
-                    <div className="stat-icon"><i className="fas fa-thumbs-up"></i></div>
+                    <div className="stat-icon"><i className="fas fa-star"></i></div>
                     <div className="stat-content">
-                      <div className="stat-label">Valoraciones</div>
-                      <div className="stat-value">{mod.estadisticas?.total_valoraciones || 0}</div>
+                      <div className="stat-label">Valoración</div>
+                      <div className="stat-value">
+                        {mod.estadisticas?.valoracion_media ? 
+                          `${mod.estadisticas.valoracion_media}/5` : 
+                          'Sin valorar'
+                        } 
+                        ({mod.estadisticas?.total_valoraciones || 0})
+                      </div>
                     </div>
                   </div>
                 
@@ -342,7 +530,7 @@ const ModDetails = () => {
                     <div className="stat-icon"><i className="fas fa-download"></i></div>
                     <div className="stat-content">
                       <div className="stat-label">Descargas</div>
-                      <div className="stat-value">{mod.estadisticas?.total_descargas || 0}</div>
+                      <div className="stat-value">{mod.total_descargas || 0}</div>
                     </div>
                   </div>
                 
@@ -368,11 +556,6 @@ const ModDetails = () => {
                 {/* Botones que solo aparecen si NO es el propietario */}
                 {!isOwner && (
                   <>
-                    <button className="mod-action-btn track" title="Seguir">
-                      <i className="fas fa-bell"></i>
-                      <span>Seguir</span>
-                    </button>
-                    
                     <button 
                       className={`mod-action-btn endorse ${isGuardado ? 'active' : ''}`}
                       onClick={handleGuardarClick}
@@ -383,10 +566,24 @@ const ModDetails = () => {
                       <span>{isGuardado ? 'Guardado' : 'Guardar'}</span>
                     </button>
                     
-                    <button className="mod-action-btn vote" title="Votar">
-                      <i className="fas fa-thumbs-up"></i>
-                      <span>Votar</span>
-                    </button>
+                    {/* Sistema de valoración con estrellas */}
+                    {isAuthenticated && (
+                      <div className="mod-rating-container">
+                        <div className="rating-stars" title="Valorar mod">
+                          {renderStars()}
+                        </div>
+                        {hasRated && (
+                          <button 
+                            className="delete-rating-btn"
+                            onClick={handleDeleteRating}
+                            disabled={ratingLoading}
+                            title="Eliminar valoración"
+                          >
+                            <i className="fas fa-times"></i>
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </>
                 )}
                 
@@ -414,7 +611,12 @@ const ModDetails = () => {
                   </>
                 )}
                 
-                <button className="mod-action-btn download-main" title="Descargar">
+                <button 
+                  className="mod-action-btn download-main" 
+                  title="Descargar"
+                  onClick={handleDownload}
+                  disabled={!mod.url}
+                >
                   <i className="fas fa-download"></i>
                   <span>Descargar</span>
                 </button>
@@ -501,14 +703,28 @@ const ModDetails = () => {
               <div className="mod-date-box">
                 <div className="date-label">Última actualización</div>
                 <div className="date-value">
-                  {mod.fecha_actualizacion ? new Date(mod.fecha_actualizacion).toLocaleDateString() : 'No disponible'}
+                  {mod.fecha_actualizacion ? 
+                    new Date(mod.fecha_actualizacion).toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    }) : 
+                    'No disponible'
+                  }
                 </div>
               </div>
               
               <div className="mod-date-box">
                 <div className="date-label">Subido originalmente</div>
                 <div className="date-value">
-                  {mod.fecha_creacion ? new Date(mod.fecha_creacion).toLocaleDateString() : 'No disponible'}
+                  {mod.fecha_creacion ? 
+                    new Date(mod.fecha_creacion).toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    }) : 
+                    'No disponible'
+                  }
                 </div>
               </div>
             </div>
@@ -521,6 +737,7 @@ const ModDetails = () => {
             <ImageCarousel 
               images={imagenesCarrusel}
               className="mod-image-carousel"
+              ref={imageCarouselRef}
             />
           </div>
         )}
@@ -542,46 +759,288 @@ const ModDetails = () => {
       
         {/* Pestañas de navegación */}
         <div className="mod-content-tabs">
-          <button className="tab-btn active">
+          <button 
+            className={`tab-btn ${activeTab === 'descripcion' ? 'active' : ''}`}
+            onClick={() => handleTabChange('descripcion')}
+          >
             Descripción
           </button>
-          <button className="tab-btn">
-            Archivos <span className="tab-count">1</span>
+          <button 
+            className={`tab-btn ${activeTab === 'imagenes' ? 'active' : ''}`}
+            onClick={() => handleTabChange('imagenes')}
+          >
+            Imágenes <span className="tab-count">{imagenesCarrusel.length}</span>
           </button>
-          <button className="tab-btn">
-            Imágenes <span className="tab-count">0</span>
-          </button>
-          <button className="tab-btn">
+          <button 
+            className={`tab-btn ${activeTab === 'comentarios' ? 'active' : ''}`}
+            onClick={() => handleTabChange('comentarios')}
+          >
             Comentarios <span className="tab-count">0</span>
           </button>
+          {/* Tab Detalles - Solo visible para el propietario */}
+          {isOwner && (
+            <button 
+              className={`tab-btn ${activeTab === 'detalles' ? 'active' : ''}`}
+              onClick={() => handleTabChange('detalles')}
+            >
+              <i className="fas fa-chart-line"></i> Detalles
+            </button>
+          )}
         </div>
         
         {/* Contenido de la pestaña activa */}
-        <div className="mod-tab-content active">
-          <div className="mod-description">
-            <h2>Sobre este mod</h2>
-            
-            {isAuthenticated && (
-              <div className="user-download-info">
-                <i className="fas fa-download"></i> Última descarga: {new Date().toLocaleDateString()}
-              </div>
-            )}
-            
-            <div className="description-content">
-              <p>{mod.descripcion}</p>
-            </div>
-            
-            <div className="mod-action-buttons">
-              <button className="report-btn">
-                <i className="fas fa-flag"></i> Reportar
-              </button>
+        {activeTab === 'descripcion' && (
+          <div className="mod-tab-content active">
+            <div className="mod-description">
+              <h2>Sobre este mod</h2>
               
-              <button className="share-btn">
-                <i className="fas fa-share-alt"></i> Compartir
-              </button>
+              {isAuthenticated && descargaUsuario && descargaUsuario.ha_descargado && (
+                <div className="user-download-info">
+                  <i className="fas fa-download"></i> 
+                  Última descarga: {new Date(descargaUsuario.ultima_descarga).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                  {descargaUsuario.total_descargas_usuario > 1 && (
+                    <span className="download-count">
+                      ({descargaUsuario.total_descargas_usuario} {descargaUsuario.total_descargas_usuario === 1 ? 'descarga' : 'descargas'})
+                    </span>
+                  )}
+                </div>
+              )}
+              
+              {isAuthenticated && loadingDescarga && (
+                <div className="user-download-info loading">
+                  <i className="fas fa-spinner fa-spin"></i> Cargando información de descarga...
+                </div>
+              )}
+              
+              {isAuthenticated && descargaUsuario && !descargaUsuario.ha_descargado && !loadingDescarga && (
+                <div className="user-download-info no-download">
+                  <i className="fas fa-info-circle"></i> Aún no has descargado este mod
+                </div>
+              )}
+              
+              <div className="description-content">
+                <p>{mod.descripcion}</p>
+              </div>
+              
+              <div className="mod-action-buttons">
+                <button className="report-btn">
+                  <i className="fas fa-flag"></i> Reportar
+                </button>
+                
+                <button className="share-btn" onClick={handleShareClick}>
+                  <i className="fas fa-share-alt"></i> Compartir
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'imagenes' && (
+          <div className="mod-tab-content active">
+            <div className="mod-images-gallery">
+              <h2>Galería de imágenes ({imagenesCarrusel.length})</h2>
+              
+              {imagenesCarrusel.length > 0 ? (
+                <div className="tab-image-grid-container">
+                  <div className="images-grid">
+                    {imagenesCarrusel.map((imagen, index) => (
+                      <div 
+                        key={index}
+                        className="grid-image-item"
+                        onClick={() => {
+                          if (imageCarouselRef.current) {
+                            imageCarouselRef.current.openLightbox(index);
+                          }
+                        }}
+                      >
+                        <img 
+                          src={imagen} 
+                          alt={`Imagen ${index + 1} de ${mod.titulo}`}
+                          loading="lazy"
+                        />
+                        <div className="image-overlay">
+                          <i className="fas fa-search-plus"></i>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="gallery-description">
+                    <p>
+                      Todas las imágenes de <strong>{mod.titulo}</strong>.
+                    </p>
+                    <div className="gallery-stats">
+                      <span className="stat-item">
+                        <i className="fas fa-images"></i>
+                        {imagenesCarrusel.length} {imagenesCarrusel.length === 1 ? 'imagen' : 'imágenes'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="no-images-placeholder">
+                  <i className="fas fa-images"></i>
+                  <h3>Sin imágenes disponibles</h3>
+                  <p>Este mod no tiene imágenes adicionales para mostrar</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'comentarios' && (
+          <div className="mod-tab-content active">
+            <div className="mod-comments">
+              <h2>Comentarios</h2>
+              <p>Sistema de comentarios próximamente...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Tab Detalles - Solo para el propietario */}
+        {activeTab === 'detalles' && isOwner && (
+          <div className="mod-tab-content active">
+            <div className="mod-details-owner">
+              <h2>
+                <i className="fas fa-chart-line"></i> 
+                Estadísticas y Rendimiento
+              </h2>
+              
+              {/* Estadísticas principales */}
+              <div className="stats-grid">
+                <div className="stat-card downloads">
+                  <div className="stat-icon">
+                    <i className="fas fa-download"></i>
+                  </div>
+                  <div className="stat-content">
+                    <div className="stat-value">
+                      {mod.estadisticas?.total_descargas || mod.total_descargas || 0}
+                    </div>
+                    <div className="stat-label">Total Descargas</div>
+                  </div>
+                </div>
+
+                <div className="stat-card rating">
+                  <div className="stat-icon">
+                    <i className="fas fa-star"></i>
+                  </div>
+                  <div className="stat-content">
+                    <div className="stat-value">
+                      {mod.estadisticas?.valoracion_media ? 
+                        Number(mod.estadisticas.valoracion_media).toFixed(1) : 
+                        '0.0'
+                      }
+                    </div>
+                    <div className="stat-label">Valoración Media</div>
+                  </div>
+                </div>
+
+                <div className="stat-card reviews">
+                  <div className="stat-icon">
+                    <i className="fas fa-users"></i>
+                  </div>
+                  <div className="stat-content">
+                    <div className="stat-value">
+                      {mod.estadisticas?.total_valoraciones || 0}
+                    </div>
+                    <div className="stat-label">Total Valoraciones</div>
+                  </div>
+                </div>
+
+                <div className="stat-card comments">
+                  <div className="stat-icon">
+                    <i className="fas fa-comments"></i>
+                  </div>
+                  <div className="stat-content">
+                    <div className="stat-value">0</div>
+                    <div className="stat-label">Comentarios</div>
+                  </div>
+                </div>
+
+                <div className="stat-card views">
+                  <div className="stat-icon">
+                    <i className="fas fa-eye"></i>
+                  </div>
+                  <div className="stat-content">
+                    <div className="stat-value">N/A</div>
+                    <div className="stat-label">Visitas</div>
+                  </div>
+                </div>
+
+                <div className="stat-card favorites">
+                  <div className="stat-icon">
+                    <i className="fas fa-heart"></i>
+                  </div>
+                  <div className="stat-content">
+                    <div className="stat-value">
+                      {mod.estadisticas?.total_favoritos || 0}
+                    </div>
+                    <div className="stat-label">Favoritos</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Información detallada del mod */}
+              <div className="mod-info-detailed">
+                {/* Enlaces y archivos */}
+                <div className="info-section">
+                  <h3>
+                    <i className="fas fa-link"></i>
+                    Enlaces y Archivos
+                  </h3>
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <span className="info-label">URL de descarga:</span>
+                      <span className="info-value">
+                        {mod.url ? (
+                          <a href={mod.url} target="_blank" rel="noopener noreferrer" className="download-link">
+                            <i className="fas fa-external-link-alt"></i> Ver enlace
+                          </a>
+                        ) : (
+                          'No configurado'
+                        )}
+                      </span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Imagen banner:</span>
+                      <span className="info-value">
+                        {mod.imagen_banner ? (
+                          <span className="file-status available">
+                            <i className="fas fa-check-circle"></i> Configurado
+                          </span>
+                        ) : (
+                          <span className="file-status missing">
+                            <i className="fas fa-times-circle"></i> No configurado
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">Imágenes adicionales:</span>
+                      <span className="info-value">
+                        {imagenesCarrusel.length > 1 ? (
+                          <span className="file-status available">
+                            <i className="fas fa-check-circle"></i> {imagenesCarrusel.length - 1} imágenes
+                          </span>
+                        ) : (
+                          <span className="file-status missing">
+                            <i className="fas fa-times-circle"></i> No configuradas
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {!isAuthenticated && (
           <div className="login-needed-card">
@@ -597,6 +1056,23 @@ const ModDetails = () => {
         onConfirm={confirmDeleteMod}
         onCancel={cancelDeleteMod}
         isOpen={showDeleteModal}
+      />
+
+      {/* Modal de compartir */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={handleCloseShareModal}
+        modTitle={mod?.titulo || ''}
+        modUrl={`/mods/${id}`}
+        modDescription={mod?.descripcion || ''}
+      />
+
+      {/* Modal de edición */}
+      <EditModAdmin
+        isOpen={showEditModal}
+        onClose={handleCloseEditModal}
+        mod={mod}
+        onSave={handleSaveModFromModal}
       />
     </div>
   );
