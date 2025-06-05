@@ -267,125 +267,65 @@
 }
 
 /* Grid de mods mejorado */
-.grid {
+.explorar-mods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
   animation: scaleIn 0.5s ease-out;
-  align-items: stretch; /* Asegurar que todas las cards tengan la misma altura */
-}
-
-/* Prevenir overflow en el grid */
-.grid {
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
 }
 
-/* Estilos específicos para el grid de mods */
-.grid > div {
+/* Estilos específicos para las cards en el grid */
+.explorar-mods-grid > * {
+  width: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 480px; /* Altura mínima para consistencia */
-  max-width: 100%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.grid > div:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
-
-/* Asegurar que las imágenes mantengan aspect ratio */
-.grid img {
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  width: 100%;
-  height: 192px; /* 48 * 4 = 192px (h-48) */
-}
-
-/* Mejorar responsive design */
+/* Mejorar responsive design para el grid */
 @media (max-width: 640px) {
-  .grid {
-    gap: 1.5rem !important; /* Reducir gap en móviles */
-  }
-  
-  .grid > div {
-    min-height: 420px;
-  }
-  
-  .grid img {
-    height: 160px;
+  .explorar-mods-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
-@media (min-width: 641px) and (max-width: 1024px) {
-  .grid {
-    gap: 2rem !important; /* Gap moderado en tablets */
-  }
-  
-  .grid > div {
-    min-height: 460px;
+@media (min-width: 641px) and (max-width: 768px) {
+  .explorar-mods-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
   }
 }
 
-@media (min-width: 1025px) {
-  .grid {
-    gap: 2rem !important; /* Gap amplio en desktop */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .explorar-mods-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.75rem;
   }
-  
-  .grid > div {
-    min-height: 500px;
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .explorar-mods-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1281px) {
+  .explorar-mods-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
   }
 }
 
 /* Mejorar el aspecto en pantallas muy grandes */
 @media (min-width: 1920px) {
-  .grid {
-    gap: 2.5rem !important;
+  .explorar-mods-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2.5rem;
   }
-  
-  .grid > div {
-    min-height: 520px;
-  }
-}
-
-/* Mejorar distribución del contenido en las cards */
-.grid .bg-custom-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.grid .bg-custom-card > div:last-child {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* Asegurar que las descripciones no se desborden */
-.grid .line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-height: 1.4;
-  max-height: 2.8em; /* 2 líneas * 1.4 line-height */
-}
-
-/* Mejorar espaciado en las estadísticas */
-.grid .flex.items-center.justify-between {
-  margin-top: auto;
-  padding-top: 1rem;
-}
-
-/* Asegurar que los botones no se apilen incorrectamente */
-.grid .flex.items-center.space-x-3 {
-  flex-shrink: 0;
-  min-width: 0;
-}
-
-.grid .flex.items-center.space-x-3 > * {
-  flex-shrink: 0;
 }
 
 /* Vista de lista próximamente */
