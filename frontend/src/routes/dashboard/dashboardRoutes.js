@@ -7,6 +7,15 @@ import ProtectedRoute from '../../middlewares/authMiddleware';
 const dashboardRoutes = (
   [
     <Route 
+      key="dashboard-base" 
+      path="/dashboard" 
+      element={
+        <ProtectedRoute>
+          <Dashboard defaultTab={0} />
+        </ProtectedRoute>
+      } 
+    />,
+    <Route 
       key="dashboard-mis-mods" 
       path="/dashboard/mis-mods" 
       element={

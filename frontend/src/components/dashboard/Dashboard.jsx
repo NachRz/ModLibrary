@@ -15,7 +15,9 @@ const Dashboard = ({ defaultTab = 0 }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState(defaultTab);
-  const [adminModeActive, setAdminModeActive] = useState(false);
+  
+  // Detectar automáticamente si estamos en modo admin basado en la ruta
+  const adminModeActive = location.pathname.startsWith('/admin');
   
   // Mapeo de rutas a índices de pestañas (sin General)
   const pathToTabIndex = {
@@ -103,9 +105,9 @@ const Dashboard = ({ defaultTab = 0 }) => {
     }
   };
 
-  // Función para manejar el toggle de admin
+  // Función para manejar el toggle de admin (ya no necesita cambiar estado local)
   const handleAdminToggle = (isActive) => {
-    setAdminModeActive(isActive);
+    // La navegación se maneja en AdminToggle
     // Resetear a la primera pestaña cuando se cambie de modo
     setCurrentTab(0);
   };

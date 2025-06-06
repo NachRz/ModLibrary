@@ -6,6 +6,7 @@ import userService from '../../services/api/userService';
 import ModCardCompact from './Cards/ModCardCompact';
 import GameCard from './Cards/GameCard';
 import UserCard from './Cards/UserCard';
+import PageContainer from '../layout/PageContainer';
 import '../../assets/styles/components/common/SearchResults.css';
 
 const SearchResults = () => {
@@ -125,8 +126,8 @@ const SearchResults = () => {
   const { mods, games, users } = getVisibleResults();
 
   return (
-    <div className="search-results-page">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <PageContainer>
+      <div className="search-results-page">
         {/* Header con nueva búsqueda */}
         <div className="search-header">
           <h1 className="search-title">
@@ -330,7 +331,7 @@ const SearchResults = () => {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

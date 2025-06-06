@@ -300,8 +300,8 @@ const ModDetails = () => {
 
   // Configuración del breadcrumb
   const breadcrumbItems = [
-    { label: 'Mods', path: '/mods' },
-    { label: mod?.titulo || 'Detalles del Mod', path: `/mods/${id}` }
+    { label: mod?.juego?.titulo || 'Juego', path: mod?.juego?.id ? `/juegos/${mod.juego.id}` : '/juegos' },
+    { label: mod?.titulo || 'Mod', path: `/mods/${id}` }
   ];
 
   // Manejar eliminación del mod
@@ -544,7 +544,14 @@ const ModDetails = () => {
             
             <div className="mod-stats-and-actions">
               <div className="mod-stats-section">
-                <h1 className="mod-title-main">{mod.titulo}</h1>
+                <h1 
+                  className="mod-title-main"
+                  data-mod-name={mod.titulo}
+                  data-game-name={mod.juego?.titulo}
+                  data-game-id={mod.juego?.id}
+                >
+                  {mod.titulo}
+                </h1>
                 <div className="mod-stats-group">
                   <div className="mod-stat-box">
                     <div className="stat-icon"><i className="fas fa-star"></i></div>
@@ -699,7 +706,14 @@ const ModDetails = () => {
               <div className="creator-header">Creado por</div>
               <div 
                 className="creator-content clickable"
-                onClick={() => navigate(`/usuarios/${mod.creador?.id}/perfil`)}
+                onClick={() => {
+                  // Si es tu propio perfil, ir a /perfil, sino a /usuarios/{id}/perfil
+                  if (currentUserId && mod.creador?.id === currentUserId) {
+                    navigate('/perfil');
+                  } else {
+                    navigate(`/usuarios/${mod.creador?.id}/perfil`);
+                  }
+                }}
                 style={{ cursor: 'pointer' }}
                 title={`Ver perfil de ${mod.creador?.nome || 'Usuario'}`}
               >

@@ -6,6 +6,7 @@ import Contacto from '../components/contacto/Contacto';
 import SearchResults from '../components/common/SearchResults';
 import authRoutes from './auth/authRoutes';
 import dashboardRoutes from './dashboard/dashboardRoutes';
+import adminRoutes from './admin/adminRoutes';
 import modRoutes from './mods/modRoutes';
 import userRoutes from './user/userRoutes';
 import juegoRoutes from './juegos/juegoRoutes';
@@ -20,6 +21,9 @@ const AppRoutes = () => {
 
             {/* Rutas del dashboard */}
             {dashboardRoutes}
+
+            {/* Rutas del panel de administración */}
+            {adminRoutes}
 
             {/* Rutas de mods */}
             {modRoutes}

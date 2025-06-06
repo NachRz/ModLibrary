@@ -366,7 +366,10 @@ const GameDetails = () => {
             {/* Información del juego */}
             <div className="flex-1 pt-8">
               <div className="flex items-start justify-between mb-4">
-                <h1 className="text-4xl md:text-5xl font-bold text-white">
+                <h1 
+                  className="text-4xl md:text-5xl font-bold text-white"
+                  data-game-name={juego.titulo || juego.title}
+                >
                   {juego.titulo || juego.title}
                 </h1>
                 

@@ -17,6 +17,7 @@ import modService from '../../services/api/modService';
 import gameService from '../../services/api/gameService';
 import etiquetasService from '../../services/api/etiquetasService';
 import AsyncSelect from 'react-select/async';
+import PageContainer from '../layout/PageContainer';
 
 // Componente personalizado para la opción del select de juegos (mejorado desde EditModAdmin)
 const CustomGameOption = ({ innerProps, label, data }) => (
@@ -1106,7 +1107,8 @@ const CrearMod = () => {
   );
 
   return (
-    <div className="create-mod-container">
+    <PageContainer>
+      <div className="create-mod-container">
       {submitSuccess ? (
         renderSuccessMessage()
       ) : (
@@ -1188,7 +1190,8 @@ const CrearMod = () => {
           </form>
         </>
       )}
-    </div>
+      </div>
+    </PageContainer>
   );
 };
 
