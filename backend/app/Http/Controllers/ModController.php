@@ -434,12 +434,37 @@ class ModController extends Controller
         if ($request->has('permitir_comentarios')) $mod->permitir_comentarios = $request->boolean('permitir_comentarios');
         if ($request->has('visible_en_busqueda')) $mod->visible_en_busqueda = $request->boolean('visible_en_busqueda');
 
+        // Limpiar información previa sobre juegos eliminados
+        \App\Models\Mod::clearJuegoEliminadoEnActualizacion();
+
         // Guardar cambios
         $mod->save();
 
-        // Actualizar etiquetas si se proporcionaron
+        // Verificar si se eliminó un juego automáticamente al cambiar el juego del mod
+        $juegoEliminadoInfo = \App\Models\Mod::getJuegoEliminadoEnActualizacion();
+
+        // Actualizar etiquetas si se proporcionaron y verificar etiquetas huérfanas
+        $etiquetasEliminadasInfo = [];
         if ($request->has('etiquetas') && is_array($request->etiquetas)) {
+            // Obtener etiquetas actuales antes del sync
+            $etiquetasAntes = $mod->etiquetas()->get();
+            
+            // Sincronizar etiquetas
             $mod->etiquetas()->sync($request->etiquetas);
+            
+            // Verificar si alguna etiqueta anterior se quedó sin mods
+            foreach ($etiquetasAntes as $etiquetaAnterior) {
+                if (!in_array($etiquetaAnterior->id, $request->etiquetas)) {
+                    // Esta etiqueta se eliminó del mod, verificar si debe eliminarse
+                    $etiquetaParaVerificar = \App\Models\Etiqueta::find($etiquetaAnterior->id);
+                    if ($etiquetaParaVerificar) {
+                        $resultado = $etiquetaParaVerificar->verificarYEliminarSiSinMods();
+                        if ($resultado['etiqueta_eliminada']) {
+                            $etiquetasEliminadasInfo[] = $resultado['etiqueta_info'];
+                        }
+                    }
+                }
+            }
         }
 
         // Cargar relaciones para la respuesta
@@ -449,10 +474,31 @@ class ModController extends Controller
             'etiquetas:id,nombre'
         ]);
 
+        $message = 'Mod actualizado exitosamente';
+        if ($juegoEliminadoInfo) {
+            $message .= ". Nota: El juego '{$juegoEliminadoInfo['titulo']}' fue eliminado automáticamente porque no tenía más mods asociados";
+            
+            if (!empty($juegoEliminadoInfo['generos_eliminados'])) {
+                $nombresGeneros = array_column($juegoEliminadoInfo['generos_eliminados'], 'nombre');
+                $message .= " y se eliminaron los géneros: " . implode(', ', $nombresGeneros);
+            }
+            
+            $message .= ".";
+        }
+        
+        if (!empty($etiquetasEliminadasInfo)) {
+            $nombresEtiquetas = array_column($etiquetasEliminadasInfo, 'nombre');
+            if (count($nombresEtiquetas) > 0) {
+                $message .= " También se eliminaron las etiquetas: " . implode(', ', $nombresEtiquetas) . ".";
+            }
+        }
+
         return response()->json([
             'status' => 'success',
-            'message' => 'Mod actualizado exitosamente',
-            'data' => $mod
+            'message' => $message,
+            'data' => $mod,
+            'juego_eliminado' => $juegoEliminadoInfo,
+            'etiquetas_eliminadas' => $etiquetasEliminadasInfo
         ]);
     }
 
@@ -518,12 +564,41 @@ class ModController extends Controller
                 ], 403);
             }
 
+            // Limpiar información previa del observer
+            \App\Observers\ModObserver::clearAllEliminacionInfo();
+
             // Hacer soft delete del mod
             $mod->delete();
 
+            // Verificar si se eliminó un juego y etiquetas automáticamente
+            $juegoEliminadoInfo = \App\Observers\ModObserver::getJuegoEliminadoInfo();
+            $etiquetasEliminadasInfo = \App\Observers\ModObserver::getEtiquetasEliminadasInfo();
+            
+            $message = 'Mod desactivado correctamente (puede ser restaurado)';
+            
+            if ($juegoEliminadoInfo) {
+                $message .= ". Nota: El juego '{$juegoEliminadoInfo['titulo']}' fue eliminado automáticamente porque no tenía más mods asociados";
+                
+                if (!empty($juegoEliminadoInfo['generos_eliminados'])) {
+                    $nombresGeneros = array_column($juegoEliminadoInfo['generos_eliminados'], 'nombre');
+                    $message .= " y se eliminaron los géneros: " . implode(', ', $nombresGeneros);
+                }
+                
+                $message .= ".";
+            }
+            
+            if (!empty($etiquetasEliminadasInfo)) {
+                $nombresEtiquetas = array_column($etiquetasEliminadasInfo, 'nombre');
+                if (count($nombresEtiquetas) > 0) {
+                    $message .= " También se eliminaron las etiquetas: " . implode(', ', $nombresEtiquetas) . ".";
+                }
+            }
+
             return response()->json([
                 'status' => 'success',
-                'message' => 'Mod desactivado correctamente (puede ser restaurado)'
+                'message' => $message,
+                'juego_eliminado' => $juegoEliminadoInfo,
+                'etiquetas_eliminadas' => $etiquetasEliminadasInfo
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -637,6 +712,9 @@ class ModController extends Controller
                 ], 403);
             }
 
+            // Limpiar información previa del observer
+            \App\Observers\ModObserver::clearAllEliminacionInfo();
+
             // ModObserver se encargará automáticamente de:
             // - Eliminar imagen banner y imágenes adicionales
             // - Eliminar relaciones many-to-many (etiquetas, usuariosGuardados)
@@ -646,9 +724,35 @@ class ModController extends Controller
             // Eliminar el mod definitivamente
             $mod->forceDelete();
 
+            // Verificar si se eliminó un juego y etiquetas automáticamente
+            $juegoEliminadoInfo = \App\Observers\ModObserver::getJuegoEliminadoInfo();
+            $etiquetasEliminadasInfo = \App\Observers\ModObserver::getEtiquetasEliminadasInfo();
+            
+            $message = 'Mod eliminado definitivamente';
+            
+            if ($juegoEliminadoInfo) {
+                $message .= ". Nota: El juego '{$juegoEliminadoInfo['titulo']}' fue eliminado automáticamente porque no tenía más mods asociados";
+                
+                if (!empty($juegoEliminadoInfo['generos_eliminados'])) {
+                    $nombresGeneros = array_column($juegoEliminadoInfo['generos_eliminados'], 'nombre');
+                    $message .= " y se eliminaron los géneros: " . implode(', ', $nombresGeneros);
+                }
+                
+                $message .= ".";
+            }
+            
+            if (!empty($etiquetasEliminadasInfo)) {
+                $nombresEtiquetas = array_column($etiquetasEliminadasInfo, 'nombre');
+                if (count($nombresEtiquetas) > 0) {
+                    $message .= " También se eliminaron las etiquetas: " . implode(', ', $nombresEtiquetas) . ".";
+                }
+            }
+
             return response()->json([
                 'status' => 'success',
-                'message' => 'Mod eliminado definitivamente'
+                'message' => $message,
+                'juego_eliminado' => $juegoEliminadoInfo,
+                'etiquetas_eliminadas' => $etiquetasEliminadasInfo
             ]);
         } catch (\Exception $e) {
             return response()->json([

@@ -641,16 +641,37 @@ class AuthController extends Controller
         try {
             $usuario = Usuario::onlyTrashed()->findOrFail($id);
 
+            // Limpiar información previa del observer
+            \App\Observers\ModObserver::clearAllEliminacionInfo();
+
             // Eliminar todos los mods del usuario (ModObserver manejará archivos automáticamente)
             $mods = $usuario->mods;
             
+            $juegosEliminados = [];
+            $etiquetasEliminadas = [];
+            
             foreach ($mods as $mod) {
+                // Limpiar información antes de cada eliminación
+                \App\Observers\ModObserver::clearAllEliminacionInfo();
+                
                 // ModObserver se encargará automáticamente de:
                 // - Eliminar imagen banner y imágenes adicionales
                 // - Eliminar relaciones many-to-many
                 // - Eliminar valoraciones y comentarios
                 // - Eliminar versiones (VersionModObserver elimina archivos)
                 $mod->delete();
+                
+                // Capturar información de eliminaciones automáticas
+                $juegoEliminadoInfo = \App\Observers\ModObserver::getJuegoEliminadoInfo();
+                $etiquetasEliminadasInfo = \App\Observers\ModObserver::getEtiquetasEliminadasInfo();
+                
+                if ($juegoEliminadoInfo) {
+                    $juegosEliminados[] = $juegoEliminadoInfo;
+                }
+                
+                if (!empty($etiquetasEliminadasInfo)) {
+                    $etiquetasEliminadas = array_merge($etiquetasEliminadas, $etiquetasEliminadasInfo);
+                }
             }
 
             // Eliminar relaciones del usuario
@@ -664,9 +685,23 @@ class AuthController extends Controller
             // Eliminar definitivamente
             $usuario->forceDelete();
 
+            $message = 'Usuario y todos sus mods eliminados definitivamente';
+            
+            if (!empty($juegosEliminados)) {
+                $nombresJuegos = array_column($juegosEliminados, 'titulo');
+                $message .= ". También se eliminaron los juegos: " . implode(', ', $nombresJuegos);
+            }
+            
+            if (!empty($etiquetasEliminadas)) {
+                $nombresEtiquetas = array_unique(array_column($etiquetasEliminadas, 'nombre'));
+                $message .= ". También se eliminaron las etiquetas: " . implode(', ', $nombresEtiquetas);
+            }
+
             return response()->json([
                 'status' => 'success',
-                'message' => 'Usuario y todos sus mods eliminados definitivamente'
+                'message' => $message,
+                'juegos_eliminados' => $juegosEliminados,
+                'etiquetas_eliminadas' => $etiquetasEliminadas
             ]);
         } catch (\Exception $e) {
             Log::error('Error al eliminar usuario con mods definitivamente', [

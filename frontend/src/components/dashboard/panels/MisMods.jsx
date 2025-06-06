@@ -31,6 +31,20 @@ const MisMods = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [modToEdit, setModToEdit] = useState(null);
 
+  // Función helper para formatear mensajes sobre juegos y géneros eliminados
+  const formatearMensajeEliminacion = (mensajeBase, juegoEliminadoInfo) => {
+    if (!juegoEliminadoInfo) return mensajeBase;
+    
+    let mensaje = `${mensajeBase} El juego "${juegoEliminadoInfo.titulo}" fue eliminado automáticamente porque no tenía más mods asociados`;
+    
+    if (juegoEliminadoInfo.generos_eliminados && juegoEliminadoInfo.generos_eliminados.length > 0) {
+      const nombresGeneros = juegoEliminadoInfo.generos_eliminados.map(g => g.nombre).join(', ');
+      mensaje += ` y se eliminaron los géneros: ${nombresGeneros}`;
+    }
+    
+    return mensaje + '.';
+  };
+
   useEffect(() => {
     const fetchMyMods = async () => {
       try {
@@ -124,7 +138,14 @@ const MisMods = () => {
               : mod
           )
         );
-        showNotification(`Mod "${modToDelete.titulo}" desactivado correctamente (puede ser restaurado)`, 'success');
+        
+        // Mostrar notificación con información sobre juegos y géneros eliminados si aplica
+        if (response.juego_eliminado) {
+          const mensaje = formatearMensajeEliminacion(`Mod "${modToDelete.titulo}" desactivado correctamente (puede ser restaurado).`, response.juego_eliminado);
+          showNotification(mensaje, 'success', 10000);
+        } else {
+          showNotification(`Mod "${modToDelete.titulo}" desactivado correctamente (puede ser restaurado)`, 'success');
+        }
       } else {
         throw new Error(response.message || 'Error al eliminar el mod');
       }

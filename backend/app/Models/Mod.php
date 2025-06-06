@@ -15,6 +15,11 @@ class Mod extends Model
 
     protected $table = 'mods';
 
+    /**
+     * Variable estática para comunicar información sobre juegos eliminados al actualizar
+     */
+    public static $juegoEliminadoEnActualizacion = null;
+
     protected $fillable = [
         'titulo',
         'imagen',
@@ -62,11 +67,21 @@ class Mod extends Model
 
         // Al actualizar un mod
         static::updated(function ($mod) {
+            $juegoAnteriorId = null;
+            
+            // Limpiar información previa
+            self::$juegoEliminadoEnActualizacion = null;
+            
             // Si cambió el juego
             if ($mod->isDirty('juego_id')) {
+                $juegoAnteriorId = $mod->getOriginal('juego_id');
+                
                 // Decrementar el contador del juego anterior si el mod estaba publicado
-                if ($mod->getOriginal('juego_id') && $mod->getOriginal('estado') === 'publicado') {
-                    Juego::find($mod->getOriginal('juego_id'))?->decrementarModsTotales();
+                if ($juegoAnteriorId && $mod->getOriginal('estado') === 'publicado') {
+                    $juegoAnterior = Juego::find($juegoAnteriorId);
+                    if ($juegoAnterior) {
+                        $juegoAnterior->decrementarModsTotales();
+                    }
                 }
                 // Incrementar el contador del nuevo juego si el mod está publicado
                 if ($mod->juego_id && $mod->estado === 'publicado') {
@@ -92,7 +107,58 @@ class Mod extends Model
                     }
                 }
             }
+            
+            // Verificar si el juego anterior se quedó sin mods y debe ser eliminado
+            if ($juegoAnteriorId && $juegoAnteriorId !== $mod->juego_id) {
+                try {
+                    $juegoAnterior = Juego::find($juegoAnteriorId);
+                    if ($juegoAnterior) {
+                        $tituloJuegoAnterior = $juegoAnterior->titulo;
+                        $idJuegoAnterior = $juegoAnterior->id;
+                        
+                        $resultado = $juegoAnterior->verificarYEliminarSiSinMods();
+                        if ($resultado['juego_eliminado']) {
+                            self::$juegoEliminadoEnActualizacion = [
+                                'titulo' => $tituloJuegoAnterior,
+                                'id' => $idJuegoAnterior,
+                                'generos_eliminados' => $resultado['generos_eliminados']
+                            ];
+                            
+                            $mensaje = "Juego '{$tituloJuegoAnterior}' (ID: {$idJuegoAnterior}) eliminado automáticamente después de cambiar juego del mod {$mod->id}";
+                            
+                            if (!empty($resultado['generos_eliminados'])) {
+                                $nombresGeneros = array_column($resultado['generos_eliminados'], 'nombre');
+                                $mensaje .= ". También se eliminaron los géneros: " . implode(', ', $nombresGeneros);
+                            }
+                            
+                            \Illuminate\Support\Facades\Log::info($mensaje);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Error al verificar eliminación de juego anterior después de actualizar mod {$mod->id}: " . $e->getMessage(), [
+                        'mod_id' => $mod->id,
+                        'juego_anterior_id' => $juegoAnteriorId,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
         });
+    }
+
+    /**
+     * Obtiene información sobre el último juego eliminado automáticamente en una actualización
+     */
+    public static function getJuegoEliminadoEnActualizacion(): ?array
+    {
+        return self::$juegoEliminadoEnActualizacion;
+    }
+
+    /**
+     * Limpia la información del juego eliminado en actualización
+     */
+    public static function clearJuegoEliminadoEnActualizacion(): void
+    {
+        self::$juegoEliminadoEnActualizacion = null;
     }
 
     /**

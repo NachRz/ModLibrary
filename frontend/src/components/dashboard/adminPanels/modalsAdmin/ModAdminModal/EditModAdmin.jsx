@@ -953,7 +953,9 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             es_destacado: formData.es_destacado,
             permitir_comentarios: formData.permitir_comentarios,
             visible_en_busqueda: formData.visible_en_busqueda,
-            etiquetas: formData.etiquetas || []
+            etiquetas: formData.etiquetas || [],
+            // Pasar información sobre juegos eliminados
+            juego_eliminado: response.juego_eliminado
           };
           
           onSave(updatedModForTable);

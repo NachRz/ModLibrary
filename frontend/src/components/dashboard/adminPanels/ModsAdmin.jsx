@@ -46,6 +46,20 @@ const ModsAdmin = () => {
   const [modToRestore, setModToRestore] = useState(null);
   const [restoring, setRestoring] = useState(false);
 
+  // Función helper para formatear mensajes sobre juegos y géneros eliminados
+  const formatearMensajeEliminacion = (mensajeBase, juegoEliminadoInfo) => {
+    if (!juegoEliminadoInfo) return mensajeBase;
+    
+    let mensaje = `${mensajeBase}. El juego "${juegoEliminadoInfo.titulo}" fue eliminado automáticamente porque no tenía más mods asociados`;
+    
+    if (juegoEliminadoInfo.generos_eliminados && juegoEliminadoInfo.generos_eliminados.length > 0) {
+      const nombresGeneros = juegoEliminadoInfo.generos_eliminados.map(g => g.nombre).join(', ');
+      mensaje += ` y se eliminaron los géneros: ${nombresGeneros}`;
+    }
+    
+    return mensaje + '.';
+  };
+
   // Cargar datos iniciales
   useEffect(() => {
     loadInitialData();
@@ -239,7 +253,19 @@ const ModsAdmin = () => {
           ...modToDelete, 
           fecha_eliminacion: new Date().toLocaleString() 
         }]);
-        showNotification(`Mod "${modToDelete.titulo}" desactivado correctamente (puede ser restaurado)`, 'success');
+        
+        // Mostrar notificación con información sobre juegos eliminados
+        if (response.juego_eliminado) {
+          let mensaje = formatearMensajeEliminacion(`Mod "${modToDelete.titulo}" desactivado correctamente.`, response.juego_eliminado);
+          
+          showNotification(
+            mensaje, 
+            'success', 
+            10000 // Duración más larga para mensajes con más información
+          );
+        } else {
+          showNotification(`Mod "${modToDelete.titulo}" desactivado correctamente (puede ser restaurado)`, 'success');
+        }
       } else {
         throw new Error(response.message || 'Error al eliminar el mod');
       }
@@ -316,7 +342,19 @@ const ModsAdmin = () => {
       
       if (response.status === 'success') {
         setDeletedMods(prev => prev.filter(mod => mod.id !== modToDelete.id));
-        showNotification(`Mod "${modToDelete.titulo}" eliminado definitivamente`, 'success');
+        
+        // Mostrar notificación con información sobre juegos eliminados
+        if (response.juego_eliminado) {
+          let mensaje = formatearMensajeEliminacion(`Mod "${modToDelete.titulo}" eliminado definitivamente.`, response.juego_eliminado);
+          
+          showNotification(
+            mensaje, 
+            'success', 
+            10000 // Duración más larga para mensajes con más información
+          );
+        } else {
+          showNotification(`Mod "${modToDelete.titulo}" eliminado definitivamente`, 'success');
+        }
       } else {
         throw new Error(response.message || 'Error al eliminar definitivamente');
       }
@@ -355,6 +393,17 @@ const ModsAdmin = () => {
         } : mod
       )
     );
+    
+    // Mostrar notificación sobre juegos eliminados si aplica
+    if (updatedMod.juego_eliminado) {
+      let mensaje = formatearMensajeEliminacion(`Mod actualizado correctamente.`, updatedMod.juego_eliminado);
+      
+      showNotification(
+        mensaje, 
+        'success', 
+        10000 // Duración más larga para mensajes con más información
+      );
+    }
   };
 
   const handleEditClose = () => {
