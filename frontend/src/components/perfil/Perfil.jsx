@@ -5,35 +5,13 @@ import UserProfileEditModal from '../dashboard/modals/UserProfileEditModal';
 import userService from '../../services/api/userService';
 import modService from '../../services/api/modService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGamepad, faPlus, faBookmark, faStar, faChevronDown, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faGamepad, faPlus, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import PageContainer from '../layout/PageContainer';
 import ModCard from '../common/Cards/ModCard';
 import ModDeleteConfirmationModal from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/ModDeleteConfirmationModal';
 import EditModAdmin from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/EditModAdmin';
 
-// Componente para mostrar las tarjetas de estadísticas
-const StatCard = ({ title, value, icon, change, color }) => {
-  const cardContent = (
-    <div className={`bg-gradient-to-br ${color} rounded-xl shadow-lg p-5 text-white transform hover:scale-[1.02] transition-all duration-300`}>
-      <div className="flex justify-between">
-        <div>
-          <p className="text-white/80 text-sm font-medium">{title}</p>
-          <p className="text-3xl font-bold mt-1">{value}</p>
-        </div>
-        <div className="p-3 bg-white/20 rounded-lg">
-          {icon}
-        </div>
-      </div>
-      {change && (
-        <div className="mt-3">
-          <span className="text-white/80 text-xs font-medium">{change}</span>
-        </div>
-      )}
-    </div>
-  );
 
-  return cardContent;
-};
 
 const Perfil = () => {
   const { user, updateUser, loading: authLoading } = useAuth();
@@ -223,13 +201,23 @@ const Perfil = () => {
               return sum + (mod.estadisticas?.total_descargas || mod.total_descargas || 0);
             }, 0);
             
+            // Calcular juegos únicos en los que ha trabajado
+            const uniqueGamesSet = new Set();
+            modsResponse.data.forEach(mod => {
+              if (mod.juego && mod.juego.id) {
+                uniqueGamesSet.add(mod.juego.id);
+              }
+            });
+            const uniqueGamesCount = uniqueGamesSet.size;
+            
             // Para perfiles públicos, establecemos estadísticas basadas en los mods reales
             setUserStats({
               modsCreated: totalMods,
               misJuegos: 0, // No mostraremos juegos favoritos para perfiles públicos
               modsGuardados: 0, // No mostraremos mods guardados para perfiles públicos
               rating: averageRating,
-              totalDownloads: totalDownloads
+              totalDownloads: totalDownloads,
+              uniqueGames: uniqueGamesCount
             });
             
             console.log('Perfil público cargado exitosamente:', {
@@ -262,7 +250,8 @@ const Perfil = () => {
               misJuegos: 0,
               modsGuardados: 0,
               rating: 0,
-              totalDownloads: 0
+              totalDownloads: 0,
+              uniqueGames: 0
             });
           }
         } catch (error) {
@@ -287,7 +276,8 @@ const Perfil = () => {
             misJuegos: 0,
             modsGuardados: 0,
             rating: 0,
-            totalDownloads: 0
+            totalDownloads: 0,
+            uniqueGames: 0
           });
         } finally {
           setPublicUserLoading(false);
@@ -446,48 +436,7 @@ const Perfil = () => {
     }
   }, [activeTab, currentUser, authLoading]);
 
-  // Definir los iconos para las tarjetas de estadísticas
-  const allStatCards = [
-    {
-      title: 'Mods Creados',
-      value: loading ? '...' : userStats.modsCreated,
-      icon: <FontAwesomeIcon icon={faPlus} className="h-7 w-7 text-white" />,
-      change: userStats.modsCreated > 0 ? `${userStats.modsCreated} mod${userStats.modsCreated !== 1 ? 's' : ''} creado${userStats.modsCreated !== 1 ? 's' : ''}` : (isPublicProfile ? 'No ha creado mods aún' : 'Comienza creando tu primer mod'),
-      color: 'from-custom-primary/80 to-custom-primary',
-      showInPublic: true
-    },
-    {
-      title: 'Valoración Media',
-      value: loading ? '...' : (userStats.rating > 0 ? userStats.rating.toFixed(1) : '0.0'),
-      icon: <FontAwesomeIcon icon={faStar} className="h-7 w-7 text-white" />,
-      change: userStats.rating > 0 ? `${userStats.rating.toFixed(1)}/5.0 estrellas` : 'Sin valoraciones aún',
-      color: 'from-purple-500/80 to-purple-600',
-      showInPublic: true
-    },
-    {
-      title: isPublicProfile ? 'Descargas Totales' : 'Mis Juegos',
-      value: loading ? '...' : (isPublicProfile ? (userStats.totalDownloads || 0) : userStats.misJuegos),
-      icon: <FontAwesomeIcon icon={isPublicProfile ? faDownload : faGamepad} className="h-7 w-7 text-white" />,
-      change: isPublicProfile 
-        ? (userStats.totalDownloads > 0 ? `${userStats.totalDownloads} descargas en total` : 'Sin descargas aún')
-        : (userStats.misJuegos > 0 ? `${userStats.misJuegos} juego${userStats.misJuegos !== 1 ? 's' : ''} favorito${userStats.misJuegos !== 1 ? 's' : ''}` : 'Explora y agrega juegos a favoritos'),
-      color: 'from-custom-secondary/80 to-custom-secondary',
-      showInPublic: true
-    },
-    {
-      title: 'Mods Guardados',
-      value: loading ? '...' : userStats.modsGuardados,
-      icon: <FontAwesomeIcon icon={faBookmark} className="h-7 w-7 text-white" />,
-      change: userStats.modsGuardados > 0 ? `${userStats.modsGuardados} mod${userStats.modsGuardados !== 1 ? 's' : ''} guardado${userStats.modsGuardados !== 1 ? 's' : ''}` : 'Guarda mods interesantes para más tarde',
-      color: 'from-custom-tertiary/80 to-custom-tertiary',
-      showInPublic: false // No mostrar en perfiles públicos por privacidad
-    }
-  ];
 
-  // Filtrar las tarjetas según el tipo de perfil
-  const statCardData = isPublicProfile 
-    ? allStatCards.filter(card => card.showInPublic)
-    : allStatCards;
 
   const handleSaveUser = (updatedUser) => {
     // Actualizar el usuario en el contexto de autenticación
@@ -699,50 +648,106 @@ const Perfil = () => {
             </div>
           </div>
 
-          {/* Tarjetas de estadísticas - Ajustadas para perfiles públicos */}
-          <div className={`grid gap-5 ${isPublicProfile ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'}`}>
-            {statCardData.map((stat, index) => (
-              <StatCard 
-                key={index}
-                title={stat.title}
-                value={stat.value}
-                icon={stat.icon}
-                change={stat.change}
-                color={stat.color}
-              />
-            ))}
-          </div>
 
-          {/* Sección adicional para perfiles públicos - Aprovecha el espacio de "Crear Mod" */}
-          {isPublicProfile && (
-            <div className="bg-custom-card rounded-xl shadow-lg p-6 border border-custom-detail/10 hover:shadow-xl transition-all duration-300">
+
+          {/* Paneles de Estadísticas */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {/* Mods Creados */}
+            <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl p-6 border border-blue-500/20 hover:border-blue-500/30 transition-all duration-300">
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white mb-2">Actividad del Usuario</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-custom-primary rounded-full"></div>
-                      <span className="text-custom-detail">
-                        {userStats.modsCreated > 0 ? `${userStats.modsCreated} mod${userStats.modsCreated !== 1 ? 's' : ''} creado${userStats.modsCreated !== 1 ? 's' : ''}` : 'Sin mods creados'}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-custom-secondary rounded-full"></div>
-                      <span className="text-custom-detail">
-                        {userStats.rating > 0 ? `${userStats.rating.toFixed(1)}/5.0 valoración media` : 'Sin valoraciones'}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-custom-tertiary rounded-full"></div>
-                      <span className="text-custom-detail">
-                        {userStats.totalDownloads > 0 ? `${userStats.totalDownloads} descargas totales` : 'Sin descargas'}
-                      </span>
-                    </div>
-                  </div>
+                <div>
+                  <p className="text-blue-400 text-sm font-medium mb-1">Mods Creados</p>
+                  <p className="text-2xl font-bold text-white">{userStats.modsCreated || 0}</p>
+                  <p className="text-xs text-custom-detail mt-1">
+                    {isPublicProfile ? 'Contribuciones públicas' : 'Tus contribuciones'}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.78 0-2.678-2.153-1.415-3.414l5-5A2 2 0 009 9.172V5L8 4z" />
+                  </svg>
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Valoración Media */}
+            <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 rounded-xl p-6 border border-yellow-500/20 hover:border-yellow-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-yellow-400 text-sm font-medium mb-1">Valoración Media</p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-2xl font-bold text-white">{userStats.rating ? userStats.rating.toFixed(1) : '0.0'}</p>
+                    <div className="flex space-x-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg
+                          key={star}
+                          className={`w-4 h-4 ${
+                            star <= (userStats.rating || 0) ? 'text-yellow-400' : 'text-gray-600'
+                          }`}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-custom-detail mt-1">De 5.0 estrellas</p>
+                </div>
+                <div className="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Total de Descargas */}
+            <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 rounded-xl p-6 border border-green-500/20 hover:border-green-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-400 text-sm font-medium mb-1">Total Descargas</p>
+                  <p className="text-2xl font-bold text-white">{userStats.totalDownloads || 0}</p>
+                  <p className="text-xs text-custom-detail mt-1">
+                    {isPublicProfile ? 'Impacto en la comunidad' : 'Alcance de tus mods'}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Juegos/Guardados según tipo de perfil */}
+            <div className={`bg-gradient-to-br ${isPublicProfile ? 'from-purple-500/10 to-purple-600/5 border-purple-500/20 hover:border-purple-500/30' : 'from-purple-500/10 to-purple-600/5 border-purple-500/20 hover:border-purple-500/30'} rounded-xl p-6 border transition-all duration-300`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`${isPublicProfile ? 'text-purple-400' : 'text-purple-400'} text-sm font-medium mb-1`}>
+                    {isPublicProfile ? 'Juegos Trabajados' : 'Mods Guardados'}
+                  </p>
+                  <p className="text-2xl font-bold text-white">
+                    {isPublicProfile ? (userStats.uniqueGames || 0) : (userStats.modsGuardados || 0)}
+                  </p>
+                  <p className="text-xs text-custom-detail mt-1">
+                    {isPublicProfile ? 'Diversidad de contenido' : 'Tu colección favorita'}
+                  </p>
+                </div>
+                <div className={`w-12 h-12 ${isPublicProfile ? 'bg-purple-500/20' : 'bg-purple-500/20'} rounded-lg flex items-center justify-center`}>
+                  {isPublicProfile ? (
+                    <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Botón de Crear Mod - Solo para perfil propio */}
           {isOwnProfile && (

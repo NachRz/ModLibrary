@@ -340,7 +340,7 @@ const GameDetails = () => {
           
           {/* Breadcrumbs */}
           <div className="absolute top-4 left-0 right-0 z-10">
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-[1600px] mx-auto px-4">
               <Breadcrumb
                 items={[
                   { label: 'Juegos', path: '/juegos' },
@@ -352,7 +352,7 @@ const GameDetails = () => {
         </div>
         
         {/* Contenido del header */}
-        <div className="max-w-7xl mx-auto px-4 relative -mt-72">
+                  <div className="max-w-[1600px] mx-auto px-4 relative -mt-72">
           <div className="flex flex-col md:flex-row gap-8">
             {/* Imagen del juego */}
             <div className="flex-shrink-0">
@@ -442,7 +442,7 @@ const GameDetails = () => {
       </div>
 
       {/* Navegación de pestañas */}
-      <div className="max-w-7xl mx-auto px-4 mt-8">
+      <div className="max-w-[1600px] mx-auto px-4 mt-8">
         {/* Header con título y Ver todo */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white flex items-center">
@@ -544,7 +544,7 @@ const GameDetails = () => {
       </div>
 
       {/* Sección de Mods */}
-      <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="max-w-[1600px] mx-auto px-4 py-4">
         {/* Información de resultados */}
         <div className="mb-6">
           <p className="text-gray-400 text-sm">

@@ -122,8 +122,15 @@ const Navbar = () => {
     { name: 'Juegos', path: '/juegos' },
   ];
 
-  // Opciones del panel
-  const panelOptions = [
+  // Detectar si estamos en modo admin
+  const isAdminMode = location.pathname.startsWith('/admin');
+  
+  // Opciones del panel según el modo
+  const panelOptions = isAdminMode ? [
+    { name: 'Gestión Usuarios', path: '/admin/usuarios' },
+    { name: 'Gestión Mods', path: '/admin/mods' },
+    { name: 'Gestión Comentarios', path: '/admin/comentarios' },
+  ] : [
     { name: 'Mis Mods', path: '/dashboard/mis-mods' },
     { name: 'Juegos Favoritos', path: '/dashboard/juegos-favoritos' },
     { name: 'Mods Guardados', path: '/dashboard/guardados' },
@@ -153,9 +160,17 @@ const Navbar = () => {
     setIsSearchModalOpen(false);
   };
 
+  // Determinar si estamos en páginas que necesitan ancho extendido
+  const isWideLayout = location.pathname.startsWith('/mods') || 
+                       location.pathname.startsWith('/juegos') || 
+                       location.pathname.startsWith('/search') || 
+                       location.pathname.startsWith('/dashboard') ||
+                       location.pathname.startsWith('/admin') ||
+                       location.pathname === '/';
+
   return (
     <nav className="bg-custom-card border-b border-custom-detail/10 shadow-custom sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={`mx-auto px-4 sm:px-6 lg:px-8 ${isWideLayout ? 'max-w-[1600px]' : 'max-w-7xl'}`}>
         <div className="flex justify-between h-16">
           {/* Logo y enlaces principales */}
           <div className="flex h-full">
@@ -174,8 +189,8 @@ const Navbar = () => {
               {/* Mi Panel con desplegable - versión desktop */}
               {isLoggedIn && (
                 <NavLinkWithDropdown
-                  title="Mi Panel"
-                  isActive={location.pathname === '/perfil' || location.pathname.startsWith('/dashboard')}
+                  title={isAdminMode ? "Panel Admin" : "Mi Panel"}
+                  isActive={location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin')}
                 >
                   {panelOptions.map(option => (
                     <Link 
@@ -196,51 +211,12 @@ const Navbar = () => {
             {/* Botón de búsqueda */}
             <button 
               onClick={handleOpenSearchModal}
-              className="text-custom-detail p-2 rounded-md hover:text-custom-text hover:bg-custom-primary/5 transition-colors mr-2" 
+              className="search-button-enhanced text-custom-detail hover:text-custom-text transition-all duration-300 mr-4" 
               aria-label="Buscar"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-            </button>
-
-            {/* Icono de favoritos */}
-            <button 
-              className="text-custom-detail p-2 rounded-md hover:text-custom-secondary hover:bg-custom-primary/5 transition-colors mr-2 hidden md:block" 
-              aria-label="Favoritos"
-            >
-              <div className="relative">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span className="absolute -top-1 -right-1 bg-custom-secondary text-custom-text text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
-              </div>
-            </button>
-
-            {/* Icono de notificaciones */}
-            <button 
-              className="text-custom-detail p-2 rounded-md hover:text-custom-primary hover:bg-custom-primary/5 transition-colors mr-2 hidden md:block" 
-              aria-label="Notificaciones"
-            >
-              <div className="relative">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span className="absolute -top-1 -right-1 bg-custom-primary text-custom-text text-xs rounded-full h-4 w-4 flex items-center justify-center">5</span>
-              </div>
-            </button>
-
-            {/* Icono de mensajes */}
-            <button 
-              className="text-custom-detail p-2 rounded-md hover:text-custom-primary-hover hover:bg-custom-primary/5 transition-colors mr-2 hidden md:block" 
-              aria-label="Mensajes"
-            >
-              <div className="relative">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-                <span className="absolute -top-1 -right-1 bg-custom-primary-hover text-custom-text text-xs rounded-full h-4 w-4 flex items-center justify-center">2</span>
-              </div>
             </button>
 
             {/* Perfil o botón de login */}
@@ -283,6 +259,18 @@ const Navbar = () => {
                       </svg>
                       Crear Mods
                     </Link>
+                    {/* Opción para cambiar modo (solo para admins) */}
+                    {userData.rol === 'admin' && (
+                      <Link 
+                        to={isAdminMode ? "/dashboard/mis-mods" : "/admin"} 
+                        className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors flex items-center"
+                      >
+                        <svg className="h-4 w-4 mr-2 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                        </svg>
+                        {isAdminMode ? 'Ir a Mi Panel' : 'Panel Admin'}
+                      </Link>
+                    )}
                     <div className="border-t border-custom-detail/10 my-1"></div>
                     <button 
                       onClick={handleLogout}
@@ -358,7 +346,7 @@ const Navbar = () => {
                 </div>
                 
                 {/* Opciones del perfil en móvil */}
-                <div className="grid grid-cols-2 gap-2">
+                <div className={`grid gap-2 ${userData.rol === 'admin' ? 'grid-cols-3' : 'grid-cols-2'}`}>
                   <Link 
                     to="/perfil" 
                     className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
@@ -379,6 +367,19 @@ const Navbar = () => {
                     </svg>
                     <span className="text-xs font-medium text-custom-text">Crear Mods</span>
                   </Link>
+                  {/* Botón para cambiar modo (solo para admins) */}
+                  {userData.rol === 'admin' && (
+                    <Link 
+                      to={isAdminMode ? "/dashboard/mis-mods" : "/admin"} 
+                      className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <svg className="h-5 w-5 mb-1 text-orange-400 group-hover:text-orange-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                      </svg>
+                      <span className="text-xs font-medium text-custom-text">{isAdminMode ? 'Usuario' : 'Admin'}</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             )}
@@ -411,24 +412,30 @@ const Navbar = () => {
             {isLoggedIn && (
               <div className="space-y-1">
                 <div className="text-xs font-semibold text-custom-detail uppercase tracking-wider px-3 py-2 mt-4">
-                  Panel Personal
+                  {isAdminMode ? 'Administración' : 'Panel Personal'}
                 </div>
                 <button
                   className={`flex justify-between items-center w-full px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
-                    location.pathname === '/perfil' || location.pathname.startsWith('/dashboard')
+                    location.pathname === '/perfil' || location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin')
                       ? 'text-custom-text bg-gradient-to-r from-custom-primary/20 to-custom-secondary/10 border-l-4 border-custom-secondary shadow-sm'
                       : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/8'
                   }`}
                   onClick={() => {
                     togglePanelMenu();
-                    // Redireccionar a la primera página del dashboard
-                    if (location.pathname !== '/perfil' && !location.pathname.startsWith('/dashboard')) {
-                      window.location.href = '/dashboard/mis-mods';
+                    // Redireccionar según el modo
+                    if (isAdminMode) {
+                      if (!location.pathname.startsWith('/admin')) {
+                        window.location.href = '/admin';
+                      }
+                    } else {
+                      if (location.pathname !== '/perfil' && !location.pathname.startsWith('/dashboard')) {
+                        window.location.href = '/dashboard/mis-mods';
+                      }
                     }
                   }}
                   aria-expanded={isPanelMenuOpen}
                 >
-                  <span>Mi Panel</span>
+                  <span>{isAdminMode ? 'Panel Admin' : 'Mi Panel'}</span>
                   <svg 
                     className={`h-5 w-5 transition-all duration-300 ${isPanelMenuOpen ? 'transform rotate-180 text-custom-secondary' : 'text-custom-detail'}`} 
                     fill="none" 

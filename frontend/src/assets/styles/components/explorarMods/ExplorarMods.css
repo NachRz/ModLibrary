@@ -46,7 +46,7 @@
   animation: fadeIn 0.5s ease-out;
 }
 
-/* Header con efecto de cristal */
+/* Header con efecto de cristal y fondo limitado */
 .explorar-header {
   background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(10px);
@@ -54,6 +54,11 @@
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.explorar-header > div {
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 /* Panel de filtros */
@@ -313,10 +318,18 @@
   }
 }
 
-@media (min-width: 1281px) {
+@media (min-width: 1281px) and (max-width: 1599px) {
   .explorar-mods-grid {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 2rem;
+  }
+}
+
+/* Optimizado para ancho 1600px */
+@media (min-width: 1600px) and (max-width: 1919px) {
+  .explorar-mods-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2.25rem;
   }
 }
 

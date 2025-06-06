@@ -129,22 +129,24 @@ const SearchResults = () => {
     <PageContainer>
       <div className="search-results-page">
         {/* Header con nueva búsqueda */}
-        <div className="search-header">
-          <h1 className="search-title">
-            {searchQuery ? `Resultados para "${searchQuery}"` : 'Resultados de búsqueda'}
-          </h1>
-
-          {/* Información de resultados */}
-          {!loading && searchQuery && (
-            <div className="results-info">
-              <p className="results-count">
-                {totalResults > 0 
-                  ? `${totalResults} resultado${totalResults !== 1 ? 's' : ''} encontrado${totalResults !== 1 ? 's' : ''}`
-                  : 'No se encontraron resultados'
-                }
-              </p>
+        <div className="explorar-header">
+          <div className="max-w-[1600px] mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+              <div>
+                <h1 className="text-3xl font-bold text-custom-text">
+                  {searchQuery ? `Resultados para "${searchQuery}"` : 'Resultados de búsqueda'}
+                </h1>
+                {!loading && searchQuery && (
+                  <p className={`mt-1 text-custom-detail results-counter`}>
+                    {totalResults > 0 
+                      ? `${totalResults} resultado${totalResults !== 1 ? 's' : ''} encontrado${totalResults !== 1 ? 's' : ''}`
+                      : 'No se encontraron resultados'
+                    }
+                  </p>
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Pestañas de filtrado */}
@@ -186,7 +188,7 @@ const SearchResults = () => {
         )}
 
         {/* Contenido principal */}
-        <div className="search-content">
+        <div className="search-content max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="loading-state">
               <div className="spinner"></div>

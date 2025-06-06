@@ -24,6 +24,49 @@
   width: 260px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2); /* custom-secondary con opacidad */
   background-color: rgba(30, 41, 59, 0.95);
+  animation: glow 2s infinite;
+}
+
+/* Estilos mejorados para el botón de búsqueda */
+.search-button-enhanced {
+  position: relative;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.6));
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(241, 143, 117, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(241, 143, 117, 0.2);
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button-enhanced:hover {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(30, 41, 59, 0.7));
+  border-color: rgba(241, 143, 117, 0.6);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
+  transform: translateY(-1px);
+  animation: glow 2s infinite;
+}
+
+.search-button-enhanced:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 3px rgba(241, 143, 117, 0.3);
+}
+
+/* Efecto de brillo en el borde cuando está abierto */
+@keyframes glow {
+  0% {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
+  }
+  50% {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(241, 143, 117, 0.3);
+  }
+  100% {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
+  }
 }
 
 .search-input {
@@ -73,23 +116,6 @@
 .search-wrapper-open .search-input::placeholder {
   opacity: 0.7;
   transition: opacity 0.3s ease 0.2s;
-}
-
-/* Efecto de brillo en el borde cuando está abierto */
-@keyframes glow {
-  0% {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
-  }
-  50% {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(241, 143, 117, 0.3);
-  }
-  100% {
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
-  }
-}
-
-.search-wrapper-open {
-  animation: glow 2s infinite;
 }
 
 /* Ocultar barras de desplazamiento */

@@ -1,7 +1,7 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
 
 .mod-details-container {
-  max-width: 1240px;
+  max-width: 1600px;
   margin: 40px auto 0;
   padding: 0;
   background: #0F172A;
@@ -17,7 +17,7 @@
 .mod-header-banner {
   position: relative;
   width: 100%;
-  max-width: 1240px;
+  max-width: 1600px;
   height: 372px;
   margin: 0 auto;
   background: linear-gradient(135deg, #1E3A8A 0%, #3730A3 50%, #1E40AF 100%);

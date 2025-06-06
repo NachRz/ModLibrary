@@ -229,7 +229,7 @@ const ExplorarJuegos = () => {
       <div className="explorar-container">
         {/* Cabecera con título y contador de resultados */}
         <div className="explorar-header">
-          <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+          <div className="max-w-[1600px] mx-auto px-4 py-6 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
               <div className="flex items-center">
                 <div>
@@ -243,7 +243,7 @@ const ExplorarJuegos = () => {
           </div>
         </div>
 
-        <div className="explorar-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="explorar-content max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Panel de filtros */}
             <div className={`lg:w-80 flex-shrink-0 transition-all duration-300 ${showFilters ? 'block' : 'hidden lg:hidden'}`}>
@@ -444,7 +444,7 @@ const ExplorarJuegos = () => {
                   <div className="loading-spinner w-12 h-12 border-4 border-custom-primary/20 border-t-custom-primary rounded-full animate-spin"></div>
                 </div>
               ) : juegosEnPagina.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl-wide:grid-cols-5 gap-6">
                   {juegosEnPagina.map(juego => (
                     <GameCard
                       key={juego.id}

@@ -293,6 +293,13 @@ const ExplorarMods = () => {
   const modsFiltrados = useMemo(() => {
     return mods
       .filter(mod => {
+        // Filtro para excluir mods en estado de borrador
+        if (mod.estado === 'borrador' || mod.estado === 'draft') {
+          return false;
+        }
+        return true;
+      })
+      .filter(mod => {
         // Filtro por búsqueda general
         if (filtros.busqueda) {
           const searchTerm = filtros.busqueda.toLowerCase();
@@ -722,7 +729,7 @@ const ExplorarMods = () => {
       <div className="explorar-container">
         {/* Cabecera con título y contador de resultados */}
         <div className="explorar-header">
-          <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+          <div className="max-w-[1600px] mx-auto px-4 py-6 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
               <div>
                 <h1 className="text-3xl font-bold text-custom-text">Explorar Mods</h1>
@@ -734,7 +741,7 @@ const ExplorarMods = () => {
           </div>
         </div>
 
-        <div className="explorar-content max-w-7xl mx-auto px-4 sm:px-6 lg-custom:px-8 pt-8 pb-16">
+        <div className="explorar-content max-w-[1600px] mx-auto px-4 sm:px-6 lg-custom:px-8 pt-8 pb-16">
           <div className="flex flex-col lg-custom:flex-row gap-8">
             {/* Panel de filtros */}
             <div className={`lg-custom:w-80 flex-shrink-0 transition-all duration-300 ${showFilters ? 'block' : 'hidden'}`}>

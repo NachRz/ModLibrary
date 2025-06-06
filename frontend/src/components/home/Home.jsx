@@ -58,12 +58,7 @@ const Home = () => {
     }
   ];
 
-  const stats = [
-    { number: "10K+", label: "Mods disponibles" },
-    { number: "500+", label: "Juegos compatibles" },
-    { number: "50K+", label: "Usuarios activos" },
-    { number: "1M+", label: "Descargas mensuales" }
-  ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-custom-bg to-custom-bg/90">
@@ -103,19 +98,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Stats Section */}
-      <div className="bg-custom-card/30 backdrop-blur-sm border-y border-custom-detail/10">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center transform transition-all duration-500 hover:scale-105">
-                <span className="block text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-custom-secondary to-custom-accent">{stat.number}</span>
-                <span className="block mt-2 text-custom-detail text-sm font-medium uppercase tracking-wider">{stat.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+
 
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
