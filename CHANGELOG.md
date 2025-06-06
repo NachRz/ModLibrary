@@ -4,6 +4,18 @@ Todas las versiones siguen la convención [SemVer](https://semver.org/).
 
 ---
 
+## v1.5.0 – Mejoras en navegación, perfiles y formato de código
+- Actualización del Navbar para mostrar solo opciones del modo actual (admin/usuario).
+- Implementación de rutas específicas para cada sección del panel admin.
+- Desarrollo de paneles de estadísticas completos en perfiles de usuario.
+- Eliminación de sección de estadísticas del home para mejorar la UX.
+- Mejora del cálculo de estadísticas para perfiles públicos y privados.
+- Ajustes generales de interfaz y experiencia de usuario.
+- Normalización y mejora de la indentación y formato del código.
+- Refactor de breadcrumbs y rutas de administrador para mejor navegación.
+
+---
+
 ## v1.4.0 – Gestión automática final / Limpieza de datos huérfanos
 - Funcionalidad en backend que revisa periódicamente:
   - Juegos sin mods asociados ni usuarios que los tengan en favoritos → se eliminan.
