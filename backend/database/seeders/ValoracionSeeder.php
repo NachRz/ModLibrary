@@ -26,4 +26,4 @@ class ValoracionSeeder extends Seeder
             }
         }
     }
-} 
+}

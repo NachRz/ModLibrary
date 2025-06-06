@@ -10,7 +10,7 @@ const comentarioService = {
   getComentarios: async (modId, options = {}) => {
     try {
       const params = new URLSearchParams();
-      
+
       if (options.page) params.append('page', options.page);
       if (options.perPage) params.append('per_page', options.perPage);
       if (options.sortBy) params.append('sort_by', options.sortBy);
@@ -20,9 +20,9 @@ const comentarioService = {
       return response.data;
     } catch (error) {
       console.error('Error al obtener comentarios:', error);
-      throw error.response?.data || { 
-        status: 'error', 
-        message: 'Error al cargar los comentarios' 
+      throw error.response?.data || {
+        status: 'error',
+        message: 'Error al cargar los comentarios'
       };
     }
   },
@@ -41,9 +41,9 @@ const comentarioService = {
       return response.data;
     } catch (error) {
       console.error('Error al crear comentario:', error);
-      throw error.response?.data || { 
-        status: 'error', 
-        message: 'Error al publicar el comentario' 
+      throw error.response?.data || {
+        status: 'error',
+        message: 'Error al publicar el comentario'
       };
     }
   },
@@ -63,9 +63,9 @@ const comentarioService = {
       return response.data;
     } catch (error) {
       console.error('Error al actualizar comentario:', error);
-      throw error.response?.data || { 
-        status: 'error', 
-        message: 'Error al actualizar el comentario' 
+      throw error.response?.data || {
+        status: 'error',
+        message: 'Error al actualizar el comentario'
       };
     }
   },
@@ -82,9 +82,9 @@ const comentarioService = {
       return response.data;
     } catch (error) {
       console.error('Error al eliminar comentario:', error);
-      throw error.response?.data || { 
-        status: 'error', 
-        message: 'Error al eliminar el comentario' 
+      throw error.response?.data || {
+        status: 'error',
+        message: 'Error al eliminar el comentario'
       };
     }
   },
@@ -100,9 +100,9 @@ const comentarioService = {
       return response.data;
     } catch (error) {
       console.error('Error al obtener estadísticas de comentarios:', error);
-      throw error.response?.data || { 
-        status: 'error', 
-        message: 'Error al cargar las estadísticas' 
+      throw error.response?.data || {
+        status: 'error',
+        message: 'Error al cargar las estadísticas'
       };
     }
   }

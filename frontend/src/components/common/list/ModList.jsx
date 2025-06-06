@@ -5,11 +5,11 @@ import { useNotification } from '../../../context/NotificationContext';
 import '../../../assets/styles/components/common/list/ModList.css';
 
 const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDelete }) => {
-  const { 
-    isAuthenticated, 
-    isSaved, 
-    toggleSavedStatus, 
-    loading: userLoading 
+  const {
+    isAuthenticated,
+    isSaved,
+    toggleSavedStatus,
+    loading: userLoading
   } = useUserModsStatus();
   const { showNotification } = useNotification();
 
@@ -78,11 +78,11 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
   const handleSaveToggle = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       return;
     }
-    
+
     const prevStatus = isModSaved;
     try {
       await toggleSavedStatus(mod.id);
@@ -127,14 +127,14 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
     <div className="mod-list-item">
       {/* Imagen */}
       <div className="mod-list-image">
-        <img 
-          src={imageUrl} 
+        <img
+          src={imageUrl}
           alt={mod.titulo}
           className="w-full h-full object-cover"
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
-        
+
         {/* Categoría sobre la imagen */}
         <div className="absolute top-3 left-3 bg-custom-primary/90 text-white text-xs font-medium py-1.5 px-3 rounded-full shadow-lg backdrop-blur-sm">
           {mod.categoria}
@@ -145,7 +145,7 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
       <div className="mod-list-content">
         <div className="mod-list-header">
           <div className="mod-list-title-section">
-            <Link 
+            <Link
               to={modUrl}
               className="mod-list-title"
             >
@@ -194,7 +194,7 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
 
         <div className="mod-list-actions">
           {isAuthenticated && showSaveButton && !isCreator && (
-            <button 
+            <button
               onClick={handleSaveToggle}
               disabled={userLoading}
               className={`mod-list-save-button ${isModSaved ? 'active' : ''}`}
@@ -208,7 +208,7 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
           {isCreator && (
             <>
               {onEdit && (
-                <button 
+                <button
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -222,7 +222,7 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
                 </button>
               )}
               {onDelete && (
-                <button 
+                <button
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -238,7 +238,7 @@ const ModListItem = ({ mod, showSaveButton = true, onSavedChange, onEdit, onDele
             </>
           )}
 
-          <Link 
+          <Link
             to={modUrl}
             className="mod-list-view-button"
           >
@@ -266,7 +266,7 @@ const ModList = ({ mods, showSaveButton = true, onSavedChange, onEdit, onDelete 
   return (
     <div className="mod-list">
       {mods.map((mod) => (
-        <ModListItem 
+        <ModListItem
           key={mod.id}
           mod={mod}
           showSaveButton={showSaveButton}

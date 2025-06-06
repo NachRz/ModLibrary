@@ -20,16 +20,16 @@ const UsuariosAdminContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('active'); // Nueva pestaña activa
   const [deletedUsers, setDeletedUsers] = useState([]); // Usuarios eliminados
-  
+
   // Estados para los nuevos modales
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [viewingUser, setViewingUser] = useState(null);
-  
+
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
-  
+
   // Estados para los modales de eliminación
   const [showUserHasModsModal, setShowUserHasModsModal] = useState(false);
   const [showFinalConfirmationModal, setShowFinalConfirmationModal] = useState(false);
@@ -49,13 +49,13 @@ const UsuariosAdminContent = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       // Cargar ambos tipos de datos en paralelo
       const [usersResponse, deletedUsersResponse] = await Promise.all([
         adminService.getAllUsers(),
         adminService.getDeletedUsers()
       ]);
-      
+
       setUsuarios(usersResponse.data || []);
       setDeletedUsers(deletedUsersResponse.data || []);
     } catch (error) {
@@ -125,7 +125,7 @@ const UsuariosAdminContent = () => {
       await adminService.permanentDeleteUser(userToDelete.id);
       setDeletedUsers(prev => prev.filter(user => user.id !== userToDelete.id));
       showNotification(
-        `Usuario "${userToDelete.nome}" eliminado definitivamente (mods mantenidos)`, 
+        `Usuario "${userToDelete.nome}" eliminado definitivamente (mods mantenidos)`,
         'success'
       );
       setShowPermanentDeleteModal(false);
@@ -140,7 +140,7 @@ const UsuariosAdminContent = () => {
       await adminService.permanentDeleteUserWithMods(userToDelete.id);
       setDeletedUsers(prev => prev.filter(user => user.id !== userToDelete.id));
       showNotification(
-        `Usuario "${userToDelete.nome}" y todos sus mods eliminados definitivamente`, 
+        `Usuario "${userToDelete.nome}" y todos sus mods eliminados definitivamente`,
         'success'
       );
       setShowPermanentDeleteModal(false);
@@ -191,7 +191,7 @@ const UsuariosAdminContent = () => {
   const handleRoleChange = async (userId, newRole) => {
     try {
       await adminService.updateUserRole(userId, newRole);
-      setUsuarios(prev => prev.map(user => 
+      setUsuarios(prev => prev.map(user =>
         user.id === userId ? { ...user, rol: newRole } : user
       ));
       showNotification(`Rol actualizado correctamente`, 'success');
@@ -203,7 +203,7 @@ const UsuariosAdminContent = () => {
   const handleStatusChange = async (userId, newStatus) => {
     try {
       await adminService.updateUserStatus(userId, newStatus);
-      setUsuarios(prev => prev.map(user => 
+      setUsuarios(prev => prev.map(user =>
         user.id === userId ? { ...user, estado: newStatus } : user
       ));
       showNotification(`Estado actualizado correctamente`, 'success');
@@ -224,15 +224,15 @@ const UsuariosAdminContent = () => {
         ...updatedUser,
         imageTimestamp: Date.now()
       };
-      
+
       // Actualizar el usuario en la lista local inmediatamente
-      setUsuarios(prev => prev.map(user => 
+      setUsuarios(prev => prev.map(user =>
         user.id === updatedUser.id ? userWithTimestamp : user
       ));
 
       // Si es el usuario actualmente logueado, actualizar el contexto y localStorage
       updateAuthUser(userWithTimestamp);
-      
+
       // Recargar los datos del usuario de forma asíncrona para asegurar sincronización
       setTimeout(async () => {
         try {
@@ -241,7 +241,7 @@ const UsuariosAdminContent = () => {
           console.error('Error al recargar usuarios después de actualización:', error);
         }
       }, 100);
-      
+
       showNotification('Usuario actualizado correctamente', 'success');
     } catch (error) {
       showNotification(error.message || 'Error al actualizar usuario', 'error');
@@ -251,7 +251,7 @@ const UsuariosAdminContent = () => {
   const handleDeleteUser = async (userId) => {
     const user = usuarios.find(u => u.id === userId);
     setUserToDelete(user);
-    
+
     // Siempre mostrar el modal de opciones (tanto para usuarios con mods como sin mods)
     setShowUserHasModsModal(true);
   };
@@ -266,14 +266,14 @@ const UsuariosAdminContent = () => {
       await adminService.softDeleteUser(userToDelete.id);
       setUsuarios(prev => prev.filter(user => user.id !== userToDelete.id));
       showNotification(
-        `Usuario "${userToDelete.nome}" desactivado correctamente (los mods se mantienen)`, 
+        `Usuario "${userToDelete.nome}" desactivado correctamente (los mods se mantienen)`,
         'success'
       );
       setShowUserHasModsModal(false);
       setUserToDelete(null);
     } catch (softError) {
       showNotification(
-        softError.message || 'Error al desactivar usuario', 
+        softError.message || 'Error al desactivar usuario',
         'error'
       );
     }
@@ -285,24 +285,24 @@ const UsuariosAdminContent = () => {
         // Usuario con mods - eliminar forzadamente (mantiene mods huérfanos)
         await adminService.forceDeleteUser(userToDelete.id);
         showNotification(
-          `Usuario "${userToDelete.nome}" eliminado correctamente (los mods se mantienen)`, 
+          `Usuario "${userToDelete.nome}" eliminado correctamente (los mods se mantienen)`,
           'success'
         );
       } else {
         // Usuario sin mods - eliminación normal
         await adminService.deleteUser(userToDelete.id);
         showNotification(
-          `Usuario "${userToDelete.nome}" eliminado correctamente`, 
+          `Usuario "${userToDelete.nome}" eliminado correctamente`,
           'success'
         );
       }
-      
+
       setUsuarios(prev => prev.filter(user => user.id !== userToDelete.id));
       setShowFinalConfirmationModal(false);
       setUserToDelete(null);
     } catch (forceError) {
       showNotification(
-        forceError.message || 'Error al eliminar usuario', 
+        forceError.message || 'Error al eliminar usuario',
         'error'
       );
     }
@@ -326,13 +326,13 @@ const UsuariosAdminContent = () => {
       ...newUser,
       imageTimestamp: Date.now()
     };
-    
+
     // Agregar el nuevo usuario a la lista
     setUsuarios(prev => [userWithTimestamp, ...prev]);
-    
+
     // Cerrar el modal de creación
     setIsCreateModalOpen(false);
-    
+
     // Mostrar notificación
     showNotification('Usuario creado correctamente', 'success');
   };
@@ -370,7 +370,7 @@ const UsuariosAdminContent = () => {
       <div className="flex items-center">
         <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3 overflow-hidden">
           {imageUrl ? (
-            <img 
+            <img
               src={imageUrl}
               alt={`Avatar de ${usuario.nome}`}
               className="w-8 h-8 rounded-full object-cover"
@@ -381,7 +381,7 @@ const UsuariosAdminContent = () => {
               }}
             />
           ) : null}
-          <span 
+          <span
             className="text-white font-bold text-sm"
             style={{ display: imageUrl ? 'none' : 'flex' }}
           >
@@ -406,7 +406,7 @@ const UsuariosAdminContent = () => {
       <div className="bg-red-500 bg-opacity-20 border border-red-500 text-red-400 px-4 py-3 rounded">
         <p className="font-medium">Error al cargar usuarios</p>
         <p className="text-sm">{error}</p>
-        <button 
+        <button
           onClick={loadInitialData}
           className="mt-2 text-sm text-red-300 hover:text-red-200 underline"
         >
@@ -442,8 +442,8 @@ const UsuariosAdminContent = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-64"
             />
-            <FontAwesomeIcon 
-              icon={faSearch} 
+            <FontAwesomeIcon
+              icon={faSearch}
               className="absolute right-3 top-3 text-gray-400 pointer-events-none"
             />
           </div>
@@ -453,26 +453,24 @@ const UsuariosAdminContent = () => {
       {/* Pestañas */}
       <div className="border-b border-gray-600">
         <nav className="-mb-px flex space-x-8">
-        <button
-          onClick={() => handleTabChange('active')}
-            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-            activeTab === 'active'
+          <button
+            onClick={() => handleTabChange('active')}
+            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'active'
                 ? 'border-purple-500 text-purple-400'
                 : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300'
-          }`}
-        >
+              }`}
+          >
             Usuarios Activos ({usuarios.length})
-        </button>
-        <button
-          onClick={() => handleTabChange('deleted')}
-            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-            activeTab === 'deleted'
+          </button>
+          <button
+            onClick={() => handleTabChange('deleted')}
+            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'deleted'
                 ? 'border-purple-500 text-purple-400'
                 : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300'
-          }`}
-        >
+              }`}
+          >
             Usuarios Eliminados ({deletedUsers.length})
-        </button>
+          </button>
         </nav>
       </div>
 
@@ -567,18 +565,17 @@ const UsuariosAdminContent = () => {
                       </select>
                     </td>
                     <td className="col-status hidden lg:table-cell">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        usuario.tiene_mods 
-                          ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' 
+                      <span className={`px-2 py-1 rounded text-xs ${usuario.tiene_mods
+                          ? 'bg-yellow-500 bg-opacity-20 text-yellow-400'
                           : 'bg-blue-500 bg-opacity-20 text-blue-400'
-                      }`}>
+                        }`}>
                         {usuario.tiene_mods ? 'Sí' : 'No'}
                       </span>
                     </td>
                     <td className="col-date text-cell hidden lg:table-cell">{usuario.fecha_registro}</td>
                     <td className="actions-column">
                       <div className="action-buttons-container">
-                        <button 
+                        <button
                           onClick={() => handleViewProfile(usuario)}
                           className="action-btn-text view"
                           title="Ver perfil"
@@ -587,7 +584,7 @@ const UsuariosAdminContent = () => {
                           <span className="btn-text-full">Ver</span>
                           <span className="btn-text-short">V</span>
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleEditUser(usuario)}
                           className="action-btn-text edit"
                           title="Editar usuario"
@@ -596,7 +593,7 @@ const UsuariosAdminContent = () => {
                           <span className="btn-text-full">Editar</span>
                           <span className="btn-text-short">E</span>
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDeleteUser(usuario.id)}
                           className="action-btn-text delete"
                           title="Eliminar usuario"
@@ -621,18 +618,17 @@ const UsuariosAdminContent = () => {
                     </td>
                     <td className="col-role text-cell hidden lg:table-cell">{usuario.rol}</td>
                     <td className="col-status hidden lg:table-cell">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        usuario.tiene_mods 
-                          ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' 
+                      <span className={`px-2 py-1 rounded text-xs ${usuario.tiene_mods
+                          ? 'bg-yellow-500 bg-opacity-20 text-yellow-400'
                           : 'bg-blue-500 bg-opacity-20 text-blue-400'
-                      }`}>
+                        }`}>
                         {usuario.tiene_mods ? 'Sí' : 'No'}
                       </span>
                     </td>
                     <td className="col-date text-cell hidden lg:table-cell">{usuario.fecha_eliminacion}</td>
                     <td className="actions-column">
                       <div className="action-buttons-container">
-                        <button 
+                        <button
                           onClick={() => handleRestoreUser(usuario.id)}
                           className="action-btn-text restore"
                           title="Restaurar usuario"
@@ -641,7 +637,7 @@ const UsuariosAdminContent = () => {
                           <span className="btn-text-full">Restaurar</span>
                           <span className="btn-text-short">R</span>
                         </button>
-                        <button 
+                        <button
                           onClick={() => handlePermanentDelete(usuario.id)}
                           className="action-btn-text delete"
                           title="Eliminar definitivamente"
@@ -673,17 +669,17 @@ const UsuariosAdminContent = () => {
       )}
 
       {/* Paginación */}
-      {((activeTab === 'active' && filteredUsuarios.length > 0) || 
+      {((activeTab === 'active' && filteredUsuarios.length > 0) ||
         (activeTab === 'deleted' && filteredDeletedUsers.length > 0)) && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={activeTab === 'active' ? totalPagesActive : totalPagesDeleted}
-          onPageChange={handlePageChange}
-          itemsPerPage={itemsPerPage}
-          totalItems={activeTab === 'active' ? filteredUsuarios.length : filteredDeletedUsers.length}
-          onItemsPerPageChange={handleItemsPerPageChange}
-        />
-      )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={activeTab === 'active' ? totalPagesActive : totalPagesDeleted}
+            onPageChange={handlePageChange}
+            itemsPerPage={itemsPerPage}
+            totalItems={activeTab === 'active' ? filteredUsuarios.length : filteredDeletedUsers.length}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        )}
 
       {/* Modal de edición */}
       <UserEditModalAdmin

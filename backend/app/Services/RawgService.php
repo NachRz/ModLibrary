@@ -124,4 +124,4 @@ class RawgService
             return null;
         }
     }
-} 
+}

@@ -14,7 +14,8 @@
   width: 40px;
   border-radius: 20px;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
-  background-color: rgba(30, 41, 59, 0.8); /* Tono similar a bg-custom-card pero con transparencia */
+  background-color: rgba(30, 41, 59, 0.8);
+  /* Tono similar a bg-custom-card pero con transparencia */
   transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
   display: flex;
   align-items: center;
@@ -22,7 +23,8 @@
 
 .search-wrapper-open {
   width: 260px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2); /* custom-secondary con opacidad */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
+  /* custom-secondary con opacidad */
   background-color: rgba(30, 41, 59, 0.95);
   animation: glow 2s infinite;
 }
@@ -61,9 +63,11 @@
   0% {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
   }
+
   50% {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(241, 143, 117, 0.3);
   }
+
   100% {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(241, 143, 117, 0.2);
   }
@@ -100,11 +104,13 @@
 }
 
 .search-wrapper-open .search-button {
-  background-color: rgba(27, 79, 114, 0.3); /* custom-primary con opacidad */
+  background-color: rgba(27, 79, 114, 0.3);
+  /* custom-primary con opacidad */
 }
 
 .search-wrapper-open .search-button:hover {
-  background-color: rgba(27, 79, 114, 0.5); /* custom-primary con más opacidad */
+  background-color: rgba(27, 79, 114, 0.5);
+  /* custom-primary con más opacidad */
 }
 
 /* Efecto de foco para el input de búsqueda */
@@ -120,12 +126,15 @@
 
 /* Ocultar barras de desplazamiento */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* Internet Explorer y Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer y Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari y Opera */
+  display: none;
+  /* Chrome, Safari y Opera */
 }
 
 .navbar {
@@ -134,4 +143,4 @@
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   z-index: 20;
-} 
+}

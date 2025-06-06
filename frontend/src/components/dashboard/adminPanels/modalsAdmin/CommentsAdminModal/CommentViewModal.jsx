@@ -71,7 +71,7 @@ const CommentViewModal = ({ isOpen, onClose, comment }) => {
                   </div>
                   <h4 className="text-lg font-semibold text-white">Usuario Autor</h4>
                 </div>
-                
+
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-gray-600/50">
                     {comment.usuario?.foto_perfil ? (
@@ -102,9 +102,8 @@ const CommentViewModal = ({ isOpen, onClose, comment }) => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Rol:</span>
-                      <span className={`font-medium ${
-                        comment.usuario.rol === 'admin' ? 'text-purple-400' : 'text-blue-400'
-                      }`}>
+                      <span className={`font-medium ${comment.usuario.rol === 'admin' ? 'text-purple-400' : 'text-blue-400'
+                        }`}>
                         {comment.usuario.rol === 'admin' ? 'Administrador' : 'Usuario'}
                       </span>
                     </div>
@@ -120,7 +119,7 @@ const CommentViewModal = ({ isOpen, onClose, comment }) => {
                   </div>
                   <h4 className="text-lg font-semibold text-white">Mod Asociado</h4>
                 </div>
-                
+
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center border border-gray-600/50">
                     {comment.mod?.imagen ? (
@@ -147,9 +146,8 @@ const CommentViewModal = ({ isOpen, onClose, comment }) => {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-400">Estado:</span>
-                      <span className={`font-medium ${
-                        comment.mod.estado === 'publicado' ? 'text-green-400' : 'text-yellow-400'
-                      }`}>
+                      <span className={`font-medium ${comment.mod.estado === 'publicado' ? 'text-green-400' : 'text-yellow-400'
+                        }`}>
                         {comment.mod.estado === 'publicado' ? 'Publicado' : 'Borrador'}
                       </span>
                     </div>
@@ -170,7 +168,7 @@ const CommentViewModal = ({ isOpen, onClose, comment }) => {
                 </div>
                 <h4 className="text-lg font-semibold text-white">Información Temporal</h4>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-gradient-to-br from-blue-500/5 to-blue-600/5 border border-blue-500/20 rounded-lg p-3">
                   <div className="flex items-center space-x-2 mb-2">
@@ -181,14 +179,14 @@ const CommentViewModal = ({ isOpen, onClose, comment }) => {
                     {formatDate(comment.created_at)}
                   </p>
                 </div>
-                
+
                 <div className="bg-gradient-to-br from-purple-500/5 to-purple-600/5 border border-purple-500/20 rounded-lg p-3">
                   <div className="flex items-center space-x-2 mb-2">
                     <FontAwesomeIcon icon={faEdit} className="text-purple-400 text-sm" />
                     <span className="text-purple-300 font-medium text-sm">Última Modificación</span>
                   </div>
                   <p className="text-white font-medium">
-                    {comment.updated_at !== comment.created_at 
+                    {comment.updated_at !== comment.created_at
                       ? formatDate(comment.updated_at)
                       : 'Sin modificaciones'
                     }
@@ -223,9 +221,8 @@ const CommentViewModal = ({ isOpen, onClose, comment }) => {
                   <div className="text-gray-400">Líneas</div>
                 </div>
                 <div className="text-center">
-                  <div className={`text-lg font-bold ${
-                    comment.updated_at !== comment.created_at ? 'text-yellow-400' : 'text-green-400'
-                  }`}>
+                  <div className={`text-lg font-bold ${comment.updated_at !== comment.created_at ? 'text-yellow-400' : 'text-green-400'
+                    }`}>
                     {comment.updated_at !== comment.created_at ? 'Editado' : 'Original'}
                   </div>
                   <div className="text-gray-400">Estado</div>

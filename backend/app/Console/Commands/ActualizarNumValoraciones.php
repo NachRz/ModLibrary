@@ -27,17 +27,17 @@ class ActualizarNumValoraciones extends Command
     public function handle()
     {
         $this->info('Actualizando estadísticas para todos los mods...');
-        
+
         $mods = Mod::all();
         $count = 0;
-        
+
         foreach ($mods as $mod) {
             $mod->actualizarValMedia();
             $count++;
         }
-        
+
         $this->info("¡Completado! Se han actualizado {$count} mods.");
-        
+
         return Command::SUCCESS;
     }
-} 
+}

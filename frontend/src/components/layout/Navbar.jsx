@@ -8,11 +8,10 @@ import '../../assets/styles/components/layout/navbar.css'; // Ruta actualizada a
 const NavLink = ({ to, children, isActive }) => (
   <Link
     to={to}
-    className={`inline-flex items-center h-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-      isActive
+    className={`inline-flex items-center h-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${isActive
         ? 'text-custom-text bg-custom-primary/15 border-b-2 border-custom-secondary'
         : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/5'
-    }`}
+      }`}
   >
     {children}
   </Link>
@@ -24,11 +23,10 @@ const NavLinkWithDropdown = ({ title, isActive, children }) => {
     <div className="relative h-full flex items-center group">
       <Link
         to="/dashboard/mis-mods"
-        className={`inline-flex items-center h-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-          isActive
+        className={`inline-flex items-center h-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${isActive
             ? 'text-custom-text bg-custom-primary/15 border-b-2 border-custom-secondary'
             : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/5'
-        }`}
+          }`}
       >
         {title}
         <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -72,12 +70,12 @@ const Navbar = () => {
         setUserData({ nome: '', correo: '', rol: '', foto_perfil: '' });
       }
     };
-    
+
     checkAuth();
-    
+
     // Escuchar cambios en localStorage para actualizar el estado
     window.addEventListener('storage', checkAuth);
-    
+
     // Escuchar evento personalizado de actualización de usuario
     const handleUserUpdate = (event) => {
       const updatedUser = event.detail;
@@ -90,9 +88,9 @@ const Navbar = () => {
         });
       }
     };
-    
+
     window.addEventListener('userUpdated', handleUserUpdate);
-    
+
     return () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('userUpdated', handleUserUpdate);
@@ -124,7 +122,7 @@ const Navbar = () => {
 
   // Detectar si estamos en modo admin
   const isAdminMode = location.pathname.startsWith('/admin');
-  
+
   // Opciones del panel según el modo
   const panelOptions = isAdminMode ? [
     { name: 'Gestión Usuarios', path: '/admin/usuarios' },
@@ -161,12 +159,12 @@ const Navbar = () => {
   };
 
   // Determinar si estamos en páginas que necesitan ancho extendido
-  const isWideLayout = location.pathname.startsWith('/mods') || 
-                       location.pathname.startsWith('/juegos') || 
-                       location.pathname.startsWith('/search') || 
-                       location.pathname.startsWith('/dashboard') ||
-                       location.pathname.startsWith('/admin') ||
-                       location.pathname === '/';
+  const isWideLayout = location.pathname.startsWith('/mods') ||
+    location.pathname.startsWith('/juegos') ||
+    location.pathname.startsWith('/search') ||
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/admin') ||
+    location.pathname === '/';
 
   return (
     <nav className="bg-custom-card border-b border-custom-detail/10 shadow-custom sticky top-0 z-50">
@@ -185,7 +183,7 @@ const Navbar = () => {
                   {link.name}
                 </NavLink>
               ))}
-              
+
               {/* Mi Panel con desplegable - versión desktop */}
               {isLoggedIn && (
                 <NavLinkWithDropdown
@@ -193,7 +191,7 @@ const Navbar = () => {
                   isActive={location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin')}
                 >
                   {panelOptions.map(option => (
-                    <Link 
+                    <Link
                       key={option.path}
                       to={option.path}
                       className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors"
@@ -209,9 +207,9 @@ const Navbar = () => {
           {/* Lado derecho de la navbar */}
           <div className="flex items-center">
             {/* Botón de búsqueda */}
-            <button 
+            <button
               onClick={handleOpenSearchModal}
-              className="search-button-enhanced text-custom-detail hover:text-custom-text transition-all duration-300 mr-4" 
+              className="search-button-enhanced text-custom-detail hover:text-custom-text transition-all duration-300 mr-4"
               aria-label="Buscar"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -228,7 +226,7 @@ const Navbar = () => {
                 </div>
                 <div className="h-10 w-10 rounded-full bg-custom-primary flex items-center justify-center text-custom-text shadow-sm cursor-pointer group-hover:ring-2 group-hover:ring-custom-secondary/50 transition-all overflow-hidden">
                   {userData.foto_perfil && profileImageUrl ? (
-                    <img 
+                    <img
                       src={profileImageUrl}
                       alt={`Foto de perfil de ${userData.nome}`}
                       className="w-full h-full object-cover"
@@ -239,7 +237,7 @@ const Navbar = () => {
                     </span>
                   )}
                 </div>
-                
+
                 {/* Menú desplegable */}
                 <div className="absolute top-full right-0 mt-2 w-48 bg-custom-card rounded-custom shadow-custom-lg border border-custom-detail/10 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 transform origin-top-right scale-95 group-hover:scale-100">
                   <div className="py-1">
@@ -261,8 +259,8 @@ const Navbar = () => {
                     </Link>
                     {/* Opción para cambiar modo (solo para admins) */}
                     {userData.rol === 'admin' && (
-                      <Link 
-                        to={isAdminMode ? "/dashboard/mis-mods" : "/admin"} 
+                      <Link
+                        to={isAdminMode ? "/dashboard/mis-mods" : "/admin"}
                         className="block px-4 py-2 text-sm text-custom-text hover:bg-custom-primary/10 transition-colors flex items-center"
                       >
                         <svg className="h-4 w-4 mr-2 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -272,7 +270,7 @@ const Navbar = () => {
                       </Link>
                     )}
                     <div className="border-t border-custom-detail/10 my-1"></div>
-                    <button 
+                    <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-custom-error hover:bg-custom-error/10 transition-colors flex items-center"
                     >
@@ -323,7 +321,7 @@ const Navbar = () => {
                   <div className="relative">
                     <div className="h-12 w-12 rounded-full bg-gradient-to-br from-custom-primary to-custom-secondary flex items-center justify-center text-custom-text shadow-lg overflow-hidden ring-2 ring-custom-primary/20">
                       {userData.foto_perfil && profileImageUrl ? (
-                        <img 
+                        <img
                           src={profileImageUrl}
                           alt={`Foto de perfil de ${userData.nome}`}
                           className="w-full h-full object-cover"
@@ -344,11 +342,11 @@ const Navbar = () => {
                     </span>
                   </div>
                 </div>
-                
+
                 {/* Opciones del perfil en móvil */}
                 <div className={`grid gap-2 ${userData.rol === 'admin' ? 'grid-cols-3' : 'grid-cols-2'}`}>
-                  <Link 
-                    to="/perfil" 
+                  <Link
+                    to="/perfil"
                     className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -357,8 +355,8 @@ const Navbar = () => {
                     </svg>
                     <span className="text-xs font-medium text-custom-text">Mi Perfil</span>
                   </Link>
-                  <Link 
-                    to="/mods/crear" 
+                  <Link
+                    to="/mods/crear"
                     className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -369,8 +367,8 @@ const Navbar = () => {
                   </Link>
                   {/* Botón para cambiar modo (solo para admins) */}
                   {userData.rol === 'admin' && (
-                    <Link 
-                      to={isAdminMode ? "/dashboard/mis-mods" : "/admin"} 
+                    <Link
+                      to={isAdminMode ? "/dashboard/mis-mods" : "/admin"}
                       className="flex flex-col items-center justify-center p-3 bg-custom-card rounded-lg hover:bg-custom-primary/10 transition-all duration-200 group border border-custom-detail/10"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -393,11 +391,10 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
-                    isActive(link.path)
+                  className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${isActive(link.path)
                       ? 'text-custom-text bg-gradient-to-r from-custom-primary/20 to-custom-secondary/10 border-l-4 border-custom-secondary shadow-sm'
                       : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/8 hover:translate-x-1'
-                  }`}
+                    }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <span className="flex-1">{link.name}</span>
@@ -407,7 +404,7 @@ const Navbar = () => {
                 </Link>
               ))}
             </div>
-            
+
             {/* Mi Panel con desplegable - versión móvil */}
             {isLoggedIn && (
               <div className="space-y-1">
@@ -415,11 +412,10 @@ const Navbar = () => {
                   {isAdminMode ? 'Administración' : 'Panel Personal'}
                 </div>
                 <button
-                  className={`flex justify-between items-center w-full px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
-                    location.pathname === '/perfil' || location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin')
+                  className={`flex justify-between items-center w-full px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${location.pathname === '/perfil' || location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin')
                       ? 'text-custom-text bg-gradient-to-r from-custom-primary/20 to-custom-secondary/10 border-l-4 border-custom-secondary shadow-sm'
                       : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/8'
-                  }`}
+                    }`}
                   onClick={() => {
                     togglePanelMenu();
                     // Redireccionar según el modo
@@ -436,27 +432,26 @@ const Navbar = () => {
                   aria-expanded={isPanelMenuOpen}
                 >
                   <span>{isAdminMode ? 'Panel Admin' : 'Mi Panel'}</span>
-                  <svg 
-                    className={`h-5 w-5 transition-all duration-300 ${isPanelMenuOpen ? 'transform rotate-180 text-custom-secondary' : 'text-custom-detail'}`} 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
+                  <svg
+                    className={`h-5 w-5 transition-all duration-300 ${isPanelMenuOpen ? 'transform rotate-180 text-custom-secondary' : 'text-custom-detail'}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                
+
                 <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isPanelMenuOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <div className="pl-6 space-y-1">
                     {panelOptions.map(option => (
                       <Link
                         key={option.path}
                         to={option.path}
-                        className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                          isActive(option.path)
+                        className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive(option.path)
                             ? 'text-custom-secondary bg-custom-secondary/10 font-semibold'
                             : 'text-custom-detail hover:text-custom-text hover:bg-custom-primary/5 hover:translate-x-1'
-                        }`}
+                          }`}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <div className="h-1.5 w-1.5 rounded-full bg-current mr-3 opacity-60"></div>
@@ -467,11 +462,11 @@ const Navbar = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Botón de desconectar separado al final */}
             {isLoggedIn && (
               <div className="border-t border-custom-detail/10 pt-4 mt-6">
-                <button 
+                <button
                   onClick={handleLogout}
                   className="w-full flex items-center justify-center px-4 py-3 rounded-xl text-base font-medium text-custom-error bg-custom-error/5 hover:bg-custom-error/10 transition-all duration-200 border border-custom-error/20 hover:border-custom-error/30"
                 >
@@ -486,8 +481,8 @@ const Navbar = () => {
             {/* Si no está logueado, mostrar botón de login */}
             {!isLoggedIn && (
               <div className="border-t border-custom-detail/10 pt-4 mt-6">
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="block px-4 py-3 rounded-xl text-base font-medium text-white bg-gradient-to-r from-custom-primary to-custom-secondary hover:from-custom-primary-hover hover:to-custom-secondary/90 transition-all duration-200 text-center shadow-lg transform hover:scale-[1.02]"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -500,9 +495,9 @@ const Navbar = () => {
       </div>
 
       {/* Modal de búsqueda */}
-      <SearchModal 
-        isOpen={isSearchModalOpen} 
-        onClose={handleCloseSearchModal} 
+      <SearchModal
+        isOpen={isSearchModalOpen}
+        onClose={handleCloseSearchModal}
       />
     </nav>
   );

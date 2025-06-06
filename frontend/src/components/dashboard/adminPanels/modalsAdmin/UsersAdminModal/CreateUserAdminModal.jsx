@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import adminService from '../../../../../services/api/adminService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faEye, 
-  faEyeSlash, 
-  faUpload, 
+import {
+  faEye,
+  faEyeSlash,
+  faUpload,
   faTrash,
   faUser,
   faEnvelope,
@@ -63,7 +63,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Validación específica para el nombre de usuario
     if (name === 'nome') {
       const validUsernamePattern = /^[a-zA-Z0-9_.-]*$/;
@@ -71,7 +71,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
         return;
       }
     }
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -94,34 +94,34 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
         setError('Por favor, selecciona un archivo de imagen válido');
         return;
       }
-      
+
       // Validar tamaño (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('La imagen es demasiado grande. Máximo 5MB');
         return;
       }
-      
+
       setSelectedFile(file);
-      
+
       // Crear preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrl(e.target.result);
       };
       reader.readAsDataURL(file);
-      
+
       setError('');
     }
   };
 
   const uploadImage = async () => {
     if (!selectedFile) return null;
-    
+
     try {
       setUploadingImage(true);
       const formData = new FormData();
       formData.append('image', selectedFile);
-      
+
       const response = await adminService.uploadProfileImage(formData);
       return response.data.url;
     } catch (error) {
@@ -133,7 +133,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.nome.trim()) {
       errors.nome = 'El nombre de usuario es requerido';
     } else if (formData.nome.length < 3) {
@@ -162,7 +162,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -184,16 +184,16 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
 
       const response = await adminService.createUser(createData);
       const newUser = response.data;
-      
+
       // Si hay un archivo seleccionado, subirlo después de crear el usuario
       if (selectedFile) {
         try {
           const formDataImg = new FormData();
           formDataImg.append('image', selectedFile);
           formDataImg.append('user_id', newUser.id); // Usar el ID del usuario recién creado
-          
+
           const imageResponse = await adminService.uploadProfileImage(formDataImg);
-          
+
           // Actualizar los datos del usuario con la ruta de la imagen
           newUser.foto_perfil = imageResponse.data.url;
         } catch (imageError) {
@@ -201,7 +201,7 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
           // No fallar si la imagen no se puede subir, el usuario ya fue creado
         }
       }
-      
+
       onUserCreated(newUser);
       resetForm();
       onClose();
@@ -282,8 +282,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                 <div className="relative">
                   <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden">
                     {previewUrl ? (
-                      <img 
-                        src={previewUrl} 
+                      <img
+                        src={previewUrl}
                         alt="Preview"
                         className="w-16 h-16 rounded-full object-cover"
                       />
@@ -352,9 +352,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   onChange={handleChange}
                   placeholder="usuario123"
                   autoComplete="off"
-                  className={`w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border transition-all duration-300 ${
-                    validationErrors.nome ? 'border-red-500/50' : 'border-gray-600/50'
-                  } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
+                  className={`w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border transition-all duration-300 ${validationErrors.nome ? 'border-red-500/50' : 'border-gray-600/50'
+                    } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
                   required
                 />
                 {validationErrors.nome && (
@@ -375,9 +374,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                   onChange={handleChange}
                   placeholder="usuario@ejemplo.com"
                   autoComplete="off"
-                  className={`w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border transition-all duration-300 ${
-                    validationErrors.correo ? 'border-red-500/50' : 'border-gray-600/50'
-                  } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
+                  className={`w-full bg-gray-700/50 text-white px-3 py-2 rounded-lg border transition-all duration-300 ${validationErrors.correo ? 'border-red-500/50' : 'border-gray-600/50'
+                    } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
                   required
                 />
                 {validationErrors.correo && (
@@ -426,8 +424,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
               </h3>
 
               {/* Campos ocultos para confundir el auto-completado */}
-              <input type="text" style={{display: 'none'}} />
-              <input type="password" style={{display: 'none'}} />
+              <input type="text" style={{ display: 'none' }} />
+              <input type="password" style={{ display: 'none' }} />
 
               {/* Contraseña */}
               <div>
@@ -442,9 +440,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                     onChange={handleChange}
                     placeholder="••••••••"
                     autoComplete="new-password"
-                    className={`w-full bg-gray-700/50 text-white px-3 py-2 pr-10 rounded-lg border transition-all duration-300 ${
-                      validationErrors.password ? 'border-red-500/50' : 'border-gray-600/50'
-                    } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
+                    className={`w-full bg-gray-700/50 text-white px-3 py-2 pr-10 rounded-lg border transition-all duration-300 ${validationErrors.password ? 'border-red-500/50' : 'border-gray-600/50'
+                      } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
                     required
                   />
                   <button
@@ -473,9 +470,8 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
                     onChange={handleChange}
                     placeholder="••••••••"
                     autoComplete="new-password"
-                    className={`w-full bg-gray-700/50 text-white px-3 py-2 pr-10 rounded-lg border transition-all duration-300 ${
-                      validationErrors.password_confirmation ? 'border-red-500/50' : 'border-gray-600/50'
-                    } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
+                    className={`w-full bg-gray-700/50 text-white px-3 py-2 pr-10 rounded-lg border transition-all duration-300 ${validationErrors.password_confirmation ? 'border-red-500/50' : 'border-gray-600/50'
+                      } focus:border-purple-500 focus:ring-1 focus:ring-purple-500`}
                     required
                   />
                   <button
@@ -536,9 +532,9 @@ const CreateUserAdminModal = ({ isOpen, onClose, onUserCreated }) => {
               disabled={loading || uploadingImage}
               className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
-              <FontAwesomeIcon 
-                icon={loading ? faSpinner : faUserPlus} 
-                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+              <FontAwesomeIcon
+                icon={loading ? faSpinner : faUserPlus}
+                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
               />
               <span className="hidden sm:inline">
                 {loading ? 'Creando...' : uploadingImage ? 'Subiendo...' : 'Crear Usuario'}

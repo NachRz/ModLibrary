@@ -56,12 +56,12 @@ const Tabs = ({ tabs = [], defaultTab = 0, onTabChange }) => {
                 `}
               >
                 <span className="relative z-10">{tab?.label || `Tab ${index + 1}`}</span>
-                
+
                 {/* Indicador activo - línea debajo */}
                 {safeActiveTab === index && (
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 rounded-t-full transform transition-transform duration-300"></span>
                 )}
-                
+
                 {/* Efecto sutil al pasar el ratón */}
                 <span className={`
                   absolute inset-0 bg-blue-400/5 opacity-0 transition-opacity duration-200

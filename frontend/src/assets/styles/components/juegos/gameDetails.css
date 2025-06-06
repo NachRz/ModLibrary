@@ -343,8 +343,13 @@
 
 /* Animaciones */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Media queries para responsividad */
@@ -360,12 +365,12 @@
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .game-flex-container {
     flex-direction: row;
     gap: 1.5rem;
   }
-  
+
   .game-image-wrapper {
     width: 12rem;
     height: 16rem;
@@ -376,7 +381,7 @@
   .game-main-title {
     font-size: 3rem;
   }
-  
+
   .game-image-wrapper {
     width: 14rem;
     height: 18rem;
@@ -397,14 +402,14 @@
   .game-main-title {
     font-size: 1.875rem;
   }
-  
+
   .mods-grid-container {
     grid-template-columns: 1fr;
   }
-  
+
   .game-stats-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-} 
+}

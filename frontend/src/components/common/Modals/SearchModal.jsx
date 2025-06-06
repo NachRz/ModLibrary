@@ -46,7 +46,7 @@ const SearchModal = ({ isOpen, onClose }) => {
 
     try {
       const response = await modService.searchModsByName(query.trim());
-      
+
       if (response.status === 'success') {
         // Mapear los datos para que sean compatibles con ModCard
         const formattedMods = response.data.map(mod => ({
@@ -81,7 +81,7 @@ const SearchModal = ({ isOpen, onClose }) => {
 
     try {
       const games = await gameService.searchGames(query.trim());
-      
+
       // Si games es un array, continuar con el mapeo
       if (Array.isArray(games)) {
         // Mapear los datos para que sean compatibles con GameCard
@@ -91,7 +91,7 @@ const SearchModal = ({ isOpen, onClose }) => {
           imagen_fondo: game.imagen_fondo || game.background_image || game.image,
           mods_totales: game.mods_totales || game.total_mods || game.totalMods || 0
         }));
-        
+
         setGameResults(formattedGames);
       } else {
         // Si no es un array, establecer array vacío
@@ -99,7 +99,7 @@ const SearchModal = ({ isOpen, onClose }) => {
       }
     } catch (error) {
       console.error('Error searching games:', error);
-      
+
       // Intentar usar datos mock como fallback
       try {
         const allGames = await gameService.getAllGames();
@@ -107,14 +107,14 @@ const SearchModal = ({ isOpen, onClose }) => {
           const title = game.titulo || game.title || game.name || '';
           return title.toLowerCase().includes(query.trim().toLowerCase());
         });
-        
+
         const formattedGames = filteredGames.map(game => ({
           ...game,
           titulo: game.titulo || game.title || game.name,
           imagen_fondo: game.imagen_fondo || game.background_image || game.image,
           mods_totales: game.mods_totales || game.total_mods || game.totalMods || 0
         }));
-        
+
         setGameResults(formattedGames);
       } catch (fallbackError) {
         console.error('Error en fallback:', fallbackError);
@@ -140,7 +140,7 @@ const SearchModal = ({ isOpen, onClose }) => {
 
     try {
       const response = await userService.searchUsers(query.trim());
-      
+
       if (response.status === 'success') {
         // Los datos ya vienen formateados desde el backend
         setUserResults(response.data);
@@ -232,7 +232,7 @@ const SearchModal = ({ isOpen, onClose }) => {
   const fetchFavoriteGames = async () => {
     setLoadingFavorites(true);
     setErrorFavorites(null);
-    
+
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -242,7 +242,7 @@ const SearchModal = ({ isOpen, onClose }) => {
       }
 
       const juegosFavoritos = await gameService.getFavoriteGames();
-      
+
       // Mapear los datos de la API al formato esperado
       const formattedGames = juegosFavoritos.map(juego => ({
         id: juego.id,
@@ -359,7 +359,7 @@ const SearchModal = ({ isOpen, onClose }) => {
   // Añadir búsqueda a recientes
   const addToRecentSearches = (query) => {
     if (!query.trim()) return;
-    
+
     const updatedRecentSearches = [
       query.trim(),
       ...recentSearches.filter(search => search !== query.trim())
@@ -425,12 +425,12 @@ const SearchModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="nexus-modal-overlay"
       onClick={handleBackdropClick}
     >
       <div className="nexus-modal-backdrop"></div>
-      
+
       <div className="nexus-modal-content">
         {/* Header con campo de búsqueda */}
         <div className="nexus-modal-header">
@@ -463,9 +463,9 @@ const SearchModal = ({ isOpen, onClose }) => {
                   type="button"
                   onClick={onClose}
                   className="nexus-close-button"
-                                  >
-                    Cerrar
-                  </button>
+                >
+                  Cerrar
+                </button>
               </div>
             </form>
           </div>
@@ -481,7 +481,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                   {searchQuery.trim() ? `Resultados para "${searchQuery}"` : 'Resultados de búsqueda'}
                 </h3>
               </div>
-              
+
               {loadingSearch ? (
                 <div className="loading-state">
                   <div className="spinner"></div>
@@ -501,7 +501,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                       <div className="mods-grid">
                         {searchResults.slice(0, 3).map((mod) => (
                           <div key={mod.id} className="mod-card-wrapper">
-                            <ModCardCompact 
+                            <ModCardCompact
                               mod={mod}
                               onClick={() => {
                                 navigate(`/mods/${mod.id}`);
@@ -512,7 +512,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                         ))}
                       </div>
                       {searchResults.length > 3 && (
-                        <button 
+                        <button
                           className="view-all-button"
                           onClick={() => {
                             navigate(`/mods?search=${encodeURIComponent(searchQuery)}`);
@@ -532,7 +532,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                       <div className="games-grid-compact">
                         {gameResults.slice(0, 4).map((game) => (
                           <div key={game.id} className="game-card-wrapper">
-                            <GameCard 
+                            <GameCard
                               game={game}
                               showStats={true}
                               showFavoriteButton={false}
@@ -545,7 +545,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                         ))}
                       </div>
                       {gameResults.length > 4 && (
-                        <button 
+                        <button
                           className="view-all-button"
                           onClick={() => {
                             navigate(`/juegos?search=${encodeURIComponent(searchQuery)}`);
@@ -565,7 +565,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                       <div className="users-grid-compact">
                         {userResults.slice(0, 4).map((user) => (
                           <div key={user.id} className="user-card-wrapper">
-                            <UserCard 
+                            <UserCard
                               user={user}
                               onClick={() => {
                                 navigate(`/usuarios/${user.id}/perfil`);
@@ -577,7 +577,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                         ))}
                       </div>
                       {userResults.length > 4 && (
-                        <button 
+                        <button
                           className="view-all-button"
                           onClick={() => {
                             navigate(`/usuarios?search=${encodeURIComponent(searchQuery)}`);
@@ -601,7 +601,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                   {/* Botón para ver todos los resultados en página completa */}
                   {hasSearched && (searchResults.length > 0 || gameResults.length > 0 || userResults.length > 0) && (
                     <div className="search-category-section">
-                      <button 
+                      <button
                         className="view-all-button view-all-results-button"
                         onClick={() => {
                           const encodedQuery = encodeURIComponent(searchQuery);
@@ -624,7 +624,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                   {searchQuery.trim() ? `Resultados para "${searchQuery}"` : 'Resultados de búsqueda'}
                 </h3>
               </div>
-              
+
               {loadingSearch ? (
                 <div className="loading-state">
                   <div className="spinner"></div>
@@ -639,7 +639,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                 <div className="mods-grid">
                   {searchResults.map((mod) => (
                     <div key={mod.id} className="mod-card-wrapper">
-                      <ModCardCompact 
+                      <ModCardCompact
                         mod={mod}
                         onClick={() => {
                           navigate(`/mods/${mod.id}`);
@@ -663,7 +663,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                   {searchQuery.trim() ? `Resultados para "${searchQuery}"` : 'Resultados de búsqueda'}
                 </h3>
               </div>
-              
+
               {loadingSearch ? (
                 <div className="loading-state">
                   <div className="spinner"></div>
@@ -678,7 +678,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                 <div className="games-grid">
                   {gameResults.map((game) => (
                     <div key={game.id} className="game-card-wrapper">
-                      <GameCard 
+                      <GameCard
                         game={game}
                         showStats={true}
                         showFavoriteButton={false}
@@ -704,7 +704,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                   {searchQuery.trim() ? `Resultados para "${searchQuery}"` : 'Resultados de búsqueda'}
                 </h3>
               </div>
-              
+
               {loadingSearch ? (
                 <div className="loading-state">
                   <div className="spinner"></div>
@@ -719,7 +719,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                 <div className="users-grid">
                   {userResults.map((user) => (
                     <div key={user.id} className="user-card-wrapper">
-                      <UserCard 
+                      <UserCard
                         user={user}
                         onClick={() => {
                           navigate(`/usuarios/${user.id}/perfil`);
@@ -744,7 +744,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                 <div className="nexus-section-header">
                   <h3 className="nexus-section-title">Búsquedas recientes</h3>
                   {recentSearches.length > 0 && (
-                    <button 
+                    <button
                       className="nexus-clear-button"
                       onClick={clearAllRecentSearches}
                     >
@@ -764,7 +764,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         <span className="nexus-recent-text">{search}</span>
-                        <button 
+                        <button
                           className="nexus-remove-button"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -810,8 +810,8 @@ const SearchModal = ({ isOpen, onClose }) => {
                         className="game-item"
                       >
                         {game.image ? (
-                          <img 
-                            src={game.image} 
+                          <img
+                            src={game.image}
                             alt={game.name}
                             className="game-image"
                           />

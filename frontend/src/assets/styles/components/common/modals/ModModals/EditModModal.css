@@ -1,41 +1,49 @@
 .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #374151;
-    border-radius: 3px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #6b7280;
-    border-radius: 3px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-  }
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #6b7280 #374151;
-  }
-  
-  /* Scrollbar horizontal para tabs */
-  .custom-scrollbar-horizontal::-webkit-scrollbar {
-    height: 4px;
-  }
-  .custom-scrollbar-horizontal::-webkit-scrollbar-track {
-    background: #374151;
-    border-radius: 2px;
-  }
-  .custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
-    background: #6b7280;
-    border-radius: 2px;
-  }
-  .custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-  }
-  .custom-scrollbar-horizontal {
-    scrollbar-width: thin;
-    scrollbar-color: #6b7280 #374151;
-  }
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 #374151;
+}
+
+/* Scrollbar horizontal para tabs */
+.custom-scrollbar-horizontal::-webkit-scrollbar {
+  height: 4px;
+}
+
+.custom-scrollbar-horizontal::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 2px;
+}
+
+.custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 2px;
+}
+
+.custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.custom-scrollbar-horizontal {
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 #374151;
+}
 
 /* Estilos para el select de juegos */
 .select-container {
@@ -378,8 +386,13 @@
 
 /* Animación para el estado de carga */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .select-container .select__loading-indicator div {
@@ -391,36 +404,36 @@
   .game-option {
     padding: 0.5rem;
   }
-  
+
   .game-option-image,
   .game-single-image {
     width: 32px;
     height: 32px;
     margin-right: 0.75rem;
   }
-  
+
   .game-option-title {
     font-size: 0.875rem;
   }
-  
+
   .game-option-rating {
     font-size: 0.75rem;
   }
-  
+
   .game-single-image {
     width: 28px;
     height: 28px;
     margin-right: 0.5rem;
   }
-  
+
   .game-single-title {
     font-size: 0.75rem;
   }
-  
+
   .game-single-rating {
     font-size: 0.65rem;
   }
-  
+
   .select-container .select__control {
     min-height: 38px;
   }
@@ -429,15 +442,15 @@
     padding: 0.5rem;
     gap: 0.5rem;
   }
-  
+
   .tag-option-name {
     font-size: 0.75rem;
   }
-  
+
   .tag-option-count {
     font-size: 0.65rem;
   }
-  
+
   .custom-multi-value {
     font-size: 0.75rem;
     padding: 0.2rem 0.5rem;

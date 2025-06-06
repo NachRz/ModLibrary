@@ -269,22 +269,22 @@
     width: 95%;
     margin: 20px;
   }
-  
+
   .share-modal-header,
   .share-modal-body {
     padding: 16px;
   }
-  
+
   .copy-link-container {
     flex-direction: column;
   }
-  
+
   .copy-link-btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .social-share-grid {
     grid-template-columns: 1fr 1fr;
   }
-} 
+}

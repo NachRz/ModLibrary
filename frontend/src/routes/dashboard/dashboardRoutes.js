@@ -6,41 +6,41 @@ import ProtectedRoute from '../../middlewares/authMiddleware';
 
 const dashboardRoutes = (
   [
-    <Route 
-      key="dashboard-base" 
-      path="/dashboard" 
+    <Route
+      key="dashboard-base"
+      path="/dashboard"
       element={
         <ProtectedRoute>
           <Dashboard defaultTab={0} />
         </ProtectedRoute>
-      } 
+      }
     />,
-    <Route 
-      key="dashboard-mis-mods" 
-      path="/dashboard/mis-mods" 
+    <Route
+      key="dashboard-mis-mods"
+      path="/dashboard/mis-mods"
       element={
         <ProtectedRoute>
           <Dashboard defaultTab={0} />
         </ProtectedRoute>
-      } 
+      }
     />,
-    <Route 
-      key="dashboard-juegos-favoritos" 
-      path="/dashboard/juegos-favoritos" 
+    <Route
+      key="dashboard-juegos-favoritos"
+      path="/dashboard/juegos-favoritos"
       element={
         <ProtectedRoute>
           <Dashboard defaultTab={1} />
         </ProtectedRoute>
-      } 
+      }
     />,
-    <Route 
-      key="dashboard-guardados" 
-      path="/dashboard/guardados" 
+    <Route
+      key="dashboard-guardados"
+      path="/dashboard/guardados"
       element={
         <ProtectedRoute>
           <Dashboard defaultTab={2} />
         </ProtectedRoute>
-      } 
+      }
     />,
   ]
 );

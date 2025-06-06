@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faExclamationTriangle, 
-  faTrash, 
+import {
+  faExclamationTriangle,
+  faTrash,
   faTimes,
   faUserMinus,
   faShieldAlt,
@@ -27,15 +27,15 @@ export const UserHasModsModal = ({ userName, userHasMods, onConfirm, onSoftDelet
                 Eliminar Usuario
               </h2>
             </div>
-            <button 
-              onClick={onCancel} 
+            <button
+              onClick={onCancel}
               className="text-gray-400 hover:text-white transition-colors text-lg sm:text-xl hover:rotate-90 transition-transform duration-300"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
         </div>
-        
+
         {/* Contenido con scroll personalizado */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 min-h-0">
           <div className="bg-gradient-to-r from-yellow-500/20 to-yellow-600/30 border border-yellow-500/50 rounded-xl p-4 mb-4 sm:mb-6">
@@ -43,13 +43,13 @@ export const UserHasModsModal = ({ userName, userHasMods, onConfirm, onSoftDelet
               Vas a eliminar al usuario <span className="font-bold text-white">"{userName}"</span>
             </p>
             <p className="text-yellow-200 text-xs sm:text-sm mb-3">
-              {userHasMods 
+              {userHasMods
                 ? 'Este usuario ha creado contenido en el sistema. Tienes las siguientes opciones:'
                 : 'Elige cómo proceder con la eliminación:'
               }
             </p>
           </div>
-          
+
           <div className="space-y-3 sm:space-y-4">
             <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/30 border border-blue-500/50 rounded-xl p-3 sm:p-4">
               <h3 className="text-blue-300 font-bold mb-2 sm:mb-3 flex items-center text-sm sm:text-base">
@@ -131,7 +131,7 @@ export const UserHasModsModal = ({ userName, userHasMods, onConfirm, onSoftDelet
 export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCancel, isOpen }) => {
   const [confirmText, setConfirmText] = useState('');
   const [understood, setUnderstood] = useState(false);
-  
+
   const handleConfirm = () => {
     if (confirmText === 'ELIMINAR USUARIO' && understood) {
       onConfirm();
@@ -156,15 +156,15 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
                 Confirmación de Eliminación
               </h2>
             </div>
-            <button 
-              onClick={onCancel} 
+            <button
+              onClick={onCancel}
               className="text-gray-400 hover:text-white transition-colors text-lg sm:text-xl hover:rotate-90 transition-transform duration-300"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
         </div>
-        
+
         {/* Contenido con scroll personalizado */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 min-h-0">
           <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4 mb-4 sm:mb-6">
@@ -234,11 +234,10 @@ export const FinalConfirmationModal = ({ userName, userHasMods, onConfirm, onCan
             <button
               onClick={handleConfirm}
               disabled={!isValid}
-              className={`px-3 sm:px-5 py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 text-sm ${
-                isValid 
+              className={`px-3 sm:px-5 py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 text-sm ${isValid
                   ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
                   : 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               <FontAwesomeIcon icon={faTrash} />
               <span className="hidden sm:inline">Eliminar Usuario</span>
@@ -270,15 +269,15 @@ export const PermanentDeleteModal = ({ userName, onDeleteKeepMods, onDeleteWithM
                 Eliminación Definitiva
               </h2>
             </div>
-            <button 
-              onClick={onCancel} 
+            <button
+              onClick={onCancel}
               className="text-gray-400 hover:text-white transition-colors text-lg sm:text-xl hover:rotate-90 transition-transform duration-300"
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
         </div>
-        
+
         {/* Contenido con scroll personalizado */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 min-h-0">
           <div className="bg-gradient-to-r from-red-500/20 to-red-600/30 border border-red-500/50 rounded-xl p-4 mb-4 sm:mb-6">
@@ -289,7 +288,7 @@ export const PermanentDeleteModal = ({ userName, onDeleteKeepMods, onDeleteWithM
               Elige cómo proceder:
             </p>
           </div>
-          
+
           <div className="space-y-3 sm:space-y-4">
             <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/30 border border-blue-500/50 rounded-xl p-3 sm:p-4">
               <h3 className="text-blue-300 font-bold mb-2 sm:mb-3 flex items-center text-sm sm:text-base">

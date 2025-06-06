@@ -20,7 +20,7 @@ class ComentarioController extends Controller
         try {
             // Verificar que el mod existe
             $mod = Mod::findOrFail($modId);
-            
+
             // Verificar si el mod permite comentarios
             if (!$mod->permitir_comentarios) {
                 return response()->json([
@@ -61,7 +61,7 @@ class ComentarioController extends Controller
                     'usuario' => [
                         'id' => $comentario->usuario->id,
                         'nombre' => $comentario->usuario->nome,
-                        'foto_perfil' => $comentario->usuario->foto_perfil ? 
+                        'foto_perfil' => $comentario->usuario->foto_perfil ?
                             asset('storage/' . $comentario->usuario->foto_perfil) : null,
                     ],
                     'es_autor' => Auth::check() && Auth::id() === $comentario->usuario_id,
@@ -81,7 +81,6 @@ class ComentarioController extends Controller
                     'to' => $comentarios->lastItem(),
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al obtener comentarios:', [
                 'mod_id' => $modId,
@@ -112,7 +111,7 @@ class ComentarioController extends Controller
 
             // Verificar que el mod existe
             $mod = Mod::findOrFail($modId);
-            
+
             // Verificar si el mod permite comentarios
             if (!$mod->permitir_comentarios) {
                 return response()->json([
@@ -152,7 +151,7 @@ class ComentarioController extends Controller
                 'usuario' => [
                     'id' => $comentario->usuario->id,
                     'nombre' => $comentario->usuario->nome,
-                    'foto_perfil' => $comentario->usuario->foto_perfil ? 
+                    'foto_perfil' => $comentario->usuario->foto_perfil ?
                         asset('storage/' . $comentario->usuario->foto_perfil) : null,
                 ],
                 'es_autor' => true,
@@ -170,14 +169,12 @@ class ComentarioController extends Controller
                 'message' => 'Comentario publicado exitosamente',
                 'data' => $comentarioFormateado
             ], 201);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Datos de comentario inválidos',
                 'errors' => $e->errors()
             ], 422);
-
         } catch (\Exception $e) {
             Log::error('Error al crear comentario:', [
                 'mod_id' => $modId,
@@ -209,7 +206,7 @@ class ComentarioController extends Controller
 
             // Verificar que el mod existe
             $mod = Mod::findOrFail($modId);
-            
+
             // Verificar si el mod permite comentarios
             if (!$mod->permitir_comentarios) {
                 return response()->json([
@@ -257,7 +254,7 @@ class ComentarioController extends Controller
                 'usuario' => [
                     'id' => $comentario->usuario->id,
                     'nombre' => $comentario->usuario->nome,
-                    'foto_perfil' => $comentario->usuario->foto_perfil ? 
+                    'foto_perfil' => $comentario->usuario->foto_perfil ?
                         asset('storage/' . $comentario->usuario->foto_perfil) : null,
                 ],
                 'es_autor' => true,
@@ -275,14 +272,12 @@ class ComentarioController extends Controller
                 'message' => 'Comentario actualizado exitosamente',
                 'data' => $comentarioFormateado
             ]);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Datos de comentario inválidos',
                 'errors' => $e->errors()
             ], 422);
-
         } catch (\Exception $e) {
             Log::error('Error al actualizar comentario:', [
                 'comentario_id' => $comentarioId,
@@ -342,7 +337,6 @@ class ComentarioController extends Controller
                 'status' => 'success',
                 'message' => 'Comentario eliminado exitosamente'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al eliminar comentario:', [
                 'comentario_id' => $comentarioId,
@@ -377,7 +371,6 @@ class ComentarioController extends Controller
                     'permite_comentarios' => $mod->permitir_comentarios,
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al obtener estadísticas de comentarios:', [
                 'mod_id' => $modId,
@@ -390,4 +383,4 @@ class ComentarioController extends Controller
             ], 500);
         }
     }
-} 
+}

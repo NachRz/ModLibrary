@@ -7,7 +7,7 @@ import { useNotification } from '../../../../../context/NotificationContext';
 
 const CommentDeleteModal = ({ isOpen, onClose, comment, onCommentDeleted }) => {
   const { showNotification } = useNotification();
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -95,7 +95,7 @@ const CommentDeleteModal = ({ isOpen, onClose, comment, onCommentDeleted }) => {
                 <h4 className="text-lg font-semibold text-red-300">¡Advertencia!</h4>
               </div>
               <p className="text-red-200 leading-relaxed">
-                Esta acción eliminará permanentemente el comentario y <strong>no se puede deshacer</strong>. 
+                Esta acción eliminará permanentemente el comentario y <strong>no se puede deshacer</strong>.
                 Una vez eliminado, el comentario desaparecerá completamente del sistema.
               </p>
             </div>
@@ -106,7 +106,7 @@ const CommentDeleteModal = ({ isOpen, onClose, comment, onCommentDeleted }) => {
                 <FontAwesomeIcon icon={faTrash} className="text-yellow-400" />
                 <h4 className="text-lg font-semibold text-white">Comentario a Eliminar</h4>
               </div>
-              
+
               <div className="bg-gradient-to-br from-red-500/5 to-red-600/5 border border-red-500/20 rounded-lg p-3">
                 <p className="text-gray-300 leading-relaxed whitespace-pre-wrap text-sm">
                   {truncateText(comment.contenido, 150)}
@@ -233,9 +233,9 @@ const CommentDeleteModal = ({ isOpen, onClose, comment, onCommentDeleted }) => {
               disabled={loading}
               className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
-              <FontAwesomeIcon 
-                icon={loading ? faSpinner : faTrashAlt} 
-                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+              <FontAwesomeIcon
+                icon={loading ? faSpinner : faTrashAlt}
+                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
               />
               <span className="hidden sm:inline">{loading ? 'Eliminando...' : 'Eliminar Comentario'}</span>
               <span className="sm:hidden">{loading ? 'Eliminando...' : 'Eliminar'}</span>

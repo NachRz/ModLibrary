@@ -16,12 +16,12 @@ const MisMods = () => {
   const [myMods, setMyMods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Estados para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modToDelete, setModToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-  
+
   // Estados para el modal de restauración
   const [showRestoreModal, setShowRestoreModal] = useState(false);
   const [modToRestore, setModToRestore] = useState(null);
@@ -34,14 +34,14 @@ const MisMods = () => {
   // Función helper para formatear mensajes sobre juegos y géneros eliminados
   const formatearMensajeEliminacion = (mensajeBase, juegoEliminadoInfo) => {
     if (!juegoEliminadoInfo) return mensajeBase;
-    
+
     let mensaje = `${mensajeBase} El juego "${juegoEliminadoInfo.titulo}" fue eliminado automáticamente porque no tenía más mods asociados`;
-    
+
     if (juegoEliminadoInfo.generos_eliminados && juegoEliminadoInfo.generos_eliminados.length > 0) {
       const nombresGeneros = juegoEliminadoInfo.generos_eliminados.map(g => g.nombre).join(', ');
       mensaje += ` y se eliminaron los géneros: ${nombresGeneros}`;
     }
-    
+
     return mensaje + '.';
   };
 
@@ -50,15 +50,15 @@ const MisMods = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Obtener tanto mods activos como eliminados
         const [activeModsResponse, deletedModsResponse] = await Promise.allSettled([
           modService.getMyMods(),
           modService.getMyDeletedMods()
         ]);
-        
+
         let allMods = [];
-        
+
         // Procesar mods activos
         if (activeModsResponse.status === 'fulfilled' && activeModsResponse.value.status === 'success') {
           const activeMods = activeModsResponse.value.data.map(mod => ({
@@ -67,7 +67,7 @@ const MisMods = () => {
           }));
           allMods = [...allMods, ...activeMods];
         }
-        
+
         // Procesar mods eliminados
         if (deletedModsResponse.status === 'fulfilled' && deletedModsResponse.value.status === 'success') {
           const deletedMods = deletedModsResponse.value.data.map(mod => ({
@@ -77,14 +77,14 @@ const MisMods = () => {
           }));
           allMods = [...allMods, ...deletedMods];
         }
-        
+
         setMyMods(allMods);
-        
+
         // Si no hay mods en absoluto, mostrar mensaje
         if (allMods.length === 0) {
           setError('No tienes mods creados aún');
         }
-        
+
       } catch (err) {
         console.error('Error al cargar los mods:', err);
         setError(err.message || 'Error al cargar los mods');
@@ -92,7 +92,7 @@ const MisMods = () => {
         setLoading(false);
       }
     };
-    
+
     fetchMyMods();
   }, []);
 
@@ -124,21 +124,21 @@ const MisMods = () => {
   // Confirmar eliminación (soft delete)
   const confirmDelete = async () => {
     if (!modToDelete) return;
-    
+
     try {
       setDeleting(true);
       const response = await modService.softDeleteMod(modToDelete.id);
-      
+
       if (response.status === 'success') {
         // Marcar el mod como eliminado en lugar de quitarlo de la lista
-        setMyMods(prevMods => 
-          prevMods.map(mod => 
-            mod.id === modToDelete.id 
+        setMyMods(prevMods =>
+          prevMods.map(mod =>
+            mod.id === modToDelete.id
               ? { ...mod, is_deleted: true, deleted_at: new Date().toISOString() }
               : mod
           )
         );
-        
+
         // Mostrar notificación con información sobre juegos y géneros eliminados si aplica
         if (response.juego_eliminado) {
           const mensaje = formatearMensajeEliminacion(`Mod "${modToDelete.titulo}" desactivado correctamente (puede ser restaurado).`, response.juego_eliminado);
@@ -167,16 +167,16 @@ const MisMods = () => {
   // Confirmar restauración
   const confirmRestore = async () => {
     if (!modToRestore) return;
-    
+
     try {
       setRestoring(true);
       const response = await modService.restoreMod(modToRestore.id);
-      
+
       if (response.status === 'success') {
         // Marcar el mod como activo
-        setMyMods(prevMods => 
-          prevMods.map(mod => 
-            mod.id === modToRestore.id 
+        setMyMods(prevMods =>
+          prevMods.map(mod =>
+            mod.id === modToRestore.id
               ? { ...mod, is_deleted: false, deleted_at: null }
               : mod
           )
@@ -215,7 +215,7 @@ const MisMods = () => {
     } else {
       mod = myMods.find(m => m.id === modIdOrMod);
     }
-    
+
     if (mod) {
       setModToEdit(mod);
       setShowEditModal(true);
@@ -231,10 +231,10 @@ const MisMods = () => {
   // Función para guardar cambios desde el modal de edición
   const handleSaveModFromModal = (updatedMod) => {
     console.log('Mod actualizado desde modal:', updatedMod);
-    
+
     // Actualizar el mod en la lista local
-    setMyMods(prevMods => 
-      prevMods.map(mod => 
+    setMyMods(prevMods =>
+      prevMods.map(mod =>
         mod.id === updatedMod.id ? {
           ...mod, // Mantener los campos existentes
           ...updatedMod, // Sobrescribir con los campos actualizados
@@ -248,15 +248,15 @@ const MisMods = () => {
         } : mod
       )
     );
-    
+
     // Cerrar el modal
     setShowEditModal(false);
     setModToEdit(null);
-    
+
     // Mostrar notificación de éxito
     showNotification(`Mod "${updatedMod.titulo || updatedMod.nombre}" actualizado exitosamente`, 'success');
   };
-  
+
   // Filtrado mejorado para incluir mods eliminados
   const getFilteredMods = () => {
     switch (activeFilter) {
@@ -287,8 +287,8 @@ const MisMods = () => {
     <div className="text-center py-8">
       <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
         <p>{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="mt-2 text-sm underline hover:text-red-800"
         >
           Intentar de nuevo
@@ -300,14 +300,14 @@ const MisMods = () => {
   const renderEmptyState = () => (
     <div className="text-center py-8">
       <p className="text-custom-detail">
-        {activeFilter === 'eliminados' 
-          ? 'No tienes mods eliminados.' 
+        {activeFilter === 'eliminados'
+          ? 'No tienes mods eliminados.'
           : 'No tienes mods en esta categoría.'
         }
       </p>
       {activeFilter !== 'todos' && (
-        <button 
-          onClick={() => setActiveFilter('todos')} 
+        <button
+          onClick={() => setActiveFilter('todos')}
           className="mt-2 text-sm text-custom-primary hover:underline"
         >
           Ver todos los mods
@@ -320,14 +320,14 @@ const MisMods = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredMods.map(mod => (
         <div key={mod.id} className={mod.is_deleted ? 'opacity-75' : ''}>
-          <ModCard 
-            mod={mod} 
-            isOwner={true} 
+          <ModCard
+            mod={mod}
+            isOwner={true}
             showSaveButton={false}
             onEdit={!mod.is_deleted ? () => handleEditMod(mod) : undefined}
             onDelete={!mod.is_deleted ? () => handleDeleteMod(mod) : undefined}
             actions={mod.is_deleted ? (
-              <button 
+              <button
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -353,11 +353,10 @@ const MisMods = () => {
   );
 
   const renderFilterButtons = () => {
-    const buttonClass = (filter) => `px-4 py-2 rounded-md transition-colors duration-300 ${
-      activeFilter === filter 
-        ? 'bg-custom-primary text-white' 
+    const buttonClass = (filter) => `px-4 py-2 rounded-md transition-colors duration-300 ${activeFilter === filter
+        ? 'bg-custom-primary text-white'
         : 'bg-custom-bg text-custom-detail hover:text-custom-text'
-    }`;
+      }`;
 
     const activeMods = myMods.filter(mod => !mod.is_deleted);
     const deletedMods = myMods.filter(mod => mod.is_deleted);
@@ -385,8 +384,8 @@ const MisMods = () => {
       <div className="space-y-6 animate-fadeIn mb-8">
         <div className="flex justify-between items-center">
           <h3 className="text-xl font-bold text-custom-text">Mis Mods</h3>
-          <button 
-            onClick={() => navigate('/mods/crear')} 
+          <button
+            onClick={() => navigate('/mods/crear')}
             className="bg-custom-primary hover:bg-custom-primary-hover text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center shadow-md hover:shadow-lg"
           >
             <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -395,14 +394,14 @@ const MisMods = () => {
             Crear Nuevo Mod
           </button>
         </div>
-        
+
         <div className="bg-custom-card rounded-lg shadow-custom p-4">
           {renderFilterButtons()}
-          
+
           {loading ? renderLoading() :
-           error ? renderError() :
-           filteredMods.length === 0 ? renderEmptyState() :
-           renderModGrid()}
+            error ? renderError() :
+              filteredMods.length === 0 ? renderEmptyState() :
+                renderModGrid()}
         </div>
       </div>
 

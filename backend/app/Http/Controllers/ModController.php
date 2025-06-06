@@ -30,7 +30,7 @@ class ModController extends Controller
         ])
             ->whereNull('deleted_at')
             ->get();
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $mods
@@ -46,7 +46,7 @@ class ModController extends Controller
     public function search(Request $request): JsonResponse
     {
         $nombre = $request->input('nombre', '');
-        
+
         if (empty($nombre) || strlen($nombre) < 2) {
             return response()->json([
                 'status' => 'error',
@@ -71,17 +71,17 @@ class ModController extends Controller
         $mods = $mods->map(function ($mod) {
             $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
             $totalValoraciones = $mod->valoraciones->count();
-            
+
             // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
             unset($mod->valoraciones);
-            
+
             // Agregar las estadísticas calculadas
             $mod->estadisticas = [
                 'valoracion_media' => round($valoracionMedia, 1),
                 'total_valoraciones' => $totalValoraciones,
                 'total_descargas' => $mod->total_descargas
             ];
-            
+
             return $mod;
         });
 
@@ -146,8 +146,8 @@ class ModController extends Controller
 
         // Crear la carpeta del mod y procesar las imágenes
         $resultadoProcesamiento = $this->crearCarpetaYProcesarImagenes(
-            $mod->titulo, 
-            $mod->id, 
+            $mod->titulo,
+            $mod->id,
             $request->file('imagen_banner'),
             $request->file('imagenes_adicionales')
         );
@@ -155,8 +155,8 @@ class ModController extends Controller
         // Actualizar el mod con las rutas correctas de las imágenes
         $mod->update([
             'imagen_banner' => $resultadoProcesamiento['ruta_banner'],
-            'imagenes_adicionales' => !empty($resultadoProcesamiento['rutas_adicionales']) 
-                ? json_encode($resultadoProcesamiento['rutas_adicionales']) 
+            'imagenes_adicionales' => !empty($resultadoProcesamiento['rutas_adicionales'])
+                ? json_encode($resultadoProcesamiento['rutas_adicionales'])
                 : null
         ]);
 
@@ -193,7 +193,7 @@ class ModController extends Controller
         // Convertir el título del mod en un nombre de carpeta válido
         $modSlug = strtolower(str_replace([' ', '/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $modTitulo));
         $basePath = storage_path('app/public/mods/' . $modSlug);
-        
+
         // Crear carpeta principal del mod si no existe
         if (!File::exists($basePath)) {
             File::makeDirectory($basePath, 0755, true);
@@ -217,10 +217,10 @@ class ModController extends Controller
         if ($imagenBanner) {
             $nombreBanner = 'banner_' . $modId . '_' . time() . '.' . $imagenBanner->getClientOriginalExtension();
             $rutaBanner = $basePath . '/banners/' . $nombreBanner;
-            
+
             // Mover el archivo a la carpeta específica del mod
             $imagenBanner->move($basePath . '/banners', $nombreBanner);
-            
+
             // Guardar la ruta relativa para la base de datos
             $resultado['ruta_banner'] = 'mods/' . $modSlug . '/banners/' . $nombreBanner;
         }
@@ -230,10 +230,10 @@ class ModController extends Controller
             foreach ($imagenesAdicionales as $index => $imagen) {
                 $nombreImagen = 'img_adicional_' . $modId . '_' . ($index + 1) . '_' . time() . '.' . $imagen->getClientOriginalExtension();
                 $rutaImagen = $basePath . '/imagenes_adicionales/' . $nombreImagen;
-                
+
                 // Mover el archivo a la carpeta específica del mod
                 $imagen->move($basePath . '/imagenes_adicionales', $nombreImagen);
-                
+
                 // Guardar la ruta relativa para la base de datos
                 $resultado['rutas_adicionales'][] = 'mods/' . $modSlug . '/imagenes_adicionales/' . $nombreImagen;
             }
@@ -252,7 +252,7 @@ class ModController extends Controller
     {
         // Solo buscar mods que no han sido eliminados, a menos que sea el creador o admin
         $usuario = request()->user();
-        
+
         $query = Mod::with([
             'creador:id,nome,correo,foto_perfil',
             'valoraciones',
@@ -273,7 +273,7 @@ class ModController extends Controller
                     'message' => 'Mod no encontrado'
                 ], 404);
             }
-            
+
             // Si está eliminado y no es el creador ni admin, no mostrar
             if ($tempMod->deleted_at && $usuario->id !== $tempMod->creador_id && $usuario->rol !== 'admin') {
                 return response()->json([
@@ -281,7 +281,7 @@ class ModController extends Controller
                     'message' => 'Mod no encontrado'
                 ], 404);
             }
-            
+
             // Si es el creador o admin, permitir ver mods eliminados
             if ($usuario->id === $tempMod->creador_id || $usuario->rol === 'admin') {
                 $query = $query->withTrashed();
@@ -303,7 +303,7 @@ class ModController extends Controller
         $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
         $totalValoraciones = $mod->valoraciones->count();
         $totalDescargas = $mod->total_descargas;
-        
+
         // Contar cuántas veces este mod ha sido guardado como favorito
         $totalFavoritos = DB::table('mods_guardados')
             ->where('mod_id', $id)
@@ -428,7 +428,7 @@ class ModController extends Controller
         if ($request->filled('url')) $mod->url = $request->url;
         if ($request->filled('estado')) $mod->estado = $request->estado;
         if ($request->filled('juego_id')) $mod->juego_id = $request->juego_id;
-        
+
         // Actualizar campos booleanos
         if ($request->has('es_destacado')) $mod->es_destacado = $request->boolean('es_destacado');
         if ($request->has('permitir_comentarios')) $mod->permitir_comentarios = $request->boolean('permitir_comentarios');
@@ -448,10 +448,10 @@ class ModController extends Controller
         if ($request->has('etiquetas') && is_array($request->etiquetas)) {
             // Obtener etiquetas actuales antes del sync
             $etiquetasAntes = $mod->etiquetas()->get();
-            
+
             // Sincronizar etiquetas
             $mod->etiquetas()->sync($request->etiquetas);
-            
+
             // Verificar si alguna etiqueta anterior se quedó sin mods
             foreach ($etiquetasAntes as $etiquetaAnterior) {
                 if (!in_array($etiquetaAnterior->id, $request->etiquetas)) {
@@ -477,15 +477,15 @@ class ModController extends Controller
         $message = 'Mod actualizado exitosamente';
         if ($juegoEliminadoInfo) {
             $message .= ". Nota: El juego '{$juegoEliminadoInfo['titulo']}' fue eliminado automáticamente porque no tenía más mods asociados";
-            
+
             if (!empty($juegoEliminadoInfo['generos_eliminados'])) {
                 $nombresGeneros = array_column($juegoEliminadoInfo['generos_eliminados'], 'nombre');
                 $message .= " y se eliminaron los géneros: " . implode(', ', $nombresGeneros);
             }
-            
+
             $message .= ".";
         }
-        
+
         if (!empty($etiquetasEliminadasInfo)) {
             $nombresEtiquetas = array_column($etiquetasEliminadasInfo, 'nombre');
             if (count($nombresEtiquetas) > 0) {
@@ -552,7 +552,7 @@ class ModController extends Controller
     {
         try {
             $mod = Mod::findOrFail($id);
-            
+
             // Obtenemos el usuario autenticado
             $usuario = $request->user();
 
@@ -573,20 +573,20 @@ class ModController extends Controller
             // Verificar si se eliminó un juego y etiquetas automáticamente
             $juegoEliminadoInfo = \App\Observers\ModObserver::getJuegoEliminadoInfo();
             $etiquetasEliminadasInfo = \App\Observers\ModObserver::getEtiquetasEliminadasInfo();
-            
+
             $message = 'Mod desactivado correctamente (puede ser restaurado)';
-            
+
             if ($juegoEliminadoInfo) {
                 $message .= ". Nota: El juego '{$juegoEliminadoInfo['titulo']}' fue eliminado automáticamente porque no tenía más mods asociados";
-                
+
                 if (!empty($juegoEliminadoInfo['generos_eliminados'])) {
                     $nombresGeneros = array_column($juegoEliminadoInfo['generos_eliminados'], 'nombre');
                     $message .= " y se eliminaron los géneros: " . implode(', ', $nombresGeneros);
                 }
-                
+
                 $message .= ".";
             }
-            
+
             if (!empty($etiquetasEliminadasInfo)) {
                 $nombresEtiquetas = array_column($etiquetasEliminadasInfo, 'nombre');
                 if (count($nombresEtiquetas) > 0) {
@@ -663,7 +663,7 @@ class ModController extends Controller
     {
         try {
             $mod = Mod::onlyTrashed()->findOrFail($id);
-            
+
             // Obtenemos el usuario autenticado
             $usuario = $request->user();
 
@@ -700,7 +700,7 @@ class ModController extends Controller
     {
         try {
             $mod = Mod::onlyTrashed()->findOrFail($id);
-            
+
             // Obtenemos el usuario autenticado
             $usuario = $request->user();
 
@@ -727,20 +727,20 @@ class ModController extends Controller
             // Verificar si se eliminó un juego y etiquetas automáticamente
             $juegoEliminadoInfo = \App\Observers\ModObserver::getJuegoEliminadoInfo();
             $etiquetasEliminadasInfo = \App\Observers\ModObserver::getEtiquetasEliminadasInfo();
-            
+
             $message = 'Mod eliminado definitivamente';
-            
+
             if ($juegoEliminadoInfo) {
                 $message .= ". Nota: El juego '{$juegoEliminadoInfo['titulo']}' fue eliminado automáticamente porque no tenía más mods asociados";
-                
+
                 if (!empty($juegoEliminadoInfo['generos_eliminados'])) {
                     $nombresGeneros = array_column($juegoEliminadoInfo['generos_eliminados'], 'nombre');
                     $message .= " y se eliminaron los géneros: " . implode(', ', $nombresGeneros);
                 }
-                
+
                 $message .= ".";
             }
-            
+
             if (!empty($etiquetasEliminadasInfo)) {
                 $nombresEtiquetas = array_column($etiquetasEliminadasInfo, 'nombre');
                 if (count($nombresEtiquetas) > 0) {
@@ -772,10 +772,10 @@ class ModController extends Controller
     {
         // Obtener el usuario autenticado
         $usuario = request()->user();
-        
+
         // Si es el propio creador, incluir mods eliminados, sino solo activos
         $query = Mod::where('creador_id', $creadorId);
-        
+
         if (!$usuario || $usuario->id !== $creadorId) {
             // Si no es el creador, solo mostrar mods activos
             $query = $query->whereNull('deleted_at');
@@ -783,44 +783,44 @@ class ModController extends Controller
             // Si es el creador, incluir mods eliminados usando withTrashed
             $query = Mod::withTrashed()->where('creador_id', $creadorId);
         }
-        
+
         $mods = $query->with([
-                'creador:id,nome,correo,foto_perfil',
-                'valoraciones',
-                'juego:id,titulo,imagen_fondo',
-                'etiquetas:id,nombre',
-                'versiones'
-            ])
+            'creador:id,nome,correo,foto_perfil',
+            'valoraciones',
+            'juego:id,titulo,imagen_fondo',
+            'etiquetas:id,nombre',
+            'versiones'
+        ])
             ->get();
-        
+
         if ($mods->isEmpty()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No se encontraron mods para este creador'
             ], 404);
         }
-        
+
         // Calcular la valoración media para cada mod
         $mods = $mods->map(function ($mod) {
             $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
             $totalValoraciones = $mod->valoraciones->count();
-            
+
             // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
             unset($mod->valoraciones);
-            
+
             // Agregar las estadísticas calculadas
             $mod->estadisticas = [
                 'valoracion_media' => round($valoracionMedia, 1),
                 'total_valoraciones' => $totalValoraciones,
                 'total_descargas' => $mod->total_descargas
             ];
-            
+
             // Añadir información de soft delete si aplica
             $mod->is_deleted = $mod->deleted_at !== null;
-            
+
             return $mod;
         });
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $mods
@@ -840,25 +840,25 @@ class ModController extends Controller
             'juego:id,titulo,imagen_fondo',
             'etiquetas:id,nombre'
         ])->get();
-        
+
         // Calcular la valoración media para cada mod
         $mods = $mods->map(function ($mod) {
             $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
             $totalValoraciones = $mod->valoraciones->count();
-            
+
             // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
             unset($mod->valoraciones);
-            
+
             // Agregar las estadísticas calculadas
             $mod->estadisticas = [
                 'valoracion_media' => round($valoracionMedia, 1),
                 'total_valoraciones' => $totalValoraciones,
                 'total_descargas' => $mod->versiones->sum('descargas') ?? 0
             ];
-            
+
             return $mod;
         });
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $mods
@@ -883,25 +883,25 @@ class ModController extends Controller
                 'versiones'
             ])
             ->get();
-        
+
         // Calcular la valoración media para cada mod
         $mods = $mods->map(function ($mod) {
             $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
             $totalValoraciones = $mod->valoraciones->count();
-            
+
             // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
             unset($mod->valoraciones);
-            
+
             // Agregar las estadísticas calculadas
             $mod->estadisticas = [
                 'valoracion_media' => round($valoracionMedia, 1),
                 'total_valoraciones' => $totalValoraciones,
                 'total_descargas' => $mod->total_descargas
             ];
-            
+
             return $mod;
         });
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $mods
@@ -917,14 +917,14 @@ class ModController extends Controller
     public function getModsByCreatorName(string $username): JsonResponse
     {
         $usuario = Usuario::where('nome', 'like', "%{$username}%")->first();
-        
+
         if (!$usuario) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Usuario no encontrado'
             ], 404);
         }
-        
+
         $mods = Mod::where('creador_id', $usuario->id)
             ->with([
                 'creador:id,nome,correo,foto_perfil',
@@ -932,14 +932,14 @@ class ModController extends Controller
                 'etiquetas:id,nombre'
             ])
             ->get();
-        
+
         if ($mods->isEmpty()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No se encontraron mods para este creador'
             ], 404);
         }
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $mods
@@ -1009,7 +1009,7 @@ class ModController extends Controller
     public function getModsGuardados(Request $request): JsonResponse
     {
         $usuario = $request->user();
-        
+
         $modsGuardados = $usuario->modsGuardados()
             ->with([
                 'creador:id,nome,correo,foto_perfil',
@@ -1022,14 +1022,14 @@ class ModController extends Controller
                 // Calcular la valoración media
                 $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
                 $numValoraciones = $mod->valoraciones->count();
-                
+
                 // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
                 unset($mod->valoraciones);
-                
+
                 // Agregar los campos calculados
                 $mod->valoracion = round($valoracionMedia, 1);
                 $mod->numValoraciones = $numValoraciones;
-                
+
                 return $mod;
             });
 
@@ -1149,7 +1149,7 @@ class ModController extends Controller
     public function getUserValoracion(Request $request, int $id): JsonResponse
     {
         $usuario = $request->user();
-        
+
         $mod = Mod::find($id);
         if (!$mod) {
             return response()->json([
@@ -1157,11 +1157,11 @@ class ModController extends Controller
                 'message' => 'Mod no encontrado'
             ], 404);
         }
-        
+
         $valoracion = \App\Models\Valoracion::where('usuario_id', $usuario->id)
             ->where('mod_id', $id)
             ->first();
-            
+
         if (!$valoracion) {
             return response()->json([
                 'status' => 'success',
@@ -1169,7 +1169,7 @@ class ModController extends Controller
                 'data' => null
             ]);
         }
-        
+
         return response()->json([
             'status' => 'success',
             'hasRated' => true,
@@ -1179,7 +1179,7 @@ class ModController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Valorar un mod
      *
@@ -1192,9 +1192,9 @@ class ModController extends Controller
         $request->validate([
             'puntuacion' => 'required|numeric|min:1|max:5'
         ]);
-        
+
         $usuario = $request->user();
-        
+
         $mod = Mod::find($id);
         if (!$mod) {
             return response()->json([
@@ -1202,20 +1202,20 @@ class ModController extends Controller
                 'message' => 'Mod no encontrado'
             ], 404);
         }
-        
+
         // Verificar si el usuario ya ha valorado este mod
         $valoracionExistente = \App\Models\Valoracion::where('usuario_id', $usuario->id)
             ->where('mod_id', $id)
             ->first();
-            
+
         if ($valoracionExistente) {
             // Actualizar la valoración existente
             $valoracionExistente->puntuacion = $request->puntuacion;
             $valoracionExistente->fecha = now();
             $valoracionExistente->save();
-            
+
             // La media y total se actualizan automáticamente mediante events en el modelo
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Valoración actualizada correctamente',
@@ -1225,7 +1225,7 @@ class ModController extends Controller
                 ]
             ]);
         }
-        
+
         // Crear nueva valoración
         $valoracion = new \App\Models\Valoracion([
             'usuario_id' => $usuario->id,
@@ -1233,11 +1233,11 @@ class ModController extends Controller
             'puntuacion' => $request->puntuacion,
             'fecha' => now()
         ]);
-        
+
         $valoracion->save();
-        
+
         // La media y total se actualizan automáticamente mediante events en el modelo
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Valoración registrada correctamente',
@@ -1247,7 +1247,7 @@ class ModController extends Controller
             ]
         ], 201);
     }
-    
+
     /**
      * Eliminar la valoración de un mod
      *
@@ -1258,7 +1258,7 @@ class ModController extends Controller
     public function eliminarValoracion(Request $request, int $id): JsonResponse
     {
         $usuario = $request->user();
-        
+
         $mod = Mod::find($id);
         if (!$mod) {
             return response()->json([
@@ -1266,22 +1266,22 @@ class ModController extends Controller
                 'message' => 'Mod no encontrado'
             ], 404);
         }
-        
+
         $valoracion = \App\Models\Valoracion::where('usuario_id', $usuario->id)
             ->where('mod_id', $id)
             ->first();
-            
+
         if (!$valoracion) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No tienes una valoración para este mod'
             ], 404);
         }
-        
+
         $valoracion->delete();
-        
+
         // La media y total se actualizan automáticamente mediante events en el modelo
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Valoración eliminada correctamente'
@@ -1298,7 +1298,7 @@ class ModController extends Controller
     {
         try {
             $usuario = $request->user();
-            
+
             $mods = Mod::onlyTrashed()
                 ->where('creador_id', $usuario->id)
                 ->with([
@@ -1315,10 +1315,10 @@ class ModController extends Controller
                 'data' => $mods->map(function ($mod) {
                     $valoracionMedia = $mod->valoraciones->avg('puntuacion') ?? 0;
                     $totalValoraciones = $mod->valoraciones->count();
-                    
+
                     // Eliminar la colección completa de valoraciones para reducir el tamaño de la respuesta
                     unset($mod->valoraciones);
-                    
+
                     return [
                         'id' => $mod->id,
                         'titulo' => $mod->titulo,
@@ -1360,7 +1360,7 @@ class ModController extends Controller
     {
         try {
             $mod = Mod::find($id);
-            
+
             if (!$mod) {
                 return response()->json([
                     'status' => 'error',
@@ -1370,7 +1370,7 @@ class ModController extends Controller
 
             // Obtener el usuario autenticado (ahora siempre debería existir)
             $usuario = $request->user();
-            
+
             if (!$usuario) {
                 return response()->json([
                     'status' => 'error',
@@ -1380,16 +1380,16 @@ class ModController extends Controller
 
             // Incrementar el contador de descargas
             $mod->increment('total_descargas');
-            
+
             // Registrar la descarga del usuario
             DescargaUsuario::create([
                 'usuario_id' => $usuario->id,
                 'mod_id' => $id,
                 'fecha_descarga' => now()
             ]);
-            
+
             $ultimaDescarga = now()->format('Y-m-d H:i:s');
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Descarga registrada correctamente',
@@ -1398,7 +1398,6 @@ class ModController extends Controller
                     'ultima_descarga_usuario' => $ultimaDescarga
                 ]
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -1418,7 +1417,7 @@ class ModController extends Controller
     {
         try {
             $usuario = $request->user();
-            
+
             if (!$usuario) {
                 return response()->json([
                     'status' => 'error',
@@ -1427,7 +1426,7 @@ class ModController extends Controller
             }
 
             $mod = Mod::find($id);
-            
+
             if (!$mod) {
                 return response()->json([
                     'status' => 'error',
@@ -1445,7 +1444,7 @@ class ModController extends Controller
             $totalDescargasUsuario = DescargaUsuario::where('usuario_id', $usuario->id)
                 ->where('mod_id', $id)
                 ->count();
-            
+
             return response()->json([
                 'status' => 'success',
                 'data' => [
@@ -1454,7 +1453,6 @@ class ModController extends Controller
                     'total_descargas_usuario' => $totalDescargasUsuario
                 ]
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -1462,4 +1460,4 @@ class ModController extends Controller
             ], 500);
         }
     }
-} 
+}

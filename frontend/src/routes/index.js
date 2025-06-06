@@ -15,7 +15,7 @@ import juegoRoutes from './juegos/juegoRoutes';
 const AppRoutes = () => {
     return (
         <Routes>
-            
+
             {/* Rutas de autenticación */}
             {authRoutes}
 

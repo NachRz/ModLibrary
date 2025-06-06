@@ -8,7 +8,7 @@ const ShareModal = ({ isOpen, onClose, modTitle, modUrl, modDescription }) => {
 
   // Construir el enlace completo del mod
   const fullUrl = `${window.location.origin}${modUrl}`;
-  
+
   // Textos para compartir
   const shareText = `¡Mira este increíble mod! ${modTitle}`;
   const encodedText = encodeURIComponent(shareText);

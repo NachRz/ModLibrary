@@ -131,28 +131,28 @@
   .mod-card-compact-new {
     height: 65px;
   }
-  
+
   .mod-card-compact-image {
     width: 85px;
     height: 65px;
   }
-  
+
   .mod-card-compact-content {
     padding: 0 12px;
   }
-  
+
   .mod-card-compact-title {
     font-size: 13px;
   }
-  
+
   .mod-card-compact-author {
     font-size: 11px;
   }
-  
+
   .mod-card-compact-downloads {
     font-size: 11px;
   }
-  
+
   .download-icon {
     width: 12px;
     height: 12px;
@@ -163,24 +163,24 @@
   .mod-card-compact-new {
     height: 60px;
   }
-  
+
   .mod-card-compact-image {
     width: 75px;
     height: 60px;
   }
-  
+
   .mod-card-compact-content {
     padding: 0 10px;
   }
-  
+
   .mod-card-compact-stats {
     gap: 8px;
   }
-  
+
   .mod-card-compact-title {
     font-size: 12px;
   }
-  
+
   .mod-card-compact-author {
     font-size: 10px;
   }
@@ -192,6 +192,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -207,7 +208,7 @@
   .mod-card-compact-new {
     border-color: rgba(255, 255, 255, 0.3);
   }
-  
+
   .mod-card-compact-new:hover {
     border-color: rgba(255, 255, 255, 0.6);
   }
@@ -215,16 +216,17 @@
 
 /* Reducir movimiento si está configurado */
 @media (prefers-reduced-motion: reduce) {
+
   .mod-card-compact-new,
   .mod-card-compact-image img {
     transition: none;
   }
-  
+
   .mod-card-compact-new:hover {
     transform: none;
   }
-  
+
   .mod-card-compact-new:hover .mod-card-compact-image img {
     transform: none;
   }
-} 
+}

@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faExclamationTriangle, 
-  faTrash, 
-  faTimes, 
+import {
+  faExclamationTriangle,
+  faTrash,
+  faTimes,
   faTrashAlt,
   faGamepad,
   faArchive
 } from '@fortawesome/free-solid-svg-icons';
 
-const ModDeleteConfirmationModal = ({ 
-  modTitle, 
-  onConfirm, 
-  onCancel, 
-  isOpen, 
+const ModDeleteConfirmationModal = ({
+  modTitle,
+  onConfirm,
+  onCancel,
+  isOpen,
   message = "¿Estás seguro de que quieres eliminar este mod?",
   confirmText = "Eliminar",
-  isDangerous = false 
+  isDangerous = false
 }) => {
   const [inputConfirmText, setInputConfirmText] = useState('');
   const [understood, setUnderstood] = useState(false);
-  
+
   const handleConfirm = () => {
     if (isDangerous) {
       // Para eliminación permanente, requiere confirmación estricta
@@ -52,24 +52,24 @@ const ModDeleteConfirmationModal = ({
           <div className={`flex items-center justify-between ${isDangerous ? 'p-3 sm:p-5' : 'p-5'}`}>
             <div className="flex items-center space-x-3">
               <div className={`p-2 bg-gradient-to-br ${isDangerous ? 'from-red-500/20 to-red-600/30' : 'from-yellow-500/20 to-yellow-600/30'} rounded-lg`}>
-                <FontAwesomeIcon 
-                  icon={isDangerous ? faTrashAlt : faArchive} 
-                  className={`${isDangerous ? 'text-red-400' : 'text-yellow-400'}`} 
+                <FontAwesomeIcon
+                  icon={isDangerous ? faTrashAlt : faArchive}
+                  className={`${isDangerous ? 'text-red-400' : 'text-yellow-400'}`}
                 />
               </div>
               <h2 className={`${isDangerous ? 'text-lg sm:text-xl' : 'text-xl'} font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent`}>
                 {isDangerous ? 'Eliminar Definitivamente' : 'Desactivar Mod'}
               </h2>
             </div>
-            <button 
-              onClick={handleCancel} 
+            <button
+              onClick={handleCancel}
               className={`text-gray-400 hover:text-white transition-colors ${isDangerous ? 'text-lg sm:text-xl' : 'text-xl'} hover:rotate-90 transition-transform duration-300`}
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
           </div>
         </div>
-        
+
         {/* Contenido */}
         <div className={isDangerous ? "flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 min-h-0" : "p-5"}>
           {isDangerous ? (
@@ -164,14 +164,13 @@ const ModDeleteConfirmationModal = ({
             <button
               onClick={handleConfirm}
               disabled={!isValid}
-              className={`${isDangerous ? 'px-3 sm:px-5' : 'px-5'} py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 ${isDangerous ? 'text-sm' : ''} ${
-                isValid 
-                  ? (isDangerous 
-                      ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white' 
-                      : 'bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white'
-                    )
+              className={`${isDangerous ? 'px-3 sm:px-5' : 'px-5'} py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 ${isDangerous ? 'text-sm' : ''} ${isValid
+                  ? (isDangerous
+                    ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white'
+                    : 'bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white'
+                  )
                   : 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
-              }`}
+                }`}
             >
               <FontAwesomeIcon icon={isDangerous ? faTrashAlt : faArchive} />
               {isDangerous ? (

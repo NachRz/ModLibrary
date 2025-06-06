@@ -14,13 +14,25 @@
 
 /* Animaciones copiadas de ExplorarJuegos */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Página de Resultados de Búsqueda */
@@ -41,7 +53,7 @@
   margin-bottom: 32px;
 }
 
-.explorar-header > div {
+.explorar-header>div {
   max-width: 1600px;
   margin: 0 auto;
 }
@@ -186,8 +198,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text,
@@ -363,6 +380,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -371,6 +389,7 @@
 
 /* Estados de accesibilidad */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -385,4 +404,4 @@
   .tab.active {
     border-bottom-color: #ffffff;
   }
-} 
+}

@@ -11,7 +11,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener los mods' };
     }
   },
-  
+
   // Obtener mods con estadísticas y detalles completos del creador
   getModsWithDetails: async () => {
     try {
@@ -21,7 +21,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener los detalles de los mods' };
     }
   },
-  
+
   // Obtener mods por ID de creador
   getModsByCreatorId: async (creadorId) => {
     try {
@@ -31,7 +31,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener los mods del creador' };
     }
   },
-  
+
   // Obtener mods por nombre de usuario del creador
   getModsByCreatorName: async (username) => {
     try {
@@ -41,7 +41,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener los mods del creador' };
     }
   },
-  
+
   // Obtener mods por ID de juego
   getModsByGame: async (juegoId) => {
     try {
@@ -51,25 +51,25 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener los mods del juego' };
     }
   },
-  
+
   // Obtener mods del usuario autenticado con todos los detalles
   getMyMods: async () => {
     const user = authService.getCurrentUser();
     if (!user) {
       throw { message: 'Usuario no autenticado' };
     }
-    
+
     try {
       // En lugar de filtrar después, usamos directamente el endpoint específico para los mods del usuario
       const response = await apiClient.get(`/mods/creador/${user.id}`);
-      
+
       // Si se obtienen correctamente, devolvemos los datos
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error al obtener tus mods' };
     }
   },
-  
+
   // Obtener mods eliminados del usuario autenticado
   getMyDeletedMods: async () => {
     try {
@@ -79,7 +79,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener tus mods eliminados' };
     }
   },
-  
+
   // Obtener un mod específico por ID
   getModById: async (modId) => {
     try {
@@ -99,7 +99,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al buscar mods' };
     }
   },
-  
+
   // Crear un nuevo mod
   createMod: async (formData) => {
     try {
@@ -112,10 +112,10 @@ const modService = {
         });
         return response.data;
       }
-      
+
       // Si no es FormData, crear uno nuevo y procesar los datos (casos sin archivos)
       const data = new FormData();
-      
+
       // Añadir cada campo al FormData, asegurando que juego_id sea un número
       Object.keys(formData).forEach(key => {
         if (key === 'imagen' || key === 'imagen_banner') {
@@ -144,12 +144,12 @@ const modService = {
       throw error.response?.data || { message: 'Error al crear el mod' };
     }
   },
-  
+
   // Actualizar un mod existente
   updateMod: async (modId, formData) => {
     try {
       let config = {};
-      
+
       // Si formData es una instancia de FormData, configurar headers para multipart
       if (formData instanceof FormData) {
         config.headers = {
@@ -161,14 +161,14 @@ const modService = {
           'Content-Type': 'application/json'
         };
       }
-      
+
       const response = await apiClient.put(`/mods/${modId}`, formData, config);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error al actualizar el mod' };
     }
   },
-  
+
   // Eliminar un mod
   deleteMod: async (modId) => {
     try {
@@ -178,7 +178,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al eliminar el mod' };
     }
   },
-  
+
   // Cambiar el estado de un mod (borrador/publicado)
   changeModStatus: async (modId, estado) => {
     try {
@@ -188,7 +188,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al cambiar el estado del mod' };
     }
   },
-  
+
   // Obtener todas las versiones de un mod
   getModVersions: async (modId) => {
     try {
@@ -198,7 +198,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener las versiones del mod' };
     }
   },
-  
+
   // Añadir una nueva versión a un mod
   addModVersion: async (modId, versionData) => {
     try {
@@ -252,7 +252,7 @@ const modService = {
       throw error.response?.data || { message: 'Error al verificar el estado del mod' };
     }
   },
-  
+
   // Obtener la valoración del usuario para un mod específico
   getUserRating: async (modId) => {
     try {
@@ -262,19 +262,19 @@ const modService = {
       throw error.response?.data || { message: 'Error al obtener tu valoración' };
     }
   },
-  
+
   // Valorar un mod
   rateMod: async (modId, rating) => {
     try {
-      const response = await apiClient.post(`/mods/${modId}/valoracion`, { 
-        puntuacion: rating 
+      const response = await apiClient.post(`/mods/${modId}/valoracion`, {
+        puntuacion: rating
       });
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error al valorar el mod' };
     }
   },
-  
+
   // Eliminar valoración de un mod
   deleteRating: async (modId) => {
     try {
@@ -316,7 +316,7 @@ const modService = {
   },
 
   // =============== MÉTODOS DE SOFT DELETE (SOLO ADMINS) ===============
-  
+
   // Eliminar mod con soft delete
   softDeleteMod: async (modId) => {
     try {

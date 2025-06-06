@@ -32,20 +32,20 @@ const genreService = {
       genresCache.isFetching = true;
 
       const response = await apiClient.get('/generos');
-      
+
       if (response.data.status === 'success') {
         genresCache.allGenres = response.data.data;
         genresCache.lastFetched = Date.now();
         genresCache.isFetching = false;
-        
+
         return response.data.data;
       }
-      
+
       throw new Error('Error al obtener géneros');
     } catch (error) {
       genresCache.isFetching = false;
       console.error('Error en getAllGenres:', error);
-      
+
       // En caso de error, devolver géneros de ejemplo
       const mockGenres = [
         { id: 1, nombre: 'Acción', slug: 'action' },
@@ -59,11 +59,11 @@ const genreService = {
         { id: 9, nombre: 'Casual', slug: 'casual' },
         { id: 10, nombre: 'Indie', slug: 'indie' }
       ];
-      
+
       // Almacenar en caché los datos de ejemplo
       genresCache.allGenres = mockGenres;
       genresCache.lastFetched = Date.now();
-      
+
       return mockGenres;
     }
   },
@@ -80,11 +80,11 @@ const genreService = {
       };
 
       const response = await apiClient.get('/generos/filtros/juegos', { params });
-      
+
       if (response.data.status === 'success') {
         return response.data.data;
       }
-      
+
       throw new Error('Error al filtrar juegos por géneros');
     } catch (error) {
       console.error('Error en getGamesByGenres:', error);
@@ -96,11 +96,11 @@ const genreService = {
   getGenreStatistics: async () => {
     try {
       const response = await apiClient.get('/generos/estadisticas');
-      
+
       if (response.data.status === 'success') {
         return response.data.data;
       }
-      
+
       throw new Error('Error al obtener estadísticas de géneros');
     } catch (error) {
       console.error('Error en getGenreStatistics:', error);

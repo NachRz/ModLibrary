@@ -73,4 +73,4 @@ class Usuario extends Authenticatable
     {
         return $this->hasMany(DescargaUsuario::class, 'usuario_id');
     }
-} 
+}

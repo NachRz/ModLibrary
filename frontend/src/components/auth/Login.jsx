@@ -29,17 +29,17 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     if (!credentials.email || !credentials.password) {
       setError('Por favor, completa todos los campos');
       setLoading(false);
       return;
     }
-    
+
     try {
       // Usar el login del contexto de autenticación
       await login(credentials);
-      
+
       // Redirección a la página de origen o dashboard
       navigate(from, { replace: true });
     } catch (error) {
@@ -72,7 +72,7 @@ const Login = () => {
             </p>
           </div>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-5">
             <div className="group">
@@ -166,7 +166,7 @@ const Login = () => {
             </GradientButton>
           </div>
         </form>
-        
+
         <div className="mt-6 text-center text-xs text-custom-detail">
           <p>Al iniciar sesión, aceptas nuestros <Link to="#" className="underline hover:text-custom-primary transition-colors duration-300">Términos de Servicio</Link> y <Link to="#" className="underline hover:text-custom-primary transition-colors duration-300">Política de Privacidad</Link></p>
         </div>

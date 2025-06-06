@@ -192,7 +192,7 @@ const adminService = {
   getComentarios: async (params = {}) => {
     try {
       const queryParams = new URLSearchParams();
-      
+
       if (params.page) queryParams.append('page', params.page);
       if (params.per_page) queryParams.append('per_page', params.per_page);
       if (params.search) queryParams.append('search', params.search);
@@ -230,7 +230,7 @@ const adminService = {
         message: error.response?.data?.message || 'Error al actualizar el comentario',
         response: error.response
       };
-      
+
       throw errorData;
     }
   },

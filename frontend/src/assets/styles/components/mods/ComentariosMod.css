@@ -99,8 +99,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* FORMULARIO DE COMENTARIO */
@@ -632,4 +637,4 @@
   }
 }
 
-/* TEMA MODLIBRARY COMPLETADO - CONSISTENTE CON EL DISEÑO DE LA APLICACIÓN */ 
+/* TEMA MODLIBRARY COMPLETADO - CONSISTENTE CON EL DISEÑO DE LA APLICACIÓN */

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import adminService from '../../../../../services/api/adminService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faUser, 
-  faEnvelope, 
-  faCalendarAlt, 
+import {
+  faUser,
+  faEnvelope,
+  faCalendarAlt,
   faGamepad,
   faShieldAlt,
   faEdit,
@@ -46,19 +46,19 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
     try {
       setLoading(true);
       setError('');
-      
+
       // Cargar detalles del usuario y estadísticas en paralelo
       const [detailsResponse, statsResponse] = await Promise.all([
         adminService.getUserDetails(user.id),
         adminService.getUserStats(user.id)
       ]);
-      
+
       // Agregar timestamp a los detalles del usuario
       const userDetailsWithTimestamp = {
         ...detailsResponse.data,
         imageTimestamp: Date.now()
       };
-      
+
       setUserDetails(userDetailsWithTimestamp);
       setUserStats(statsResponse.data);
     } catch (error) {
@@ -84,7 +84,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
       admin: 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-purple-300 border border-purple-500/50',
       usuario: 'bg-gradient-to-r from-blue-600/20 to-cyan-600/20 text-blue-300 border border-blue-500/50'
     };
-    
+
     return styles[rol] || styles.usuario;
   };
 
@@ -99,7 +99,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
       reviews: 'bg-gradient-to-br from-pink-600/20 to-rose-800/30 border border-pink-500/30',
       saved: 'bg-gradient-to-br from-cyan-600/20 to-teal-800/30 border border-cyan-500/30'
     };
-    
+
     return styles[type] || styles.totalMods;
   };
 
@@ -115,7 +115,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
               <div className="relative">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden">
                   {imageUrl ? (
-                    <img 
+                    <img
                       src={imageUrl}
                       alt={`Avatar de ${userDetails?.nome || user?.nome}`}
                       className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
@@ -125,7 +125,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                       }}
                     />
                   ) : null}
-                  <span 
+                  <span
                     className="text-white font-bold text-xl"
                     style={{ display: imageUrl ? 'none' : 'flex' }}
                   >
@@ -205,7 +205,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                     <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded-lg border border-gray-600/20">
                       <span className="text-gray-300 font-medium text-sm">Nombre completo:</span>
                       <span className="text-white text-sm">
-                        {userDetails?.nombre || userDetails?.apelidos 
+                        {userDetails?.nombre || userDetails?.apelidos
                           ? `${userDetails?.nombre || ''} ${userDetails?.apelidos || ''}`.trim()
                           : 'No especificado'
                         }
@@ -271,7 +271,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                       <span>Datos en tiempo real</span>
                     </div>
                   </div>
-                  
+
                   {/* Estadísticas principales con efectos mejorados */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div className={`relative p-4 rounded-xl transition-all duration-300 hover:scale-105 ${getStatCardStyle('totalMods')}`}>
@@ -281,7 +281,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                         <div className="text-gray-300 text-xs font-medium">Total Mods</div>
                       </div>
                     </div>
-                    
+
                     <div className={`relative p-4 rounded-xl transition-all duration-300 hover:scale-105 ${getStatCardStyle('published')}`}>
                       <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent rounded-xl"></div>
                       <div className="relative text-center">
@@ -289,7 +289,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                         <div className="text-gray-300 text-xs font-medium">Publicados</div>
                       </div>
                     </div>
-                    
+
                     <div className={`relative p-4 rounded-xl transition-all duration-300 hover:scale-105 ${getStatCardStyle('downloads')}`}>
                       <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent rounded-xl"></div>
                       <div className="relative text-center">
@@ -297,7 +297,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                         <div className="text-gray-300 text-xs font-medium">Descargas</div>
                       </div>
                     </div>
-                    
+
                     <div className={`relative p-4 rounded-xl transition-all duration-300 hover:scale-105 ${getStatCardStyle('rating')}`}>
                       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-xl"></div>
                       <div className="relative text-center">
@@ -306,7 +306,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Estadísticas secundarias */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     <div className={`relative p-3 rounded-xl transition-all duration-300 hover:scale-105 ${getStatCardStyle('drafts')}`}>
@@ -316,7 +316,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                         <div className="text-gray-300 text-xs font-medium">Borradores</div>
                       </div>
                     </div>
-                    
+
                     <div className={`relative p-3 rounded-xl transition-all duration-300 hover:scale-105 ${getStatCardStyle('reviews')}`}>
                       <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent rounded-xl"></div>
                       <div className="relative text-center">
@@ -324,7 +324,7 @@ const UserProfileViewModal = ({ user, isOpen, onClose, onEdit }) => {
                         <div className="text-gray-300 text-xs font-medium">Valoraciones</div>
                       </div>
                     </div>
-                    
+
                     <div className={`relative p-3 rounded-xl transition-all duration-300 hover:scale-105 ${getStatCardStyle('saved')}`}>
                       <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent rounded-xl"></div>
                       <div className="relative text-center">

@@ -286,6 +286,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -297,19 +298,19 @@
     width: 150px;
     height: 90px;
   }
-  
+
   .lightbox-overlay {
     padding: 1rem;
   }
-  
+
   .lightbox-nav-btn.prev {
     left: -60px;
   }
-  
+
   .lightbox-nav-btn.next {
     right: -60px;
   }
-  
+
   .lightbox-thumbnails {
     max-width: 100vw;
     margin-left: -1rem;
@@ -324,25 +325,25 @@
     width: 120px;
     height: 75px;
   }
-  
+
   .carousel-nav-btn {
     width: 35px;
     height: 35px;
   }
-  
+
   .lightbox-nav-btn {
     width: 45px;
     height: 45px;
   }
-  
+
   .lightbox-nav-btn.prev {
     left: 10px;
   }
-  
+
   .lightbox-nav-btn.next {
     right: 10px;
   }
-  
+
   .lightbox-close-btn {
     top: 15px;
     right: 15px;
@@ -368,4 +369,4 @@
 
 .lightbox-thumbnails::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
-} 
+}

@@ -16,16 +16,15 @@ export const NotificationsAdminUserDeleteProvider = ({ children }) => {
 
   const NotificationModal = ({ message, type }) => (
     <div className="fixed top-4 right-4 z-50">
-      <div className={`rounded-lg p-4 shadow-lg border max-w-sm ${
-        type === 'success' 
-          ? 'bg-green-800 border-green-600 text-green-200' 
+      <div className={`rounded-lg p-4 shadow-lg border max-w-sm ${type === 'success'
+          ? 'bg-green-800 border-green-600 text-green-200'
           : type === 'error'
-          ? 'bg-red-800 border-red-600 text-red-200'
-          : 'bg-blue-800 border-blue-600 text-blue-200'
-      }`}>
+            ? 'bg-red-800 border-red-600 text-red-200'
+            : 'bg-blue-800 border-blue-600 text-blue-200'
+        }`}>
         <div className="flex items-center space-x-3">
-          <FontAwesomeIcon 
-            icon={type === 'success' ? faCheck : faExclamationTriangle} 
+          <FontAwesomeIcon
+            icon={type === 'success' ? faCheck : faExclamationTriangle}
             className="flex-shrink-0"
           />
           <span className="text-sm font-medium">{message}</span>
@@ -39,7 +38,7 @@ export const NotificationsAdminUserDeleteProvider = ({ children }) => {
       showNotification
     }}>
       {children}
-      
+
       {/* Notificaciones */}
       {notification && (
         <NotificationModal

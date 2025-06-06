@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faTimes, 
-  faSave, 
-  faImage, 
-  faFile, 
-  faUsers, 
+import {
+  faTimes,
+  faSave,
+  faImage,
+  faFile,
+  faUsers,
   faCalendar,
   faDownload,
   faStar,
@@ -33,9 +33,9 @@ const CustomGameOption = ({ innerProps, label, data }) => (
   <div {...innerProps} className="game-option">
     <div className="game-option-image">
       {data.game?.background_image || data.game?.imagen_fondo ? (
-        <img 
-          src={data.game.background_image || data.game.imagen_fondo} 
-          alt={label} 
+        <img
+          src={data.game.background_image || data.game.imagen_fondo}
+          alt={label}
         />
       ) : (
         <div className="no-image">Sin imagen</div>
@@ -56,9 +56,9 @@ const CustomGameSingleValue = ({ children, data }) => (
   <div className="game-single-value">
     <div className="game-single-image">
       {data.game?.background_image || data.game?.imagen_fondo ? (
-        <img 
-          src={data.game.background_image || data.game.imagen_fondo} 
-          alt={children} 
+        <img
+          src={data.game.background_image || data.game.imagen_fondo}
+          alt={children}
         />
       ) : (
         <div className="no-image">Sin imagen</div>
@@ -104,7 +104,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const { isAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
-  
+
   // Estados del formulario
   const [formData, setFormData] = useState({
     titulo: '',
@@ -174,7 +174,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       setLoading(false);
       setErrorGames(null);
       setIsSyncingGame(false);
-      
+
       // Limpiar URLs de vista previa para evitar memory leaks
       setFormData(prev => {
         if (prev.imagenPreview) {
@@ -237,9 +237,9 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const cargarDatosDelMod = async () => {
     try {
       setLoading(true);
-      
+
       let modCompleto = mod;
-      
+
       // Intentar obtener datos completos del backend
       try {
         const response = await modService.getModById(mod.id);
@@ -256,7 +256,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       console.log('modCompleto.imagen_banner:', modCompleto.imagen_banner);
       console.log('modCompleto.imagen:', modCompleto.imagen);
       console.log('============================');
-      
+
       console.log('=== DEBUG IMÁGENES ADICIONALES ===');
       console.log('modCompleto.imagenes_adicionales:', modCompleto.imagenes_adicionales);
       console.log('Tipo:', typeof modCompleto.imagenes_adicionales);
@@ -267,7 +267,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       let imagenesAdicionalesProcesadas = [];
       if (modCompleto.imagenes_adicionales) {
         let imagenesRaw = modCompleto.imagenes_adicionales;
-        
+
         // Si es string, parsearlo
         if (typeof imagenesRaw === 'string') {
           try {
@@ -277,7 +277,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             imagenesRaw = [];
           }
         }
-        
+
         // Si es array, procesarlo
         if (Array.isArray(imagenesRaw)) {
           imagenesAdicionalesProcesadas = imagenesRaw.map(img => {
@@ -293,7 +293,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       }
 
       console.log('Imágenes adicionales procesadas:', imagenesAdicionalesProcesadas);
-        
+
       // Cargar datos del mod (desde backend o prop)
       const modData = {
         titulo: modCompleto.titulo || '',
@@ -332,7 +332,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           juegos_count: tag.juegos_count || 0
         }));
         setSelectedTags(formattedTags);
-        
+
         // También establecer las etiquetas en formData con el formato correcto
         setFormData(prev => ({
           ...prev,
@@ -390,7 +390,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
 
       setEstadisticas(estadisticasData);
       showNotification('Datos del mod cargados correctamente', 'success');
-      
+
     } catch (error) {
       console.error('Error al cargar datos del mod:', error);
       showNotification('Error al cargar datos del mod', 'error');
@@ -403,7 +403,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const loadTagOptions = async (inputValue) => {
     try {
       const response = await etiquetasService.searchTags(inputValue);
-      
+
       if (response.etiquetas) {
         return response.etiquetas.map(tag => ({
           value: tag.id, // Este es el rawg_id cuando viene de RAWG
@@ -411,7 +411,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           juegos_count: tag.juegos_count || 0
         }));
       }
-      
+
       return [];
     } catch (error) {
       console.error('Error al cargar etiquetas:', error);
@@ -451,11 +451,11 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       if (inputValue && inputValue.trim()) {
         setErrorGames(null);
       }
-      
+
       if (!inputValue || inputValue.trim() === '') {
         return initialGameOptions;
       }
-      
+
       const games = await gameService.searchRawgGames(inputValue);
       return games.map(game => ({
         value: game.id,
@@ -473,7 +473,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
     if (selectedOption) {
       // Inmediatamente actualizar el juego seleccionado en la UI
       setSelectedGame(selectedOption);
-      
+
       // Sincronizar en segundo plano sin bloquear la interfaz
       syncGameInBackground(selectedOption);
     } else {
@@ -491,10 +491,10 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
     try {
       setIsSyncingGame(true);
       setErrorGames(null);
-      
+
       // Mostrar que se está sincronizando pero sin bloquear
       console.log('Sincronizando juego en segundo plano:', selectedOption.label);
-      
+
       // Verificar y sincronizar el juego
       const syncedGame = await gameService.verifyAndSyncGame(selectedOption.value);
 
@@ -503,18 +503,18 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         ...prev,
         juego_id: syncedGame.id // Usamos el ID de nuestra base de datos
       }));
-      
+
       console.log('Juego sincronizado exitosamente:', syncedGame);
     } catch (error) {
       console.error('Error al sincronizar el juego:', error);
       setErrorGames(`Error al sincronizar ${selectedOption.label}: ${error.message || 'Error desconocido'}`);
-      
+
       // En caso de error, mantener la selección visual pero sin ID
       setFormData(prev => ({
         ...prev,
         juego_id: null
       }));
-      
+
       showNotification(`Error al sincronizar juego: ${error.message}`, 'error');
     } finally {
       setIsSyncingGame(false);
@@ -532,14 +532,14 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   // Manejador para la carga de imagen banner (mejorado copiando del modal de usuarios)
   const handleBannerFileChange = (e) => {
     const file = e.target.files[0];
-    
+
     if (file) {
       // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
         showNotification('Por favor, selecciona un archivo de imagen válido', 'error');
         return;
       }
-      
+
       // Validar tamaño (máximo 5MB como en el modal de usuarios)
       if (file.size > 5 * 1024 * 1024) {
         showNotification('La imagen es demasiado grande. Máximo 5MB', 'error');
@@ -547,14 +547,14 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       }
 
       setSelectedBannerFile(file);
-      
+
       // Crear preview usando FileReader
       const reader = new FileReader();
       reader.onload = (e) => {
         setBannerPreviewUrl(e.target.result);
       };
       reader.readAsDataURL(file);
-      
+
       // Limpiar error previo
       console.log('Banner file selected:', file.name);
     }
@@ -563,19 +563,19 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   // Función para subir imagen banner (copiado del modal de usuarios)
   const uploadBannerImage = async () => {
     if (!selectedBannerFile) return null;
-    
+
     try {
       setUploadingBanner(true);
       const uploadFormData = new FormData();
       uploadFormData.append('imagen_banner', selectedBannerFile);
       uploadFormData.append('mod_id', mod.id);
-      
+
       // Usar el servicio de mods para subir la imagen
       const response = await modService.uploadBannerImage(uploadFormData);
-      
+
       // Actualizar timestamp para forzar actualización de imagen
       setBannerImageTimestamp(Date.now());
-      
+
       return response.data.url || response.data.imagen_banner;
     } catch (error) {
       console.error('Error uploading banner:', error);
@@ -609,41 +609,41 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   // Manejador para la carga de imágenes adicionales
   const handleAdditionalImagesUpload = (e) => {
     const files = Array.from(e.target.files);
-    
+
     if (files.length === 0) return;
-    
+
     // Validar cada archivo
     const validFiles = [];
     const errors = [];
-    
+
     files.forEach((file, index) => {
       // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
         errors.push(`Archivo ${index + 1}: No es una imagen válida`);
         return;
       }
-      
+
       // Validar tamaño (máximo 2MB)
       if (file.size > 2 * 1024 * 1024) {
         errors.push(`Archivo ${index + 1}: Tamaño mayor a 2MB`);
         return;
       }
-      
+
       validFiles.push(file);
     });
-    
+
     // Mostrar errores si los hay
     if (errors.length > 0) {
       showNotification(errors.join(', '), 'error');
     }
-    
+
     // Agregar archivos válidos
     if (validFiles.length > 0) {
       setFormData(prev => ({
-          ...prev,
+        ...prev,
         imagenesAdicionalesFiles: [...prev.imagenesAdicionalesFiles, ...validFiles]
       }));
-      
+
       showNotification(`${validFiles.length} imagen(es) agregada(s) exitosamente`, 'success');
     }
   };
@@ -651,38 +651,38 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   // Función para manejar selección de imágenes adicionales (mejorada con subida separada)
   const handleAdditionalImagesFileChange = (e) => {
     const files = Array.from(e.target.files);
-    
+
     if (files.length === 0) return;
-    
+
     // Validar cada archivo
     const validFiles = [];
     const errors = [];
-    
+
     files.forEach((file, index) => {
       // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
         errors.push(`Archivo ${index + 1}: No es una imagen válida`);
         return;
       }
-      
+
       // Validar tamaño (máximo 5MB como el banner)
       if (file.size > 5 * 1024 * 1024) {
         errors.push(`Archivo ${index + 1}: Tamaño mayor a 5MB`);
         return;
       }
-      
+
       validFiles.push(file);
     });
-    
+
     // Mostrar errores si los hay
     if (errors.length > 0) {
       showNotification(errors.join(', '), 'error');
     }
-    
+
     // Si hay archivos válidos, procesarlos
     if (validFiles.length > 0) {
       setSelectedAdditionalFiles(prev => [...prev, ...validFiles]);
-      
+
       // Crear previews para los nuevos archivos
       const newPreviews = validFiles.map(file => {
         return new Promise((resolve) => {
@@ -691,11 +691,11 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           reader.readAsDataURL(file);
         });
       });
-      
+
       Promise.all(newPreviews).then(previews => {
         setAdditionalPreviewUrls(prev => [...prev, ...previews]);
       });
-      
+
       showNotification(`${validFiles.length} imagen(es) agregada(s) para subir`, 'success');
     }
   };
@@ -703,18 +703,18 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   // Función para subir imágenes adicionales
   const uploadAdditionalImages = async () => {
     if (!selectedAdditionalFiles || selectedAdditionalFiles.length === 0) return null;
-    
+
     try {
       setUploadingAdditionalImages(true);
       const uploadFormData = new FormData();
-      
+
       selectedAdditionalFiles.forEach((file, index) => {
         uploadFormData.append('imagenes_adicionales[]', file);
       });
       uploadFormData.append('mod_id', mod.id);
-      
+
       const response = await modService.uploadAdditionalImages(uploadFormData);
-      
+
       console.log('Imágenes adicionales subidas:', response);
       return response.data;
     } catch (error) {
@@ -735,18 +735,18 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const deleteExistingAdditionalImage = async (imagePath, index) => {
     try {
       setDeletingImageIndex(index);
-      
+
       console.log('=== ELIMINAR IMAGEN ADICIONAL ===');
       console.log('imagePath recibido:', imagePath);
       console.log('index:', index);
       console.log('formData.imagenes_adicionales:', formData.imagenes_adicionales);
-      
+
       await modService.deleteAdditionalImage(mod.id, imagePath);
-      
+
       // Actualizar el estado local - mejorar la lógica de filtrado
       const nuevasImagenes = formData.imagenes_adicionales.filter(img => {
         console.log('Comparando imagen:', img);
-        
+
         // Obtener la ruta relativa de la imagen actual
         let rutaRelativaImg = img;
         if (img.includes('/storage/')) {
@@ -754,21 +754,21 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         } else if (img.includes('storage/')) {
           rutaRelativaImg = img.split('storage/')[1];
         }
-        
+
         console.log('Ruta relativa de imagen:', rutaRelativaImg);
         console.log('Ruta a eliminar:', imagePath);
         console.log('¿Coincide?', rutaRelativaImg === imagePath);
-        
+
         return rutaRelativaImg !== imagePath;
       });
-      
+
       console.log('Imágenes después del filtro:', nuevasImagenes);
-      
+
       setFormData(prev => ({
         ...prev,
         imagenes_adicionales: nuevasImagenes
       }));
-      
+
       showNotification('Imagen eliminada correctamente', 'success');
     } catch (error) {
       console.error('Error deleting additional image:', error);
@@ -787,7 +787,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   // Manejador para cambios en la selección de etiquetas con AsyncSelect
   const handleTagChange = async (selectedOptions) => {
     setSelectedTags(selectedOptions || []);
-    
+
     // Sincronizar etiquetas con la base de datos local para obtener los IDs correctos
     if (selectedOptions && selectedOptions.length > 0) {
       try {
@@ -840,19 +840,19 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      
+
       console.log('=== INICIANDO GUARDADO DEL MOD ===');
       console.log('ID del mod:', mod.id);
       console.log('Datos del formulario:', formData);
       console.log('Etiquetas seleccionadas:', selectedTags);
       console.log('Banner file selected:', selectedBannerFile);
-      
+
       // Validaciones básicas
       if (!formData.titulo.trim()) {
         showNotification('El título es obligatorio', 'error');
         return;
       }
-      
+
       if (!formData.descripcion.trim()) {
         showNotification('La descripción es obligatoria', 'error');
         return;
@@ -876,7 +876,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         try {
           const additionalImagesResult = await uploadAdditionalImages();
           console.log('Additional images uploaded successfully:', additionalImagesResult);
-          
+
           // Actualizar el estado local con las nuevas imágenes
           if (additionalImagesResult && additionalImagesResult.todas_las_imagenes) {
             setFormData(prev => ({
@@ -884,10 +884,10 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               imagenes_adicionales: additionalImagesResult.todas_las_imagenes.map(img => `${window.location.origin}/storage/${img}`)
             }));
           }
-          
+
           // Limpiar archivos seleccionados después de subirlos
           clearSelectedAdditionalImages();
-          
+
           showNotification(`${additionalImagesResult.total_imagenes_subidas} imagen(es) adicional(es) subida(s) correctamente`, 'success');
         } catch (uploadError) {
           console.error('Error uploading additional images:', uploadError);
@@ -910,28 +910,28 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         permitir_comentarios: Boolean(formData.permitir_comentarios),
         visible_en_busqueda: Boolean(formData.visible_en_busqueda)
       };
-      
+
       // Agregar imagen banner URL si se subió o cambió
       if (finalBannerUrl) {
         updateData.imagen_banner = finalBannerUrl;
       }
-      
+
       // Agregar juego_id si está seleccionado
       if (formData.juego_id) {
         updateData.juego_id = formData.juego_id;
       }
-      
+
       console.log('Datos JSON a enviar:', updateData);
 
       console.log('Enviando petición al backend...');
       const response = await modService.updateMod(mod.id, updateData);
-      
+
       console.log('Respuesta del backend:', response);
-      
+
       if (response.status === 'success') {
         console.log('Mod actualizado exitosamente');
         showNotification('Mod actualizado exitosamente', 'success');
-        
+
         // Actualizar el mod en el estado del componente padre
         if (onSave) {
           const updatedModForTable = {
@@ -957,10 +957,10 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             // Pasar información sobre juegos eliminados
             juego_eliminado: response.juego_eliminado
           };
-          
+
           onSave(updatedModForTable);
         }
-        
+
         onClose();
       } else {
         console.error('Error en la respuesta del backend:', response);
@@ -972,14 +972,14 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       console.error('Mensaje:', error.message);
       console.error('Response data:', error.response?.data);
       console.error('Status:', error.response?.status);
-      
+
       let errorMessage = 'Error al actualizar el mod';
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       showNotification(errorMessage, 'error');
     } finally {
       setLoading(false);
@@ -1006,7 +1006,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               </div>
               Información Básica
             </h4>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Información básica */}
               <div className="space-y-4">
@@ -1211,7 +1211,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           </div>
           Gestión de Etiquetas
         </h4>
-        
+
         {/* Selector AsyncSelect de etiquetas */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1319,7 +1319,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
   const renderTabEstadisticas = () => (
     <div className="space-y-6">
       <h4 className="text-lg font-medium text-white mb-4">Estadísticas del Mod</h4>
-      
+
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
@@ -1327,42 +1327,42 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         </div>
       ) : (
         <>
-      {/* Estadísticas principales */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gray-700 p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <FontAwesomeIcon icon={faDownload} className="text-blue-400 text-xl" />
+          {/* Estadísticas principales */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <FontAwesomeIcon icon={faDownload} className="text-blue-400 text-xl" />
                 <span className="text-2xl font-bold text-white">{estadisticas.total_descargas.toLocaleString()}</span>
-          </div>
-          <p className="text-gray-300 text-sm mt-2">Total Descargas</p>
-        </div>
+              </div>
+              <p className="text-gray-300 text-sm mt-2">Total Descargas</p>
+            </div>
 
-        <div className="bg-gray-700 p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <FontAwesomeIcon icon={faStar} className="text-yellow-400 text-xl" />
-            <span className="text-2xl font-bold text-white">
-              {Number(estadisticas.valoracion_media).toFixed(1)}
-            </span>
-          </div>
-          <p className="text-gray-300 text-sm mt-2">Valoración Media</p>
-        </div>
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <FontAwesomeIcon icon={faStar} className="text-yellow-400 text-xl" />
+                <span className="text-2xl font-bold text-white">
+                  {Number(estadisticas.valoracion_media).toFixed(1)}
+                </span>
+              </div>
+              <p className="text-gray-300 text-sm mt-2">Valoración Media</p>
+            </div>
 
-        <div className="bg-gray-700 p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <FontAwesomeIcon icon={faUsers} className="text-green-400 text-xl" />
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <FontAwesomeIcon icon={faUsers} className="text-green-400 text-xl" />
                 <span className="text-2xl font-bold text-white">{estadisticas.total_valoraciones.toLocaleString()}</span>
-          </div>
-          <p className="text-gray-300 text-sm mt-2">Total Valoraciones</p>
-        </div>
+              </div>
+              <p className="text-gray-300 text-sm mt-2">Total Valoraciones</p>
+            </div>
 
-        <div className="bg-gray-700 p-4 rounded-lg">
-          <div className="flex items-center justify-between">
-            <FontAwesomeIcon icon={faComments} className="text-purple-400 text-xl" />
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <FontAwesomeIcon icon={faComments} className="text-purple-400 text-xl" />
                 <span className="text-2xl font-bold text-white">{estadisticas.total_comentarios.toLocaleString()}</span>
+              </div>
+              <p className="text-gray-300 text-sm mt-2">Comentarios</p>
+            </div>
           </div>
-          <p className="text-gray-300 text-sm mt-2">Comentarios</p>
-        </div>
-      </div>
 
           {/* Estadísticas adicionales si están disponibles */}
           {(estadisticas.vistas > 0 || estadisticas.likes > 0 || estadisticas.favoritos > 0) && (
@@ -1402,62 +1402,62 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             </div>
           )}
 
-      {/* Estadísticas de descargas por período */}
-      <div>
-        <h5 className="text-white font-medium mb-3">Descargas por Período</h5>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <FontAwesomeIcon icon={faCalendar} className="text-cyan-400 text-lg" />
+          {/* Estadísticas de descargas por período */}
+          <div>
+            <h5 className="text-white font-medium mb-3">Descargas por Período</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-700 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <FontAwesomeIcon icon={faCalendar} className="text-cyan-400 text-lg" />
                   <span className="text-xl font-bold text-white">{estadisticas.descargas_mes_actual.toLocaleString()}</span>
-            </div>
+                </div>
                 <p className="text-gray-300 text-sm mt-2">Este Mes {estadisticas.descargas_mes_actual < estadisticas.total_descargas * 0.05 ? '(estimado)' : ''}</p>
-          </div>
+              </div>
 
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <div className="flex items-center justify-between">
-              <FontAwesomeIcon icon={faCalendar} className="text-emerald-400 text-lg" />
+              <div className="bg-gray-700 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <FontAwesomeIcon icon={faCalendar} className="text-emerald-400 text-lg" />
                   <span className="text-xl font-bold text-white">{estadisticas.descargas_semana_actual.toLocaleString()}</span>
-            </div>
+                </div>
                 <p className="text-gray-300 text-sm mt-2">Esta Semana {estadisticas.descargas_semana_actual < estadisticas.total_descargas * 0.02 ? '(estimado)' : ''}</p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Fechas importantes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gray-700 p-4 rounded-lg">
-          <h5 className="text-white font-medium mb-2">Fecha de Creación</h5>
-          <p className="text-gray-300">
-            {estadisticas.fecha_creacion ? 
-              new Date(estadisticas.fecha_creacion).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }) : 
-              'No disponible'
-            }
-          </p>
-        </div>
+          {/* Fechas importantes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h5 className="text-white font-medium mb-2">Fecha de Creación</h5>
+              <p className="text-gray-300">
+                {estadisticas.fecha_creacion ?
+                  new Date(estadisticas.fecha_creacion).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) :
+                  'No disponible'
+                }
+              </p>
+            </div>
 
-        <div className="bg-gray-700 p-4 rounded-lg">
-          <h5 className="text-white font-medium mb-2">Última Actualización</h5>
-          <p className="text-gray-300">
-            {estadisticas.fecha_actualizacion ? 
-              new Date(estadisticas.fecha_actualizacion).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }) : 
-              'No disponible'
-            }
-          </p>
-        </div>
-      </div>
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h5 className="text-white font-medium mb-2">Última Actualización</h5>
+              <p className="text-gray-300">
+                {estadisticas.fecha_actualizacion ?
+                  new Date(estadisticas.fecha_actualizacion).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  }) :
+                  'No disponible'
+                }
+              </p>
+            </div>
+          </div>
 
           {/* Información adicional sobre las estadísticas */}
           <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
@@ -1482,7 +1482,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
       <div className="text-center py-8">
         <FontAwesomeIcon icon={faGamepad} className="text-4xl text-purple-400 mb-4" />
         <h4 className="text-lg font-medium text-white mb-2">Información del Mod</h4>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           <div className="bg-gray-700 rounded-lg p-4 text-left">
             <h5 className="text-white font-medium mb-2">ID del Mod:</h5>
@@ -1490,7 +1490,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               {mod?.id || 'No disponible'}
             </p>
           </div>
-          
+
           <div className="bg-gray-700 rounded-lg p-4 text-left">
             <h5 className="text-white font-medium mb-2">Estado:</h5>
             <p className="text-gray-300 text-sm capitalize">
@@ -1508,17 +1508,17 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
         <FontAwesomeIcon icon={faImage} className="mr-2" />
         Gestión de Imágenes
       </h4>
-      
+
       {/* Imagen Banner Principal */}
       <div className="bg-gray-700 rounded-lg p-6">
         <h5 className="text-white font-medium mb-4">Imagen Banner Principal</h5>
-        
+
         {/* Imagen Banner Actual y Nueva */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Banner:
           </label>
-          
+
           {/* Mostrar imagen actual y/o nueva */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Banner actual (si existe y no hay archivo seleccionado) */}
@@ -1560,7 +1560,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                 </div>
               </div>
             )}
-            
+
             {/* Vista previa de nuevo banner */}
             {bannerPreviewUrl && selectedBannerFile && (
               <div className="relative">
@@ -1587,7 +1587,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                 </div>
               </div>
             )}
-            
+
             {/* Placeholder si no hay imagen */}
             {!formData.imagen_banner && !selectedBannerFile && (
               <div className="w-full h-40 bg-gray-600 rounded-lg border border-gray-500 border-dashed flex items-center justify-center">
@@ -1599,7 +1599,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             )}
           </div>
         </div>
-        
+
         {/* Controles de subida */}
         <div className="space-y-4">
           <div>
@@ -1617,14 +1617,13 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               />
               <label
                 htmlFor="banner-upload"
-                className={`cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${
-                  uploadingBanner ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${uploadingBanner ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
               >
                 <FontAwesomeIcon icon={uploadingBanner ? faSpinner : faImage} className={`mr-2 ${uploadingBanner ? 'animate-spin' : ''}`} />
                 {uploadingBanner ? 'Subiendo...' : 'Seleccionar Banner'}
               </label>
-              
+
               {(selectedBannerFile || formData.imagen_banner) && !uploadingBanner && (
                 <button
                   type="button"
@@ -1636,24 +1635,24 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                 </button>
               )}
             </div>
-            
+
             {selectedBannerFile && !uploadingBanner && (
               <p className="text-green-400 text-sm mt-2">
                 ✓ {selectedBannerFile.name} ({(selectedBannerFile.size / (1024 * 1024)).toFixed(2)} MB)
               </p>
             )}
-            
+
             <p className="text-xs text-gray-400 mt-2">
               Imagen principal que aparecerá en listas y detalles. Formatos: JPG, PNG, GIF. Máximo: 5MB
             </p>
           </div>
         </div>
       </div>
-      
+
       {/* Imágenes Adicionales */}
       <div className="bg-gray-700 rounded-lg p-6">
         <h5 className="text-white font-medium mb-4">Imágenes Adicionales</h5>
-        
+
         {/* Imágenes Adicionales Actuales */}
         {formData.imagenes_adicionales && formData.imagenes_adicionales.length > 0 && (
           <div className="mb-6">
@@ -1663,7 +1662,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {formData.imagenes_adicionales.map((imagen, index) => {
                 console.log(`Renderizando imagen adicional ${index + 1}:`, imagen);
-                
+
                 // Obtener la ruta relativa para la eliminación
                 let rutaRelativa = imagen;
                 if (imagen.includes('/storage/')) {
@@ -1671,9 +1670,9 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                 } else if (imagen.includes('storage/')) {
                   rutaRelativa = imagen.split('storage/')[1];
                 }
-                
+
                 console.log(`Ruta relativa calculada para imagen ${index + 1}:`, rutaRelativa);
-                
+
                 return (
                   <div key={index} className="relative">
                     <img
@@ -1703,9 +1702,8 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                         type="button"
                         onClick={() => deleteExistingAdditionalImage(rutaRelativa, index)}
                         disabled={deletingImageIndex === index}
-                        className={`bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-xs transition-all ${
-                          deletingImageIndex === index ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                        className={`bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-xs transition-all ${deletingImageIndex === index ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
                       >
                         {deletingImageIndex === index ? (
                           <FontAwesomeIcon icon={faSpinner} className="w-3 h-3 animate-spin" />
@@ -1764,7 +1762,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
                 </div>
               ))}
             </div>
-            
+
             {/* Botones de control para nuevas imágenes */}
             <div className="flex items-center space-x-3 mt-3">
               <button
@@ -1778,7 +1776,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             </div>
           </div>
         )}
-        
+
         {/* Subir Nuevas Imágenes Adicionales */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1798,9 +1796,8 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
             />
             <label
               htmlFor="imagenes-adicionales-upload-new"
-              className={`cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${
-                uploadingAdditionalImages ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${uploadingAdditionalImages ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               <FontAwesomeIcon icon={faImage} className="mr-2" />
               Seleccionar Imágenes
@@ -1811,7 +1808,7 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
           </div>
         </div>
       </div>
-      
+
       {/* Información sobre imágenes */}
       <div className="bg-blue-500 bg-opacity-20 border border-blue-500 rounded-lg p-4">
         <div className="flex items-center space-x-2 mb-2">
@@ -1902,20 +1899,19 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-2 sm:py-3 px-2 sm:px-4 text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${
-                  activeTab === tab.id
+                className={`py-2 sm:py-3 px-2 sm:px-4 text-sm font-medium transition-all duration-300 whitespace-nowrap rounded-t-lg ${activeTab === tab.id
                     ? `bg-gradient-to-r from-${tab.color}-600/20 to-${tab.color}-700/30 text-${tab.color}-300 border-b-2 border-${tab.color}-500`
                     : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
-                }`}
+                  }`}
               >
                 <FontAwesomeIcon icon={tab.icon} className="mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">
-                  {tab.id === 'general' ? 'Gen' : 
-                   tab.id === 'etiquetas' ? 'Tags' :
-                   tab.id === 'imagenes' ? 'Img' :
-                   tab.id === 'estadisticas' ? 'Est' :
-                   tab.id === 'avanzado' ? 'Avz' : tab.label.slice(0, 3)}
+                  {tab.id === 'general' ? 'Gen' :
+                    tab.id === 'etiquetas' ? 'Tags' :
+                      tab.id === 'imagenes' ? 'Img' :
+                        tab.id === 'estadisticas' ? 'Est' :
+                          tab.id === 'avanzado' ? 'Avz' : tab.label.slice(0, 3)}
                 </span>
               </button>
             ))}
@@ -1946,9 +1942,9 @@ const EditModAdmin = ({ mod, isOpen, onClose, onSave }) => {
               disabled={loading}
               className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
-              <FontAwesomeIcon 
-                icon={faSave} 
-                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+              <FontAwesomeIcon
+                icon={faSave}
+                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
               />
               <span className="hidden sm:inline">{loading ? 'Guardando...' : 'Guardar Cambios'}</span>
               <span className="sm:hidden">{loading ? 'Guardando...' : 'Guardar'}</span>

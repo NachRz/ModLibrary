@@ -97,14 +97,14 @@ class AdminController extends Controller
                             'id' => $usuario->id,
                             'nome' => $usuario->nome ?? 'Sin nombre',
                             'email' => $usuario->email ?? 'Sin email',
-                            'foto_perfil' => $usuario->foto_perfil ? 
+                            'foto_perfil' => $usuario->foto_perfil ?
                                 asset('storage/' . $usuario->foto_perfil) : null,
                         ] : null,
                         'mod' => $mod ? [
                             'id' => $mod->id,
                             'titulo' => $mod->titulo ?? 'Sin título',
                             'descripcion' => $mod->descripcion ?? 'Sin descripción',
-                            'imagen' => $mod->imagen ? 
+                            'imagen' => $mod->imagen ?
                                 asset('storage/' . $mod->imagen) : null,
                         ] : null,
                     ];
@@ -113,7 +113,7 @@ class AdminController extends Controller
                         'comentario_id' => $comentario->id,
                         'error' => $e->getMessage()
                     ]);
-                    
+
                     return [
                         'id' => $comentario->id,
                         'contenido' => $comentario->contenido,
@@ -139,7 +139,6 @@ class AdminController extends Controller
                     'to' => $comentarios->lastItem(),
                 ]
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al obtener comentarios para admin:', [
                 'error' => $e->getMessage(),
@@ -175,14 +174,14 @@ class AdminController extends Controller
                     'id' => $comentario->usuario->id,
                     'nome' => $comentario->usuario->nome,
                     'email' => $comentario->usuario->email,
-                    'foto_perfil' => $comentario->usuario->foto_perfil ? 
+                    'foto_perfil' => $comentario->usuario->foto_perfil ?
                         asset('storage/' . $comentario->usuario->foto_perfil) : null,
                 ] : null,
                 'mod' => $comentario->mod ? [
                     'id' => $comentario->mod->id,
                     'titulo' => $comentario->mod->titulo,
                     'descripcion' => $comentario->mod->descripcion,
-                    'imagen' => $comentario->mod->imagen ? 
+                    'imagen' => $comentario->mod->imagen ?
                         asset('storage/' . $comentario->mod->imagen) : null,
                 ] : null,
             ];
@@ -191,7 +190,6 @@ class AdminController extends Controller
                 'status' => 'success',
                 'data' => $comentarioData
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al obtener comentario para admin:', [
                 'comentario_id' => $comentarioId,
@@ -253,14 +251,14 @@ class AdminController extends Controller
                     'id' => $usuario->id,
                     'nome' => $usuario->nome ?? 'Sin nombre',
                     'email' => $usuario->email ?? '',
-                    'foto_perfil' => $usuario->foto_perfil ? 
+                    'foto_perfil' => $usuario->foto_perfil ?
                         asset('storage/' . $usuario->foto_perfil) : null,
                 ] : null,
                 'mod' => $mod ? [
                     'id' => $mod->id,
                     'titulo' => $mod->titulo ?? 'Sin título',
                     'descripcion' => $mod->descripcion ?? '',
-                    'imagen' => $mod->imagen ? 
+                    'imagen' => $mod->imagen ?
                         asset('storage/' . $mod->imagen) : null,
                 ] : null,
             ];
@@ -276,14 +274,12 @@ class AdminController extends Controller
                 'message' => 'Comentario actualizado exitosamente',
                 'data' => $comentarioData
             ]);
-
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Datos de comentario inválidos',
                 'errors' => $e->errors()
             ], 422);
-
         } catch (\Exception $e) {
             Log::error('Error al actualizar comentario (admin):', [
                 'comentario_id' => $comentarioId,
@@ -324,7 +320,6 @@ class AdminController extends Controller
                 'status' => 'success',
                 'message' => 'Comentario eliminado exitosamente'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al eliminar comentario (admin):', [
                 'comentario_id' => $comentarioId,
@@ -350,7 +345,7 @@ class AdminController extends Controller
                 'total_comentarios' => Comentario::count(),
                 'comentarios_hoy' => Comentario::whereDate('created_at', today())->count(),
                 'comentarios_esta_semana' => Comentario::whereBetween('created_at', [
-                    now()->startOfWeek(), 
+                    now()->startOfWeek(),
                     now()->endOfWeek()
                 ])->count(),
                 'comentarios_este_mes' => Comentario::whereMonth('created_at', now()->month)
@@ -374,7 +369,6 @@ class AdminController extends Controller
                 'status' => 'success',
                 'data' => $stats
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al obtener estadísticas de comentarios:', [
                 'error' => $e->getMessage(),
@@ -387,4 +381,4 @@ class AdminController extends Controller
             ], 500);
         }
     }
-} 
+}

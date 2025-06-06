@@ -42,7 +42,7 @@ class EtiquetaController extends Controller
     public function update(Request $request, $id)
     {
         $etiqueta = Etiqueta::findOrFail($id);
-        
+
         $request->validate([
             'nombre' => 'required|string|max:255',
             'rawg_id' => 'required|integer|unique:etiquetas,rawg_id,' . $id
@@ -91,7 +91,6 @@ class EtiquetaController extends Controller
                 'status' => 'success',
                 'data' => $etiqueta
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al sincronizar etiqueta con RAWG', [
                 'rawg_id' => $rawgId,
@@ -132,7 +131,6 @@ class EtiquetaController extends Controller
                 'siguiente' => $results['next'],
                 'anterior' => $results['previous']
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al buscar etiquetas en RAWG', [
                 'error' => $e->getMessage()
@@ -141,4 +139,4 @@ class EtiquetaController extends Controller
             return Response::json(['error' => 'Error al buscar etiquetas'], 500);
         }
     }
-} 
+}

@@ -30,12 +30,12 @@ class ModSeeder extends Seeder
     {
         $modSlug = strtolower(str_replace(' ', '_', $modTitulo));
         $basePath = storage_path('app/public/mods/' . $modSlug);
-        
+
         // Eliminar carpeta del mod si ya existe
         if (File::exists($basePath)) {
             File::deleteDirectory($basePath);
         }
-        
+
         // Crear carpeta principal del mod
         File::makeDirectory($basePath, 0755, true);
 
@@ -48,7 +48,7 @@ class ModSeeder extends Seeder
 
         // Crear carpetas de versiones y copiar archivos por defecto
         $versiones = array_merge([$versionActual], $versionesAnteriores);
-        
+
         foreach ($versiones as $version) {
             $versionPath = $basePath . '/versions/v' . $version;
             File::makeDirectory($versionPath, 0755, true);
@@ -56,7 +56,7 @@ class ModSeeder extends Seeder
             // Copiar archivo de mod por defecto con nuevo nombre: mod_{mod_id}_v{version}.zip
             $defaultModFile = storage_path('app/public/defaults/files/default_mod.zip');
             $modFile = $versionPath . '/mod_' . $modId . '_v' . $version . '.zip';
-            
+
             if (File::exists($defaultModFile)) {
                 File::copy($defaultModFile, $modFile);
             } else {
@@ -68,7 +68,7 @@ class ModSeeder extends Seeder
         // Copiar banner por defecto: banner_{mod_id}_v{version}.jpg
         $defaultBanner = storage_path('app/public/defaults/banners/default_banner.jpg');
         $modBanner = $basePath . '/banners/banner_' . $modId . '_v' . $versionActual . '.jpg';
-        
+
         if (File::exists($defaultBanner)) {
             File::copy($defaultBanner, $modBanner);
         } else {
@@ -80,7 +80,7 @@ class ModSeeder extends Seeder
         $imagenesAdicionales = [];
         $defaultImagesDir = storage_path('app/public/defaults/imagenes_adicionales/');
         $defaultImagesPaths = [];
-        
+
         if (File::exists($defaultImagesDir)) {
             $files = File::files($defaultImagesDir);
             foreach ($files as $file) {
@@ -134,14 +134,13 @@ class ModSeeder extends Seeder
                             'games_count' => $generoData['games_count'] ?? 0
                         ]
                     );
-                    
+
                     $generosIds[] = $genero->id;
                 }
             }
 
             // Sincronizar la relación (esto reemplaza los géneros existentes del juego)
             $juego->generos()->sync($generosIds);
-
         } catch (\Exception $e) {
             // Silenciar errores para mantener consistencia
         }
@@ -150,20 +149,20 @@ class ModSeeder extends Seeder
     public function run()
     {
         $this->command->info('Iniciando ModSeeder - Creación de mods y carpetas...');
-        
+
         // Cargar datos del JSON
         $jsonPath = base_path('resources/assets/data/mods.json');
         if (!File::exists($jsonPath)) {
             $this->command->error("Archivo JSON no encontrado: {$jsonPath}");
             return;
         }
-        
+
         $jsonData = json_decode(File::get($jsonPath), true);
         if (!$jsonData || !isset($jsonData['mods'])) {
             $this->command->error("Estructura JSON inválida o sin datos de mods");
             return;
         }
-        
+
         $mods = $jsonData['mods'];
         $this->command->info("Encontrados " . count($mods) . " mods en el JSON");
 
@@ -172,7 +171,7 @@ class ModSeeder extends Seeder
         if (!File::exists($defaultsPath)) {
             File::makeDirectory($defaultsPath, 0755, true);
             $this->command->info("Creado directorio de archivos por defecto: {$defaultsPath}");
-            
+
             // Crear subdirectorios
             File::makeDirectory($defaultsPath . '/banners', 0755, true);
             File::makeDirectory($defaultsPath . '/files', 0755, true);
@@ -209,14 +208,14 @@ class ModSeeder extends Seeder
             // Buscar el juego en RAWG API para obtener su ID real
             $rawgId = null;
             $rawgData = null;
-            
+
             $searchResults = $this->rawgService->searchGames($juegoNombre);
             if ($searchResults && isset($searchResults['results']) && count($searchResults['results']) > 0) {
                 // Tomar el primer resultado que coincide mejor con el nombre
                 $rawgData = $searchResults['results'][0];
                 $rawgId = $rawgData['id'];
             }
-            
+
             $juego = Juego::firstOrCreate(
                 ['titulo' => $juegoNombre],
                 [
@@ -243,10 +242,10 @@ class ModSeeder extends Seeder
                     $this->extraerYAsociarGeneros($juego, $gameFullData);
                 }
             }
-            
+
             $juegosMap[$juegoNombre] = $juego;
         }
-        
+
         $this->command->info('Juegos creados con géneros extraídos automáticamente.');
 
         // Recopilar todas las etiquetas únicas primero
@@ -295,9 +294,9 @@ class ModSeeder extends Seeder
 
         // Ahora, procesar los mods usando los juegos y etiquetas ya creados
         $this->command->info('Creando mods y sus carpetas...');
-        
+
         $totalMods = count($mods);
-        
+
         foreach ($mods as $modData) {
             // Determinar el creador basado en el campo 'Creador'
             $creadorNombre = $modData['Creador'] ?? 'usuario1';
@@ -322,12 +321,12 @@ class ModSeeder extends Seeder
 
             // Crear carpetas para el mod usando el ID real
             $resultado = $this->crearCarpetasMod(
-                $modData['Titulo'], 
-                $modData['VersionActual'], 
+                $modData['Titulo'],
+                $modData['VersionActual'],
                 $modData['VersionesAnteriores'] ?? [],
                 $mod->id
             );
-            
+
             $modSlug = $resultado[0];
             $bannerFileName = $resultado[1];
             $imagenesAdicionales = $resultado[2];
@@ -378,9 +377,9 @@ class ModSeeder extends Seeder
                 }
             }
         }
-        
+
         $this->command->info('Seeder de mods completado con éxito.');
         $this->command->info("Total de mods procesados: {$totalMods}");
         $this->command->info("Todas las carpetas y archivos de mods han sido creados.");
     }
-} 
+}

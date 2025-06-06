@@ -8,18 +8,18 @@ const authService = {
         correo: credentials.email,
         contrasina: credentials.password
       });
-      
+
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
-      
+
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error de conexión' };
     }
   },
-  
+
   // Registro de usuario
   register: async (userData) => {
     try {
@@ -30,18 +30,18 @@ const authService = {
         nombre: userData.username, // Usando username como nombre por simplicidad
         apelidos: 'Usuario' // Valor por defecto, se podría añadir este campo al formulario
       });
-      
+
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
-      
+
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error de conexión' };
     }
   },
-  
+
   // Cerrar sesión
   logout: async () => {
     try {
@@ -55,7 +55,7 @@ const authService = {
       localStorage.removeItem('user');
     }
   },
-  
+
   // Obtener el usuario actual
   getCurrentUser: () => {
     const userStr = localStorage.getItem('user');
@@ -64,7 +64,7 @@ const authService = {
     }
     return null;
   },
-  
+
   // Verificar si el usuario está autenticado
   isAuthenticated: () => {
     return !!localStorage.getItem('token');

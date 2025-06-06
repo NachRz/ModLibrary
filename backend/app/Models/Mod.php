@@ -68,14 +68,14 @@ class Mod extends Model
         // Al actualizar un mod
         static::updated(function ($mod) {
             $juegoAnteriorId = null;
-            
+
             // Limpiar información previa
             self::$juegoEliminadoEnActualizacion = null;
-            
+
             // Si cambió el juego
             if ($mod->isDirty('juego_id')) {
                 $juegoAnteriorId = $mod->getOriginal('juego_id');
-                
+
                 // Decrementar el contador del juego anterior si el mod estaba publicado
                 if ($juegoAnteriorId && $mod->getOriginal('estado') === 'publicado') {
                     $juegoAnterior = Juego::find($juegoAnteriorId);
@@ -88,12 +88,12 @@ class Mod extends Model
                     Juego::find($mod->juego_id)?->incrementarModsTotales();
                 }
             }
-            
+
             // Si cambió el estado
             if ($mod->isDirty('estado')) {
                 $estadoAnterior = $mod->getOriginal('estado');
                 $estadoActual = $mod->estado;
-                
+
                 // Si pasó de publicado a borrador
                 if ($estadoAnterior === 'publicado' && $estadoActual === 'borrador') {
                     if ($mod->juego) {
@@ -107,7 +107,7 @@ class Mod extends Model
                     }
                 }
             }
-            
+
             // Verificar si el juego anterior se quedó sin mods y debe ser eliminado
             if ($juegoAnteriorId && $juegoAnteriorId !== $mod->juego_id) {
                 try {
@@ -115,7 +115,7 @@ class Mod extends Model
                     if ($juegoAnterior) {
                         $tituloJuegoAnterior = $juegoAnterior->titulo;
                         $idJuegoAnterior = $juegoAnterior->id;
-                        
+
                         $resultado = $juegoAnterior->verificarYEliminarSiSinMods();
                         if ($resultado['juego_eliminado']) {
                             self::$juegoEliminadoEnActualizacion = [
@@ -123,14 +123,14 @@ class Mod extends Model
                                 'id' => $idJuegoAnterior,
                                 'generos_eliminados' => $resultado['generos_eliminados']
                             ];
-                            
+
                             $mensaje = "Juego '{$tituloJuegoAnterior}' (ID: {$idJuegoAnterior}) eliminado automáticamente después de cambiar juego del mod {$mod->id}";
-                            
+
                             if (!empty($resultado['generos_eliminados'])) {
                                 $nombresGeneros = array_column($resultado['generos_eliminados'], 'nombre');
                                 $mensaje .= ". También se eliminaron los géneros: " . implode(', ', $nombresGeneros);
                             }
-                            
+
                             \Illuminate\Support\Facades\Log::info($mensaje);
                         }
                     }
@@ -176,7 +176,7 @@ class Mod extends Model
     public function actualizarValMedia()
     {
         $numValoraciones = $this->valoraciones()->count();
-        
+
         if ($numValoraciones > 0) {
             $this->val_media = $this->valoraciones()->avg('puntuacion'); //Calcula el promedio de valoraciones usando la función avg
         } else {
@@ -226,4 +226,4 @@ class Mod extends Model
     {
         return $this->hasMany(DescargaUsuario::class, 'mod_id');
     }
-} 
+}

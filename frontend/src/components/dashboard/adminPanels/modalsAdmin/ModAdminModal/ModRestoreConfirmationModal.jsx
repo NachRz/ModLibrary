@@ -3,35 +3,35 @@ import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faTimes, faExclamationTriangle, faGamepad } from '@fortawesome/free-solid-svg-icons';
 
-const ModRestoreConfirmationModal = ({ 
-  modTitle, 
-  onConfirm, 
-  onCancel, 
-  isOpen, 
+const ModRestoreConfirmationModal = ({
+  modTitle,
+  onConfirm,
+  onCancel,
+  isOpen,
   message = "¿Estás seguro de que quieres restaurar este mod?",
-  isLoading = false 
+  isLoading = false
 }) => {
   if (!isOpen) return null;
 
   const modalContent = (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl max-w-lg w-full mx-auto border border-green-500/50">
-        
+
         {/* Header con gradiente mejorado */}
         <div className="bg-gradient-to-r from-green-600/10 to-green-700/10 border-b border-gray-700/50">
           <div className="flex items-center justify-between p-5">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-gradient-to-br from-green-500/20 to-green-600/30 rounded-lg">
-                <FontAwesomeIcon 
-                  icon={faUndo} 
-                  className="text-green-400" 
+                <FontAwesomeIcon
+                  icon={faUndo}
+                  className="text-green-400"
                 />
               </div>
               <h2 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 Restaurar Mod
               </h2>
             </div>
-            <button 
+            <button
               onClick={onCancel}
               disabled={isLoading}
               className="text-gray-400 hover:text-white transition-colors text-xl hover:rotate-90 transition-transform duration-300 disabled:opacity-50"
@@ -40,7 +40,7 @@ const ModRestoreConfirmationModal = ({
             </button>
           </div>
         </div>
-        
+
         {/* Contenido */}
         <div className="p-5">
           <div className="bg-gradient-to-r from-green-500/20 to-green-600/30 border border-green-500/50 rounded-xl p-4 mb-6">
@@ -78,15 +78,14 @@ const ModRestoreConfirmationModal = ({
             <button
               onClick={onConfirm}
               disabled={isLoading}
-              className={`px-5 py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 ${
-                isLoading 
-                  ? 'bg-gray-600/50 text-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
-              }`}
+              className={`px-5 py-2 rounded-lg transition-all duration-300 font-medium flex items-center space-x-2 ${isLoading
+                ? 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
+                : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
+                }`}
             >
-              <FontAwesomeIcon 
-                icon={faUndo} 
-                className={`${isLoading ? 'animate-spin' : ''}`} 
+              <FontAwesomeIcon
+                icon={faUndo}
+                className={`${isLoading ? 'animate-spin' : ''}`}
               />
               <span>{isLoading ? 'Restaurando...' : 'Restaurar Mod'}</span>
             </button>

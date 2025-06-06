@@ -12,34 +12,34 @@ import '../../../assets/styles/components/dashboard/adminPanel/adminTables.css';
 
 const ComentariosAdmin = () => {
   const { showNotification } = useNotification();
-  
+
   // Estados principales
   const [comentarios, setComentarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Estados de filtros y búsqueda
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroMod, setFiltroMod] = useState('');
   const [filtroUsuario, setFiltroUsuario] = useState('');
-  
+
   // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [itemsPerPage] = useState(10);
-  
+
   // Estados de modales
   const [editModal, setEditModal] = useState({ isOpen: false, comment: null });
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, comment: null });
   const [viewModal, setViewModal] = useState({ isOpen: false, comment: null });
-  
+
   // Cargar comentarios
   const loadComentarios = async (page = 1, filters = {}) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = {
         page,
         per_page: itemsPerPage,
@@ -48,10 +48,10 @@ const ComentariosAdmin = () => {
         user_filter: filtroUsuario,
         ...filters
       };
-      
+
       // Aquí necesitaremos crear un endpoint específico para admin
       const response = await adminService.getComentarios(params);
-      
+
       if (response.status === 'success') {
         console.log('Comentarios recibidos:', response.data.data);
         // Log para verificar los datos del mod
@@ -75,70 +75,70 @@ const ComentariosAdmin = () => {
       setLoading(false);
     }
   };
-  
+
   // Efecto para cargar datos iniciales
   useEffect(() => {
     loadComentarios(1);
   }, []);
-  
+
   // Efecto para filtros
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       loadComentarios(1);
     }, 500);
-    
+
     return () => clearTimeout(timeoutId);
   }, [searchTerm, filtroMod, filtroUsuario]);
-  
+
   // Manejar búsqueda
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
-  
+
   // Manejar filtros
   const handleModFilter = (e) => {
     setFiltroMod(e.target.value);
     setCurrentPage(1);
   };
-  
+
   const handleUserFilter = (e) => {
     setFiltroUsuario(e.target.value);
     setCurrentPage(1);
   };
-  
+
   // Manejar paginación
   const handlePageChange = (page) => {
     setCurrentPage(page);
     loadComentarios(page);
   };
-  
+
   // Abrir modales
   const openEditModal = (comment) => {
     setEditModal({ isOpen: true, comment });
   };
-  
+
   const openDeleteModal = (comment) => {
     setDeleteModal({ isOpen: true, comment });
   };
-  
+
   const openViewModal = (comment) => {
     setViewModal({ isOpen: true, comment });
   };
-  
+
   // Cerrar modales
   const closeEditModal = () => {
     setEditModal({ isOpen: false, comment: null });
   };
-  
+
   const closeDeleteModal = () => {
     setDeleteModal({ isOpen: false, comment: null });
   };
-  
+
   const closeViewModal = () => {
     setViewModal({ isOpen: false, comment: null });
   };
-  
+
   // Manejar actualización de comentario
   const handleCommentUpdated = (updatedComment) => {
     setComentarios(prevComentarios =>
@@ -149,7 +149,7 @@ const ComentariosAdmin = () => {
     closeEditModal();
     showNotification('Comentario actualizado exitosamente', 'success');
   };
-  
+
   // Manejar eliminación de comentario
   const handleCommentDeleted = (deletedCommentId) => {
     setComentarios(prevComentarios =>
@@ -157,13 +157,13 @@ const ComentariosAdmin = () => {
     );
     closeDeleteModal();
     showNotification('Comentario eliminado exitosamente', 'success');
-    
+
     // Recargar si la página actual queda vacía
     if (comentarios.length === 1 && currentPage > 1) {
       handlePageChange(currentPage - 1);
     }
   };
-  
+
   // Formatear fecha
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -175,13 +175,13 @@ const ComentariosAdmin = () => {
       minute: '2-digit'
     });
   };
-  
+
   // Truncar texto
   const truncateText = (text, maxLength = 50) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
-  
+
   if (loading && comentarios.length === 0) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -190,7 +190,7 @@ const ComentariosAdmin = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -202,14 +202,14 @@ const ComentariosAdmin = () => {
           </p>
         </div>
       </div>
-      
+
       {/* Filtros y búsqueda */}
       <div className="bg-custom-card rounded-lg p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Búsqueda por contenido */}
           <div className="relative">
-            <FontAwesomeIcon 
-              icon={faSearch} 
+            <FontAwesomeIcon
+              icon={faSearch}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             />
             <input
@@ -220,11 +220,11 @@ const ComentariosAdmin = () => {
               className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
             />
           </div>
-          
+
           {/* Filtro por mod */}
           <div className="relative">
-            <FontAwesomeIcon 
-              icon={faGamepad} 
+            <FontAwesomeIcon
+              icon={faGamepad}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             />
             <input
@@ -235,11 +235,11 @@ const ComentariosAdmin = () => {
               className="w-full bg-gray-700 border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
             />
           </div>
-          
+
           {/* Filtro por usuario */}
           <div className="relative">
-            <FontAwesomeIcon 
-              icon={faUser} 
+            <FontAwesomeIcon
+              icon={faUser}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
             />
             <input
@@ -252,7 +252,7 @@ const ComentariosAdmin = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Error */}
       {error && (
         <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
@@ -265,7 +265,7 @@ const ComentariosAdmin = () => {
           </button>
         </div>
       )}
-      
+
       {/* Tabla de comentarios */}
       <div className="admin-table-container">
         <div className="admin-table-scroll">
@@ -368,7 +368,7 @@ const ComentariosAdmin = () => {
             </tbody>
           </table>
         </div>
-        
+
         {comentarios.length === 0 && !loading && (
           <div className="text-center py-12">
             <FontAwesomeIcon icon={faComment} className="text-6xl text-gray-600 mb-4" />
@@ -382,7 +382,7 @@ const ComentariosAdmin = () => {
           </div>
         )}
       </div>
-      
+
       {/* Paginación */}
       {totalPages > 1 && (
         <Pagination
@@ -391,21 +391,21 @@ const ComentariosAdmin = () => {
           onPageChange={handlePageChange}
         />
       )}
-      
+
       {/* Modales */}
       <CommentViewModal
         isOpen={viewModal.isOpen}
         onClose={closeViewModal}
         comment={viewModal.comment}
       />
-      
+
       <CommentEditModal
         isOpen={editModal.isOpen}
         onClose={closeEditModal}
         comment={editModal.comment}
         onCommentUpdated={handleCommentUpdated}
       />
-      
+
       <CommentDeleteModal
         isOpen={deleteModal.isOpen}
         onClose={closeDeleteModal}

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import modService from '../../../../../services/api/modService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faEye, 
-  faDownload, 
-  faStar, 
+import {
+  faEye,
+  faDownload,
+  faStar,
   faCalendarAlt,
   faGamepad,
   faUser,
@@ -39,14 +39,14 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
     try {
       setLoading(true);
       setError('');
-      
+
       // Cargar detalles del mod y estadísticas
       const [detailsResponse] = await Promise.all([
         modService.getModById(mod.id)
       ]);
-      
+
       setModDetails(detailsResponse.data);
-      
+
       // Calcular estadísticas del mod
       const stats = {
         total_descargas: detailsResponse.data.estadisticas?.total_descargas || detailsResponse.data.total_descargas || 0,
@@ -58,7 +58,7 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
         visitas: detailsResponse.data.visitas || 0,
         favoritos: detailsResponse.data.favoritos || 0
       };
-      
+
       setModStats(stats);
     } catch (error) {
       setError('Error al cargar el perfil del mod');
@@ -87,7 +87,7 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
       publicado: 'bg-gradient-to-r from-green-600/20 to-emerald-600/20 text-green-300 border border-green-500/50',
       borrador: 'bg-gradient-to-r from-orange-600/20 to-yellow-600/20 text-orange-300 border border-orange-500/50'
     };
-    
+
     return styles[estado] || styles.borrador;
   };
 
@@ -101,7 +101,7 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
       views: 'bg-gradient-to-br from-cyan-600/20 to-teal-800/30 border border-cyan-500/30',
       favorites: 'bg-gradient-to-br from-green-600/20 to-emerald-800/30 border border-green-500/30'
     };
-    
+
     return styles[type] || styles.downloads;
   };
 
@@ -110,7 +110,7 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
       publicado: 'Publicado',
       borrador: 'Borrador'
     };
-    
+
     return statusMap[estado] || 'Borrador';
   };
 
@@ -126,8 +126,8 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
               <div className="relative">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center overflow-hidden">
                   {modDetails?.imagen_banner && !imageError ? (
-                    <img 
-                      src={modDetails.imagen_banner} 
+                    <img
+                      src={modDetails.imagen_banner}
                       alt={`Banner de ${modDetails.titulo}`}
                       className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover"
                       onError={handleImageError}
@@ -221,8 +221,8 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
                     <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded-lg border border-gray-600/20">
                       <span className="text-gray-300 font-medium text-sm">Creador:</span>
                       <span className="text-white text-sm flex items-center">
-                        <img 
-                          src={modDetails?.creador?.foto_perfil || '/images/user-placeholder.jpg'} 
+                        <img
+                          src={modDetails?.creador?.foto_perfil || '/images/user-placeholder.jpg'}
                           alt={modDetails?.creador?.nome}
                           className="w-6 h-6 rounded-full mr-2"
                           onError={(e) => {
@@ -288,7 +288,7 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
                     </div>
                     Estadísticas y Rendimiento
                   </h3>
-                  
+
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div className={`p-4 rounded-lg ${getStatCardStyle('downloads')}`}>
                       <div className="flex items-center justify-between mb-2">
@@ -393,7 +393,7 @@ const ModViewModal = ({ mod, isOpen, onClose, onEdit }) => {
                     <FontAwesomeIcon icon={faExternalLinkAlt} />
                     <span>Ver en Frontend</span>
                   </a>
-                  
+
                   {modDetails?.url && (
                     <a
                       href={modDetails.url}

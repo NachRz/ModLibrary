@@ -29,7 +29,7 @@ class Genero extends Model
     public function juegos(): BelongsToMany
     {
         return $this->belongsToMany(Juego::class, 'juegos_generos', 'genero_id', 'juego_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -43,7 +43,7 @@ class Genero extends Model
         if ($totalJuegos > 0) {
             return false;
         }
-        
+
         // Si no tiene juegos, se puede eliminar
         try {
             $this->delete();
@@ -67,24 +67,24 @@ class Genero extends Model
     public static function verificarYEliminarGenerosSinJuegos(array $generoIds): array
     {
         $generosEliminados = [];
-        
+
         foreach ($generoIds as $generoId) {
             $genero = self::find($generoId);
             if ($genero) {
                 $nombreGenero = $genero->nombre;
                 $idGenero = $genero->id;
-                
+
                 if ($genero->verificarYEliminarSiSinJuegos()) {
                     $generosEliminados[] = [
                         'id' => $idGenero,
                         'nombre' => $nombreGenero
                     ];
-                    
+
                     \Illuminate\Support\Facades\Log::info("Género '{$nombreGenero}' (ID: {$idGenero}) eliminado automáticamente por no tener juegos asociados");
                 }
             }
         }
-        
+
         return $generosEliminados;
     }
 }

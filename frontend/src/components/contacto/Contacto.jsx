@@ -21,13 +21,13 @@ const Contacto = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setEnviando(true);
-    
+
     // Simular envío del formulario
     setTimeout(() => {
       setEnviando(false);
       setEnviado(true);
       setFormData({ nombre: '', email: '', asunto: '', mensaje: '' });
-      
+
       // Resetear mensaje de éxito después de 3 segundos
       setTimeout(() => setEnviado(false), 3000);
     }, 1500);
@@ -77,7 +77,7 @@ const Contacto = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-custom-bg to-custom-bg/90">
-      
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-custom-primary/10 via-custom-secondary/10 to-custom-tertiary/10"></div>
@@ -101,8 +101,8 @@ const Contacto = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
           {contactInfo.map((info, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="bg-custom-card/60 backdrop-blur-sm rounded-2xl p-6 border border-custom-detail/10 shadow-custom hover:shadow-custom-lg transition-all duration-500 hover:transform hover:-translate-y-2 group"
             >
               <div className={`flex items-center justify-center h-12 w-12 rounded-xl ${info.color} text-custom-text mb-4 group-hover:scale-110 transition-transform duration-300`}>
@@ -122,7 +122,7 @@ const Contacto = () => {
       {/* Main Content: Form and Map */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          
+
           {/* Contact Form */}
           <div className="bg-custom-card/60 backdrop-blur-sm rounded-2xl p-8 border border-custom-detail/10 shadow-custom">
             <div className="mb-8">

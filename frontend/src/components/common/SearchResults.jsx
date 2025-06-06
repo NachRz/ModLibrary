@@ -25,7 +25,7 @@ const SearchResults = () => {
     const urlParams = new URLSearchParams(location.search);
     const query = urlParams.get('q') || '';
     setSearchQuery(query);
-    
+
     if (query.trim()) {
       performSearch(query.trim());
     } else {
@@ -138,7 +138,7 @@ const SearchResults = () => {
                 </h1>
                 {!loading && searchQuery && (
                   <p className={`mt-1 text-custom-detail results-counter`}>
-                    {totalResults > 0 
+                    {totalResults > 0
                       ? `${totalResults} resultado${totalResults !== 1 ? 's' : ''} encontrado${totalResults !== 1 ? 's' : ''}`
                       : 'No se encontraron resultados'
                     }
@@ -198,7 +198,7 @@ const SearchResults = () => {
             <div className="error-state">
               <p className="error-text">Error al realizar la búsqueda</p>
               <p className="error-subtext">{error}</p>
-              <button 
+              <button
                 className="retry-button"
                 onClick={() => performSearch(searchQuery)}
               >
@@ -227,7 +227,7 @@ const SearchResults = () => {
                       <div className="mods-grid">
                         {mods.map((mod) => (
                           <div key={mod.id} className="mod-card-wrapper">
-                            <ModCardCompact 
+                            <ModCardCompact
                               mod={mod}
                               onClick={() => navigate(`/mods/${mod.id}`)}
                             />
@@ -244,7 +244,7 @@ const SearchResults = () => {
                       <div className="games-grid">
                         {games.map((game) => (
                           <div key={game.id} className="game-card-wrapper">
-                            <GameCard 
+                            <GameCard
                               game={game}
                               showStats={true}
                               showFavoriteButton={false}
@@ -263,7 +263,7 @@ const SearchResults = () => {
                       <div className="users-grid">
                         {users.map((user) => (
                           <div key={user.id} className="user-card-wrapper">
-                            <UserCard 
+                            <UserCard
                               user={user}
                               onClick={() => navigate(`/usuarios/${user.id}/perfil`)}
                               showLink={false}
@@ -283,7 +283,7 @@ const SearchResults = () => {
                       <div className="mods-grid">
                         {mods.map((mod) => (
                           <div key={mod.id} className="mod-card-wrapper">
-                            <ModCardCompact 
+                            <ModCardCompact
                               mod={mod}
                               onClick={() => navigate(`/mods/${mod.id}`)}
                             />
@@ -299,7 +299,7 @@ const SearchResults = () => {
                       <div className="games-grid">
                         {games.map((game) => (
                           <div key={game.id} className="game-card-wrapper">
-                            <GameCard 
+                            <GameCard
                               game={game}
                               showStats={true}
                               showFavoriteButton={false}
@@ -317,7 +317,7 @@ const SearchResults = () => {
                       <div className="users-grid">
                         {users.map((user) => (
                           <div key={user.id} className="user-card-wrapper">
-                            <UserCard 
+                            <UserCard
                               user={user}
                               onClick={() => navigate(`/usuarios/${user.id}/perfil`)}
                               showLink={false}

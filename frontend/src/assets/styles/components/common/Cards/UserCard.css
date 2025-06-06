@@ -114,17 +114,17 @@
     padding: 16px 12px 12px 12px;
     min-height: 100px;
   }
-  
+
   .user-card-avatar {
     width: 40px;
     height: 40px;
     margin-bottom: 10px;
   }
-  
+
   .user-avatar-fallback {
     font-size: 14px;
   }
-  
+
   .user-card-name {
     font-size: 13px;
   }
@@ -135,17 +135,17 @@
     padding: 14px 10px 10px 10px;
     min-height: 90px;
   }
-  
+
   .user-card-avatar {
     width: 36px;
     height: 36px;
     margin-bottom: 8px;
   }
-  
+
   .user-avatar-fallback {
     font-size: 12px;
   }
-  
+
   .user-card-name {
     font-size: 12px;
   }
@@ -157,7 +157,7 @@
     border: 2px solid #FFFFFF;
     background: #000000;
   }
-  
+
   .user-card:hover {
     border-color: #FFFFFF;
     background: #1F2937;
@@ -166,12 +166,13 @@
 
 /* Modo sin animaciones */
 @media (prefers-reduced-motion: reduce) {
+
   .user-card,
   .user-card-avatar img {
     transition: none;
   }
-  
+
   .user-card:hover {
     transform: none;
   }
-} 
+}

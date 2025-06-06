@@ -11,13 +11,13 @@ import '../../../assets/styles/components/common/buttons/buttons.css'; // Ruta a
  * @param {Function} props.onClick - Función a ejecutar al hacer clic
  * @returns {JSX.Element} Componente botón con gradiente
  */
-const GradientButton = ({ 
-  type = 'button', 
-  children, 
-  icon, 
-  className = '', 
+const GradientButton = ({
+  type = 'button',
+  children,
+  icon,
+  className = '',
   onClick,
-  ...props 
+  ...props
 }) => {
   return (
     <button

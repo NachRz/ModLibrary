@@ -402,15 +402,15 @@
     padding: 0.5rem;
     gap: 0.5rem;
   }
-  
+
   .tag-option-name {
     font-size: 0.75rem;
   }
-  
+
   .tag-option-count {
     font-size: 0.65rem;
   }
-  
+
   .custom-multi-value {
     font-size: 0.75rem;
     padding: 0.2rem 0.5rem;
@@ -470,43 +470,43 @@
   .create-mod-container {
     padding: 1rem;
   }
-  
+
   .create-mod-header {
     padding: 1rem;
   }
-  
+
   .create-mod-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .create-mod-form {
     padding: 1rem;
   }
-  
+
   .tab-content {
     min-height: auto;
   }
-  
+
   /* Mejorar las tabs en móvil */
   .border-b .flex {
     overflow-x: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  
+
   .border-b .flex::-webkit-scrollbar {
     display: none;
   }
-  
+
   /* Ajustes para archivos en móvil */
   .bg-gray-700.rounded-lg {
     padding: 1rem;
   }
-  
-  .space-y-2 > * + * {
+
+  .space-y-2>*+* {
     margin-top: 0.5rem;
   }
-} 
+}
 
 /* Estilos específicos para la gestión de archivos */
 .file-upload-area {
@@ -531,6 +531,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -547,9 +548,12 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -583,36 +587,36 @@
   .game-option {
     padding: 0.5rem;
   }
-  
+
   .game-option-image,
   .game-single-image {
     width: 32px;
     height: 32px;
     margin-right: 0.75rem;
   }
-  
+
   .game-option-title {
     font-size: 0.875rem;
   }
-  
+
   .game-option-rating {
     font-size: 0.75rem;
   }
-  
+
   .game-single-image {
     width: 28px;
     height: 28px;
     margin-right: 0.5rem;
   }
-  
+
   .game-single-title {
     font-size: 0.75rem;
   }
-  
+
   .game-single-rating {
     font-size: 0.65rem;
   }
-  
+
   .select-container .select__control {
     min-height: 38px;
   }
@@ -680,10 +684,15 @@
 
 /* Animación para el estado de carga */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .select-container .select__loading-indicator div {
   animation: spin 1s linear infinite;
-} 
+}

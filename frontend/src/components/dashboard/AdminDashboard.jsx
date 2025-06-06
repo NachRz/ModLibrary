@@ -11,7 +11,7 @@ const AdminDashboard = ({ defaultTab = 0 }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState(defaultTab);
-  
+
   // Mapeo de rutas a índices de pestañas de admin
   const pathToTabIndex = {
     '/admin': 0,
@@ -42,13 +42,13 @@ const AdminDashboard = ({ defaultTab = 0 }) => {
       content: <ComentariosAdmin />
     }
   ];
-  
+
   // Actualizar la pestaña activa basada en la ruta actual
   useEffect(() => {
-    const tabIndex = pathToTabIndex[location.pathname] !== undefined 
-      ? pathToTabIndex[location.pathname] 
+    const tabIndex = pathToTabIndex[location.pathname] !== undefined
+      ? pathToTabIndex[location.pathname]
       : defaultTab;
-    
+
     // Validar que el índice esté dentro del rango
     if (tabIndex >= 0 && tabIndex < adminTabConfig.length) {
       setCurrentTab(tabIndex);
@@ -64,9 +64,9 @@ const AdminDashboard = ({ defaultTab = 0 }) => {
       console.warn('Índice de pestaña fuera de rango:', index);
       return;
     }
-    
+
     setCurrentTab(index);
-    
+
     // Navegar a la ruta correspondiente
     if (tabIndexToPath[index]) {
       navigate(tabIndexToPath[index]);
@@ -96,17 +96,17 @@ const AdminDashboard = ({ defaultTab = 0 }) => {
               Gestión avanzada del sistema
             </p>
           </div>
-          
+
           {/* Toggle de admin para poder volver */}
-          <AdminToggle 
-            isEnabled={true} 
-            onToggle={handleAdminToggle} 
+          <AdminToggle
+            isEnabled={true}
+            onToggle={handleAdminToggle}
           />
         </div>
-        
-        <Tabs 
-          tabs={adminTabConfig} 
-          defaultTab={safeCurrentTab} 
+
+        <Tabs
+          tabs={adminTabConfig}
+          defaultTab={safeCurrentTab}
           onTabChange={handleTabChange}
         />
       </div>

@@ -47,7 +47,7 @@ const ExplorarJuegos = () => {
     try {
       setCargando(true);
       setError(null);
-      
+
       const response = await gameService.getAllGames(forceRefresh);
       setJuegos(response.map(game => ({
         id: game.id,
@@ -94,7 +94,7 @@ const ExplorarJuegos = () => {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     // Establecer marca de tiempo inicial
     localStorage.setItem('explorarJuegos_lastFetch', Date.now().toString());
 
@@ -167,18 +167,18 @@ const ExplorarJuegos = () => {
           return false;
         }
       }
-      
+
       // Filtro por géneros
       if (filtros.generosSeleccionados.length > 0) {
         const juegoGeneros = juego.generos || [];
-        const hasMatchingGenre = filtros.generosSeleccionados.some(generoId => 
+        const hasMatchingGenre = filtros.generosSeleccionados.some(generoId =>
           juegoGeneros.some(genero => genero.id === generoId)
         );
         if (!hasMatchingGenre) {
           return false;
         }
       }
-      
+
       return true;
     })
     .sort((a, b) => {
@@ -282,7 +282,7 @@ const ExplorarJuegos = () => {
                   <div className="filter-section">
                     <div className="game-genre-section">
                       <h3 className="game-genre-title">GAME GENRE</h3>
-                      
+
                       {/* Campo de búsqueda de géneros */}
                       <div className="genre-search-container">
                         <input
@@ -294,7 +294,7 @@ const ExplorarJuegos = () => {
                           className="genre-search-input"
                         />
                       </div>
-                      
+
                       {cargandoGeneros ? (
                         <div className="p-4 bg-custom-bg/20 rounded-md text-center">
                           <div className="loading-spinner w-6 h-6 border-2 border-custom-primary/20 border-t-custom-primary rounded-full animate-spin mx-auto mb-2"></div>
@@ -358,7 +358,7 @@ const ExplorarJuegos = () => {
                         </span>
                       </div>
                     )}
-                    
+
                     {filtros.generosSeleccionados.map(generoId => (
                       <div key={generoId} className="filtro-tag">
                         <span className="tipo">Género:</span>
@@ -494,7 +494,7 @@ const ExplorarJuegos = () => {
                     </span>{' '}
                     de <span className="font-medium text-custom-text">{juegosFiltrados.length}</span> juegos
                   </div>
-                  
+
                   <div className="flex space-x-2">
                     <button
                       onClick={() => handlePaginaChange(1)}
@@ -505,7 +505,7 @@ const ExplorarJuegos = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                       </svg>
                     </button>
-                    
+
                     <button
                       onClick={() => handlePaginaChange(paginacion.paginaActual - 1)}
                       disabled={paginacion.paginaActual === 1}
@@ -515,7 +515,7 @@ const ExplorarJuegos = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
-                    
+
                     {/* Mostrar páginas */}
                     <div className="hidden sm:flex space-x-2">
                       {Array.from({ length: Math.min(5, totalPaginas) }, (_, i) => {
@@ -529,23 +529,22 @@ const ExplorarJuegos = () => {
                         } else {
                           pageNum = paginacion.paginaActual - 2 + i;
                         }
-                        
+
                         return (
                           <button
                             key={pageNum}
                             onClick={() => handlePaginaChange(pageNum)}
-                            className={`pagination-button ${
-                              paginacion.paginaActual === pageNum
+                            className={`pagination-button ${paginacion.paginaActual === pageNum
                                 ? 'bg-custom-primary border-custom-primary text-white'
                                 : ''
-                            }`}
+                              }`}
                           >
                             {pageNum}
                           </button>
                         );
                       })}
                     </div>
-                    
+
                     <button
                       onClick={() => handlePaginaChange(paginacion.paginaActual + 1)}
                       disabled={paginacion.paginaActual === totalPaginas}
@@ -555,7 +554,7 @@ const ExplorarJuegos = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
-                    
+
                     <button
                       onClick={() => handlePaginaChange(totalPaginas)}
                       disabled={paginacion.paginaActual === totalPaginas}

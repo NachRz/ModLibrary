@@ -16,12 +16,12 @@ class UsuarioSeeder extends Seeder
     private function crearCarpetaUsuario($usuarioId)
     {
         $userPath = storage_path('app/public/users/user_' . $usuarioId);
-        
+
         // Eliminar carpeta del usuario si ya existe
         if (File::exists($userPath)) {
             File::deleteDirectory($userPath);
         }
-        
+
         // Crear carpeta del usuario
         File::makeDirectory($userPath, 0755, true);
 
@@ -41,17 +41,17 @@ class UsuarioSeeder extends Seeder
     public function run()
     {
         $this->command->info('Iniciando UsuarioSeeder - Creación de usuarios y carpetas...');
-        
+
         // Asegurar que existe el directorio de defaults si no existe
         $defaultsPath = storage_path('app/public/defaults');
         if (!File::exists($defaultsPath)) {
             File::makeDirectory($defaultsPath, 0755, true);
             $this->command->info("Creado directorio de archivos por defecto: {$defaultsPath}");
-            
+
             // Crear subdirectorio de avatares
             File::makeDirectory($defaultsPath . '/avatars', 0755, true);
         }
-        
+
         // Usuario 1 - Admin existente
         if (!Usuario::where('correo', 'admin@gmail.com')->exists()) {
             $usuario1 = Usuario::create([
@@ -129,10 +129,10 @@ class UsuarioSeeder extends Seeder
                 'url' => 'https://www.linkedin.com/usuario3'
             ]);
         }
-        
+
         $this->command->newLine();
         $this->command->info('Seeder de usuarios completado con éxito.');
         $this->command->info("Total de usuarios procesados: 3");
         $this->command->info("Todas las carpetas y archivos de usuarios han sido creados.");
     }
-} 
+}

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import adminService from '../../../../../services/api/adminService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faUser, 
-  faEnvelope, 
+import {
+  faUser,
+  faEnvelope,
   faEdit,
   faShieldAlt,
   faCrown,
@@ -61,13 +61,13 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
       setLoading(true);
       const response = await adminService.getUserDetails(user.id);
       const userData = response.data;
-      
+
       // Agregar timestamp a los datos del usuario
       const userDataWithTimestamp = {
         ...userData,
         imageTimestamp: Date.now()
       };
-      
+
       setFormData({
         nome: userDataWithTimestamp.nome || '',
         correo: userDataWithTimestamp.correo || '',
@@ -77,11 +77,11 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
         rol: userDataWithTimestamp.rol || 'usuario',
         foto_perfil: userDataWithTimestamp.foto_perfil || ''
       });
-      
+
       // Limpiar estados de archivo al cargar nuevos datos
       setSelectedFile(null);
       setImageTimestamp(userDataWithTimestamp.imageTimestamp);
-      
+
       // Actualizar preview URL con el nuevo timestamp
       if (userDataWithTimestamp.foto_perfil) {
         if (userDataWithTimestamp.foto_perfil.startsWith('http')) {
@@ -106,7 +106,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Validación específica para el nombre de usuario
     if (name === 'nome') {
       // Validar que solo contenga letras, números y algunos caracteres especiales
@@ -115,7 +115,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
         return; // No actualizar si contiene caracteres inválidos
       }
     }
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -130,22 +130,22 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
         setError('Por favor, selecciona un archivo de imagen válido');
         return;
       }
-      
+
       // Validar tamaño (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('La imagen es demasiado grande. Máximo 5MB');
         return;
       }
-      
+
       setSelectedFile(file);
-      
+
       // Crear preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrl(e.target.result);
       };
       reader.readAsDataURL(file);
-      
+
       // Limpiar error previo
       setError('');
     }
@@ -153,19 +153,19 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
 
   const uploadImage = async () => {
     if (!selectedFile) return null;
-    
+
     try {
       setUploadingImage(true);
       const uploadFormData = new FormData();
       uploadFormData.append('image', selectedFile);
       uploadFormData.append('user_id', user.id);
-      
+
       const response = await adminService.uploadProfileImage(uploadFormData);
-      
+
       // Actualizar timestamp para forzar actualización de imagen
       const newTimestamp = Date.now();
       setImageTimestamp(newTimestamp);
-      
+
       // Actualizar el preview URL con el nuevo timestamp
       if (response.data.url) {
         if (response.data.url.startsWith('http')) {
@@ -174,7 +174,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
           setPreviewUrl(`http://localhost:8000/storage/${response.data.url}?t=${newTimestamp}`);
         }
       }
-      
+
       return response.data.url;
     } catch (error) {
       throw new Error('Error al subir la imagen: ' + error.message);
@@ -191,12 +191,12 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
     try {
       let finalImageUrl = formData.foto_perfil;
       const newTimestamp = Date.now();
-      
+
       // Si hay un archivo seleccionado, subirlo primero
       if (selectedFile) {
         finalImageUrl = await uploadImage();
       }
-      
+
       // Preparar datos para actualizar
       const updateData = {
         rol: formData.rol,
@@ -208,7 +208,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
       };
 
       await adminService.updateUser(user.id, updateData);
-      
+
       // Crear objeto de usuario actualizado con timestamp fresco
       const updatedUser = {
         ...user,
@@ -218,7 +218,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
         imageTimestamp: newTimestamp,
         updated_at: new Date().toISOString()
       };
-      
+
       onSave(updatedUser);
       onClose();
     } catch (error) {
@@ -303,15 +303,15 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                     </div>
                     Foto de Perfil
                   </label>
-                  
+
                   {/* Preview e interfaz de subida */}
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                         {previewUrl ? (
-                          <img 
+                          <img
                             src={previewUrl}
-                            alt="Preview" 
+                            alt="Preview"
                             className="w-16 h-16 rounded-full object-cover"
                             onError={(e) => {
                               console.error('Error loading image:', previewUrl);
@@ -320,7 +320,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                             }}
                           />
                         ) : null}
-                        <span 
+                        <span
                           className="text-white font-bold text-xl"
                           style={{ display: previewUrl ? 'none' : 'flex' }}
                         >
@@ -333,7 +333,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center space-x-3">
                         <input
@@ -349,7 +349,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                         >
                           Subir Imagen
                         </label>
-                        
+
                         {(previewUrl || selectedFile) && (
                           <button
                             type="button"
@@ -360,13 +360,13 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                           </button>
                         )}
                       </div>
-                      
+
                       {selectedFile && (
                         <p className="text-green-400 text-sm">
                           ✓ {selectedFile.name}
                         </p>
                       )}
-                      
+
                       <p className="text-xs text-gray-400">
                         Formatos: JPG, PNG, GIF. Máximo 5MB
                       </p>
@@ -400,7 +400,7 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
                       maxLength="50"
                     />
                     <p className="text-xs text-gray-400 mt-1">
-                      Solo administradores pueden modificar nombres de usuario. 
+                      Solo administradores pueden modificar nombres de usuario.
                       Debe ser único (3-50 caracteres: letras, números, puntos, guiones y guiones bajos)
                     </p>
                   </div>
@@ -509,9 +509,9 @@ const UserEditModal = ({ user, isOpen, onClose, onSave }) => {
               disabled={loading}
               className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
-              <FontAwesomeIcon 
-                icon={loading ? faSpinner : faSave} 
-                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+              <FontAwesomeIcon
+                icon={loading ? faSpinner : faSave}
+                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
               />
               <span className="hidden sm:inline">{loading ? 'Guardando...' : 'Guardar Cambios'}</span>
               <span className="sm:hidden">{loading ? 'Guardando...' : 'Guardar'}</span>

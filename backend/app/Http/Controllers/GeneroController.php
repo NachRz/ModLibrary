@@ -21,7 +21,7 @@ class GeneroController extends Controller
     public function index(): JsonResponse
     {
         $generos = Genero::orderBy('nombre')->get();
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $generos
@@ -78,7 +78,6 @@ class GeneroController extends Controller
                     'total' => $generosCreados + $generosActualizados
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -93,7 +92,7 @@ class GeneroController extends Controller
     public function getJuegosPorGenero(Request $request, int $generoId): JsonResponse
     {
         $genero = Genero::find($generoId);
-        
+
         if (!$genero) {
             return response()->json([
                 'status' => 'error',
@@ -105,10 +104,10 @@ class GeneroController extends Controller
         $perPage = $request->get('per_page', 20);
 
         $juegos = $genero->juegos()
-            ->whereHas('mods', function($query) {
+            ->whereHas('mods', function ($query) {
                 $query->where('estado', 'publicado')->whereNull('deleted_at');
             })
-            ->with(['mods' => function($query) {
+            ->with(['mods' => function ($query) {
                 $query->where('estado', 'publicado')->whereNull('deleted_at');
             }])
             ->paginate($perPage, ['*'], 'page', $page);
@@ -134,18 +133,18 @@ class GeneroController extends Controller
 
         // Filtrar por géneros si se proporcionan
         if (!empty($generosIds)) {
-            $query->whereHas('generos', function($q) use ($generosIds) {
+            $query->whereHas('generos', function ($q) use ($generosIds) {
                 $q->whereIn('generos.id', $generosIds);
             });
         }
 
         // Solo incluir juegos que tengan al menos un mod publicado
-        $query->whereHas('mods', function($q) {
+        $query->whereHas('mods', function ($q) {
             $q->where('estado', 'publicado')->whereNull('deleted_at');
         });
 
         // Incluir relaciones
-        $query->with(['generos', 'mods' => function($q) {
+        $query->with(['generos', 'mods' => function ($q) {
             $q->where('estado', 'publicado')->whereNull('deleted_at');
         }]);
 
@@ -179,7 +178,7 @@ class GeneroController extends Controller
     {
         try {
             $juego = Juego::find($juegoId);
-            
+
             if (!$juego) {
                 return response()->json([
                     'status' => 'error',
@@ -212,7 +211,7 @@ class GeneroController extends Controller
                             'games_count' => $generoData['games_count'] ?? 0
                         ]
                     );
-                    
+
                     $generosIds[] = $genero->id;
                 }
             }
@@ -228,7 +227,6 @@ class GeneroController extends Controller
                     'generos_sincronizados' => count($generosIds)
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

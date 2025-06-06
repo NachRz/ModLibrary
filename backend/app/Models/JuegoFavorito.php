@@ -31,4 +31,4 @@ class JuegoFavorito extends Model
     {
         return $this->belongsTo(Juego::class, 'juego_id');
     }
-} 
+}

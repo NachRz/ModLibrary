@@ -40,14 +40,13 @@ class JuegoController extends Controller
                             'games_count' => $generoData['games_count'] ?? 0
                         ]
                     );
-                    
+
                     $generosIds[] = $genero->id;
                 }
             }
 
             // Sincronizar la relación (esto reemplaza los géneros existentes del juego)
             $juego->generos()->sync($generosIds);
-
         } catch (\Exception $e) {
             // Silenciar errores para mantener consistencia con la limpieza de logs
         }
@@ -57,15 +56,19 @@ class JuegoController extends Controller
     {
         $juegos = Juego::with('generos')
             ->select([
-                'id', 'titulo', 'imagen_fondo', 'mods_totales',
-                'rating', 'fecha_lanzamiento'
+                'id',
+                'titulo',
+                'imagen_fondo',
+                'mods_totales',
+                'rating',
+                'fecha_lanzamiento'
             ])
             ->whereHas('mods', function ($query) {
                 $query->where('estado', 'publicado')
-                      ->whereNull('deleted_at');
+                    ->whereNull('deleted_at');
             })
             ->get();
-        
+
         return response()->json([
             'status' => 'success',
             'data' => $juegos->map(function ($juego) {
@@ -137,8 +140,13 @@ class JuegoController extends Controller
     public function show($id)
     {
         $juego = Juego::with('generos')->select([
-            'id', 'titulo', 'descripcion', 'imagen_fondo',
-            'mods_totales', 'rating', 'fecha_lanzamiento'
+            'id',
+            'titulo',
+            'descripcion',
+            'imagen_fondo',
+            'mods_totales',
+            'rating',
+            'fecha_lanzamiento'
         ])->find($id);
 
         if (!$juego) {
@@ -212,7 +220,6 @@ class JuegoController extends Controller
                 'data' => $juego,
                 'message' => 'Juego creado exitosamente'
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -229,7 +236,7 @@ class JuegoController extends Controller
         try {
             /** @var Usuario $usuario */
             $usuario = Auth::user();
-            
+
             if (!$usuario) {
                 return response()->json([
                     'status' => 'error',
@@ -239,8 +246,12 @@ class JuegoController extends Controller
 
             $juegosFavoritos = $usuario->juegosFavoritos()
                 ->select([
-                    'juegos.id', 'juegos.titulo', 'juegos.imagen_fondo', 
-                    'juegos.mods_totales', 'juegos.rating', 'juegos.fecha_lanzamiento'
+                    'juegos.id',
+                    'juegos.titulo',
+                    'juegos.imagen_fondo',
+                    'juegos.mods_totales',
+                    'juegos.rating',
+                    'juegos.fecha_lanzamiento'
                 ])
                 ->withPivot('fecha_agregado')
                 ->orderBy('juegos_favoritos.fecha_agregado', 'desc')
@@ -260,7 +271,6 @@ class JuegoController extends Controller
                     ];
                 })
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -276,7 +286,7 @@ class JuegoController extends Controller
     {
         try {
             $usuario = Auth::user();
-            
+
             if (!$usuario) {
                 return response()->json([
                     'status' => 'error',
@@ -316,7 +326,6 @@ class JuegoController extends Controller
                 'status' => 'success',
                 'message' => 'Juego agregado a favoritos exitosamente'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -332,7 +341,7 @@ class JuegoController extends Controller
     {
         try {
             $usuario = Auth::user();
-            
+
             if (!$usuario) {
                 return response()->json([
                     'status' => 'error',
@@ -358,7 +367,6 @@ class JuegoController extends Controller
                 'status' => 'success',
                 'message' => 'Juego eliminado de favoritos exitosamente'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -374,7 +382,7 @@ class JuegoController extends Controller
     {
         try {
             $usuario = Auth::user();
-            
+
             if (!$usuario) {
                 return response()->json([
                     'status' => 'error',
@@ -392,7 +400,6 @@ class JuegoController extends Controller
                     'es_favorito' => $esFavorito
                 ]
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -400,4 +407,4 @@ class JuegoController extends Controller
             ], 500);
         }
     }
-} 
+}

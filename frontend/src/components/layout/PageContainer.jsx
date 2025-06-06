@@ -7,14 +7,14 @@ import useBreadcrumb from '../../hooks/useBreadcrumb';
 const PageContainer = ({ children, className = '' }) => {
   const breadcrumbItems = useBreadcrumb();
   const location = useLocation();
-  
+
   // Determinar si estamos en páginas que necesitan ancho extendido
-  const isWideLayout = location.pathname.startsWith('/mods') || 
-                       location.pathname.startsWith('/juegos') || 
-                       location.pathname.startsWith('/search') || 
-                       location.pathname.startsWith('/dashboard') ||
-                       location.pathname.startsWith('/admin') ||
-                       location.pathname === '/';
+  const isWideLayout = location.pathname.startsWith('/mods') ||
+    location.pathname.startsWith('/juegos') ||
+    location.pathname.startsWith('/search') ||
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/admin') ||
+    location.pathname === '/';
   const maxWidthClass = isWideLayout ? 'max-w-[1600px]' : 'max-w-7xl';
 
   return (

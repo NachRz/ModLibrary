@@ -10,7 +10,7 @@ const Home = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
-    
+
     // Si hubiera un sistema real de autenticación, aquí obtendríamos el nombre del usuario
     if (token) {
       setUsername('Usuario');
@@ -75,7 +75,7 @@ const Home = () => {
               </span>
             </h1>
             <p className="mt-8 max-w-lg mx-auto text-lg text-custom-detail/90 sm:max-w-3xl leading-relaxed">
-              Organiza, gestiona y comparte tus mods favoritos en un solo lugar. 
+              Organiza, gestiona y comparte tus mods favoritos en un solo lugar.
               Descubre nuevas creaciones y mantén tus juegos siempre actualizados con las mejores modificaciones.
             </p>
             <div className="mt-12 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center">
@@ -112,11 +112,11 @@ const Home = () => {
             Una plataforma completa diseñada para todos los amantes de las modificaciones de juegos.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 place-items-center">
           {features.map((feature, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="bg-custom-card/60 backdrop-blur-sm rounded-2xl p-8 border border-custom-detail/10 shadow-custom hover:shadow-custom-lg transition-all duration-500 hover:transform hover:-translate-y-2 group w-full max-w-sm min-h-[320px] flex flex-col"
             >
               <div className={`flex items-center justify-center h-14 w-14 rounded-xl ${feature.color} text-custom-text mb-6 group-hover:scale-110 transition-transform duration-300`}>
@@ -136,8 +136,8 @@ const Home = () => {
         <div className="bg-gradient-to-r from-custom-primary to-custom-secondary/90 relative overflow-hidden">
           {/* Elementos decorativos */}
           <div className="absolute top-0 left-0 w-40 h-40 bg-white rounded-full filter blur-3xl opacity-10 animate-pulse"></div>
-          <div className="absolute bottom-0 right-10 w-60 h-60 bg-white rounded-full filter blur-3xl opacity-10 animate-pulse" style={{animationDelay: '3s'}}></div>
-          
+          <div className="absolute bottom-0 right-10 w-60 h-60 bg-white rounded-full filter blur-3xl opacity-10 animate-pulse" style={{ animationDelay: '3s' }}></div>
+
           <div className="max-w-7xl mx-auto py-16 px-4 sm:py-20 sm:px-6 lg:px-8 lg:py-24 relative z-10">
             <div className="text-center">
               <span className="inline-block bg-white/20 backdrop-blur-sm text-custom-text px-4 py-2 rounded-full text-sm font-medium mb-6">
@@ -148,7 +148,7 @@ const Home = () => {
                 <span className="block mt-2">Únete a la comunidad hoy mismo</span>
               </h2>
               <p className="mt-6 text-lg text-custom-text/90 max-w-2xl mx-auto">
-                Empieza a organizar tu colección de mods, comparte tus creaciones 
+                Empieza a organizar tu colección de mods, comparte tus creaciones
                 y descubre un mundo de posibilidades para tus juegos favoritos.
               </p>
               <div className="mt-10">

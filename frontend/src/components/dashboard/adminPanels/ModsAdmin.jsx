@@ -20,11 +20,11 @@ const ModsAdmin = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('todos');
   const [activeTab, setActiveTab] = useState('active'); // Nueva pestaña activa
-  
+
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
-  
+
   // Estados para el modal de eliminación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modToDelete, setModToDelete] = useState(null);
@@ -49,14 +49,14 @@ const ModsAdmin = () => {
   // Función helper para formatear mensajes sobre juegos y géneros eliminados
   const formatearMensajeEliminacion = (mensajeBase, juegoEliminadoInfo) => {
     if (!juegoEliminadoInfo) return mensajeBase;
-    
+
     let mensaje = `${mensajeBase}. El juego "${juegoEliminadoInfo.titulo}" fue eliminado automáticamente porque no tenía más mods asociados`;
-    
+
     if (juegoEliminadoInfo.generos_eliminados && juegoEliminadoInfo.generos_eliminados.length > 0) {
       const nombresGeneros = juegoEliminadoInfo.generos_eliminados.map(g => g.nombre).join(', ');
       mensaje += ` y se eliminaron los géneros: ${nombresGeneros}`;
     }
-    
+
     return mensaje + '.';
   };
 
@@ -69,13 +69,13 @@ const ModsAdmin = () => {
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      
+
       // Cargar ambos tipos de datos en paralelo
       const [modsResponse, deletedModsResponse] = await Promise.all([
         modService.getModsWithDetails(),
         modService.getDeletedMods()
       ]);
-      
+
       // Procesar mods activos
       if (modsResponse.status === 'success') {
         const formattedMods = modsResponse.data.map(mod => ({
@@ -93,7 +93,7 @@ const ModsAdmin = () => {
       } else {
         throw new Error(modsResponse.message || 'Error al cargar los mods');
       }
-      
+
       // Procesar mods eliminados
       if (deletedModsResponse.status === 'success') {
         setDeletedMods(deletedModsResponse.data || []);
@@ -114,7 +114,7 @@ const ModsAdmin = () => {
     try {
       setLoading(true);
       const response = await modService.getModsWithDetails();
-      
+
       if (response.status === 'success') {
         // Formatear los datos para el panel de admin
         const formattedMods = response.data.map(mod => ({
@@ -146,7 +146,7 @@ const ModsAdmin = () => {
     try {
       setLoading(true);
       const response = await modService.getDeletedMods();
-      
+
       if (response.status === 'success') {
         setDeletedMods(response.data || []);
       } else {
@@ -173,11 +173,11 @@ const ModsAdmin = () => {
 
   const filteredMods = mods.filter(mod => {
     const matchesSearch = mod.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         mod.creador.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         mod.juego.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      mod.creador.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mod.juego.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesFilter = filterStatus === 'todos' || mod.estado === filterStatus;
-    
+
     return matchesSearch && matchesFilter;
   });
 
@@ -217,9 +217,9 @@ const ModsAdmin = () => {
   const handleStatusChange = async (modId, newStatus) => {
     try {
       const response = await modService.changeModStatus(modId, newStatus);
-      
+
       if (response.status === 'success') {
-        setMods(prev => prev.map(mod => 
+        setMods(prev => prev.map(mod =>
           mod.id === modId ? { ...mod, estado: newStatus } : mod
         ));
         showNotification(`Estado del mod actualizado a "${newStatus}"`, 'success');
@@ -240,27 +240,27 @@ const ModsAdmin = () => {
   // Confirmar eliminación (soft delete)
   const confirmDelete = async () => {
     if (!modToDelete) return;
-    
+
     try {
       setDeleting(true);
       const response = await modService.softDeleteMod(modToDelete.id);
-      
+
       if (response.status === 'success') {
         // Eliminar el mod de la lista local
         setMods(prevMods => prevMods.filter(mod => mod.id !== modToDelete.id));
         // Añadir el mod a la lista de eliminados para actualizar el contador
-        setDeletedMods(prevDeleted => [...prevDeleted, { 
-          ...modToDelete, 
-          fecha_eliminacion: new Date().toLocaleString() 
+        setDeletedMods(prevDeleted => [...prevDeleted, {
+          ...modToDelete,
+          fecha_eliminacion: new Date().toLocaleString()
         }]);
-        
+
         // Mostrar notificación con información sobre juegos eliminados
         if (response.juego_eliminado) {
           let mensaje = formatearMensajeEliminacion(`Mod "${modToDelete.titulo}" desactivado correctamente.`, response.juego_eliminado);
-          
+
           showNotification(
-            mensaje, 
-            'success', 
+            mensaje,
+            'success',
             10000 // Duración más larga para mensajes con más información
           );
         } else {
@@ -287,11 +287,11 @@ const ModsAdmin = () => {
   // Confirmar restauración
   const confirmRestore = async () => {
     if (!modToRestore) return;
-    
+
     try {
       setRestoring(true);
       const response = await modService.restoreMod(modToRestore.id);
-      
+
       if (response.status === 'success') {
         // Formatear el mod restaurado para la lista de activos
         const formattedMod = {
@@ -306,7 +306,7 @@ const ModsAdmin = () => {
           titulo: modToRestore.titulo
         };
         setMods(prevMods => [...prevMods, formattedMod]);
-        
+
         setDeletedMods(prev => prev.filter(mod => mod.id !== modToRestore.id));
         showNotification(`Mod "${modToRestore.titulo}" restaurado correctamente`, 'success');
       } else {
@@ -335,21 +335,21 @@ const ModsAdmin = () => {
 
   const confirmPermanentDelete = async () => {
     if (!modToDelete) return;
-    
+
     try {
       setDeleting(true);
       const response = await modService.forceDeleteMod(modToDelete.id);
-      
+
       if (response.status === 'success') {
         setDeletedMods(prev => prev.filter(mod => mod.id !== modToDelete.id));
-        
+
         // Mostrar notificación con información sobre juegos eliminados
         if (response.juego_eliminado) {
           let mensaje = formatearMensajeEliminacion(`Mod "${modToDelete.titulo}" eliminado definitivamente.`, response.juego_eliminado);
-          
+
           showNotification(
-            mensaje, 
-            'success', 
+            mensaje,
+            'success',
             10000 // Duración más larga para mensajes con más información
           );
         } else {
@@ -382,8 +382,8 @@ const ModsAdmin = () => {
 
   const handleEditSave = (updatedMod) => {
     // Actualizar el mod en la lista local
-    setMods(prevMods => 
-      prevMods.map(mod => 
+    setMods(prevMods =>
+      prevMods.map(mod =>
         mod.id === updatedMod.id ? {
           ...mod, // Mantener los campos existentes
           ...updatedMod, // Sobrescribir con los campos actualizados
@@ -393,14 +393,14 @@ const ModsAdmin = () => {
         } : mod
       )
     );
-    
+
     // Mostrar notificación sobre juegos eliminados si aplica
     if (updatedMod.juego_eliminado) {
       let mensaje = formatearMensajeEliminacion(`Mod actualizado correctamente.`, updatedMod.juego_eliminado);
-      
+
       showNotification(
-        mensaje, 
-        'success', 
+        mensaje,
+        'success',
         10000 // Duración más larga para mensajes con más información
       );
     }
@@ -462,7 +462,7 @@ const ModsAdmin = () => {
             <h2 className="text-lg lg:text-xl font-semibold text-white">Gestión de Mods</h2>
             <p className="text-gray-400 text-sm">Administra y modera los mods del sistema</p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             {activeTab === 'active' && (
               <>
@@ -484,7 +484,7 @@ const ModsAdmin = () => {
                 </select>
               </>
             )}
-            
+
             <div className="relative w-full sm:w-auto">
               <input
                 type="text"
@@ -493,8 +493,8 @@ const ModsAdmin = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-gray-700 text-white px-3 lg:px-4 py-2 pr-10 rounded-lg border border-gray-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-full sm:w-64 text-sm"
               />
-              <FontAwesomeIcon 
-                icon={faSearch} 
+              <FontAwesomeIcon
+                icon={faSearch}
                 className="absolute right-3 top-3 text-gray-400 pointer-events-none"
               />
             </div>
@@ -506,21 +506,19 @@ const ModsAdmin = () => {
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => handleTabChange('active')}
-              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'active'
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'active'
                   ? 'border-purple-500 text-purple-400'
                   : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300'
-              }`}
+                }`}
             >
               Mods Activos ({mods.length})
             </button>
             <button
               onClick={() => handleTabChange('deleted')}
-              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'deleted'
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'deleted'
                   ? 'border-purple-500 text-purple-400'
                   : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-300'
-              }`}
+                }`}
             >
               Mods Eliminados ({deletedMods.length})
             </button>
@@ -631,7 +629,7 @@ const ModsAdmin = () => {
                         </td>
                         <td className="actions-column">
                           <div className="action-buttons-container">
-                            <button 
+                            <button
                               onClick={() => handleViewMod(mod)}
                               className="action-btn-text view"
                               title="Ver mod"
@@ -640,8 +638,8 @@ const ModsAdmin = () => {
                               <span className="btn-text-full">Ver</span>
                               <span className="btn-text-short">V</span>
                             </button>
-                            
-                            <button 
+
+                            <button
                               onClick={() => handleEditMod(mod)}
                               className="action-btn-text edit"
                               title="Editar mod"
@@ -650,16 +648,16 @@ const ModsAdmin = () => {
                               <span className="btn-text-full">Editar</span>
                               <span className="btn-text-short">E</span>
                             </button>
-                            
-                            <button 
+
+                            <button
                               onClick={() => handleDeleteMod(mod)}
                               className="action-btn-text delete"
                               title="Eliminar mod"
                               disabled={deleting && modToDelete?.id === mod.id}
                             >
-                              <FontAwesomeIcon 
-                                icon={faTrash} 
-                                className={`action-btn-icon ${deleting && modToDelete?.id === mod.id ? 'animate-spin' : ''}`} 
+                              <FontAwesomeIcon
+                                icon={faTrash}
+                                className={`action-btn-icon ${deleting && modToDelete?.id === mod.id ? 'animate-spin' : ''}`}
                               />
                               <span className="btn-text-full">Eliminar</span>
                               <span className="btn-text-short">X</span>
@@ -706,7 +704,7 @@ const ModsAdmin = () => {
                         </td>
                         <td className="actions-column">
                           <div className="action-buttons-container">
-                            <button 
+                            <button
                               onClick={() => handleRestoreMod(mod)}
                               className="action-btn-text restore"
                               title="Restaurar mod"
@@ -715,7 +713,7 @@ const ModsAdmin = () => {
                               <span className="btn-text-full">Restaurar</span>
                               <span className="btn-text-short">R</span>
                             </button>
-                            <button 
+                            <button
                               onClick={() => handlePermanentDelete(mod)}
                               className="action-btn-text delete"
                               title="Eliminar definitivamente"

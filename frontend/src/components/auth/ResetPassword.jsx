@@ -49,7 +49,7 @@ const ResetPassword = () => {
             Ingresa tu correo electrónico y te enviaremos instrucciones para restablecer tu contraseña
           </p>
         </div>
-        
+
         {error && (
           <div className="text-custom-error text-sm text-center p-3 bg-custom-error/10 rounded-lg border border-custom-error/20 animate-pulse">
             <svg className="h-5 w-5 inline-block mr-1 mb-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -58,7 +58,7 @@ const ResetPassword = () => {
             {error}
           </div>
         )}
-        
+
         {success && (
           <div className="text-green-600 text-sm text-center p-3 bg-green-50 rounded-lg border border-green-200 animate-pulse">
             <svg className="h-5 w-5 inline-block mr-1 mb-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -67,7 +67,7 @@ const ResetPassword = () => {
             {success}
           </div>
         )}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-5">
             <div className="group">
@@ -111,7 +111,7 @@ const ResetPassword = () => {
             </GradientButton>
           </div>
         </form>
-        
+
         <div className="text-center mt-4">
           <Link to="/login" className="text-sm font-medium text-custom-detail hover:text-custom-primary transition-colors duration-300">
             ← Volver a iniciar sesión

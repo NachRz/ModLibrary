@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Limpiando carpetas específicas (mods y users)...');
 
         $storageAppPublicPath = storage_path('app/public');
-        
+
         // Limpiar carpeta de mods
         $modsPath = $storageAppPublicPath . '/mods';
         if (File::exists($modsPath)) {
@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
         // Recrear las carpetas
         File::makeDirectory($modsPath, 0755, true);
         File::makeDirectory($usersPath, 0755, true);
-        
+
         $this->command->info('Carpetas mods y users recreadas');
     }
 
@@ -69,7 +69,6 @@ class DatabaseSeeder extends Seeder
             // Simplemente ejecutar el comando artisan storage:link
             Artisan::call('storage:link');
             $this->command->info('Enlace simbólico creado correctamente');
-
         } catch (\Exception $e) {
             $this->command->error('Error al crear el enlace simbólico: ' . $e->getMessage());
             Log::error('Error al crear enlace simbólico en seeder', [

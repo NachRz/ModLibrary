@@ -16,10 +16,10 @@ import EditModAdmin from '../dashboard/adminPanels/modalsAdmin/ModAdminModal/Edi
 const Perfil = () => {
   const { user, updateUser, loading: authLoading } = useAuth();
   const { userId } = useParams(); // Obtener el userId de la URL si existe
-  
+
   // Debug logs
   console.log('Perfil component - userId:', userId, 'authLoading:', authLoading, 'user:', user);
-  
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [userStats, setUserStats] = useState({
     modsCreated: 0,
@@ -33,11 +33,11 @@ const Perfil = () => {
   const [filteredMods, setFilteredMods] = useState([]);
   const [availableGames, setAvailableGames] = useState([]);
   const [modsLoading, setModsLoading] = useState(false);
-  
+
   // Estado para el usuario público (cuando se ve el perfil de otro usuario)
   const [publicUser, setPublicUser] = useState(null);
   const [publicUserLoading, setPublicUserLoading] = useState(false);
-  
+
   // Estados para filtros
   const [selectedGame, setSelectedGame] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
@@ -50,7 +50,7 @@ const Perfil = () => {
   const [isEditModModalOpen, setIsEditModModalOpen] = useState(false);
   const [isDeleteModModalOpen, setIsDeleteModModalOpen] = useState(false);
   const [deletingMod, setDeletingMod] = useState(false);
-  
+
   const navigate = useNavigate();
 
   // Determinar si es un perfil público o el perfil propio
@@ -60,7 +60,7 @@ const Perfil = () => {
   // Función para formatear fecha de registro
   const formatearFechaRegistro = (fechaString) => {
     console.log('formatearFechaRegistro recibió:', fechaString, typeof fechaString);
-    
+
     if (!fechaString) {
       console.log('No hay fecha, usando fecha actual como fallback');
       // Si no hay fecha, usar fecha actual como fallback
@@ -71,10 +71,10 @@ const Perfil = () => {
         day: 'numeric'
       });
     }
-    
+
     try {
       let fecha;
-      
+
       // Manejar diferentes formatos de fecha
       if (typeof fechaString === 'string') {
         // Si es una fecha ISO (YYYY-MM-DD HH:MM:SS o YYYY-MM-DDTHH:MM:SS)
@@ -88,7 +88,7 @@ const Perfil = () => {
         // Si es un timestamp u otro formato
         fecha = new Date(fechaString);
       }
-      
+
       // Verificar si la fecha es válida
       if (isNaN(fecha.getTime())) {
         console.log('Fecha inválida, usando fecha actual como fallback');
@@ -99,17 +99,17 @@ const Perfil = () => {
           day: 'numeric'
         });
       }
-      
+
       // Formatear en español
       const fechaFormateada = fecha.toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       });
-      
+
       console.log('Fecha formateada exitosamente:', fechaFormateada);
       return fechaFormateada;
-      
+
     } catch (error) {
       console.error('Error al formatear fecha:', error);
       // Fallback a fecha actual en caso de error
@@ -134,9 +134,9 @@ const Perfil = () => {
     rol: currentUser?.rol || 'usuario',
     foto_perfil: currentUser?.foto_perfil || null,
     fechaRegistro: formatearFechaRegistro(
-      currentUser?.created_at || 
-      currentUser?.updated_at || 
-      currentUser?.fecha_registro || 
+      currentUser?.created_at ||
+      currentUser?.updated_at ||
+      currentUser?.fecha_registro ||
       currentUser?.fecha_creacion
     ),
     ultimaActividad: 'Ahora',
@@ -162,45 +162,45 @@ const Perfil = () => {
         try {
           setPublicUserLoading(true);
           setLoading(true);
-          
+
           console.log('Cargando perfil público para usuario ID:', userId);
-          
+
           // Obtener mods del usuario para extraer información del creador
           const modsResponse = await modService.getModsByCreatorId(userId);
-          
+
           console.log('Respuesta de mods:', modsResponse);
-          
+
           if (modsResponse.status === 'success' && modsResponse.data.length > 0) {
             // Extraer información del creador del primer mod
             const creadorData = modsResponse.data[0].creador;
             console.log('Datos del creador:', creadorData);
-            
+
             // Intentar obtener fecha de registro desde diferentes campos
-            const fechaRegistro = creadorData.created_at || 
-                                  creadorData.updated_at || 
-                                  creadorData.fecha_registro || 
-                                  creadorData.fecha_creacion ||
-                                  new Date().toISOString(); // Fallback a fecha actual
-            
+            const fechaRegistro = creadorData.created_at ||
+              creadorData.updated_at ||
+              creadorData.fecha_registro ||
+              creadorData.fecha_creacion ||
+              new Date().toISOString(); // Fallback a fecha actual
+
             console.log('Fecha de registro encontrada:', fechaRegistro);
-            
+
             setPublicUser({
               ...creadorData,
               created_at: fechaRegistro
             });
-            
+
             // Calcular rating promedio de todos los mods del usuario
             const totalMods = modsResponse.data.length;
             const totalRating = modsResponse.data.reduce((sum, mod) => {
               return sum + (mod.estadisticas?.valoracion_media || 0);
             }, 0);
             const averageRating = totalMods > 0 ? totalRating / totalMods : 0;
-            
+
             // Calcular total de descargas de todos los mods
             const totalDownloads = modsResponse.data.reduce((sum, mod) => {
               return sum + (mod.estadisticas?.total_descargas || mod.total_descargas || 0);
             }, 0);
-            
+
             // Calcular juegos únicos en los que ha trabajado
             const uniqueGamesSet = new Set();
             modsResponse.data.forEach(mod => {
@@ -209,7 +209,7 @@ const Perfil = () => {
               }
             });
             const uniqueGamesCount = uniqueGamesSet.size;
-            
+
             // Para perfiles públicos, establecemos estadísticas basadas en los mods reales
             setUserStats({
               modsCreated: totalMods,
@@ -219,7 +219,7 @@ const Perfil = () => {
               totalDownloads: totalDownloads,
               uniqueGames: uniqueGamesCount
             });
-            
+
             console.log('Perfil público cargado exitosamente:', {
               usuario: creadorData.nome,
               mods: totalMods,
@@ -230,9 +230,9 @@ const Perfil = () => {
           } else {
             // Si no hay mods, crear un usuario básico con solo el ID
             console.log('No se encontraron mods para el usuario, creando perfil básico');
-            
+
             const fechaActual = new Date().toISOString();
-            
+
             setPublicUser({
               id: parseInt(userId),
               nome: `Usuario ${userId}`,
@@ -244,7 +244,7 @@ const Perfil = () => {
               foto_perfil: null,
               created_at: fechaActual
             });
-            
+
             setUserStats({
               modsCreated: 0,
               misJuegos: 0,
@@ -258,7 +258,7 @@ const Perfil = () => {
           console.error('Error al cargar perfil público:', error);
           // Crear perfil básico aún con error
           const fechaActual = new Date().toISOString();
-          
+
           setPublicUser({
             id: parseInt(userId),
             nome: `Usuario ${userId}`,
@@ -270,7 +270,7 @@ const Perfil = () => {
             foto_perfil: null,
             created_at: fechaActual
           });
-          
+
           setUserStats({
             modsCreated: 0,
             misJuegos: 0,
@@ -296,23 +296,23 @@ const Perfil = () => {
       if (isPublicProfile) {
         return;
       }
-      
+
       // Solo cargar estadísticas si el usuario está disponible y no estamos en carga de autenticación
       if (currentUser && !authLoading) {
         try {
           setLoading(true);
-          
+
           // Cargar estadísticas del usuario, juegos favoritos y mods guardados en paralelo
           const [statsResponse, gamesResponse, savedModsResponse] = await Promise.all([
             userService.getUserStats(),
             userService.getFavoriteGames(),
             modService.getSavedMods()
           ]);
-          
+
           const stats = statsResponse.data || {};
           const favoriteGames = gamesResponse.data || [];
           const savedMods = savedModsResponse.data || [];
-          
+
           setUserStats({
             modsCreated: stats.modsCreated || 0,
             misJuegos: favoriteGames.length || 0,
@@ -351,7 +351,7 @@ const Perfil = () => {
     if (currentUser && !authLoading) {
       try {
         setModsLoading(true);
-        
+
         let response;
         if (isPublicProfile) {
           // Para perfiles públicos, usar getModsByCreatorId
@@ -361,7 +361,7 @@ const Perfil = () => {
           // Para el perfil propio, usar getMyMods
           response = await modService.getMyMods();
         }
-        
+
         if (response && response.status === 'success') {
           // Transformar los datos para que sean compatibles con ModCard
           const transformedMods = response.data.map(mod => ({
@@ -375,9 +375,9 @@ const Perfil = () => {
             // Mapear la categoría desde las etiquetas (tomar la primera si existe)
             categoria: mod.etiquetas && mod.etiquetas.length > 0 ? mod.etiquetas[0].nombre : 'Sin categoría'
           }));
-          
+
           setUserMods(transformedMods);
-          
+
           // Extraer juegos únicos de los mods
           const games = transformedMods.reduce((acc, mod) => {
             if (mod.juego && !acc.find(g => g.id === mod.juego.id)) {
@@ -386,7 +386,7 @@ const Perfil = () => {
             return acc;
           }, []);
           setAvailableGames(games);
-          
+
           console.log(`Mods cargados exitosamente: ${transformedMods.length} mods encontrados`);
         } else {
           setUserMods([]);
@@ -405,12 +405,12 @@ const Perfil = () => {
   // Aplicar filtros y ordenación
   useEffect(() => {
     let filtered = [...userMods];
-    
+
     // Filtrar por juego
     if (selectedGame !== 'all') {
       filtered = filtered.filter(mod => mod.juego?.id === parseInt(selectedGame));
     }
-    
+
     // Ordenar
     switch (sortBy) {
       case 'endorsements':
@@ -424,7 +424,7 @@ const Perfil = () => {
         filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
         break;
     }
-    
+
     setFilteredMods(filtered);
     setCurrentPage(1); // Reset página al cambiar filtros
   }, [userMods, selectedGame, sortBy]);
@@ -479,29 +479,29 @@ const Perfil = () => {
   const handleConfirmEdit = async (updatedModData) => {
     try {
       setLoading(true);
-      
+
       // El EditModAdmin ya maneja la actualización del mod internamente
       // Solo necesitamos actualizar la lista local con los datos transformados
-      setUserMods(prevMods => 
-        prevMods.map(mod => 
-          mod.id === selectedModForEdit.id 
+      setUserMods(prevMods =>
+        prevMods.map(mod =>
+          mod.id === selectedModForEdit.id
             ? {
-                ...mod,
-                titulo: updatedModData.titulo || updatedModData.nombre || mod.titulo,
-                descripcion: updatedModData.descripcion || mod.descripcion,
-                estado: updatedModData.estado || mod.estado,
-                imagen_banner: updatedModData.imagen_banner || mod.imagen_banner,
-                // Mantener las propiedades transformadas que espera ModCard
-                valoracion: mod.valoracion,
-                numValoraciones: mod.numValoraciones,
-                descargas: mod.descargas,
-                autor: mod.autor,
-                categoria: mod.categoria
-              }
+              ...mod,
+              titulo: updatedModData.titulo || updatedModData.nombre || mod.titulo,
+              descripcion: updatedModData.descripcion || mod.descripcion,
+              estado: updatedModData.estado || mod.estado,
+              imagen_banner: updatedModData.imagen_banner || mod.imagen_banner,
+              // Mantener las propiedades transformadas que espera ModCard
+              valoracion: mod.valoracion,
+              numValoraciones: mod.numValoraciones,
+              descargas: mod.descargas,
+              autor: mod.autor,
+              categoria: mod.categoria
+            }
             : mod
         )
       );
-      
+
       handleCloseEditModal();
       console.log('Mod actualizado exitosamente en la lista');
     } catch (error) {
@@ -515,13 +515,13 @@ const Perfil = () => {
     try {
       setDeletingMod(true);
       const response = await modService.deleteMod(selectedModForDelete.id);
-      
+
       if (response.status === 'success') {
         // Remover el mod de la lista local
-        setUserMods(prevMods => 
+        setUserMods(prevMods =>
           prevMods.filter(mod => mod.id !== selectedModForDelete.id)
         );
-        
+
         handleCloseDeleteModal();
         console.log('Mod eliminado exitosamente');
       }
@@ -555,8 +555,8 @@ const Perfil = () => {
             <p className="text-gray-400 mb-4">
               {isPublicProfile ? 'No se pudo cargar la información del usuario' : 'No se pudo cargar la información del usuario'}
             </p>
-            <button 
-              onClick={() => isPublicProfile ? navigate('/') : window.location.reload()} 
+            <button
+              onClick={() => isPublicProfile ? navigate('/') : window.location.reload()}
               className="px-4 py-2 bg-custom-primary text-white rounded-lg hover:bg-custom-primary/80 transition-colors"
             >
               {isPublicProfile ? 'Volver al inicio' : 'Recargar página'}
@@ -577,8 +577,8 @@ const Perfil = () => {
             {isPublicProfile ? `Perfil de ${userData.username}` : 'Mi Perfil'}
           </h1>
           <p className="text-sm text-gray-400 mt-1">
-            {isPublicProfile 
-              ? `Información pública de ${userData.username}` 
+            {isPublicProfile
+              ? `Información pública de ${userData.username}`
               : 'Gestiona tu información personal y revisa tus estadísticas'
             }
           </p>
@@ -592,9 +592,9 @@ const Perfil = () => {
                 <div className="relative">
                   <div className="w-20 h-20 bg-gradient-to-br from-custom-primary to-custom-secondary rounded-full flex items-center justify-center shadow-lg">
                     {userData.foto_perfil ? (
-                      <img 
+                      <img
                         src={`http://localhost:8000/storage/${userData.foto_perfil}?t=${Date.now()}`}
-                        alt="Foto de perfil" 
+                        alt="Foto de perfil"
                         className="w-20 h-20 rounded-full object-cover"
                       />
                     ) : (
@@ -635,7 +635,7 @@ const Perfil = () => {
                 </div>
               </div>
               {isOwnProfile && (
-                <button 
+                <button
                   onClick={() => setIsEditModalOpen(true)}
                   className="bg-custom-primary hover:bg-custom-primary-hover text-white px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2"
                 >
@@ -681,9 +681,8 @@ const Perfil = () => {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg
                           key={star}
-                          className={`w-4 h-4 ${
-                            star <= (userStats.rating || 0) ? 'text-yellow-400' : 'text-gray-600'
-                          }`}
+                          className={`w-4 h-4 ${star <= (userStats.rating || 0) ? 'text-yellow-400' : 'text-gray-600'
+                            }`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -751,12 +750,12 @@ const Perfil = () => {
 
           {/* Botón de Crear Mod - Solo para perfil propio */}
           {isOwnProfile && (
-          <div className="bg-custom-card rounded-xl shadow-lg p-4 border border-custom-detail/10 hover:shadow-xl transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-white">¿Tienes una idea para un mod?</h3>
-                <p className="text-custom-detail text-sm mt-1">Comparte tu creatividad con la comunidad</p>
-              </div>
+            <div className="bg-custom-card rounded-xl shadow-lg p-4 border border-custom-detail/10 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">¿Tienes una idea para un mod?</h3>
+                  <p className="text-custom-detail text-sm mt-1">Comparte tu creatividad con la comunidad</p>
+                </div>
                 <button
                   onClick={() => navigate('/mods/crear')}
                   className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-custom-primary to-custom-primary/80 hover:from-custom-primary-hover hover:to-custom-primary text-white font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
@@ -775,21 +774,19 @@ const Perfil = () => {
               <nav className="flex">
                 <button
                   onClick={() => setActiveTab('sobre-mi')}
-                  className={`px-6 py-4 text-sm font-medium transition-all duration-300 ${
-                    activeTab === 'sobre-mi'
+                  className={`px-6 py-4 text-sm font-medium transition-all duration-300 ${activeTab === 'sobre-mi'
                       ? 'text-custom-primary border-b-2 border-custom-primary bg-custom-primary/5'
                       : 'text-custom-detail hover:text-custom-text hover:bg-custom-bg/30'
-                  }`}
+                    }`}
                 >
                   Sobre Mi
                 </button>
                 <button
                   onClick={() => setActiveTab('mis-mods')}
-                  className={`px-6 py-4 text-sm font-medium transition-all duration-300 flex items-center ${
-                    activeTab === 'mis-mods'
+                  className={`px-6 py-4 text-sm font-medium transition-all duration-300 flex items-center ${activeTab === 'mis-mods'
                       ? 'text-custom-primary border-b-2 border-custom-primary bg-custom-primary/5'
                       : 'text-custom-detail hover:text-custom-text hover:bg-custom-bg/30'
-                  }`}
+                    }`}
                 >
                   {isPublicProfile ? 'Sus Mods' : 'Mis Mods'}
                   <span className="ml-2 px-2 py-0.5 text-xs bg-custom-secondary/20 text-custom-secondary rounded-full">
@@ -837,9 +834,9 @@ const Perfil = () => {
                           </option>
                         ))}
                       </select>
-                      <FontAwesomeIcon 
-                        icon={faChevronDown} 
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-custom-detail pointer-events-none h-3 w-3" 
+                      <FontAwesomeIcon
+                        icon={faChevronDown}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-custom-detail pointer-events-none h-3 w-3"
                       />
                     </div>
 
@@ -861,9 +858,9 @@ const Perfil = () => {
                           <option value="endorsements">Valoraciones</option>
                           <option value="downloads">Descargas</option>
                         </select>
-                        <FontAwesomeIcon 
-                          icon={faChevronDown} 
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-custom-detail pointer-events-none h-3 w-3" 
+                        <FontAwesomeIcon
+                          icon={faChevronDown}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-custom-detail pointer-events-none h-3 w-3"
                         />
                       </div>
 
@@ -878,9 +875,9 @@ const Perfil = () => {
                           <option value={20}>20 Items</option>
                           <option value={50}>50 Items</option>
                         </select>
-                        <FontAwesomeIcon 
-                          icon={faChevronDown} 
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-custom-detail pointer-events-none h-3 w-3" 
+                        <FontAwesomeIcon
+                          icon={faChevronDown}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-custom-detail pointer-events-none h-3 w-3"
                         />
                       </div>
                     </div>
@@ -895,9 +892,9 @@ const Perfil = () => {
                     <>
                       <div className={`grid gap-6 ${isPublicProfile ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
                         {getCurrentPageMods().map(mod => (
-                          <ModCard 
-                            key={mod.id} 
-                            mod={mod} 
+                          <ModCard
+                            key={mod.id}
+                            mod={mod}
                             isOwner={isOwnProfile}
                             showSaveButton={!isOwnProfile}
                             onEdit={isOwnProfile ? handleEditMod : undefined}
@@ -916,21 +913,20 @@ const Perfil = () => {
                           >
                             Anterior
                           </button>
-                          
+
                           {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                             <button
                               key={page}
                               onClick={() => setCurrentPage(page)}
-                              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                                currentPage === page
+                              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${currentPage === page
                                   ? 'bg-custom-primary text-white'
                                   : 'text-custom-detail hover:text-custom-text hover:bg-custom-bg/30'
-                              }`}
+                                }`}
                             >
                               {page}
                             </button>
                           ))}
-                          
+
                           <button
                             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                             disabled={currentPage === totalPages}
@@ -947,17 +943,17 @@ const Perfil = () => {
                         <FontAwesomeIcon icon={faGamepad} className="h-8 w-8 text-custom-detail" />
                       </div>
                       <h3 className="text-lg font-medium text-white mb-2">
-                        {selectedGame === 'all' ? 
-                          (isPublicProfile ? 'No ha creado mods aún' : 'No tienes mods creados') : 
+                        {selectedGame === 'all' ?
+                          (isPublicProfile ? 'No ha creado mods aún' : 'No tienes mods creados') :
                           'No hay mods para este juego'
                         }
                       </h3>
                       <p className="text-custom-detail mb-4">
-                        {selectedGame === 'all' 
-                          ? (isPublicProfile ? 
-                              `${userData.username} aún no ha creado ningún mod` : 
-                              'Comienza creando tu primer mod para la comunidad'
-                            )
+                        {selectedGame === 'all'
+                          ? (isPublicProfile ?
+                            `${userData.username} aún no ha creado ningún mod` :
+                            'Comienza creando tu primer mod para la comunidad'
+                          )
                           : 'Intenta cambiar el filtro de juego o crear un nuevo mod'
                         }
                       </p>
@@ -979,7 +975,7 @@ const Perfil = () => {
 
           {/* Modal de edición de perfil */}
           {isOwnProfile && (
-            <UserProfileEditModal 
+            <UserProfileEditModal
               user={userData}
               isOpen={isEditModalOpen}
               onClose={() => setIsEditModalOpen(false)}

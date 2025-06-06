@@ -13,13 +13,13 @@ import '../../assets/styles/components/explorarMods/ExplorarMods.css';
 const ExplorarMods = () => {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
-  
+
   // Hook unificado para optimizar verificaciones de usuario
-  const { 
-    isAuthenticated, 
-    getOwnershipMap, 
-    getSavedMap, 
-    loading: userLoading 
+  const {
+    isAuthenticated,
+    getOwnershipMap,
+    getSavedMap,
+    loading: userLoading
   } = useUserModsStatus();
 
   // Constante para filtros por defecto (evitar duplicación)
@@ -83,11 +83,11 @@ const ExplorarMods = () => {
   // Estados para búsqueda de etiquetas
   const [busquedaEtiquetasIncluir, setBusquedaEtiquetasIncluir] = useState('');
   const [busquedaEtiquetasExcluir, setBusquedaEtiquetasExcluir] = useState('');
-  
+
   // Estado para búsqueda de juegos
   const [busquedaJuegos, setBusquedaJuegos] = useState('');
   const [showJuegosDropdown, setShowJuegosDropdown] = useState(false);
-  
+
   // Estados para controlar dropdowns de etiquetas
   const [showEtiquetasIncluirDropdown, setShowEtiquetasIncluirDropdown] = useState(false);
   const [showEtiquetasExcluirDropdown, setShowEtiquetasExcluirDropdown] = useState(false);
@@ -123,7 +123,7 @@ const ExplorarMods = () => {
   const obtenerFiltrosDesdeURL = useCallback(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const filtrosURL = {};
-    
+
     // Obtener cada filtro de la URL
     CLAVES_FILTROS_VALIDAS.forEach(key => {
       const valor = urlParams.get(key);
@@ -135,14 +135,14 @@ const ExplorarMods = () => {
         }
       }
     });
-    
+
     return filtrosURL;
   }, []);
 
   // Función para guardar filtros en la URL
   const guardarFiltrosEnURL = useCallback((nuevosFiltros) => {
     const params = new URLSearchParams();
-    
+
     Object.keys(nuevosFiltros).forEach(key => {
       const valor = nuevosFiltros[key];
       if (valor && valor !== '' && (Array.isArray(valor) ? valor.length > 0 : true)) {
@@ -153,9 +153,9 @@ const ExplorarMods = () => {
         }
       }
     });
-    
+
     const nuevaURL = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
-    
+
     // Usar replaceState para no agregar nueva entrada al historial en cambios normales
     window.history.replaceState({ filtros: nuevosFiltros }, '', nuevaURL);
   }, []);
@@ -165,7 +165,7 @@ const ExplorarMods = () => {
     const filtrosURL = obtenerFiltrosDesdeURL();
     if (Object.keys(filtrosURL).length > 0) {
       setFiltros(prev => ({ ...prev, ...filtrosURL }));
-      
+
       // Sincronizar búsqueda de juegos
       sincronizarBusquedaJuegos(filtrosURL);
     }
@@ -177,7 +177,7 @@ const ExplorarMods = () => {
       if (event.state && event.state.filtros) {
         // Restaurar filtros desde el estado del historial
         setFiltros(event.state.filtros);
-        
+
         // Sincronizar búsqueda de juegos
         sincronizarBusquedaJuegos(event.state.filtros);
       } else {
@@ -195,7 +195,7 @@ const ExplorarMods = () => {
     };
 
     window.addEventListener('popstate', manejarPopState);
-    
+
     return () => {
       window.removeEventListener('popstate', manejarPopState);
     };
@@ -284,7 +284,7 @@ const ExplorarMods = () => {
         resetearEstadosBusqueda();
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [resetearEstadosBusqueda]);
@@ -304,8 +304,8 @@ const ExplorarMods = () => {
         if (filtros.busqueda) {
           const searchTerm = filtros.busqueda.toLowerCase();
           return mod.titulo.toLowerCase().includes(searchTerm) ||
-                 mod.descripcion.toLowerCase().includes(searchTerm) ||
-                 mod.autor.toLowerCase().includes(searchTerm);
+            mod.descripcion.toLowerCase().includes(searchTerm) ||
+            mod.autor.toLowerCase().includes(searchTerm);
         }
         return true;
       })
@@ -342,7 +342,7 @@ const ExplorarMods = () => {
         if (filtros.fechaDesde) {
           const fechaDesde = new Date(filtros.fechaDesde);
           const fechaMod = new Date(mod.fecha);
-          
+
           // Si es filtro de últimas 24 horas, comparar con precisión de horas
           if (filtros.periodoTiempo === '24h') {
             const ahora = new Date();
@@ -425,7 +425,7 @@ const ExplorarMods = () => {
   // Efecto para animar el contador de resultados (optimizado)
   useEffect(() => {
     const timer = setTimeout(() => {
-    setIsUpdatingResults(true);
+      setIsUpdatingResults(true);
       const updateTimer = setTimeout(() => setIsUpdatingResults(false), 200);
       return () => clearTimeout(updateTimer);
     }, 100);
@@ -485,13 +485,13 @@ const ExplorarMods = () => {
     if (filtros.busqueda) filtrosActivos.push(`Título: "${filtros.busqueda}"`);
     if (filtros.busquedaDescripcion) filtrosActivos.push(`Descripción: "${filtros.busquedaDescripcion}"`);
     if (filtros.busquedaAutor) filtrosActivos.push(`Autor: "${filtros.busquedaAutor}"`);
-    
+
     if (filtrosActivos.length > 0) {
       showNotification(`Filtros de búsqueda aplicados: ${filtrosActivos.join(', ')}`, 'success');
     } else {
       showNotification('No hay parámetros de búsqueda específicos activos', 'info');
     }
-    
+
     // Resetear a la primera página cuando se aplican nuevos filtros
     setPaginacion(prev => ({
       ...prev,
@@ -516,7 +516,7 @@ const ExplorarMods = () => {
   const handleClearFilters = () => {
     setFiltros(FILTROS_DEFAULT);
     resetearEstadosBusqueda();
-    
+
     // Limpiar la URL también
     window.history.replaceState({ filtros: FILTROS_DEFAULT }, '', window.location.pathname);
   };
@@ -596,7 +596,7 @@ const ExplorarMods = () => {
   const validarEtiquetaDisponible = useCallback((etiqueta, busqueda, esIncluir) => {
     // Filtrar por búsqueda solo si hay texto
     const coincideBusqueda = !busqueda || etiqueta.toLowerCase().includes(busqueda.toLowerCase());
-    
+
     if (esIncluir) {
       // Para incluir: no debe estar ya incluida ni excluida
       const noEstaIncluida = !filtros.etiquetas.includes(etiqueta);
@@ -654,10 +654,10 @@ const ExplorarMods = () => {
   // Función para guardar cambios desde el modal de edición
   const handleSaveModFromModal = useCallback((updatedMod) => {
     console.log('Mod actualizado desde modal:', updatedMod);
-    
+
     // Actualizar el mod en la lista local
-    setMods(prevMods => 
-      prevMods.map(mod => 
+    setMods(prevMods =>
+      prevMods.map(mod =>
         mod.id === updatedMod.id ? {
           ...mod, // Mantener los campos existentes
           ...updatedMod, // Sobrescribir con los campos actualizados
@@ -673,11 +673,11 @@ const ExplorarMods = () => {
         } : mod
       )
     );
-    
+
     // Cerrar el modal
     setShowEditModal(false);
     setModToEdit(null);
-    
+
     // Mostrar notificación de éxito
     showNotification(`Mod "${updatedMod.titulo || updatedMod.nombre}" actualizado exitosamente`, 'success');
   }, [showNotification]);
@@ -694,7 +694,7 @@ const ExplorarMods = () => {
 
     try {
       const response = await modService.softDeleteMod(modToDelete.id);
-      
+
       if (response.status === 'success') {
         // Remover el mod de la lista local
         setMods(prevMods => prevMods.filter(m => m.id !== modToDelete.id));
@@ -796,7 +796,7 @@ const ExplorarMods = () => {
                                 Todos los juegos
                               </button>
                               {juegosUnicos
-                                .filter(juego => 
+                                .filter(juego =>
                                   juego.toLowerCase().includes(busquedaJuegos.toLowerCase())
                                 )
                                 .map(juego => (
@@ -809,13 +809,13 @@ const ExplorarMods = () => {
                                   </button>
                                 ))
                               }
-                              {juegosUnicos.filter(juego => 
+                              {juegosUnicos.filter(juego =>
                                 juego.toLowerCase().includes(busquedaJuegos.toLowerCase())
                               ).length === 0 && (
-                                <div className="px-3 py-2 text-sm text-custom-detail">
-                                  No se encontraron juegos
-                                </div>
-                              )}
+                                  <div className="px-3 py-2 text-sm text-custom-detail">
+                                    No se encontraron juegos
+                                  </div>
+                                )}
                             </div>
                           )}
                         </div>

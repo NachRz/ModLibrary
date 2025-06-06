@@ -57,7 +57,7 @@ class Juego extends Model
     public function generos(): BelongsToMany
     {
         return $this->belongsToMany(Genero::class, 'juegos_generos', 'juego_id', 'genero_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     /**
@@ -108,39 +108,39 @@ class Juego extends Model
     {
         // Recalcular primero para asegurar exactitud
         $this->recalcularModsTotales();
-        
+
         // Si tiene mods, no eliminar
         if ($this->mods_totales > 0) {
             return ['juego_eliminado' => false, 'generos_eliminados' => []];
         }
-        
+
         // Verificar si tiene mods en cualquier estado (incluyendo borradores)
         $totalModsEnTodosEstados = $this->mods()->withTrashed()->count();
         if ($totalModsEnTodosEstados > 0) {
             return ['juego_eliminado' => false, 'generos_eliminados' => []];
         }
-        
+
         // Verificar si hay usuarios que lo tienen en favoritos
         $totalFavoritos = $this->usuariosFavoritos()->count();
         if ($totalFavoritos > 0) {
             return ['juego_eliminado' => false, 'generos_eliminados' => []];
         }
-        
+
         // Obtener los IDs de los géneros asociados antes de eliminar el juego
         $generoIds = $this->generos()->pluck('generos.id')->toArray();
-        
+
         // Si no tiene mods ni favoritos, se puede eliminar
         try {
             $this->delete();
-            
+
             // Después de eliminar el juego, verificar y eliminar géneros huérfanos
             $generosEliminados = [];
             if (!empty($generoIds)) {
                 $generosEliminados = \App\Models\Genero::verificarYEliminarGenerosSinJuegos($generoIds);
             }
-            
+
             return [
-                'juego_eliminado' => true, 
+                'juego_eliminado' => true,
                 'generos_eliminados' => $generosEliminados
             ];
         } catch (\Exception $e) {
@@ -152,4 +152,4 @@ class Juego extends Model
             return ['juego_eliminado' => false, 'generos_eliminados' => []];
         }
     }
-} 
+}

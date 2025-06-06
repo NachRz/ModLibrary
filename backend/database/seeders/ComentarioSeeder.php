@@ -26,4 +26,4 @@ class ComentarioSeeder extends Seeder
             }
         }
     }
-} 
+}

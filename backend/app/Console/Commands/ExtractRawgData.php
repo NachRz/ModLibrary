@@ -155,4 +155,4 @@ class ExtractRawgData extends Command
             $this->error("Error al procesar juego {$gameData['id']}: {$e->getMessage()}");
         }
     }
-} 
+}

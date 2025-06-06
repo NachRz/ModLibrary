@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faGamepad, 
-  faTag, 
-  faImage, 
-  faFile, 
-  faCog, 
+import {
+  faGamepad,
+  faTag,
+  faImage,
+  faFile,
+  faCog,
   faSave,
   faTimes,
   faArrowLeft,
@@ -24,9 +24,9 @@ const CustomGameOption = ({ innerProps, label, data }) => (
   <div {...innerProps} className="game-option">
     <div className="game-option-image">
       {data.game?.background_image || data.game?.imagen_fondo ? (
-        <img 
-          src={data.game.background_image || data.game.imagen_fondo} 
-          alt={label} 
+        <img
+          src={data.game.background_image || data.game.imagen_fondo}
+          alt={label}
         />
       ) : (
         <div className="no-image">Sin imagen</div>
@@ -47,9 +47,9 @@ const CustomGameSingleValue = ({ children, data }) => (
   <div className="game-single-value">
     <div className="game-single-image">
       {data.game?.background_image || data.game?.imagen_fondo ? (
-        <img 
-          src={data.game.background_image || data.game.imagen_fondo} 
-          alt={children} 
+        <img
+          src={data.game.background_image || data.game.imagen_fondo}
+          alt={children}
         />
       ) : (
         <div className="no-image">Sin imagen</div>
@@ -92,21 +92,21 @@ const CustomTagValue = ({ children, removeProps, data }) => (
 
 const CrearMod = () => {
   const navigate = useNavigate();
-  
+
   // Estado para el tab activo
   const [activeTab, setActiveTab] = useState('basico');
-  
+
   // Estado para controlar el envío del formulario
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-  
+
   // Estado para la lista de juegos (mejorado desde EditModAdmin)
   const [errorGames, setErrorGames] = useState(null);
   const [initialGameOptions, setInitialGameOptions] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   const [isSyncingGame, setIsSyncingGame] = useState(false);
-  
+
   // Estado del formulario
   const [formData, setFormData] = useState({
     titulo: '',
@@ -122,20 +122,20 @@ const CrearMod = () => {
     etiquetas: [],
     estado: 'borrador'
   });
-  
+
   // Estado para los errores de validación
   const [errors, setErrors] = useState({});
-  
+
   // Estado para las etiquetas
   const [selectedTags, setSelectedTags] = useState([]);
   const [loadingTags, setLoadingTags] = useState(false);
   const [errorTags, setErrorTags] = useState(null);
-  
+
   // Estados para manejo de imágenes adicionales (como en EditModAdmin)
   const [selectedAdditionalFiles, setSelectedAdditionalFiles] = useState([]);
   const [additionalPreviewUrls, setAdditionalPreviewUrls] = useState([]);
   const [uploadingAdditionalImages, setUploadingAdditionalImages] = useState(false);
-  
+
   // Efecto de limpieza para evitar memory leaks con las URLs de preview
   useEffect(() => {
     return () => {
@@ -145,14 +145,14 @@ const CrearMod = () => {
           URL.revokeObjectURL(url);
         }
       });
-      
+
       // Limpiar URL de imagen principal si existe
       if (formData.imagenPreview && formData.imagenPreview.startsWith('blob:')) {
         URL.revokeObjectURL(formData.imagenPreview);
       }
     };
   }, [additionalPreviewUrls, formData.imagenPreview]);
-  
+
   // Función para cargar opciones iniciales de juegos (mejorado desde EditModAdmin)
   useEffect(() => {
     const loadInitialGames = async () => {
@@ -175,7 +175,7 @@ const CrearMod = () => {
 
     loadInitialGames();
   }, []);
-  
+
   // Función para cargar opciones de juegos (mejorado desde EditModAdmin)
   const loadGameOptions = async (inputValue) => {
     try {
@@ -183,11 +183,11 @@ const CrearMod = () => {
       if (inputValue && inputValue.trim()) {
         setErrorGames(null);
       }
-      
+
       if (!inputValue || inputValue.trim() === '') {
         return initialGameOptions;
       }
-      
+
       const games = await gameService.searchRawgGames(inputValue);
       return games.map(game => ({
         value: game.id,
@@ -199,12 +199,12 @@ const CrearMod = () => {
       return [];
     }
   };
-  
+
   // Función para cargar opciones de etiquetas usando AsyncSelect (igual que EditModAdmin)
   const loadTagOptions = async (inputValue) => {
     try {
       const response = await etiquetasService.searchTags(inputValue);
-      
+
       if (response.etiquetas) {
         return response.etiquetas.map(tag => ({
           value: tag.id, // Este es el rawg_id cuando viene de RAWG
@@ -212,14 +212,14 @@ const CrearMod = () => {
           juegos_count: tag.juegos_count || 0
         }));
       }
-      
+
       return [];
     } catch (error) {
       console.error('Error al cargar etiquetas:', error);
       return [];
     }
   };
-  
+
   // Manejador para cambios en campos simples
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -227,18 +227,18 @@ const CrearMod = () => {
       ...formData,
       [name]: value
     });
-    
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
   };
-  
+
   // Manejador para cambios en el select de juegos
   const handleGameChange = async (selectedOption) => {
     if (selectedOption) {
       // Inmediatamente actualizar el juego seleccionado en la UI
       setSelectedGame(selectedOption);
-      
+
       // Sincronizar en segundo plano sin bloquear la interfaz
       syncGameInBackground(selectedOption);
     } else {
@@ -260,10 +260,10 @@ const CrearMod = () => {
     try {
       setIsSyncingGame(true);
       setErrorGames(null);
-      
+
       // Mostrar que se está sincronizando pero sin bloquear
       console.log('Sincronizando juego en segundo plano:', selectedOption.label);
-      
+
       // Verificar y sincronizar el juego
       const syncedGame = await gameService.verifyAndSyncGame(selectedOption.value);
 
@@ -272,12 +272,12 @@ const CrearMod = () => {
         ...prev,
         juego_id: syncedGame.id // Usamos el ID de nuestra base de datos
       }));
-      
+
       console.log('Juego sincronizado exitosamente:', syncedGame);
     } catch (error) {
       console.error('Error al sincronizar el juego:', error);
       setErrorGames(`Error al sincronizar ${selectedOption.label}: ${error.message || 'Error desconocido'}`);
-      
+
       // En caso de error, mantener la selección visual pero sin ID
       setFormData(prev => ({
         ...prev,
@@ -287,11 +287,11 @@ const CrearMod = () => {
       setIsSyncingGame(false);
     }
   };
-  
+
   // Manejador para cambios en la selección de etiquetas (mejorado como EditModAdmin)
   const handleTagChange = async (selectedOptions) => {
     setSelectedTags(selectedOptions || []);
-    
+
     // Sincronizar etiquetas con la base de datos local para obtener los IDs correctos
     if (selectedOptions && selectedOptions.length > 0) {
       try {
@@ -340,17 +340,17 @@ const CrearMod = () => {
       setErrors(prev => ({ ...prev, etiquetas: '' }));
     }
   };
-  
+
   // Manejador para la carga de imagen principal
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    
+
     if (file) {
       if (!file.type.startsWith('image/')) {
         setErrors(prev => ({ ...prev, imagen: 'Por favor, selecciona un archivo de imagen válido' }));
         return;
       }
-      
+
       if (file.size > 2 * 1024 * 1024) {
         setErrors(prev => ({ ...prev, imagen: 'La imagen es demasiado grande. Máximo 2MB' }));
         return;
@@ -361,7 +361,7 @@ const CrearMod = () => {
         imagen: file,
         imagenPreview: URL.createObjectURL(file)
       }));
-      
+
       if (errors.imagen) {
         setErrors(prev => ({ ...prev, imagen: '' }));
       }
@@ -380,54 +380,54 @@ const CrearMod = () => {
   // Validación del formulario
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.titulo.trim()) {
       newErrors.titulo = 'El título es obligatorio';
     }
-    
+
     if (!formData.descripcion.trim()) {
       newErrors.descripcion = 'La descripción es obligatoria';
     }
-    
+
     if (!formData.juego_id) {
       newErrors.juego_id = 'Debes seleccionar un juego';
     }
-    
+
     if (!formData.version_actual.trim()) {
       newErrors.version_actual = 'La versión del mod es obligatoria';
     }
-    
+
     if (formData.etiquetas.length === 0) {
       newErrors.etiquetas = 'Debes seleccionar al menos una etiqueta';
     }
-    
+
     if (!formData.imagen) {
       newErrors.imagen = 'Debes subir una imagen';
     }
-    
+
     if (!formData.url.trim()) {
       newErrors.url = 'Debes proporcionar una URL de descarga';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   // Manejador para enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       try {
         setSubmitting(true);
         setSubmitError(null);
-        
+
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
+
         if (!user.id) {
           throw new Error('Debes iniciar sesión para crear un mod');
         }
-        
+
         // Preparar datos base del mod
         const modDataBase = {
           titulo: formData.titulo,
@@ -443,11 +443,11 @@ const CrearMod = () => {
 
         // Crear FormData si hay archivos para subir (solo imágenes)
         let dataToSubmit;
-        
+
         if (formData.imagen || formData.imagenesAdicionalesFiles.length > 0) {
           // Usar FormData para archivos
           dataToSubmit = new FormData();
-          
+
           // Agregar datos básicos
           Object.keys(modDataBase).forEach(key => {
             if (key === 'etiquetas') {
@@ -458,25 +458,25 @@ const CrearMod = () => {
               dataToSubmit.append(key, modDataBase[key]);
             }
           });
-          
+
           // Agregar imagen principal
           if (formData.imagen) {
             dataToSubmit.append('imagen_banner', formData.imagen);
           }
-          
+
           // Agregar imágenes adicionales
           formData.imagenesAdicionalesFiles.forEach((file, index) => {
             dataToSubmit.append('imagenes_adicionales[]', file);
           });
-          
+
         } else {
           // Solo datos JSON si no hay archivos
           dataToSubmit = modDataBase;
         }
-        
+
         console.log('Enviando datos del mod al backend...');
         const response = await modService.createMod(dataToSubmit);
-        
+
         if (response.status === 'success') {
           setSubmitSuccess(true);
           setTimeout(() => {
@@ -485,7 +485,7 @@ const CrearMod = () => {
         } else {
           throw new Error(response.message || 'Error al crear el mod');
         }
-        
+
       } catch (error) {
         setSubmitError(error.message || 'Ha ocurrido un error al crear el mod');
       } finally {
@@ -493,57 +493,57 @@ const CrearMod = () => {
       }
     }
   };
-  
+
   // Función mejorada para manejo de imágenes adicionales (mejorada)
   const handleAdditionalImagesUpload = (e) => {
     const files = Array.from(e.target.files);
-    
+
     if (files.length === 0) return;
-    
+
     console.log('=== SUBIR IMÁGENES ADICIONALES CREARMOD ===');
     console.log('Archivos seleccionados:', files.length);
-    
+
     // Validar cada archivo
     const validFiles = [];
     const errors = [];
-    
+
     files.forEach((file, index) => {
       console.log(`Procesando archivo ${index + 1}:`, file.name, file.type, file.size);
-      
+
       // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
         errors.push(`Archivo ${index + 1}: No es una imagen válida`);
         return;
       }
-      
+
       // Validar tamaño (máximo 5MB como en EditModAdmin)
       if (file.size > 5 * 1024 * 1024) {
         errors.push(`Archivo ${index + 1}: Tamaño mayor a 5MB`);
         return;
       }
-      
+
       validFiles.push(file);
     });
-    
+
     console.log('Archivos válidos:', validFiles.length);
     console.log('Errores encontrados:', errors);
-    
+
     // Mostrar errores si los hay
     if (errors.length > 0) {
       setSubmitError(errors.join(', '));
     }
-    
+
     // Si hay archivos válidos, procesarlos
     if (validFiles.length > 0) {
       // Agregar a los archivos seleccionados
       setSelectedAdditionalFiles(prev => [...prev, ...validFiles]);
-      
+
       // También agregar al formData para compatibilidad con la lógica existente
       setFormData(prev => ({
         ...prev,
         imagenesAdicionalesFiles: [...prev.imagenesAdicionalesFiles, ...validFiles]
       }));
-      
+
       // Crear previews para los nuevos archivos
       const newPreviews = validFiles.map(file => {
         return new Promise((resolve) => {
@@ -552,17 +552,17 @@ const CrearMod = () => {
           reader.readAsDataURL(file);
         });
       });
-      
+
       Promise.all(newPreviews).then(previews => {
         console.log('Previews creados:', previews.length);
         setAdditionalPreviewUrls(prev => [...prev, ...previews]);
       });
-      
+
       // Limpiar errores si fue exitoso
       if (submitError) {
         setSubmitError(null);
       }
-      
+
       console.log(`${validFiles.length} imagen(es) adicional(es) agregada(s) exitosamente`);
     }
   };
@@ -570,19 +570,19 @@ const CrearMod = () => {
   // Función mejorada para eliminar imagen adicional
   const removeAdditionalImage = (index) => {
     console.log(`Eliminando imagen adicional en índice: ${index}`);
-    
+
     // Eliminar del estado de archivos seleccionados
     setSelectedAdditionalFiles(prev => prev.filter((_, i) => i !== index));
-    
+
     // Eliminar de las URLs de preview
     setAdditionalPreviewUrls(prev => prev.filter((_, i) => i !== index));
-    
+
     // Mantener compatibilidad con la lógica existente
     setFormData(prev => ({
       ...prev,
       imagenesAdicionalesFiles: prev.imagenesAdicionalesFiles.filter((_, i) => i !== index)
     }));
-    
+
     console.log(`Imagen adicional ${index + 1} eliminada correctamente`);
   };
 
@@ -605,64 +605,62 @@ const CrearMod = () => {
           <FontAwesomeIcon icon={faGamepad} className="mr-2" />
           Información Básica
         </h4>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Título del mod *
             </label>
-                  <input
-                    type="text"
-                    name="titulo"
-                    value={formData.titulo}
-                    onChange={handleChange}
-              className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                errors.titulo ? 'border-red-500' : 'border-gray-600'
-              }`}
-                    disabled={submitting}
+            <input
+              type="text"
+              name="titulo"
+              value={formData.titulo}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${errors.titulo ? 'border-red-500' : 'border-gray-600'
+                }`}
+              disabled={submitting}
               placeholder="Ej: Mi increíble mod"
-                  />
+            />
             {errors.titulo && <span className="text-red-400 text-sm mt-1 block">{errors.titulo}</span>}
-                </div>
-                
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Descripción *
             </label>
-                  <textarea
-                    name="descripcion"
-                    value={formData.descripcion}
-                    onChange={handleChange}
-                    rows="5"
-              className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                errors.descripcion ? 'border-red-500' : 'border-gray-600'
-              }`}
-                    disabled={submitting}
+            <textarea
+              name="descripcion"
+              value={formData.descripcion}
+              onChange={handleChange}
+              rows="5"
+              className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${errors.descripcion ? 'border-red-500' : 'border-gray-600'
+                }`}
+              disabled={submitting}
               placeholder="Describe tu mod, sus características y funcionalidades..."
             />
             {errors.descripcion && <span className="text-red-400 text-sm mt-1 block">{errors.descripcion}</span>}
-                </div>
-                
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Juego asociado *
             </label>
-                  <AsyncSelect
+            <AsyncSelect
               value={selectedGame}
               onChange={handleGameChange}
-                    loadOptions={loadGameOptions}
-                    defaultOptions={initialGameOptions}
-                    cacheOptions
+              loadOptions={loadGameOptions}
+              defaultOptions={initialGameOptions}
+              cacheOptions
               placeholder="Seleccionar juego..."
               loadingMessage={() => "Buscando juegos..."}
               noOptionsMessage={() => "No se encontraron juegos"}
               isDisabled={submitting}
               className={`select-container ${errorGames ? 'error' : ''}`}
               classNamePrefix="select"
-                    components={{
-                      Option: CustomGameOption,
-                      SingleValue: CustomGameSingleValue
-                    }}
+              components={{
+                Option: CustomGameOption,
+                SingleValue: CustomGameSingleValue
+              }}
               styles={{
                 control: (provided) => ({
                   ...provided,
@@ -703,8 +701,8 @@ const CrearMod = () => {
               Busca y selecciona el juego para el cual es este mod
             </small>
             {errors.juego_id && <span className="text-red-400 text-sm mt-1 block">{errors.juego_id}</span>}
-                </div>
-                
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -713,9 +711,9 @@ const CrearMod = () => {
               <select
                 name="edad_recomendada"
                 value={formData.edad_recomendada}
-                    onChange={handleChange}
+                onChange={handleChange}
                 className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    disabled={submitting}
+                disabled={submitting}
               >
                 <option value={3}>3+ (Todos los públicos)</option>
                 <option value={7}>7+ (Niños)</option>
@@ -723,8 +721,8 @@ const CrearMod = () => {
                 <option value={16}>16+ (Jóvenes)</option>
                 <option value={18}>18+ (Adultos)</option>
               </select>
-              </div>
-              
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Estado del mod
@@ -752,15 +750,14 @@ const CrearMod = () => {
                 name="version_actual"
                 value={formData.version_actual}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                  errors.version_actual ? 'border-red-500' : 'border-gray-600'
-                }`}
+                className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${errors.version_actual ? 'border-red-500' : 'border-gray-600'
+                  }`}
                 disabled={submitting}
                 placeholder="Ej: 1.0.0"
               />
               {errors.version_actual && <span className="text-red-400 text-sm mt-1 block">{errors.version_actual}</span>}
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 URL de descarga *
@@ -770,9 +767,8 @@ const CrearMod = () => {
                 name="url"
                 value={formData.url}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                  errors.url ? 'border-red-500' : 'border-gray-600'
-                }`}
+                className={`w-full px-3 py-2 bg-gray-700 border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 ${errors.url ? 'border-red-500' : 'border-gray-600'
+                  }`}
                 disabled={submitting}
                 placeholder="https://ejemplo.com/mi-mod.zip"
               />
@@ -795,28 +791,28 @@ const CrearMod = () => {
           <FontAwesomeIcon icon={faTag} className="mr-2" />
           Etiquetas del Mod
         </h4>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Seleccionar etiquetas *
             </label>
-                  <AsyncSelect
-                    isMulti
-                    cacheOptions
+            <AsyncSelect
+              isMulti
+              cacheOptions
               defaultOptions={[]}
-                    value={selectedTags}
-                    onChange={handleTagChange}
-                    loadOptions={loadTagOptions}
+              value={selectedTags}
+              onChange={handleTagChange}
+              loadOptions={loadTagOptions}
               placeholder="Buscar y seleccionar etiquetas..."
               loadingMessage={() => "Buscando etiquetas..."}
-                    noOptionsMessage={() => "No se encontraron etiquetas"}
-                    isDisabled={submitting}
-                    components={{
-                      Option: CustomTagOption,
-                      MultiValue: CustomTagValue
-                    }}
-                    styles={{
+              noOptionsMessage={() => "No se encontraron etiquetas"}
+              isDisabled={submitting}
+              components={{
+                Option: CustomTagOption,
+                MultiValue: CustomTagValue
+              }}
+              styles={{
                 control: (provided) => ({
                   ...provided,
                   backgroundColor: '#374151',
@@ -844,11 +840,11 @@ const CrearMod = () => {
                   ...provided,
                   backgroundColor: '#374151',
                   border: '1px solid #4B5563'
-                      })
-                    }}
-                  />
+                })
+              }}
+            />
             {errors.etiquetas && <span className="text-red-400 text-sm mt-1 block">{errors.etiquetas}</span>}
-                </div>
+          </div>
 
           {selectedTags.length > 0 && (
             <div className="mt-4">
@@ -887,18 +883,18 @@ const CrearMod = () => {
           <FontAwesomeIcon icon={faImage} className="mr-2" />
           Imágenes del Mod
         </h4>
-        
+
         {/* Imagen principal */}
         <div className="bg-gray-700 rounded-lg p-6 mb-6">
           <h5 className="text-white font-medium mb-4">Imagen Principal *</h5>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Subir imagen principal
               </label>
               <div className="flex items-center space-x-3">
-                      <input
+                <input
                   type="file"
                   id="imagen-upload"
                   accept="image/*"
@@ -911,8 +907,8 @@ const CrearMod = () => {
                 >
                   <FontAwesomeIcon icon={faImage} className="mr-2" />
                   Seleccionar Imagen
-                    </label>
-                    
+                </label>
+
                 {formData.imagenPreview && (
                   <button
                     type="button"
@@ -924,19 +920,19 @@ const CrearMod = () => {
                   </button>
                 )}
               </div>
-              
+
               {formData.imagen && (
                 <p className="text-green-400 text-sm mt-2">
                   ✓ {formData.imagen.name}
                 </p>
               )}
-              
+
               <p className="text-xs text-gray-400 mt-2">
                 Imagen principal que aparecerá en listas y detalles. Formatos: JPG, PNG, GIF. Máximo: 2MB
               </p>
               {errors.imagen && <span className="text-red-400 text-sm mt-1 block">{errors.imagen}</span>}
             </div>
-            
+
             {/* Vista previa de imagen principal */}
             {formData.imagenPreview && (
               <div className="mt-4">
@@ -958,7 +954,7 @@ const CrearMod = () => {
         {/* Imágenes adicionales */}
         <div className="bg-gray-700 rounded-lg p-6">
           <h5 className="text-white font-medium mb-4">Imágenes Adicionales (Opcional)</h5>
-          
+
           {/* Mostrar imágenes seleccionadas si las hay */}
           {selectedAdditionalFiles && selectedAdditionalFiles.length > 0 && (
             <div className="mb-6">
@@ -968,7 +964,7 @@ const CrearMod = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {additionalPreviewUrls.map((previewUrl, index) => {
                   console.log(`Renderizando preview imagen adicional ${index + 1}:`, previewUrl);
-                  
+
                   return (
                     <div key={index} className="relative">
                       <img
@@ -1018,7 +1014,7 @@ const CrearMod = () => {
                   );
                 })}
               </div>
-              
+
               {/* Botón para limpiar selección */}
               <div className="flex items-center justify-end mt-3">
                 <button
@@ -1032,7 +1028,7 @@ const CrearMod = () => {
               </div>
             </div>
           )}
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1052,9 +1048,8 @@ const CrearMod = () => {
                 />
                 <label
                   htmlFor="imagenes-adicionales-upload"
-                  className={`cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${
-                    uploadingAdditionalImages ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`cursor-pointer bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block ${uploadingAdditionalImages ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 >
                   <FontAwesomeIcon icon={faImage} className="mr-2" />
                   Seleccionar Imágenes
@@ -1064,7 +1059,7 @@ const CrearMod = () => {
                 </p>
               </div>
             </div>
-            
+
             {/* Eliminar la sección antigua de previsualización ya que ahora se muestra arriba */}
           </div>
         </div>
@@ -1109,87 +1104,86 @@ const CrearMod = () => {
   return (
     <PageContainer>
       <div className="create-mod-container">
-      {submitSuccess ? (
-        renderSuccessMessage()
-      ) : (
-        <>
-          {submitError && renderErrorMessage()}
-          
-          {/* Header */}
-          <div className="create-mod-header">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1>Crear nuevo mod</h1>
-                <p className="create-mod-subtitle">Completa la información para compartir tu mod con la comunidad</p>
-              </div>
-              <button 
-                onClick={() => navigate('/dashboard/mis-mods')}
-                className="text-gray-400 hover:text-white transition-colors p-2"
-                title="Volver a mis mods"
-              >
-                <FontAwesomeIcon icon={faArrowLeft} className="w-6 h-6" />
-              </button>
-            </div>
-          </div>
+        {submitSuccess ? (
+          renderSuccessMessage()
+        ) : (
+          <>
+            {submitError && renderErrorMessage()}
 
-          <form onSubmit={handleSubmit} className="create-mod-form">
-            {/* Tabs */}
-            <div className="border-b border-gray-600 mb-6">
-              <div className="flex space-x-4 overflow-x-auto">
-                {[
-                  { id: 'basico', label: 'Información Básica', icon: faGamepad },
-                  { id: 'etiquetas', label: 'Etiquetas', icon: faTag },
-                  { id: 'imagenes', label: 'Imágenes', icon: faImage }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    type="button" 
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? 'border-purple-500 text-purple-400'
-                        : 'border-transparent text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    <FontAwesomeIcon icon={tab.icon} className="mr-2" />
-                    {tab.label}
-                  </button>
-                ))}
+            {/* Header */}
+            <div className="create-mod-header">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1>Crear nuevo mod</h1>
+                  <p className="create-mod-subtitle">Completa la información para compartir tu mod con la comunidad</p>
+                </div>
+                <button
+                  onClick={() => navigate('/dashboard/mis-mods')}
+                  className="text-gray-400 hover:text-white transition-colors p-2"
+                  title="Volver a mis mods"
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} className="w-6 h-6" />
+                </button>
               </div>
             </div>
 
-            {/* Contenido de tabs */}
-            <div className="tab-content mb-8">
-              {activeTab === 'basico' && renderTabBasico()}
-              {activeTab === 'etiquetas' && renderTabEtiquetas()}
-              {activeTab === 'imagenes' && renderTabImagenes()}
-            </div>
+            <form onSubmit={handleSubmit} className="create-mod-form">
+              {/* Tabs */}
+              <div className="border-b border-gray-600 mb-6">
+                <div className="flex space-x-4 overflow-x-auto">
+                  {[
+                    { id: 'basico', label: 'Información Básica', icon: faGamepad },
+                    { id: 'etiquetas', label: 'Etiquetas', icon: faTag },
+                    { id: 'imagenes', label: 'Imágenes', icon: faImage }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
+                          ? 'border-purple-500 text-purple-400'
+                          : 'border-transparent text-gray-400 hover:text-white'
+                        }`}
+                    >
+                      <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            {/* Acciones del formulario */}
-            <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-700">
-              <button 
-                type="button" 
-                onClick={() => navigate('/dashboard/mis-mods')}
-                className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
-                disabled={submitting}
-              >
-                Cancelar
-              </button>
-              <button 
-                type="submit" 
-                className={`flex items-center space-x-2 px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors disabled:opacity-50 ${submitting ? 'cursor-not-allowed' : ''}`}
-                disabled={submitting}
-              >
-                <FontAwesomeIcon 
-                  icon={faSave} 
-                  className={`w-4 h-4 ${submitting ? 'animate-spin' : ''}`} 
-                />
-                <span>{submitting ? 'Creando...' : 'Crear Mod'}</span>
-              </button>
-            </div>
-          </form>
-        </>
-      )}
+              {/* Contenido de tabs */}
+              <div className="tab-content mb-8">
+                {activeTab === 'basico' && renderTabBasico()}
+                {activeTab === 'etiquetas' && renderTabEtiquetas()}
+                {activeTab === 'imagenes' && renderTabImagenes()}
+              </div>
+
+              {/* Acciones del formulario */}
+              <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-700">
+                <button
+                  type="button"
+                  onClick={() => navigate('/dashboard/mis-mods')}
+                  className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                  disabled={submitting}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className={`flex items-center space-x-2 px-6 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors disabled:opacity-50 ${submitting ? 'cursor-not-allowed' : ''}`}
+                  disabled={submitting}
+                >
+                  <FontAwesomeIcon
+                    icon={faSave}
+                    className={`w-4 h-4 ${submitting ? 'animate-spin' : ''}`}
+                  />
+                  <span>{submitting ? 'Creando...' : 'Crear Mod'}</span>
+                </button>
+              </div>
+            </form>
+          </>
+        )}
       </div>
     </PageContainer>
   );

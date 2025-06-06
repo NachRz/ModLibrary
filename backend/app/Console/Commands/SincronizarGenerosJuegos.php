@@ -34,10 +34,10 @@ class SincronizarGenerosJuegos extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle() 
     {
-        $this->info('Iniciando sincronización de géneros para todos los juegos...');
-        
+        $this->info('Iniciando sincronización de géneros para todos los juegos...');   
+
         $force = $this->option('force');
         $juegos = Juego::all();
         $totalJuegos = $juegos->count();
@@ -80,7 +80,7 @@ class SincronizarGenerosJuegos extends Command
                                 'games_count' => $generoData['games_count'] ?? 0
                             ]
                         );
-                        
+
                         $generosIds[] = $genero->id;
                     }
                 }

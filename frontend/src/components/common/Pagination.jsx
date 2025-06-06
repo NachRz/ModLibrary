@@ -2,13 +2,13 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-const Pagination = ({ 
-  currentPage, 
-  totalPages, 
-  onPageChange, 
-  itemsPerPage, 
+const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  itemsPerPage,
   totalItems,
-  onItemsPerPageChange 
+  onItemsPerPageChange
 }) => {
   const generatePageNumbers = () => {
     const delta = 2;
@@ -52,7 +52,7 @@ const Pagination = ({
         <span className="text-sm text-gray-400">
           Mostrando {startItem} a {endItem} de {totalItems} resultados
         </span>
-        
+
         {/* Selector de elementos por página */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-400">Mostrar:</span>
@@ -77,11 +77,10 @@ const Pagination = ({
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${
-              currentPage === 1
+            className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${currentPage === 1
                 ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-            }`}
+              }`}
           >
             <FontAwesomeIcon icon={faChevronLeft} className="w-3 h-3" />
           </button>
@@ -94,11 +93,10 @@ const Pagination = ({
               ) : (
                 <button
                   onClick={() => onPageChange(pageNumber)}
-                  className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${
-                    currentPage === pageNumber
+                  className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${currentPage === pageNumber
                       ? 'bg-purple-500 text-white'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-                  }`}
+                    }`}
                 >
                   {pageNumber}
                 </button>
@@ -110,11 +108,10 @@ const Pagination = ({
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${
-              currentPage === totalPages
+            className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-200 ${currentPage === totalPages
                 ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-            }`}
+              }`}
           >
             <FontAwesomeIcon icon={faChevronRight} className="w-3 h-3" />
           </button>

@@ -10,7 +10,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const comentariosRef = useRef(null);
-  
+
   // Estados principales
   const [comentarios, setComentarios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +53,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
         setPaginaActual(response.data.current_page);
         setTotalPaginas(response.data.last_page);
         setTotalComentarios(response.data.total);
-        
+
         // Actualizar estadísticas
         setEstadisticas(prev => ({
           ...prev,
@@ -99,7 +99,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
   // Manejar envío de nuevo comentario
   const handleEnviarComentario = async (e) => {
     e.preventDefault();
-    
+
     if (!nuevoComentario.trim()) {
       setErrorComentario('El comentario no puede estar vacío');
       return;
@@ -120,10 +120,10 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
       setErrorComentario('');
 
       const response = await comentarioService.crearComentario(modId, nuevoComentario);
-      
+
       if (response.status === 'success') {
         setNuevoComentario('');
-        
+
         // Actualizar estadísticas
         const nuevoTotal = estadisticas.total_comentarios + 1;
         setEstadisticas(prev => ({
@@ -166,14 +166,14 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
 
     try {
       const response = await comentarioService.actualizarComentario(modId, comentarioId, textoEditando);
-      
+
       if (response.status === 'success') {
         setComentarioEditando(null);
         setTextoEditando('');
-        
+
         // Recargar la página actual para mostrar el comentario actualizado
         cargarComentarios(paginaActual);
-        
+
         showNotification('Comentario actualizado exitosamente', 'success');
       }
     } catch (err) {
@@ -190,7 +190,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
 
     try {
       const response = await comentarioService.eliminarComentario(modId, comentarioId);
-      
+
       if (response.status === 'success') {
         // Actualizar estadísticas
         const nuevoTotal = estadisticas.total_comentarios - 1;
@@ -221,13 +221,13 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
   const cambiarPagina = (nuevaPagina) => {
     if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas && nuevaPagina !== paginaActual) {
       cargarComentarios(nuevaPagina);
-      
+
       // Hacer scroll al principio de la lista de comentarios
       setTimeout(() => {
         if (comentariosRef.current) {
-          comentariosRef.current.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
+          comentariosRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
           });
         }
       }, 100); // Pequeño delay para asegurar que el contenido se haya cargado
@@ -245,15 +245,15 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
     const maxVisible = 5;
     let inicio = Math.max(1, paginaActual - 2);
     let fin = Math.min(totalPaginas, inicio + maxVisible - 1);
-    
+
     if (fin - inicio < maxVisible - 1) {
       inicio = Math.max(1, fin - maxVisible + 1);
     }
-    
+
     for (let i = inicio; i <= fin; i++) {
       numeros.push(i);
     }
-    
+
     return numeros;
   };
 
@@ -310,7 +310,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
           <div className="login-prompt">
             <i className="fas fa-sign-in-alt"></i>
             <p>Inicia sesión para escribir un comentario</p>
-            <button 
+            <button
               className="login-btn"
               onClick={() => navigate('/login')}
             >
@@ -338,7 +338,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
             {nuevoComentario.length}/1000
           </span>
         </div>
-        
+
         <textarea
           value={nuevoComentario}
           onChange={(e) => setNuevoComentario(e.target.value)}
@@ -348,14 +348,14 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
           maxLength="1000"
           disabled={enviandoComentario}
         />
-        
+
         {errorComentario && (
           <div className="error-message">
             <i className="fas fa-exclamation-circle"></i>
             {errorComentario}
           </div>
         )}
-        
+
         <div className="form-actions">
           <button
             type="submit"
@@ -394,12 +394,12 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
     const imageUrl = getImageUrl();
 
     return (
-      <div 
+      <div
         className="comment-user-avatar"
         onClick={() => handleUsuarioClick(usuario.id)}
       >
         {imageUrl ? (
-          <img 
+          <img
             src={imageUrl}
             alt={`Avatar de ${usuario.nombre}`}
             className="avatar-image"
@@ -409,7 +409,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
             }}
           />
         ) : null}
-        <div 
+        <div
           className="avatar-fallback-comment"
           style={{ display: imageUrl ? 'none' : 'flex' }}
         >
@@ -471,7 +471,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
                         <div className="flex items-center">
                           {renderUserAvatar(comentario.usuario)}
                           <div className="min-w-0 flex-1 ml-3">
-                            <div 
+                            <div
                               className="text-purple-400 font-medium text-sm cursor-pointer hover:text-purple-300 transition-colors"
                               onClick={() => handleUsuarioClick(comentario.usuario.id)}
                             >
@@ -565,7 +565,7 @@ const ComentariosMod = ({ modId, isAuthenticated, permitirComentarios = true, on
             </p>
           </div>
         )}
-        
+
         {renderPaginacion()}
       </div>
     </div>

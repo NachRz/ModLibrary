@@ -37,4 +37,4 @@ class DescargaUsuario extends Model
     {
         return $this->belongsTo(Mod::class, 'mod_id');
     }
-} 
+}

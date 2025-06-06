@@ -8,12 +8,12 @@ let userModsCache = {
   userId: null,
   isAuthenticated: false,
   lastUserCheck: null,
-  
+
   // Mods guardados
   savedMods: [],
   lastSavedFetch: null,
   isFetchingSaved: false,
-  
+
   // Tiempos de expiración
   userCacheExpiration: 2 * 60 * 1000, // 2 minutos para datos de usuario
   savedCacheExpiration: 5 * 60 * 1000, // 5 minutos para mods guardados
@@ -36,11 +36,11 @@ const useUserModsStatus = (modIds = null) => {
   const updateUserCache = useCallback(() => {
     const authenticated = authService.isAuthenticated();
     const user = authenticated ? authService.getCurrentUser() : null;
-    
+
     userModsCache.userId = user?.id || null;
     userModsCache.isAuthenticated = authenticated;
     userModsCache.lastUserCheck = Date.now();
-    
+
     setCurrentUserId(user?.id || null);
     setIsAuthenticated(authenticated);
   }, []);
@@ -48,11 +48,11 @@ const useUserModsStatus = (modIds = null) => {
   // Actualizar la caché de mods guardados
   const updateSavedModsCache = useCallback(async () => {
     if (!userModsCache.isAuthenticated || userModsCache.isFetchingSaved) return;
-    
+
     try {
       userModsCache.isFetchingSaved = true;
       const response = await modService.getSavedMods();
-      
+
       if (response.status === 'success') {
         // Guardamos solo los IDs para mantener la caché liviana
         userModsCache.savedMods = response.data.map(mod => mod.id);
@@ -71,24 +71,24 @@ const useUserModsStatus = (modIds = null) => {
   const checkAndUpdateCaches = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Verificar caché de usuario
-      const isUserCacheExpired = !userModsCache.lastUserCheck || 
-                                 (Date.now() - userModsCache.lastUserCheck > userModsCache.userCacheExpiration);
-      
+      const isUserCacheExpired = !userModsCache.lastUserCheck ||
+        (Date.now() - userModsCache.lastUserCheck > userModsCache.userCacheExpiration);
+
       if (isUserCacheExpired) {
         updateUserCache();
       } else {
         setCurrentUserId(userModsCache.userId);
         setIsAuthenticated(userModsCache.isAuthenticated);
       }
-      
+
       // Verificar caché de mods guardados si el usuario está autenticado
       if (userModsCache.isAuthenticated) {
-        const isSavedCacheExpired = !userModsCache.lastSavedFetch || 
-                                    (Date.now() - userModsCache.lastSavedFetch > userModsCache.savedCacheExpiration);
-        
+        const isSavedCacheExpired = !userModsCache.lastSavedFetch ||
+          (Date.now() - userModsCache.lastSavedFetch > userModsCache.savedCacheExpiration);
+
         if (isSavedCacheExpired) {
           await updateSavedModsCache();
         } else {
@@ -112,7 +112,7 @@ const useUserModsStatus = (modIds = null) => {
   // Función para verificar si un mod es propio del usuario
   const isOwner = useCallback((mod) => {
     if (!isAuthenticated || !currentUserId || !mod) return false;
-    
+
     // Soportar tanto mod.creador_id como mod.creador?.id
     const creatorId = mod.creador_id || mod.creador?.id;
     return creatorId === currentUserId;
@@ -127,31 +127,31 @@ const useUserModsStatus = (modIds = null) => {
   // Función para alternar el estado de guardado de un mod
   const toggleSavedStatus = useCallback(async (modId) => {
     if (!isAuthenticated || !modId) return false;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const isCurrentlySaved = isSaved(modId);
-      
+
       if (isCurrentlySaved) {
         // Eliminar de guardados
         await modService.removeFromSaved(modId);
-        
+
         // Actualizar caché local
         userModsCache.savedMods = userModsCache.savedMods.filter(id => id !== Number(modId));
         setSavedModIds(userModsCache.savedMods);
       } else {
         // Guardar el mod
         await modService.saveMod(modId);
-        
+
         // Actualizar caché local
         if (!userModsCache.savedMods.includes(Number(modId))) {
           userModsCache.savedMods.push(Number(modId));
           setSavedModIds(userModsCache.savedMods);
         }
       }
-      
+
       return !isCurrentlySaved; // Retorna el nuevo estado
     } catch (err) {
       console.error('Error al cambiar el estado de guardado:', err);
@@ -168,7 +168,7 @@ const useUserModsStatus = (modIds = null) => {
       if (!isAuthenticated || !currentUserId || !Array.isArray(mods)) {
         return {};
       }
-      
+
       const ownershipMap = {};
       mods.forEach(mod => {
         if (mod && mod.id) {
@@ -176,7 +176,7 @@ const useUserModsStatus = (modIds = null) => {
           ownershipMap[mod.id] = creatorId === currentUserId;
         }
       });
-      
+
       return ownershipMap;
     };
   }, [isAuthenticated, currentUserId]);
@@ -187,12 +187,12 @@ const useUserModsStatus = (modIds = null) => {
       if (!isAuthenticated || !Array.isArray(modIds)) {
         return {};
       }
-      
+
       const savedMap = {};
       modIds.forEach(modId => {
         savedMap[modId] = savedModIds.includes(Number(modId));
       });
-      
+
       return savedMap;
     };
   }, [isAuthenticated, savedModIds]);
@@ -203,7 +203,7 @@ const useUserModsStatus = (modIds = null) => {
       if (!isAuthenticated || !currentUserId || !Array.isArray(mods)) {
         return [];
       }
-      
+
       return mods.filter(mod => {
         if (!mod) return false;
         const creatorId = mod.creador_id || mod.creador?.id;
@@ -227,20 +227,20 @@ const useUserModsStatus = (modIds = null) => {
     loading,
     error,
     savedModIds,
-    
+
     // Funciones de verificación individual
     isOwner,
     isSaved,
-    
+
     // Funciones para múltiples mods
     getOwnershipMap,
     getSavedMap,
     getOwnMods,
-    
+
     // Funciones de acción
     toggleSavedStatus,
     refresh,
-    
+
     // Datos de utilidad
     ownModsCount: (mods) => getOwnMods(mods).length,
     savedModsCount: savedModIds.length

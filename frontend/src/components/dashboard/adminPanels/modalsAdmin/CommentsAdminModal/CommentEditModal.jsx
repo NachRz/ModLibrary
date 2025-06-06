@@ -7,7 +7,7 @@ import { useNotification } from '../../../../../context/NotificationContext';
 
 const CommentEditModal = ({ isOpen, onClose, comment, onCommentUpdated }) => {
   const { showNotification } = useNotification();
-  
+
   const [contenido, setContenido] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,7 +22,7 @@ const CommentEditModal = ({ isOpen, onClose, comment, onCommentUpdated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!contenido.trim()) {
       setError('El contenido del comentario no puede estar vacío');
       return;
@@ -55,14 +55,14 @@ const CommentEditModal = ({ isOpen, onClose, comment, onCommentUpdated }) => {
       } else {
         throw new Error('No se pudo actualizar el comentario');
       }
-    } catch (err) {      
+    } catch (err) {
       // Si el error es 500 pero el comentario podría haberse actualizado
       if (err.status === 500 || (err.response && err.response.status === 500)) {
         // Intentar actualizar de todas formas con el contenido local
-        const updatedComment = { 
-          ...comment, 
-          contenido: contenido.trim(), 
-          updated_at: new Date().toISOString() 
+        const updatedComment = {
+          ...comment,
+          contenido: contenido.trim(),
+          updated_at: new Date().toISOString()
         };
         onCommentUpdated(updatedComment);
         showNotification('Comentario actualizado exitosamente', 'success');
@@ -187,11 +187,10 @@ const CommentEditModal = ({ isOpen, onClose, comment, onCommentUpdated }) => {
                 <label className="block text-sm font-medium bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Contenido del comentario *
                 </label>
-                <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                  contenido.length > 1000 ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 
-                  contenido.length > 800 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 
-                  'bg-gray-700/50 text-gray-400 border border-gray-600/30'
-                }`}>
+                <span className={`text-sm font-medium px-2 py-1 rounded-full ${contenido.length > 1000 ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                    contenido.length > 800 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                      'bg-gray-700/50 text-gray-400 border border-gray-600/30'
+                  }`}>
                   {contenido.length}/1000
                 </span>
               </div>
@@ -235,7 +234,7 @@ const CommentEditModal = ({ isOpen, onClose, comment, onCommentUpdated }) => {
                 <div className="flex flex-col">
                   <span className="text-gray-400 text-xs">Última modificación</span>
                   <span className="text-blue-200 font-medium">
-                    {comment.updated_at !== comment.created_at 
+                    {comment.updated_at !== comment.created_at
                       ? new Date(comment.updated_at).toLocaleString('es-ES')
                       : 'Sin modificaciones'
                     }
@@ -263,9 +262,9 @@ const CommentEditModal = ({ isOpen, onClose, comment, onCommentUpdated }) => {
               disabled={loading || !contenido.trim() || contenido.length < 3}
               className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
-              <FontAwesomeIcon 
-                icon={loading ? faSpinner : faSave} 
-                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} 
+              <FontAwesomeIcon
+                icon={loading ? faSpinner : faSave}
+                className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
               />
               <span className="hidden sm:inline">{loading ? 'Guardando...' : 'Guardar Cambios'}</span>
               <span className="sm:hidden">{loading ? 'Guardando...' : 'Guardar'}</span>

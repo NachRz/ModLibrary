@@ -1,40 +1,41 @@
 /**
  * Estilos para botones con gradiente
  */
- .gradient-button {
-    position: relative;
-    z-index: 1;
-    transition: all 0.3s ease;
-  }
-  
-  .gradient-button::before,
-  .gradient-button::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 0.5rem; /* rounded-lg */
-    transition: opacity 0.5s ease;
-  }
-  
-  .gradient-button::before {
-    background: linear-gradient(to right, #F18F75, #1B4F72);
-    opacity: 1;
-    z-index: -1;
-  }
-  
-  .gradient-button::after {
-    background: linear-gradient(to right, #1B4F72, #F18F75);
-    opacity: 0;
-    z-index: -1;
-  }
-  
-  .gradient-button:hover::before {
-    opacity: 0;
-  }
-  
-  .gradient-button:hover::after {
-    opacity: 1;
-  } 
+.gradient-button {
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.gradient-button::before,
+.gradient-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 0.5rem;
+  /* rounded-lg */
+  transition: opacity 0.5s ease;
+}
+
+.gradient-button::before {
+  background: linear-gradient(to right, #F18F75, #1B4F72);
+  opacity: 1;
+  z-index: -1;
+}
+
+.gradient-button::after {
+  background: linear-gradient(to right, #1B4F72, #F18F75);
+  opacity: 0;
+  z-index: -1;
+}
+
+.gradient-button:hover::before {
+  opacity: 0;
+}
+
+.gradient-button:hover::after {
+  opacity: 1;
+}

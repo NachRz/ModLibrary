@@ -112,7 +112,7 @@ const ModsGuardados = () => {
           </svg>
           <h4 className="mt-2 text-lg font-medium text-custom-text">No tienes mods guardados</h4>
           <p className="mt-1 text-custom-detail">Cuando guardes mods, aparecerán aquí para facilitar su acceso.</p>
-          <button 
+          <button
             onClick={() => navigate('/mods')}
             className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-custom-primary hover:bg-custom-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-primary transition-colors duration-300"
           >
@@ -122,8 +122,8 @@ const ModsGuardados = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedMods.map(mod => (
-            <ModCard 
-              key={mod.id} 
+            <ModCard
+              key={mod.id}
               mod={mod}
               showSaveButton={true}
               onSavedChange={(isCurrentlySaved) => handleModSavedChanged(mod.id, isCurrentlySaved)}

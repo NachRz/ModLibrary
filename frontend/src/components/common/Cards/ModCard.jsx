@@ -5,12 +5,12 @@ import { useNotification } from '../../../context/NotificationContext';
 import '../../../assets/styles/components/common/Cards/ModCard.css';
 
 const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSavedChange, onEdit, onDelete }) => {
-  const { 
-    isAuthenticated, 
-    isOwner: checkIsOwner, 
-    isSaved, 
-    toggleSavedStatus, 
-    loading: userLoading 
+  const {
+    isAuthenticated,
+    isOwner: checkIsOwner,
+    isSaved,
+    toggleSavedStatus,
+    loading: userLoading
   } = useUserModsStatus();
   const { showNotification } = useNotification();
 
@@ -78,11 +78,11 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
   const handleSaveToggle = async (e) => {
     e.preventDefault(); // Evitar que se navegue al detalle del mod
     e.stopPropagation(); // Evitar propagación del evento
-    
+
     if (!isAuthenticated) {
       return; // Si no está autenticado, no hacemos nada (podríamos redirigir al login)
     }
-    
+
     const prevStatus = isModSaved;
     try {
       await toggleSavedStatus(mod.id);
@@ -110,32 +110,31 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
     <div className="bg-custom-card rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-custom-detail/10">
       {/* Imagen del mod */}
       <div className="relative">
-        <img 
-          src={imageUrl} 
-          alt={mod.titulo} 
-          className="w-full h-48 object-cover brightness-90" 
+        <img
+          src={imageUrl}
+          alt={mod.titulo}
+          className="w-full h-48 object-cover brightness-90"
           loading="lazy"
         />
-        
+
         {/* Overlay sutil mejorado */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none"></div>
-        
+
         {/* Categoría */}
         <div className="absolute top-3 left-3 bg-custom-primary/90 text-white text-xs font-medium py-1.5 px-3 rounded-full shadow-lg backdrop-blur-sm">
           {mod.categoria}
         </div>
-        
+
         {/* Estado (si es propietario) */}
         {isOwner && mod.estado && (
-          <div className={`absolute top-3 right-3 text-xs font-medium py-1.5 px-3 rounded-full shadow-lg backdrop-blur-sm ${
-            mod.estado === 'publicado' 
-              ? 'bg-green-500/90 text-white' 
+          <div className={`absolute top-3 right-3 text-xs font-medium py-1.5 px-3 rounded-full shadow-lg backdrop-blur-sm ${mod.estado === 'publicado'
+              ? 'bg-green-500/90 text-white'
               : 'bg-yellow-500/90 text-white'
-          }`}>
+            }`}>
             {mod.estado === 'publicado' ? 'Publicado' : 'Borrador'}
           </div>
         )}
-        
+
         {/* Título sobre la imagen con mayor contraste */}
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
           <h3 className="font-bold text-lg leading-tight line-clamp-1 drop-shadow-lg">{mod.titulo}</h3>
@@ -148,12 +147,12 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
           </p>
         </div>
       </div>
-      
+
       {/* Contenido */}
       <div className="p-5">
         {/* Descripción */}
         <p className="text-white/90 text-sm mb-4 line-clamp-2 mt-1">{mod.descripcion}</p>
-        
+
         {/* Estadísticas */}
         <div className="flex items-center justify-between">
           <div className="flex items-center bg-custom-bg/50 rounded-full px-3 py-1.5 text-white shadow-sm">
@@ -167,7 +166,7 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
               ({mod.numValoraciones || 0})
             </span>
           </div>
-          
+
           <div className="flex items-center space-x-3">
             <div className="flex items-center text-white/90 bg-custom-bg/50 rounded-full px-3 py-1.5 shadow-sm">
               <svg className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,10 +174,10 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
               </svg>
               <span className="text-xs font-medium">{mod.descargas >= 1000 ? `${(mod.descargas / 1000).toFixed(1)}k` : mod.descargas}</span>
             </div>
-            
+
             {/* Botón de guardar (si está autenticado y no es el creador) */}
             {isAuthenticated && showSaveButton && !isCreator && (
-              <button 
+              <button
                 onClick={handleSaveToggle}
                 disabled={userLoading}
                 className={`mod-card-save-button ${isModSaved ? 'active' : ''}`}
@@ -187,12 +186,12 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
                 <i className={`${isModSaved ? 'fas' : 'far'} fa-bookmark`}></i>
               </button>
             )}
-            
+
             {/* Botones de editar y eliminar (solo para el creador) */}
             {isCreator && (
               <div className="flex items-center space-x-2">
                 {onEdit && (
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -205,7 +204,7 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
                   </button>
                 )}
                 {onDelete && (
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -219,15 +218,15 @@ const ModCard = ({ mod, isOwner = false, actions, showSaveButton = true, onSaved
                 )}
               </div>
             )}
-            
+
             {/* Solo mostrar acciones personalizadas si existen */}
             {actions && actions}
           </div>
         </div>
-        
+
         {/* Botón inferior */}
-        <Link 
-          to={modUrl} 
+        <Link
+          to={modUrl}
           className="mt-5 block w-full text-center py-2.5 font-medium rounded-lg text-white bg-custom-primary/10 hover:bg-custom-primary/20 transition-colors duration-300 text-sm shadow-sm hover:shadow-md"
         >
           Ver detalles

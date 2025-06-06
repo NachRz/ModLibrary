@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../../assets/styles/components/common/Cards/UserCard.css';
 
-const UserCard = ({ 
-  user, 
+const UserCard = ({
+  user,
   onClick,
-  showLink = true 
+  showLink = true
 }) => {
 
   // Manejar el clic en la tarjeta
@@ -24,7 +24,7 @@ const UserCard = ({
 
   // Obtener el nombre del usuario
   const userName = user.username || user.nome_usuario || user.name || user.nombre || 'Usuario';
-  
+
   // Obtener las iniciales del usuario para el avatar por defecto
   const getUserInitials = (name) => {
     const nombres = name.split(' ').filter(n => n.length > 0);
@@ -37,16 +37,16 @@ const UserCard = ({
   };
 
   const CardContent = (
-    <div 
+    <div
       className="user-card"
       onClick={handleCardClick}
     >
       {/* Avatar del usuario */}
       <div className="user-card-avatar">
         {avatarUrl ? (
-          <img 
-            src={avatarUrl} 
-            alt={userName} 
+          <img
+            src={avatarUrl}
+            alt={userName}
             loading="lazy"
             onError={(e) => {
               e.target.style.display = 'none';
@@ -54,14 +54,14 @@ const UserCard = ({
             }}
           />
         ) : null}
-        <div 
-          className="user-avatar-fallback" 
+        <div
+          className="user-avatar-fallback"
           style={{ display: avatarUrl ? 'none' : 'flex' }}
         >
           {getUserInitials(userName)}
         </div>
       </div>
-      
+
       {/* Nombre del usuario */}
       <div className="user-card-content">
         <h3 className="user-card-name">

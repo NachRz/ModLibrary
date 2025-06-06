@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import userService from '../../../services/api/userService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faUser, 
+import {
+  faUser,
   faEdit,
   faSpinner,
   faSave,
@@ -31,7 +31,7 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
     try {
       setLoadingProfile(true);
       const response = await userService.getCurrentProfile();
-      
+
       const profileData = response.data;
       setFormData({
         nombre: profileData.nombre || '',
@@ -39,7 +39,7 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
         sobre_mi: profileData.sobre_mi || '',
         foto_perfil: profileData.foto_perfil || ''
       });
-      
+
       // Si hay foto de perfil, actualizar el timestamp para la URL
       if (profileData.foto_perfil) {
         const timestamp = Date.now();
@@ -59,7 +59,7 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
       // Limpiar estados de archivo al abrir el modal
       setSelectedFile(null);
       setError('');
-      
+
       // Si tenemos datos del usuario del contexto, usarlos inmediatamente como valores iniciales
       if (user) {
         setFormData({
@@ -68,7 +68,7 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
           sobre_mi: user.sobre_mi || '',
           foto_perfil: user.foto_perfil || ''
         });
-        
+
         // Si hay foto de perfil en el contexto, mostrarla inmediatamente
         if (user.foto_perfil) {
           const timestamp = Date.now();
@@ -78,7 +78,7 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
           setPreviewUrl('');
         }
       }
-      
+
       // Luego cargar los datos más actualizados del backend
       loadProfileData();
     } else {
@@ -111,22 +111,22 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
         setError('Por favor, selecciona un archivo de imagen válido');
         return;
       }
-      
+
       // Validar tamaño (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('La imagen es demasiado grande. Máximo 5MB');
         return;
       }
-      
+
       setSelectedFile(file);
-      
+
       // Crear preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrl(e.target.result);
       };
       reader.readAsDataURL(file);
-      
+
       // Limpiar error previo
       setError('');
     }
@@ -134,17 +134,17 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
 
   const uploadImage = async () => {
     if (!selectedFile) return null;
-    
+
     try {
       setUploadingImage(true);
       const uploadFormData = new FormData();
       uploadFormData.append('image', selectedFile);
-      
+
       const response = await userService.uploadProfileImage(uploadFormData);
-      
+
       // Actualizar timestamp para forzar actualización de imagen
       setImageTimestamp(Date.now());
-      
+
       return response.data.url;
     } catch (error) {
       throw new Error('Error al subir la imagen: ' + error.message);
@@ -170,12 +170,12 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
 
     try {
       let finalImageUrl = formData.foto_perfil;
-      
+
       // Si hay un archivo seleccionado, subirlo primero
       if (selectedFile) {
         finalImageUrl = await uploadImage();
       }
-      
+
       const updateData = {
         nombre: formData.nombre,
         apelidos: formData.apelidos,
@@ -184,13 +184,13 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
       };
 
       const response = await userService.updateProfile(updateData);
-      
+
       const updatedUser = {
         ...user,
         ...updateData,
         updated_at: new Date().toISOString()
       };
-      
+
       onSave(updatedUser);
       onClose();
     } catch (error) {
@@ -253,15 +253,15 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
                     </div>
                     Foto de Perfil
                   </label>
-                  
+
                   {/* Preview e interfaz de subida */}
                   <div className="flex items-center space-x-4">
                     <div className="relative">
                       <div className="w-16 h-16 bg-gradient-to-br from-custom-primary to-custom-secondary rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                         {(previewUrl || formData.foto_perfil) ? (
-                          <img 
+                          <img
                             src={selectedFile ? previewUrl : `http://localhost:8000/storage/${formData.foto_perfil}?t=${imageTimestamp}`}
-                            alt="Preview" 
+                            alt="Preview"
                             className="w-16 h-16 rounded-full object-cover"
                           />
                         ) : (
@@ -276,7 +276,7 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center space-x-3">
                         <input
@@ -292,7 +292,7 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
                         >
                           {uploadingImage ? 'Subiendo...' : 'Subir Imagen'}
                         </label>
-                        
+
                         {(previewUrl || selectedFile) && (
                           <button
                             type="button"
@@ -303,13 +303,13 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
                           </button>
                         )}
                       </div>
-                      
+
                       {selectedFile && (
                         <p className="text-green-400 text-sm">
                           ✓ {selectedFile.name}
                         </p>
                       )}
-                      
+
                       <p className="text-xs text-gray-400">
                         Formatos: JPG, PNG, GIF. Máximo 5MB
                       </p>
@@ -391,9 +391,9 @@ const UserProfileEditModal = ({ user, isOpen, onClose, onSave }) => {
               disabled={loading || loadingProfile || uploadingImage}
               className="flex items-center space-x-2 px-3 sm:px-5 py-2 bg-gradient-to-r from-custom-primary to-custom-primary/80 hover:from-custom-primary-hover hover:to-custom-primary text-white rounded-lg transition-all duration-300 font-medium disabled:opacity-50 text-sm"
             >
-              <FontAwesomeIcon 
-                icon={loading || uploadingImage ? faSpinner : faSave} 
-                className={`w-4 h-4 ${loading || uploadingImage ? 'animate-spin' : ''}`} 
+              <FontAwesomeIcon
+                icon={loading || uploadingImage ? faSpinner : faSave}
+                className={`w-4 h-4 ${loading || uploadingImage ? 'animate-spin' : ''}`}
               />
               <span className="hidden sm:inline">
                 {loading || uploadingImage ? 'Guardando...' : 'Guardar Cambios'}

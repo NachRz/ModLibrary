@@ -27,7 +27,7 @@ const JuegosFavoritos = () => {
             {loading ? 'Cargando...' : `${favoriteGames.length} ${favoriteGames.length === 1 ? 'juego favorito' : 'juegos favoritos'}`}
           </p>
         </div>
-        
+
         {favoriteGames.length > 0 && (
           <div className="relative">
             <input
@@ -72,7 +72,7 @@ const JuegosFavoritos = () => {
           </svg>
           <h4 className="text-lg font-medium text-white mb-2">Error al cargar favoritos</h4>
           <p className="text-custom-detail mb-4">{error}</p>
-          <button 
+          <button
             onClick={refreshFavorites}
             className="bg-custom-primary hover:bg-custom-primary-hover text-white py-2 px-4 rounded-lg transition-all duration-300"
           >
@@ -102,9 +102,9 @@ const JuegosFavoritos = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {(searchTerm ? filteredGames : favoriteGames).map(game => (
-              <GameCard 
-                key={game.id} 
-                game={game} 
+              <GameCard
+                key={game.id}
+                game={game}
                 showFavoriteButton={true}
                 onFavoriteChange={refreshFavorites}
               />
@@ -112,7 +112,7 @@ const JuegosFavoritos = () => {
           </div>
         </>
       )}
-      
+
       {/* Estado vacío */}
       {!loading && !error && favoriteGames.length === 0 && (
         <div className="bg-custom-card rounded-xl p-8 text-center">
@@ -123,8 +123,8 @@ const JuegosFavoritos = () => {
           <p className="text-custom-detail mt-2 max-w-md mx-auto">
             Explora nuestro catálogo de juegos y añade a favoritos aquellos que más te interesen para acceder rápidamente a sus mods.
           </p>
-          <Link 
-            to="/juegos" 
+          <Link
+            to="/juegos"
             className="inline-block mt-6 bg-custom-primary hover:bg-custom-primary-hover text-white py-2 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
           >
             Explorar juegos
@@ -142,7 +142,7 @@ const JuegosFavoritos = () => {
           <p className="text-custom-detail mt-2 max-w-md mx-auto">
             No hay juegos favoritos que coincidan con "{searchTerm}". Prueba con otro término de búsqueda.
           </p>
-          <button 
+          <button
             onClick={clearSearch}
             className="mt-6 bg-custom-primary hover:bg-custom-primary-hover text-white py-2 px-6 rounded-lg transition-all duration-300"
           >

@@ -28,32 +28,32 @@ const Register = () => {
     setError('');
     setSuccess('');
     setLoading(true);
-    
+
     // Validaciones básicas
     if (!userData.username || !userData.email || !userData.password || !userData.confirmPassword) {
       setError('Por favor, completa todos los campos');
       setLoading(false);
       return;
     }
-    
+
     if (userData.password !== userData.confirmPassword) {
       setError('Las contraseñas no coinciden');
       setLoading(false);
       return;
     }
-    
+
     if (userData.password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres');
       setLoading(false);
       return;
     }
-    
+
     try {
       // Llamada real a la API para registrar al usuario
       await authService.register(userData);
-      
+
       setSuccess('Cuenta creada correctamente. Redirigiendo al perfil...');
-      
+
       // Redirección a perfil después de 2 segundos
       setTimeout(() => {
         navigate('/perfil');
@@ -91,7 +91,7 @@ const Register = () => {
             </p>
           </div>
         </div>
-        
+
         {error && (
           <div className="text-custom-error text-sm text-center p-3 bg-custom-error/10 rounded-lg border border-custom-error/20 animate-pulse">
             <svg className="h-5 w-5 inline-block mr-1 mb-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -109,7 +109,7 @@ const Register = () => {
             {success}
           </div>
         )}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-5">
             {/* Nombre de usuario */}
@@ -136,7 +136,7 @@ const Register = () => {
                 />
               </div>
             </div>
-            
+
             {/* Correo electrónico */}
             <div className="group">
               <label htmlFor="email" className="block text-sm font-medium text-custom-detail mb-2 transition-all duration-300 group-focus-within:text-custom-primary">
@@ -162,7 +162,7 @@ const Register = () => {
                 />
               </div>
             </div>
-            
+
             {/* Contraseña */}
             <div className="group">
               <label htmlFor="password" className="block text-sm font-medium text-custom-detail mb-2 transition-all duration-300 group-focus-within:text-custom-primary">
@@ -190,7 +190,7 @@ const Register = () => {
                 Usa al menos 6 caracteres con una mezcla de letras, números y símbolos
               </p>
             </div>
-            
+
             {/* Confirmar contraseña */}
             <div className="group">
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-custom-detail mb-2 transition-all duration-300 group-focus-within:text-custom-primary">
@@ -243,7 +243,7 @@ const Register = () => {
             </GradientButton>
           </div>
         </form>
-        
+
         <div className="mt-6 text-center text-xs text-custom-detail">
           <p>Al registrarte, aceptas recibir correos electrónicos sobre actualizaciones y novedades de ModLibrary.</p>
         </div>

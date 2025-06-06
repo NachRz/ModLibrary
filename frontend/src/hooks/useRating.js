@@ -40,15 +40,15 @@ const useRating = (modId) => {
   // Verificar si el usuario ya ha valorado el mod
   const checkUserRating = async () => {
     if (!isAuthenticated || !modId) return;
-    
+
     setLoading(true);
-    
+
     try {
       // Verificar si tenemos la valoración en caché y si no está expirada
       const cachedRating = ratingsCache.ratings[modId];
       const lastFetched = ratingsCache.lastFetched[modId];
       const isCacheExpired = !lastFetched || (Date.now() - lastFetched > CACHE_EXPIRATION);
-      
+
       // Si la valoración está en caché y no está expirada, la usamos
       if (cachedRating && !isCacheExpired) {
         setUserRating(cachedRating.puntuacion || 0);
@@ -56,13 +56,13 @@ const useRating = (modId) => {
         setLoading(false);
         return;
       }
-      
+
       // Si no está en caché o está expirada, hacemos la petición al servidor
       if (!ratingsCache.isFetching[modId]) {
         ratingsCache.isFetching[modId] = true;
-        
+
         const response = await modService.getUserRating(modId);
-        
+
         if (response.status === 'success') {
           if (response.hasRated) {
             // Guardamos en la caché
@@ -70,21 +70,21 @@ const useRating = (modId) => {
               puntuacion: response.data.puntuacion,
               fecha: response.data.fecha
             };
-            
+
             setUserRating(response.data.puntuacion);
             setHasRated(true);
           } else {
             // Si no ha valorado, guardamos un valor nulo en la caché
             ratingsCache.ratings[modId] = { puntuacion: 0, fecha: null };
-            
+
             setUserRating(0);
             setHasRated(false);
           }
-          
+
           // Actualizamos el timestamp de la caché
           ratingsCache.lastFetched[modId] = Date.now();
         }
-        
+
         ratingsCache.isFetching[modId] = false;
       }
     } catch (err) {
@@ -100,27 +100,27 @@ const useRating = (modId) => {
       showMessage('Debes iniciar sesión para valorar este mod', true);
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const response = await modService.rateMod(modId, rating);
-      
+
       if (response.status === 'success') {
         // Actualizamos el estado local
         setUserRating(rating);
         setHasRated(true);
-        
+
         // Actualizamos la caché
         ratingsCache.ratings[modId] = {
           puntuacion: rating,
           fecha: new Date().toISOString()
         };
         ratingsCache.lastFetched[modId] = Date.now();
-        
+
         // Mostrar mensaje de confirmación
         showMessage('¡Gracias por tu valoración!');
-        
+
         return true;
       }
     } catch (err) {
@@ -137,24 +137,24 @@ const useRating = (modId) => {
     if (!isAuthenticated || !modId || !hasRated) {
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const response = await modService.deleteRating(modId);
-      
+
       if (response.status === 'success') {
         // Actualizamos el estado local
         setUserRating(0);
         setHasRated(false);
-        
+
         // Actualizamos la caché
         ratingsCache.ratings[modId] = { puntuacion: 0, fecha: null };
         ratingsCache.lastFetched[modId] = Date.now();
-        
+
         // Mostrar mensaje de confirmación
         showMessage('Valoración eliminada correctamente');
-        
+
         return true;
       }
     } catch (err) {
@@ -174,12 +174,12 @@ const useRating = (modId) => {
   }, [modId, isAuthenticated]);
 
   return [
-    userRating, 
-    hasRated, 
-    rateMod, 
-    deleteRating, 
-    loading, 
-    error, 
+    userRating,
+    hasRated,
+    rateMod,
+    deleteRating,
+    loading,
+    error,
     ratingMessage
   ];
 };

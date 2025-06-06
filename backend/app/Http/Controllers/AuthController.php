@@ -68,7 +68,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        
+
         return response()->json([
             'message' => 'Logout exitoso'
         ]);
@@ -117,7 +117,7 @@ class AuthController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             // Si es un error de validación, devolver los errores específicos
             if ($e instanceof \Illuminate\Validation\ValidationException) {
                 return response()->json([
@@ -125,7 +125,7 @@ class AuthController extends Controller
                     'errors' => $e->errors()
                 ], 422);
             }
-            
+
             return response()->json([
                 'message' => 'Error en el servidor'
             ], 500);
@@ -178,7 +178,7 @@ class AuthController extends Controller
     public function isAdmin(Request $request)
     {
         $usuario = $request->user();
-        
+
         return response()->json([
             'is_admin' => $usuario->rol === 'admin',
             'rol' => $usuario->rol
@@ -190,20 +190,20 @@ class AuthController extends Controller
     {
         try {
             $query = $request->get('q', '');
-            
+
             if (empty(trim($query))) {
                 return response()->json([
                     'status' => 'success',
                     'data' => []
                 ]);
             }
-            
+
             $usuarios = Usuario::select('id', 'nome', 'correo', 'rol', 'nombre', 'apelidos', 'sobre_mi', 'foto_perfil', 'created_at')
-                ->where(function($q) use ($query) {
+                ->where(function ($q) use ($query) {
                     $q->where('nome', 'like', '%' . $query . '%')
-                      ->orWhere('nombre', 'like', '%' . $query . '%')
-                      ->orWhere('apelidos', 'like', '%' . $query . '%')
-                      ->orWhere('correo', 'like', '%' . $query . '%');
+                        ->orWhere('nombre', 'like', '%' . $query . '%')
+                        ->orWhere('apelidos', 'like', '%' . $query . '%')
+                        ->orWhere('correo', 'like', '%' . $query . '%');
                 })
                 ->withCount('mods')
                 ->orderBy('nome', 'asc')
@@ -224,7 +224,7 @@ class AuthController extends Controller
                             $profileImageUrl = url('storage/' . $usuario->foto_perfil);
                         }
                     }
-                    
+
                     return [
                         'id' => $usuario->id,
                         'username' => $usuario->nome,
@@ -277,7 +277,7 @@ class AuthController extends Controller
                             $profileImageUrl = url('storage/' . $usuario->foto_perfil);
                         }
                     }
-                    
+
                     return [
                         'id' => $usuario->id,
                         'nome' => $usuario->nome,
@@ -307,7 +307,7 @@ class AuthController extends Controller
     {
         try {
             $usuario = Usuario::findOrFail($id);
-            
+
             // Construir URL completa para la imagen de perfil
             $profileImageUrl = null;
             if ($usuario->foto_perfil) {
@@ -319,7 +319,7 @@ class AuthController extends Controller
                     $profileImageUrl = url('storage/' . $usuario->foto_perfil);
                 }
             }
-            
+
             return response()->json([
                 'status' => 'success',
                 'data' => [
@@ -355,7 +355,7 @@ class AuthController extends Controller
             ]);
 
             $usuario = Usuario::findOrFail($id);
-            
+
             // Evitar que el usuario se elimine a sí mismo el rol de admin
             if ($usuario->id === $request->user()->id && $request->rol !== 'admin') {
                 return response()->json([
@@ -373,7 +373,7 @@ class AuthController extends Controller
             }
 
             $usuario->rol = $request->rol;
-            
+
             // Actualizar otros campos si se proporcionan
             if ($request->has('nome') && $request->user()->rol === 'admin') {
                 $usuario->nome = $request->nome;
@@ -390,7 +390,7 @@ class AuthController extends Controller
             if ($request->has('foto_perfil')) {
                 $usuario->foto_perfil = $request->foto_perfil;
             }
-            
+
             $usuario->save();
 
             return response()->json([
@@ -435,7 +435,7 @@ class AuthController extends Controller
     {
         try {
             $usuario = Usuario::findOrFail($id);
-            
+
             // Evitar que el usuario se elimine a sí mismo
             if ($usuario->id === $request->user()->id) {
                 return response()->json([
@@ -474,7 +474,7 @@ class AuthController extends Controller
     {
         try {
             $usuario = Usuario::findOrFail($id);
-            
+
             // Evitar que el usuario se elimine a sí mismo
             if ($usuario->id === $request->user()->id) {
                 return response()->json([
@@ -514,7 +514,7 @@ class AuthController extends Controller
     {
         try {
             $usuario = Usuario::findOrFail($id);
-            
+
             // Evitar que el usuario se elimine a sí mismo
             if ($usuario->id === $request->user()->id) {
                 return response()->json([
@@ -646,29 +646,29 @@ class AuthController extends Controller
 
             // Eliminar todos los mods del usuario (ModObserver manejará archivos automáticamente)
             $mods = $usuario->mods;
-            
+
             $juegosEliminados = [];
             $etiquetasEliminadas = [];
-            
+
             foreach ($mods as $mod) {
                 // Limpiar información antes de cada eliminación
                 \App\Observers\ModObserver::clearAllEliminacionInfo();
-                
+
                 // ModObserver se encargará automáticamente de:
                 // - Eliminar imagen banner y imágenes adicionales
                 // - Eliminar relaciones many-to-many
                 // - Eliminar valoraciones y comentarios
                 // - Eliminar versiones (VersionModObserver elimina archivos)
                 $mod->delete();
-                
+
                 // Capturar información de eliminaciones automáticas
                 $juegoEliminadoInfo = \App\Observers\ModObserver::getJuegoEliminadoInfo();
                 $etiquetasEliminadasInfo = \App\Observers\ModObserver::getEtiquetasEliminadasInfo();
-                
+
                 if ($juegoEliminadoInfo) {
                     $juegosEliminados[] = $juegoEliminadoInfo;
                 }
-                
+
                 if (!empty($etiquetasEliminadasInfo)) {
                     $etiquetasEliminadas = array_merge($etiquetasEliminadas, $etiquetasEliminadasInfo);
                 }
@@ -686,12 +686,12 @@ class AuthController extends Controller
             $usuario->forceDelete();
 
             $message = 'Usuario y todos sus mods eliminados definitivamente';
-            
+
             if (!empty($juegosEliminados)) {
                 $nombresJuegos = array_column($juegosEliminados, 'titulo');
                 $message .= ". También se eliminaron los juegos: " . implode(', ', $nombresJuegos);
             }
-            
+
             if (!empty($etiquetasEliminadas)) {
                 $nombresEtiquetas = array_unique(array_column($etiquetasEliminadas, 'nombre'));
                 $message .= ". También se eliminaron las etiquetas: " . implode(', ', $nombresEtiquetas);
@@ -724,7 +724,7 @@ class AuthController extends Controller
             ]);
 
             $image = $request->file('image');
-            
+
             // Determinar el ID del usuario
             $userId = $request->input('user_id');
             if (!$userId) {
@@ -739,15 +739,15 @@ class AuthController extends Controller
                     ], 403);
                 }
             }
-            
+
             // Crear estructura de carpetas: users/user_X/
             $userFolder = "users/user_{$userId}";
             $uploadPath = storage_path("app/public/{$userFolder}");
-            
+
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0755, true);
             }
-            
+
             // Eliminar imagen anterior si existe
             $usuario = Usuario::find($userId);
             if ($usuario && $usuario->foto_perfil) {
@@ -756,20 +756,20 @@ class AuthController extends Controller
                     unlink($oldImagePath);
                 }
             }
-            
+
             // Generar nombre de archivo: user_X_avatar.extension
             $extension = $image->getClientOriginalExtension();
             $imageName = "user_{$userId}_avatar.{$extension}";
-            
+
             // Mover archivo
             $image->move($uploadPath, $imageName);
-            
+
             // Ruta relativa para guardar en la base de datos
             $relativeImagePath = "{$userFolder}/{$imageName}";
-            
+
             // Actualizar la foto de perfil del usuario en la base de datos
             $usuario->update(['foto_perfil' => $relativeImagePath]);
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Imagen subida correctamente',
@@ -795,12 +795,12 @@ class AuthController extends Controller
     {
         try {
             $usuario = Usuario::with(['mods.valoraciones', 'mods.versiones'])->findOrFail($id);
-            
+
             // Calcular estadísticas de mods
             $totalMods = $usuario->mods->count();
             $modsPublicados = $usuario->mods->where('estado', 'publicado')->count();
             $modsBorradores = $usuario->mods->where('estado', 'borrador')->count();
-            
+
             // Calcular descargas totales
             $totalDescargas = 0;
             foreach ($usuario->mods as $mod) {
@@ -808,7 +808,7 @@ class AuthController extends Controller
                     $totalDescargas += $version->descargas;
                 }
             }
-            
+
             // Calcular valoración promedio
             $totalValoraciones = 0;
             $sumaValoraciones = 0;
@@ -819,17 +819,17 @@ class AuthController extends Controller
                 }
             }
             $valoracionPromedio = $totalValoraciones > 0 ? round($sumaValoraciones / $totalValoraciones, 2) : 0;
-            
+
             // Calcular mods guardados por otros usuarios
             $totalGuardados = 0;
             foreach ($usuario->mods as $mod) {
                 $totalGuardados += $mod->usuariosGuardados()->count();
             }
-            
+
             // Fecha del primer mod
             $primerMod = $usuario->mods->sortBy('created_at')->first();
             $fechaPrimerMod = $primerMod ? $primerMod->created_at->format('Y-m-d') : null;
-            
+
             // Fecha del último mod
             $ultimoMod = $usuario->mods->sortByDesc('created_at')->first();
             $fechaUltimoMod = $ultimoMod ? $ultimoMod->created_at->format('Y-m-d') : null;
@@ -873,11 +873,11 @@ class AuthController extends Controller
 
             $image = $request->file('imagen_banner');
             $modId = $request->input('mod_id');
-            
+
             // Verificar que el usuario tenga permisos para subir imagen del mod
             $mod = \App\Models\Mod::findOrFail($modId);
             $currentUser = $request->user();
-            
+
             // Solo el creador del mod o un admin pueden subir la imagen banner
             if ($mod->creador_id !== $currentUser->id && $currentUser->rol !== 'admin') {
                 return response()->json([
@@ -885,38 +885,38 @@ class AuthController extends Controller
                     'message' => 'No tienes permisos para subir imagen de este mod'
                 ], 403);
             }
-            
+
             // Sanitizar el nombre del mod para usarlo como nombre de carpeta
             $nombreModSanitizado = preg_replace('/[^a-zA-Z0-9_\-\s]/', '', $mod->titulo);
             $nombreModSanitizado = preg_replace('/\s+/', '_', trim($nombreModSanitizado));
             $nombreModSanitizado = strtolower($nombreModSanitizado);
-            
+
             // Crear estructura de carpetas: mods/{nombre_mod}/banners/
             $modFolder = "mods/{$nombreModSanitizado}/banners";
             $uploadPath = storage_path("app/public/{$modFolder}");
-            
+
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0755, true);
             }
-            
+
             // Eliminar imagen banner anterior si existe
             if ($mod->imagen_banner && Storage::exists('public/' . $mod->imagen_banner)) {
                 Storage::delete('public/' . $mod->imagen_banner);
             }
-            
+
             // Generar nombre de archivo: banner_timestamp.extension
             $extension = $image->getClientOriginalExtension();
             $nombreArchivo = 'banner_' . time() . '.' . $extension;
-            
+
             // Mover archivo a la carpeta correcta
             $image->move($uploadPath, $nombreArchivo);
-            
+
             // Ruta relativa para guardar en la base de datos
             $relativeImagePath = "{$modFolder}/{$nombreArchivo}";
-            
+
             // Actualizar la imagen banner del mod en la base de datos
             $mod->update(['imagen_banner' => $relativeImagePath]);
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Imagen banner subida correctamente',
@@ -951,11 +951,11 @@ class AuthController extends Controller
 
             $images = $request->file('imagenes_adicionales');
             $modId = $request->input('mod_id');
-            
+
             // Verificar que el usuario tenga permisos para subir imágenes del mod
             $mod = \App\Models\Mod::findOrFail($modId);
             $currentUser = $request->user();
-            
+
             // Solo el creador del mod o un admin pueden subir imágenes adicionales
             if ($mod->creador_id !== $currentUser->id && $currentUser->rol !== 'admin') {
                 return response()->json([
@@ -963,37 +963,37 @@ class AuthController extends Controller
                     'message' => 'No tienes permisos para subir imágenes de este mod'
                 ], 403);
             }
-            
+
             // Sanitizar el nombre del mod para usarlo como nombre de carpeta
             $nombreModSanitizado = preg_replace('/[^a-zA-Z0-9_\-\s]/', '', $mod->titulo);
             $nombreModSanitizado = preg_replace('/\s+/', '_', trim($nombreModSanitizado));
             $nombreModSanitizado = strtolower($nombreModSanitizado);
-            
+
             // Crear estructura de carpetas: mods/{nombre_mod}/imagenes_adicionales/
             $modFolder = "mods/{$nombreModSanitizado}/imagenes_adicionales";
             $uploadPath = storage_path("app/public/{$modFolder}");
-            
+
             if (!file_exists($uploadPath)) {
                 mkdir($uploadPath, 0755, true);
             }
-            
+
             // Procesar cada imagen
             $uploadedImages = [];
             $timestamp = time();
-            
+
             foreach ($images as $index => $image) {
                 // Generar nombre de archivo único: adicional_{timestamp}_{index}.extension
                 $extension = $image->getClientOriginalExtension();
                 $nombreArchivo = "adicional_{$timestamp}_{$index}.{$extension}";
-                
+
                 // Mover archivo a la carpeta correcta
                 $image->move($uploadPath, $nombreArchivo);
-                
+
                 // Ruta relativa para guardar en la base de datos
                 $relativeImagePath = "{$modFolder}/{$nombreArchivo}";
                 $uploadedImages[] = $relativeImagePath;
             }
-            
+
             // Obtener imágenes adicionales existentes
             $imagenesExistentes = [];
             if ($mod->imagenes_adicionales) {
@@ -1003,13 +1003,13 @@ class AuthController extends Controller
                     $imagenesExistentes = $mod->imagenes_adicionales;
                 }
             }
-            
+
             // Combinar imágenes existentes con las nuevas
             $todasLasImagenes = array_merge($imagenesExistentes, $uploadedImages);
-            
+
             // Actualizar las imágenes adicionales del mod en la base de datos
             $mod->update(['imagenes_adicionales' => json_encode($todasLasImagenes)]);
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Imágenes adicionales subidas correctamente',
@@ -1044,18 +1044,18 @@ class AuthController extends Controller
 
             $modId = $request->input('mod_id');
             $imagenRuta = $request->input('imagen_ruta');
-            
+
             // Verificar que el usuario tenga permisos
             $mod = \App\Models\Mod::findOrFail($modId);
             $currentUser = $request->user();
-            
+
             if ($mod->creador_id !== $currentUser->id && $currentUser->rol !== 'admin') {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'No tienes permisos para eliminar imágenes de este mod'
                 ], 403);
             }
-            
+
             // Obtener imágenes adicionales existentes
             $imagenesExistentes = [];
             if ($mod->imagenes_adicionales) {
@@ -1065,12 +1065,12 @@ class AuthController extends Controller
                     $imagenesExistentes = $mod->imagenes_adicionales;
                 }
             }
-            
+
             // Buscar y eliminar la imagen de la lista
-            $nuevasImagenes = array_filter($imagenesExistentes, function($imagen) use ($imagenRuta) {
+            $nuevasImagenes = array_filter($imagenesExistentes, function ($imagen) use ($imagenRuta) {
                 return $imagen !== $imagenRuta;
             });
-            
+
             // Verificar que la imagen existía en la lista
             if (count($nuevasImagenes) === count($imagenesExistentes)) {
                 return response()->json([
@@ -1078,15 +1078,15 @@ class AuthController extends Controller
                     'message' => 'La imagen especificada no existe en este mod'
                 ], 404);
             }
-            
+
             // Eliminar archivo físico del almacenamiento
             if (Storage::exists('public/' . $imagenRuta)) {
                 Storage::delete('public/' . $imagenRuta);
             }
-            
+
             // Actualizar la base de datos
             $mod->update(['imagenes_adicionales' => json_encode(array_values($nuevasImagenes))]);
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Imagen eliminada correctamente',
@@ -1157,7 +1157,7 @@ class AuthController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             // Si es un error de validación, devolver los errores específicos
             if ($e instanceof \Illuminate\Validation\ValidationException) {
                 return response()->json([
@@ -1166,7 +1166,7 @@ class AuthController extends Controller
                     'errors' => $e->errors()
                 ], 422);
             }
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error al crear el usuario'
@@ -1179,7 +1179,7 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-            
+
             return response()->json([
                 'status' => 'success',
                 'data' => [
@@ -1212,7 +1212,7 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-            
+
             $request->validate([
                 'nombre' => 'nullable|string|max:255',
                 'apelidos' => 'nullable|string|max:255',
@@ -1262,15 +1262,15 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-            
+
             // Reutilizar la lógica existente del método getUserStats
             $usuario = Usuario::with(['mods.valoraciones', 'mods.versiones'])->findOrFail($user->id);
-            
+
             // Calcular estadísticas de mods
             $totalMods = $usuario->mods->count();
             $modsPublicados = $usuario->mods->where('estado', 'publicado')->count();
             $modsBorradores = $usuario->mods->where('estado', 'borrador')->count();
-            
+
             // Calcular descargas totales
             $totalDescargas = 0;
             foreach ($usuario->mods as $mod) {
@@ -1278,7 +1278,7 @@ class AuthController extends Controller
                     $totalDescargas += $version->descargas;
                 }
             }
-            
+
             // Calcular valoración promedio
             $totalValoraciones = 0;
             $sumaValoraciones = 0;
@@ -1289,7 +1289,7 @@ class AuthController extends Controller
                 }
             }
             $valoracionPromedio = $totalValoraciones > 0 ? round($sumaValoraciones / $totalValoraciones, 2) : 0;
-            
+
             // Calcular mods guardados por otros usuarios
             $totalGuardados = 0;
             foreach ($usuario->mods as $mod) {
@@ -1320,4 +1320,4 @@ class AuthController extends Controller
             ], 500);
         }
     }
-} 
+}

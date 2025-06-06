@@ -52,48 +52,48 @@
 }
 
 /* Anchos de columnas responsivos */
-.admin-table .col-user { 
-  min-width: 120px; 
+.admin-table .col-user {
+  min-width: 120px;
   width: auto;
 }
 
-.admin-table .col-email { 
-  min-width: 140px; 
+.admin-table .col-email {
+  min-width: 140px;
   width: auto;
 }
 
-.admin-table .col-name { 
-  min-width: 120px; 
+.admin-table .col-name {
+  min-width: 120px;
   width: auto;
 }
 
-.admin-table .col-role { 
-  min-width: 80px; 
+.admin-table .col-role {
+  min-width: 80px;
   width: auto;
 }
 
-.admin-table .col-status { 
-  min-width: 70px; 
+.admin-table .col-status {
+  min-width: 70px;
   width: auto;
 }
 
-.admin-table .col-date { 
-  min-width: 100px; 
+.admin-table .col-date {
+  min-width: 100px;
   width: auto;
 }
 
-.admin-table .col-downloads { 
-  min-width: 80px; 
+.admin-table .col-downloads {
+  min-width: 80px;
   width: auto;
 }
 
-.admin-table .col-rating { 
-  min-width: 80px; 
+.admin-table .col-rating {
+  min-width: 80px;
   width: auto;
 }
 
-.admin-table .col-content { 
-  min-width: 200px; 
+.admin-table .col-content {
+  min-width: 200px;
   width: auto;
 }
 
@@ -166,21 +166,21 @@
   .admin-table .actions-column {
     min-width: 90px;
   }
-  
+
   .action-buttons-container {
     gap: 0.125rem;
   }
-  
+
   .action-btn-text {
     width: 1.75rem;
     height: 1.75rem;
   }
-  
+
   .action-btn-icon {
     width: 0.75rem;
     height: 0.75rem;
   }
-  
+
   .admin-table th,
   .admin-table td {
     padding: 0.5rem 0.75rem;
@@ -193,33 +193,33 @@
   .admin-table .actions-column {
     min-width: 80px;
   }
-  
+
   .action-buttons-container {
     gap: 0.125rem;
   }
-  
+
   .action-btn-text {
     width: 1.5rem;
     height: 1.5rem;
   }
-  
+
   .action-btn-icon {
     width: 0.625rem;
     height: 0.625rem;
   }
-  
+
   .admin-table th,
   .admin-table td {
     padding: 0.5rem 0.5rem;
     font-size: 0.75rem;
   }
-  
-  .admin-table .col-user { 
-    min-width: 100px; 
+
+  .admin-table .col-user {
+    min-width: 100px;
   }
-  
-  .admin-table .col-role { 
-    min-width: 70px; 
+
+  .admin-table .col-role {
+    min-width: 70px;
   }
 }
 
@@ -228,28 +228,45 @@
   .admin-table .actions-column {
     min-width: 120px;
   }
-  
+
   .action-buttons-container {
     gap: 0.375rem;
   }
-  
+
   .action-btn-text {
     width: 2.25rem;
     height: 2.25rem;
   }
-  
+
   .action-btn-icon {
     width: 1rem;
     height: 1rem;
   }
-  
+
   /* Columnas más anchas en pantallas grandes */
-  .admin-table .col-user { min-width: 140px; }
-  .admin-table .col-email { min-width: 160px; }
-  .admin-table .col-name { min-width: 130px; }
-  .admin-table .col-role { min-width: 90px; }
-  .admin-table .col-status { min-width: 80px; }
-  .admin-table .col-date { min-width: 110px; }
+  .admin-table .col-user {
+    min-width: 140px;
+  }
+
+  .admin-table .col-email {
+    min-width: 160px;
+  }
+
+  .admin-table .col-name {
+    min-width: 130px;
+  }
+
+  .admin-table .col-role {
+    min-width: 90px;
+  }
+
+  .admin-table .col-status {
+    min-width: 80px;
+  }
+
+  .admin-table .col-date {
+    min-width: 110px;
+  }
 }
 
 /* ========================================
@@ -338,8 +355,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ========================================
@@ -378,4 +400,4 @@
 .admin-table-scroll {
   scrollbar-width: none;
   -ms-overflow-style: none;
-} 
+}

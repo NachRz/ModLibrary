@@ -13,7 +13,7 @@ class RecalcularModsTotales extends Command
     public function handle()
     {
         $this->info('Iniciando recálculo de mods totales...');
-        
+
         $juegos = Juego::all();
         $bar = $this->output->createProgressBar(count($juegos));
         $bar->start();
@@ -21,18 +21,18 @@ class RecalcularModsTotales extends Command
         foreach ($juegos as $juego) {
             $totalAnterior = $juego->mods_totales;
             $juego->recalcularModsTotales();
-            
+
             if ($totalAnterior !== $juego->mods_totales) {
                 $this->line(
                     "\n<fg=yellow>Juego '{$juego->titulo}': " .
-                    "actualizado de {$totalAnterior} a {$juego->mods_totales} mods</>"
+                        "actualizado de {$totalAnterior} a {$juego->mods_totales} mods</>"
                 );
             }
-            
+
             $bar->advance();
         }
 
         $bar->finish();
         $this->info("\n¡Recálculo completado!");
     }
-} 
+}

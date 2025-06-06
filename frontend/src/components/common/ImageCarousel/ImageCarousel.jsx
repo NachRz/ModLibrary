@@ -24,7 +24,7 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
   const getVisibleImages = () => {
     const visibleImages = [];
     const maxVisibleImages = Math.min(5, imagenesCarrusel.length);
-    
+
     for (let i = 0; i < maxVisibleImages; i++) {
       const index = currentImageIndex + i;
       if (index < imagenesCarrusel.length) {
@@ -66,13 +66,13 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
   };
 
   const goToPrevLightbox = () => {
-    setLightboxImageIndex(prev => 
+    setLightboxImageIndex(prev =>
       prev > 0 ? prev - 1 : imagenesCarrusel.length - 1
     );
   };
 
   const goToNextLightbox = () => {
-    setLightboxImageIndex(prev => 
+    setLightboxImageIndex(prev =>
       prev < imagenesCarrusel.length - 1 ? prev + 1 : 0
     );
   };
@@ -81,7 +81,7 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!isLightboxOpen) return;
-      
+
       switch (e.key) {
         case 'Escape':
           closeLightbox();
@@ -121,8 +121,8 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
         <div className="carousel-container">
           {/* Botón anterior */}
           {canGoPrev && (
-            <button 
-              className="carousel-nav-btn prev" 
+            <button
+              className="carousel-nav-btn prev"
               onClick={handlePrev}
               aria-label="Imagen anterior"
             >
@@ -134,27 +134,27 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
           <div className="gallery-horizontal">
             <div className="gallery-images-container">
               {getVisibleImages().map((image, index) => (
-                <div 
+                <div
                   key={index}
                   className="gallery-image-item"
                   onClick={() => openLightbox(image.originalIndex)}
                 >
-                  <img 
-                    src={image.src} 
+                  <img
+                    src={image.src}
                     alt={`Imagen ${image.originalIndex + 1}`}
                     loading="lazy"
                   />
                   <div className="image-overlay">
                     <i className="fas fa-search-plus"></i>
                   </div>
-                  
+
                   {/* Mostrar contador en la imagen central */}
-                  {((imagenesCarrusel.length > 1 && index === Math.floor(getVisibleImages().length / 2)) || 
+                  {((imagenesCarrusel.length > 1 && index === Math.floor(getVisibleImages().length / 2)) ||
                     (imagenesCarrusel.length === 1 && index === 0)) && (
-                    <div className="image-counter-overlay">
-                      {imagenesCarrusel.length} {imagenesCarrusel.length === 1 ? 'imagen' : 'imágenes'}
-                    </div>
-                  )}
+                      <div className="image-counter-overlay">
+                        {imagenesCarrusel.length} {imagenesCarrusel.length === 1 ? 'imagen' : 'imágenes'}
+                      </div>
+                    )}
                 </div>
               ))}
             </div>
@@ -162,8 +162,8 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
 
           {/* Botón siguiente */}
           {canGoNext && (
-            <button 
-              className="carousel-nav-btn next" 
+            <button
+              className="carousel-nav-btn next"
               onClick={handleNext}
               aria-label="Imagen siguiente"
             >
@@ -178,7 +178,7 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
         <div className="lightbox-overlay" onClick={closeLightbox}>
           <div className="lightbox-container" onClick={(e) => e.stopPropagation()}>
             {/* Botón cerrar */}
-            <button 
+            <button
               className="lightbox-close-btn"
               onClick={closeLightbox}
               aria-label="Cerrar"
@@ -188,8 +188,8 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
 
             {/* Imagen principal */}
             <div className="lightbox-image-container">
-              <img 
-                src={imagenesCarrusel[lightboxImageIndex]} 
+              <img
+                src={imagenesCarrusel[lightboxImageIndex]}
                 alt={`Imagen ${lightboxImageIndex + 1}`}
                 className="lightbox-image"
               />
@@ -198,7 +198,7 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
             {/* Controles de navegación */}
             {imagenesCarrusel.length > 1 && (
               <>
-                <button 
+                <button
                   className="lightbox-nav-btn prev"
                   onClick={goToPrevLightbox}
                   aria-label="Imagen anterior"
@@ -206,7 +206,7 @@ const ImageCarousel = forwardRef(({ images = [], className = '', externalLightbo
                   <i className="fas fa-chevron-left"></i>
                 </button>
 
-                <button 
+                <button
                   className="lightbox-nav-btn next"
                   onClick={goToNextLightbox}
                   aria-label="Imagen siguiente"

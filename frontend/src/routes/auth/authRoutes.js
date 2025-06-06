@@ -6,32 +6,32 @@ import ResetPassword from '../../components/auth/ResetPassword';
 import GuestRoute from '../../middlewares/guestMiddleware';
 
 const authRoutes = [
-  <Route 
-    key="login" 
-    path="/login" 
+  <Route
+    key="login"
+    path="/login"
     element={
       <GuestRoute>
         <Login />
       </GuestRoute>
-    } 
+    }
   />,
-  <Route 
-    key="register" 
-    path="/register" 
+  <Route
+    key="register"
+    path="/register"
     element={
       <GuestRoute>
         <Register />
       </GuestRoute>
-    } 
+    }
   />,
-  <Route 
-    key="reset-password" 
-    path="/reset-password" 
+  <Route
+    key="reset-password"
+    path="/reset-password"
     element={
       <GuestRoute>
         <ResetPassword />
       </GuestRoute>
-    } 
+    }
   />,
 ];
 

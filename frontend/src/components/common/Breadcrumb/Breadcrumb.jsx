@@ -9,38 +9,38 @@ const Breadcrumb = ({ items }) => {
       <ol className="breadcrumb-list">
         <li className="breadcrumb-item">
           <Link to="/" className="breadcrumb-link home">
-            <svg 
-              className="breadcrumb-home-icon" 
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              className="breadcrumb-home-icon"
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
               />
             </svg>
             <span className="sr-only">Inicio</span>
           </Link>
         </li>
         {items.map((item, index) => (
-          <li 
-            key={`${item.path}-${index}`} 
+          <li
+            key={`${item.path}-${index}`}
             className="breadcrumb-item"
           >
-            <svg 
-              className="breadcrumb-separator" 
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              className="breadcrumb-separator"
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M9 5l7 7-7 7" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
               />
             </svg>
             {index === items.length - 1 ? (
