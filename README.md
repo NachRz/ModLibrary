@@ -1,86 +1,162 @@
-# ModLibrary - Sistema de Gestión de Biblioteca
+# ModLibrary - Sistema de Gestión de Biblioteca de Mods
 
 ## 🎮 Funcionalidades Principales
 
 ### ✅ Funcionalidades Implementadas
 
-#### 1️⃣ Conexión con la API de RAWG
-- Integración con la API de RAWG para obtener información de videojuegos
-- Búsqueda y visualización de juegos
-- Obtención de detalles específicos de cada juego
+#### 🔐 Sistema de Autenticación Completo
+- **Registro de usuarios** con validaciones avanzadas
+- **Inicio de sesión seguro** con tokens JWT
+- **Recuperación de contraseña** con sistema de reset
+- **Rutas protegidas** para usuarios autenticados
+- **Middleware de autenticación** y autorización
+- **Gestión de sesiones** con persistencia local
 
-#### 2️⃣ Gestión de Base de Datos
-- Conexión segura entre backend y base de datos MySQL
-- Migraciones para la estructura de la base de datos
-- Modelos y relaciones para:
-  - Juegos
-  - Mods
-  - Usuarios
-  - Categorías
+#### 👥 Gestión de Usuarios y Perfiles
+- **Perfiles de usuario públicos** con URL personalizada (`/perfil/:usuario`)
+- **Dashboard personal** con estadísticas dinámicas
+- **Edición de perfil** con información personal
+- **Sistema de roles** (Admin/Usuario) con permisos diferenciados
+- **Estadísticas personales**: rating promedio, descargas totales, mods creados
+- **Gestión de privacidad** para perfiles públicos/privados
 
-#### 3️⃣ Backend (Laravel)
-- API RESTful para operaciones básicas
-- Endpoints para:
-  - Gestión de mods
-  - Gestión de juegos
-  - Búsqueda y filtrado
-- Integración con RAWG API
-- Validación de datos básica
+#### 🎯 Panel de Administración
+- **Gestión completa de usuarios**: crear, editar, eliminar (soft delete)
+- **Administración de mods**: moderación y gestión de contenido
+- **Panel estadístico** con métricas del sistema
+- **Middleware AdminMiddleware** para rutas exclusivas de administradores
+- **Modales responsivos** para operaciones CRUD desde el panel admin
 
-#### 4️⃣ Frontend (React)
-- Interfaz de usuario básica
-- Funcionalidades implementadas:
-  - Creación de mods (disponible en el panel de administración)
-  - Búsqueda y filtrado de mods
-- Conexión con el backend mediante API
+#### 🎮 Integración con API de RAWG
+- **Sincronización automática** de datos de videojuegos
+- **Extracción de géneros** automática al crear/sincronizar juegos
+- **Búsqueda avanzada** de juegos con filtros
+- **Caché inteligente** para optimizar peticiones
+- **Actualización periódica** de información de juegos
 
-### 📝 Cómo Probar la Creación de Mods
-1. **Accede al panel de administración**:
-   - Inicia sesión con las credenciales por defecto:
-     - Email: admin@gmail.com
-     - Contraseña: 1234
-   - Vete a Mi Panel
-   - Ahí le das crear mod y ya te lleva al formulario de creación de Mods
+#### 📦 Gestión Avanzada de Mods
+- **Creación de mods** con formulario completo
+- **Sistema de categorías** y etiquetas dinámicas
+- **Galería de imágenes** con carrusel y modal lightbox
+- **Sistema de valoraciones** con estrellas interactivas (1-5)
+- **Comentarios y reseñas** con validaciones de autoría
+- **Gestión de descargas** con contadores automáticos
+- **Filtros avanzados**: por tiempo, categoría, rating, popularidad
 
-2. **Crea un nuevo mod**:
-   - Haz clic en "Crear Mod"
-   - Completa los campos requeridos:
-     - Nombre del mod
-     - Descripción
-     - Juego asociado (seleccionable desde la API de RAWG)
-     - Categoría
-     - Enlace de descarga
-   - Haz clic en "Guardar"
+#### ⭐ Sistema de Favoritos y Guardados
+- **Mods favoritos**: guardar mods en lista personal
+- **Juegos favoritos**: sistema de favoritos para juegos
+- **Hooks personalizados**: `useSaveMod`, `useFavoriteGame`
+- **Sincronización en tiempo real** con notificaciones visuales
+- **Gestión desde dashboard** con secciones dedicadas
 
-3. **Verifica el mod creado**:
-   - El mod aparecerá en la lista de mods
-   - Podrás ver sus detalles en la vista correspondiente
+#### 🔍 Búsqueda Unificada Avanzada
+- **Búsqueda global** en múltiples entidades (Mods, Juegos, Usuarios)
+- **Resultados con pestañas** para filtrar por tipo de contenido
+- **Modal de búsqueda** accesible desde cualquier página
+- **Filtros inteligentes** por géneros, etiquetas y tiempo
+- **Autocompletado** y sugerencias en tiempo real
 
-### 🚧 Funcionalidades en Desarrollo
+#### 🎨 Interfaz de Usuario Moderna
+- **Diseño responsive** optimizado para móviles y desktop
+- **Sistema de temas** con colores personalizados (`custom-*`)
+- **Animaciones fluidas** y transiciones suaves
+- **Componentes reutilizables** con Tailwind CSS
+- **Página 404 personalizada** con navegación intuitiva
+- **Sistema de notificaciones** globales con React Context
 
-#### 1️⃣ Backend
-- Autenticación y autorización de usuarios
-- Endpoints para gestión de usuarios
-- Manejo avanzado de errores
-- Optimización de consultas
+#### 📊 Exploración y Descubrimiento
+- **Explorar Mods**: página dedicada con filtros avanzados
+- **Explorar Juegos**: navegación por géneros y popularidad
+- **Páginas de detalles** completas para mods y juegos
+- **Sistema de recomendaciones** basado en popularidad
+- **Estadísticas dinámicas** en tiempo real
 
-#### 2️⃣ Frontend
-- Sistema de categorías
-- Gestión de usuario
-- Estado global con Redux
-- Diseño responsive mejorado
-- Edición de mods
-- Eliminación de mods
+#### 🛠️ Características Técnicas
+- **Base de datos MySQL** con relaciones optimizadas
+- **API RESTful** completa con Laravel
+- **Frontend React 18** con React Router DOM
+- **Sistema de limpieza automática** de datos huérfanos
+- **Patrón Observer** para eventos del sistema
+- **Validaciones robustas** en frontend y backend
+- **Manejo de errores** centralizado y user-friendly
 
-#### 3️⃣ Base de Datos
-- Seeders para datos iniciales
-- Optimización de índices
-- Relaciones avanzadas
+### 📝 Guía de Uso y Pruebas
 
-#### 4️⃣ RAWG API
-- Actualización automática de datos de juegos
-- Caché de datos
-- Sincronización periódica
+#### 🔑 Credenciales por Defecto
+- **Administrador**:
+  - Email: `admin@gmail.com`
+  - Contraseña: `1234`
+- **Usuario regular**:
+  - Email: `user@gmail.com`
+  - Contraseña: `1234`
+
+#### 🎯 Funcionalidades Principales a Probar
+
+**1. Panel de Usuario (Dashboard)**
+- Inicia sesión y explora tu dashboard personal
+- Revisa las estadísticas de tu perfil
+- Navega por las pestañas: General, Mis Mods, Guardados
+
+**2. Gestión de Mods**
+- **Crear Mod**: Ve a "Mi Panel" → "Crear Mod"
+- **Explorar Mods**: Usa filtros por tiempo, categoría, rating
+- **Valorar Mods**: Sistema de estrellas (1-5) en cualquier mod
+- **Guardar Favoritos**: Botón de corazón en las tarjetas de mods
+- **Comentarios**: Deja reseñas en la página de detalles
+
+**3. Exploración de Juegos**
+- **Explorar Juegos**: Filtros por género y popularidad
+- **Detalles de Juego**: Vista completa con mods asociados
+- **Favoritos de Juegos**: Guarda juegos en tu lista personal
+
+**4. Búsqueda Avanzada**
+- **Búsqueda Global**: Barra superior, busca en todo el sistema
+- **Filtros Inteligentes**: Combina múltiples criterios
+- **Resultados por Pestañas**: Mods, Juegos, Usuarios
+
+**5. Panel de Administración** (solo con cuenta admin)
+- **Gestión de Usuarios**: CRUD completo de usuarios
+- **Administración de Mods**: Moderación de contenido
+- **Estadísticas del Sistema**: Métricas en tiempo real
+
+**6. Perfiles Públicos**
+- Visita `/perfil/nombreusuario` para ver perfiles públicos
+- Revisa estadísticas de otros usuarios
+- Explora sus mods publicados
+
+#### 🧪 Casos de Prueba Recomendados
+1. **Flujo completo de usuario nuevo**: Registro → Login → Crear perfil → Crear mod
+2. **Interacciones sociales**: Valorar mods → Comentar → Guardar favoritos
+3. **Búsqueda y descubrimiento**: Usar filtros → Explorar por categorías → Buscar usuarios
+4. **Administración**: Gestionar usuarios → Moderar contenido → Ver estadísticas
+5. **Responsividad**: Probar en móvil, tablet y desktop
+
+### 🚧 Funcionalidades Planificadas
+
+#### 🚀 Próximas Mejoras
+- **Sistema de chat en tiempo real** entre usuarios
+- **Notificaciones push** para actividades importantes
+- **Sistema de logros** y gamificación
+- **API pública** para desarrolladores externos
+- **Modo offline** con sincronización automática
+- **Integración con Discord** para comunidades
+
+#### 🔄 Optimizaciones Continuas
+- **Mejoras de rendimiento** en carga de imágenes
+- **Caché avanzado** con Redis para mejor velocidad
+- **Optimización SEO** para mejor indexación
+- **Análiticas avanzadas** de uso y comportamiento
+- **Tests automatizados** (unit, integration, e2e)
+- **CI/CD pipeline** para despliegues automáticos
+
+#### 🎯 Expansión de Funcionalidades
+- **Sistema de seguimiento** entre usuarios
+- **Feeds personalizados** basados en intereses
+- **Marketplace de mods premium** 
+- **Sistema de reputación** para creadores
+- **Integración con Steam Workshop**
+- **Soporte para múltiples idiomas** (i18n)
 
 ## 🚀 Guía Paso a Paso para Windows
 
@@ -205,15 +281,19 @@
    ```bash
    docker compose exec backend bash
    ```
-6. **Ejecuta las migraciones**:
+6. **Genera la clave de aplicación**:
+   ```bash
+   php artisan key:generate
+   ```
+7. **Ejecuta las migraciones**:
    ```bash
    php artisan migrate
    ```
-5. **Ejecuta los seeders**:
+8. **Ejecuta los seeders**:
    ```bash
    php artisan db:seed
    ```
-7. **Sal del contenedor**:
+9. **Sal del contenedor**:
    ```bash
    exit
    ```
@@ -346,16 +426,20 @@
    ```bash
    docker compose exec backend bash
    ```
-5. **Ejecuta las migraciones**:
+5. **Genera la clave de aplicación**:
+   ```bash
+   php artisan key:generate
+   ```
+6. **Ejecuta las migraciones**:
    ```bash
    php artisan migrate
    ```
-6. **Ejecuta los seeders**:
+7. **Ejecuta los seeders**:
    ```bash
    php artisan db:seed
    ```
    
-7. **Sal del contenedor**:
+8. **Sal del contenedor**:
    ```bash
    exit
    ```

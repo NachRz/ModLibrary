@@ -4,6 +4,18 @@ Todas las versiones siguen la convención [SemVer](https://semver.org/).
 
 ---
 
+## v1.5.1 – Página 404 personalizada y mejoras de UX
+- Implementación de una página 404 completamente personalizada y moderna.
+- Diseño atractivo con gradientes, animaciones y elementos interactivos.
+- Sistema de contexto para ocultar navbar y footer automáticamente en la página 404.
+- Botones de navegación útiles: "Ir al inicio" y "Volver atrás".
+- Tarjetas de sugerencias con enlaces directos a secciones principales (Mods, Contacto, Juegos).
+- Elementos decorativos animados para mejorar la experiencia visual.
+- Mensajes amigables en español para guiar al usuario de vuelta al contenido.
+- Experiencia completamente inmersiva sin distracciones del layout principal.
+
+---
+
 ## v1.5.0 – Mejoras en navegación, perfiles y formato de código
 - Actualización del Navbar para mostrar solo opciones del modo actual (admin/usuario).
 - Implementación de rutas específicas para cada sección del panel admin.

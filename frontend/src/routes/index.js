@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom'; // Archivo principal de rutas
 import Home from '../components/home/Home';
 import Contacto from '../components/contacto/Contacto';
 import SearchResults from '../components/common/SearchResults';
+import NotFound from '../components/common/NotFound';
 import authRoutes from './auth/authRoutes';
 import dashboardRoutes from './dashboard/dashboardRoutes';
 import adminRoutes from './admin/adminRoutes';
@@ -41,7 +42,7 @@ const AppRoutes = () => {
             <Route path="/contacto" element={<Contacto />} />
 
             {/* Ruta 404 */}
-            <Route path="*" element={<div className="max-w-7xl mx-auto px-4 py-8"><h1 className="text-3xl font-bold">Página no encontrada</h1></div>} />
+            <Route path="*" element={<NotFound />} />
 
             {/* Ruta principal */}
             <Route path="/" element={<Home />} />
